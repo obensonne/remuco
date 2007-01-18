@@ -1,0 +1,101 @@
+Remuco (remuco.sf.net) - Server
+-------------------------------------------------------------------------------
+
+Introduction
+
+Remuco is a bluetooh remote control system for music player. In addition to
+controlling, it displays handy information about the music player currently
+controlled (playlist, infos about the current song). If the music player
+supports that, it is even possible to rate your songs remotely. 
+
+This is the Remuco server, an application running on your computer and 
+interacting with a music player and remote clients on Bluetooth devices.
+
+*******************************************************************************
+Build
+*******************************************************************************
+
+For each music player to control a corresponding server binary needs to be
+build.
+
+Requirements to build server binaries:
+
+- General:
+	Development package of libbluetooth and libc need to be installed.
+
+- XMMS:
+	Development packages of xmms and libid3tag need to be installed.
+
+- XMMS2:
+	Development package of libxmms2client needs to be installed.
+
+- Amarok:
+	Development package of python needs to be installed.	
+
+To build the server binary for the music player FOOBAR, execute:
+
+$ make FOOBAR
+
+A specific example:
+
+$ make xmms2
+
+This creates a Remuco server binary you can use to control xmms2. The binary
+is called 'remuco-xmms2'.
+
+*******************************************************************************
+Install
+*******************************************************************************
+
+To install, execute:
+
+$ make FOOBAR_install
+
+A specific example:
+
+$ make xmms2_install
+
+This will install the binary into $(BIN_DIR) and possible other needed files
+into $(REM_DIR)/PLAYER. The variables BIN_DIR and REM_DIR get defined in the
+Makefile. The default values are:
+BIN_DIR := /usr/local/bin
+REM_DIR := /usr/local/lib/remuco
+These variables must not be changed between build and install!
+
+*******************************************************************************
+How to use
+*******************************************************************************
+
+Requirements to run the server binaries:
+
+- General:
+	libbluetooth
+
+- XMMS:
+	xmms, libid3tag
+
+- XMMS2:
+	libxmms2client
+	
+- Amarok:
+	python,  python-dcop
+
+If the requirements are fulfilled, just start the server binary you want to use.
+
+$ remuco-FOOBAR
+
+A specific example:
+
+$ remuco-xmms2
+
+Execute
+
+$ remuco-PLAYER -h
+
+to see how to configure the Remuco server.
+
+Trouble / Questions:
+********************
+
+See the Remuco mailing list at remuc.sf.net .
+

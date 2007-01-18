@@ -1,0 +1,52 @@
+Remuco (remuco.sf.net) - Client
+-------------------------------------------------------------------------------
+
+Introduction
+************
+
+Remuco is a bluetooh remote control system for music player. In addition to
+controlling, it displays handy information about the music player currently
+controlled (playlist, infos about the current song). If the music player
+supports that, it is even possible to rate your songs remotely. 
+
+This is the Remuco client, an application running on a mobile device with J2ME
+and Bluetooth support.
+
+Building
+********
+
+If you've got source package see documentation within the file 'build.xml' for
+how to build a binary pacakge.
+
+Installation
+************
+
+If you've got or built a binary package, unpack it and copy the jar and jad file
+on your J2ME capable and Bluetooth enabled mobile device.
+
+Installing the Remuco client on the mobile device is device dependent.
+On my Sony Ericsson k750i, I select the jad file with the file browser and
+choose option 'Install' on it.
+
+How to use
+**********
+
+Once the cleint is installed and started on your mobile device, you get prompted
+with a screen to scan for a device running the Remuco server. So push the
+button 'Scan' and .. wait. After some seconds, a list of neighbour devices is
+found. Choose your computer which runs the Remuco server (make sure the
+server is running!).
+
+After 2 more seconds you should see some infos about your music player (the one
+you specified, when started the server on the computer). There may be
+a song (if the player currently has an active song) and there should be the
+players state (playing, stopped, ..).
+
+Now explore the severel commands, listed in the menu. I hope they are self
+explaining. Have fun !
+
+Trouble / Questions:
+********************
+
+See the Remuco mailing list at remuc.sf.net .
+

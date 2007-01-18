@@ -1,0 +1,350 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     May 14, 2006 9:48:00 PM                                                        
+
+     Remuco Client
+     A Midlet (J2ME) based Bluetooth client for the Remuco system.
+                   
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     Creating a binary package:
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     
+     In order to create a binary package you either need the obfuscater ProGuard
+     installed or you must skip obfuscating. See target 'obfuscate' for how
+     to select an obfuscation strategy.
+
+     Edit file 'build.properties' as described within that file.
+
+     Run target 'dist'.
+     
+     This will create a jar and jad file in the directory 'dist' which can be
+     copied to and installed on a J2ME capable device.
+     Further a compressed package is created in 'dist' containing the jar and
+     jad file.
+     
+     !!! If you build a binary package on a system other than Linux you
+     have to set the option 'MIDlet-Jar-Size' in the created jad file manually.
+     Set the option with size in bytes of the created jar file (do not forget
+     to do this for the jad file in the compressed package too) !!!
+     
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     Creating a souce package:
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     
+     Run target 'dist.src'.
+     
+     The source package will be placed in the directory 'dist'.
+                   
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     Information for developers
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+     Testing the client with the WTK emulator:
+     
+     To test the client, run target 'run'.
+     
+     Since the client needs to connect to a server (which must run in the
+     WTK environment too), this client package contains also a Midlet based
+     server for testing purpose. You can start the test server  by running
+     target 'run.server'. This test server works with a kind of dummy
+     music player. If the test server system runs, the client can connect it and
+     you can test already quite a lot funcionalities.
+     
+     The dummy music player (class remuco.server.VirtualPlayer) is still very
+     basic. To support testing more funtionalities of the client, the player
+     should get more sophisticated .. 
+     
+     !!! The test server is currently not in a working state !!!
+
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Author(s): Christian Buennig      
+                                                               
+     ====================================================================== -->
+<project name="Remuco Client - Sunday" default="clean">
+    <description>
+            A Midlet (J2ME) based client for the remuco system.
+    </description>
+
+    <property file="build.properties" />
+
+    <!-- =================== Libraries and Classpath ====================== -->
+    
+    <!-- Some libraries we need -->
+    <property name="midp.lib" value="${wtk.home}/lib/midpapi20.jar"/>
+    <property name="midp.ver" value="MIDP-2.0"/>
+    <property name="cldc.lib" value="${wtk.home}/lib/cldcapi11.jar"/>
+    <property name="cldc.ver" value="CLDC-1.1"/>
+    <property name="jsr082.lib" value="${wtk.home}/lib/jsr082.jar"/>
+
+    <property name="base.home" value="../../base" />
+    <property name="base.src" value="${base.home}/src" />
+    
+    <!-- Classpath for build -->
+    <path id="build.cp">
+        <fileset dir="${wtk.home}/lib">
+            <include name="cldcapi11.jar"/>
+            <include name="midpapi20.jar"/>
+            <include name="jsr082.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Classpath for build to use on command line-->
+    <condition property="cp.sep" value=":">
+        <os family="unix" />
+    </condition>
+    <condition property="cp.sep" value=";">
+        <os family="windows" />
+    </condition>
+    <property name="build.cp.cmdline"
+            value="${midp.lib}${cp.sep}${cldc.lib}${cp.sep}${jsr082.lib}"/>
+
+    <!-- =================== Midlet Configuration ======================== -->
+
+    <property name="midlet.name" value="Remuco"/>
+    <property name="midlet.name.lc" value="remuco"/>
+    <property name="midlet.jar" value="${midlet.name.lc}.jar"/>
+    <property name="midlet.jad" value="${midlet.name.lc}.jad"/>
+    <property name="midlet.class" value="remuco.Main"/>
+    <property name="midlet.version" value="0.4.0"/>
+    <property name="midlet.vendor" value="${user.name}"/>
+    
+    <property name="dist.pkg-name"
+        value="remuco-client-${midlet.version}"/>
+
+    <!-- =================== Build ======================================== -->
+
+    <target name="compile">
+        <mkdir dir="build/classes" />
+        <javac  destdir="build/classes" 
+                target="1.1" source="1.3"
+                bootclasspath="${midp.lib}"
+                debug="true">
+            <!-- sources -->
+            <src path="src" />
+            <exclude name="remuco/server/**"/> <!-- contains only test-classes -->
+            <!-- classpath -->
+            <classpath refid="build.cp" />
+        </javac>
+    </target>
+
+    <!-- - - - - - - - - - - Obfuscation  - - - - - - - - - - - - - - - - - -->
+
+    <target name="obfuscate.proguard">
+        <taskdef resource="proguard/ant/task.properties"
+                 classpath="${proguard.home}/lib/proguard.jar" />
+        <proguard allowaccessmodification="yes"
+                overloadaggressively="yes"
+                defaultpackage="" 
+                usemixedcaseclassnames="no">
+            <injar path="build/classes" />
+            <outjar path="build/obfuscated"/>
+            <libraryjar refid="build.cp"/>
+            <keep access="public" extends="javax.microedition.midlet.MIDlet"/>
+        </proguard>
+    </target>
+
+    <target name="obfuscate.skip">
+        <copy todir="build/obfuscated">
+            <fileset dir="build/classes" />
+        </copy>
+    </target>
+
+    
+    <target name="obfuscate" depends="compile">
+        <mkdir dir="build/obfuscated" />
+        
+        <!-- Uncomment the method you want to use for obfuscation: -->
+        
+        <!-- Obfuscate with ProGuard -->
+        <antcall target="obfuscate.proguard" />
+        
+        <!-- Do not obfuscate -->
+        <!--<antcall target="obfuscate.skip" />-->
+    </target>
+    
+    <!-- - - - - - - - - - - Preverification  - - - - - - - - - - - - - - - -->
+
+    <target name="preverify" depends="obfuscate">
+        <mkdir dir="build/preverified"/>
+        <exec executable="${wtk.home}/bin/preverify">
+            <arg line="-classpath ${build.cp.cmdline}" />
+            <arg line="-d build/preverified" />
+            <arg line="build/obfuscated" />
+        </exec>
+    </target>
+
+    <!-- - - - - - - - - - - Create Jar - - - - - - - - - - - - - - - - - - -->
+    
+    <target name="jar" depends="preverify,write-metafile">
+        <mkdir dir="build/jar"/>
+        <copy file="build/MF" tofile="build/jar/MANIFEST.MF" />
+        <manifest file="build/jar/MANIFEST.MF" mode="update">
+        </manifest>
+        <jar jarfile="build/jar/${midlet.jar}" manifest="build/jar/MANIFEST.MF">
+            <fileset dir="build/preverified" />
+            <fileset dir="res" />
+        </jar>
+    </target>
+
+    <!-- Creates a basic meta file. The jar manifest file and the jad file
+         extend this file. -->
+    <target name="write-metafile">
+        <manifest file="build/MF">
+            <attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
+            <attribute name="MicroEdition-Profile" value="${midp.ver}" />
+            
+            <attribute name="MIDlet-1" value="${midlet.name},,${midlet.class}"/>
+            <attribute name="MIDlet-Name" value="${midlet.name}" />
+            <attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+            <attribute name="MIDlet-Version" value="${midlet.version}" />
+            
+            <attribute name="remuco-connection" value="${remuco-connection}" />
+            <attribute name="remuco-ui" value="${remuco-ui}" />
+        </manifest>
+    </target>
+    
+    <!-- =================== Dist ========================================= -->
+
+    <target name="dist.jar" depends="clean,jar"
+            description="--> create a jar deployable on a JME device">
+        <mkdir dir="dist"/>
+        <copy file="build/MF" tofile="build/${midlet.jad}" />
+        <exec executable="stat" outputproperty="midlet.jar.size" os="Linux">
+            <arg line="-c %s build/jar/${midlet.jar}" />
+        </exec>
+        
+        <manifest file="build/${midlet.jad}" mode="update">
+            <attribute name="MIDlet-Jar-URL" value="${midlet.jar}"/>
+            <attribute name="MIDlet-Jar-Size" value="${midlet.jar.size}"/>
+        </manifest>
+        <copy todir="dist" file="build/${midlet.jad}" />
+        <copy todir="dist" file="build/jar/${midlet.jar}" />
+        <echo>
+            --------------------------------------------------------------------
+            Computing size of the jar file does only work under Linux.
+            You may have to set 'MIDlet-Jar-Size' manually in dist/${midlet.jad}
+            --------------------------------------------------------------------
+        </echo>
+    </target>
+    
+    <target name="dist" depends="dist.jar"
+            description="--> create a pkg including all files, which are worth to deploy" >
+        <mkdir dir="build/dist/${dist.pkg-name}"/>
+        <copy todir="build/dist/${dist.pkg-name}">
+            <fileset file="dist/${midlet.jar}" />
+            <fileset file="dist/${midlet.jad}" />
+            <fileset dir="doc" />
+        </copy>
+        <tar destfile="dist/${dist.pkg-name}.bin.tar.gz"
+            compression="gzip" basedir="build/dist" />
+    </target>
+    
+    
+    <target name="dist.src" depends="clean">
+        <mkdir dir="build/dist-src/${dist.pkg-name}" />
+        <copy todir="build/dist-src/${dist.pkg-name}">
+            <fileset dir="${basedir}">
+                <include name="src/**/*"/>
+                <include name="doc/**/*"/>
+                <include name="res/**/*"/>
+                <include name="build.*"/>
+                <exclude name="**/.*"/> <!-- IDE,CVS,SVN data -->
+            </fileset>
+        </copy>
+        <mkdir dir="dist"/>
+        <tar destfile="dist/${dist.pkg-name}.tar.gz"
+            compression="gzip" basedir="build/dist-src">
+        </tar>
+    </target>
+
+    <!-- =================== Run ========================================== -->
+
+    
+    <target name="run" depends="dist"
+            description="--> run the client in WTK emulation environment">
+        <exec executable="${wtk.home}/bin/emulator">
+            <arg line="-Xdescriptor:dist/${midlet.jad}" />
+        </exec>            
+    </target>
+    
+    <target name="run.server"
+            description="--> run a test server in WTK emulation environment">
+        <!-- compile -->
+        <delete dir="build/server" />
+        <mkdir dir="build/server/classes" />
+        <javac  destdir="build/server/classes" 
+                target="1.1" source="1.3"
+                bootclasspath="${midp.lib}"
+                debug="true">
+            <!-- sources -->
+            <src path="src" />
+            <src path="${base.src}" />
+            <exclude name="remuco/clients/**"/>
+            <!-- classpath -->
+            <classpath refid="build.cp" />
+        </javac>
+        <!-- preverify -->
+        <mkdir dir="build/server/preverified"/>
+        <exec executable="${wtk.home}/bin/preverify">
+            <arg line="-classpath ${build.cp.cmdline}" />
+            <arg line="-d build/server/preverified" />
+            <arg line="build/server/classes" />
+        </exec>
+        <!-- jar -->
+        <mkdir dir="build/server/jar"/>
+        <jar jarfile="build/server/jar/server.jar">
+            <fileset dir="build/server/preverified" />
+            <fileset dir="res" />
+            <manifest>
+                <attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
+                <attribute name="MicroEdition-Profile" value="${midp.ver}" />
+                <attribute name="MIDlet-1"
+                    value="TestHost,,remuco.server.midlet.TestHost"/>
+                <attribute name="MIDlet-Name" value="TestHost" />
+                <attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+                <attribute name="MIDlet-Version" value="${midlet.version}" />
+            </manifest>
+        </jar>
+        <!-- jad -->
+        <exec executable="stat" outputproperty="server.jar.size" os="Linux">
+            <arg line="-c %s build/server/jar/server.jar" />
+        </exec>
+        <manifest file="build/server/jar/server.jad" mode="update">
+            <attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
+            <attribute name="MicroEdition-Profile" value="${midp.ver}" />
+            <attribute name="MIDlet-1"
+                value="TestHost,,remuco.server.midlet.TestHost"/>
+            <attribute name="MIDlet-Name" value="TestHost" />
+            <attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+            <attribute name="MIDlet-Version" value="${midlet.version}" />
+            <attribute name="MIDlet-Jar-URL" value="server.jar"/>
+            <attribute name="MIDlet-Jar-Size" value="${server.jar.size}"/>
+        </manifest>
+        <!-- run -->
+        <exec executable="${wtk.home}/bin/emulator">
+            <arg line="-Xdescriptor:build/server/jar/server.jad" />
+        </exec>            
+    </target>
+    <!-- =================== Misc ========================================= -->
+
+    <target name="clean">
+        <delete dir="build" />
+        <delete dir="dist" />
+    </target>
+
+    <target name="install" 
+                description="--> copy MIDlet jar to dir">
+        <mkdir dir="${install.dest}" />
+        <copy todir="${install.dest}" overwrite="true">
+            <fileset file="dist/${midlet.jar}" />
+            <fileset file="dist/${midlet.jad}" />
+        </copy>
+    </target>
+
+    
+</project>
+
