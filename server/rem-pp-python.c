@@ -65,8 +65,9 @@
 			if ((int) _int == -1 && PyErr_Occurred()) {	\
 				LOG_ERROR("not an int at %i\n", _pos);	\
 				_err = 1;				\
-			} else						\
+			} else {					\
 				LOG_NOISE("got %i\n", _int);		\
+			}						\
 		}							\
 } while(0)
 
@@ -136,7 +137,7 @@ rem_pp_init(void)
 		LOG_ERROR("malloc failed\n");
 		return -1;
 	}
-	sprintf(py_path_new, "%s:%s", ENV_PYTHONPATH_VAL, py_path);
+	sprintf(py_path_new, "%s:%s:.", ENV_PYTHONPATH_VAL, py_path);
 	setenv(ENV_PYTHONPATH_NAME, py_path_new, 1);
 	LOG_INFO("%s=%s\n", ENV_PYTHONPATH_NAME, py_path_new);
 	free(py_path_new);
@@ -318,21 +319,18 @@ rem_pp_get_song(const union rem_pp_sid *sid, struct rem_pp_song *song)
 	int		i;
 	char		*str;
 	
-	LOG_DEBUG("getting tags for song %s\n", sid->str);
+	LOG_NOISE("getting tags for song %s\n", sid->str);
 	pTuple_args = PyTuple_New(1);
 	pString_sid = PyString_FromString(sid->str);
 	PyTuple_SetItem(pTuple_args, 0, pString_sid);
 	pDict_song = PyObject_CallObject(pFunc_get_song, pTuple_args);
 	Py_DECREF(pTuple_args);
-	LOG_DEBUG("haha\n");
 	if (pDict_song) {
 		if (!PyDict_Check(pDict_song)) {
-			LOG_DEBUG("haha\n");
 			LOG_ERROR("song data is no PyDict\n");
 			Py_DECREF(pDict_song);
 			return -1;
 		}	
-		LOG_DEBUG("haha\n");
 		pList_names = PyDict_Keys(pDict_song);
 		song->tag_count = PyList_Size(pList_names);
 		if (song->tag_count > REM_MAX_TAGS) {
