@@ -291,15 +291,15 @@ rem_pp_get_song(const union rem_pp_sid *sid, struct rem_pp_song *song)
 int rem_pp_process_cmd(struct rem_pp_pc *pc)
 {
 	
-#define REM_PP_XMMS2_WAT_RESULT do {	\
-	xmmsc_result_wait (result);	\
-	if (xmmsc_result_iserror (result)) {	\
+#define REM_PP_XMMS2_WAT_RESULT						\
+	xmmsc_result_wait (result);					\
+	if (xmmsc_result_iserror (result)) {				\
 		LOG_ERROR("%s\n", xmmsc_result_get_error(result));	\
-		xmmsc_result_unref(result);	\
-		rem_pp_xmms2_disconnect("");	\
-		break;	\
-	}		\
-} while(0)
+		xmmsc_result_unref(result);				\
+		rem_pp_xmms2_disconnect("");				\
+		break;							\
+	}
+
 
 	LOG_DEBUG("command: %hu, param: %hu\n", pc->cmd, pc->param);
 
