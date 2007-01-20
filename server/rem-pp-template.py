@@ -54,7 +54,6 @@ def rem_pp_get_song(sid):
     
     """ Example song to return: """
     
-    print rem.REM_TAG_NAME_ARTIST
     song = {rem.REM_TAG_NAME_ARTIST : "Sade", \
             rem.REM_TAG_NAME_TITLE : "Smooth Operator", \
             rem.REM_TAG_NAME_RATING : "4/5", \
