@@ -32,9 +32,9 @@ Requirements to build server binaries:
 - Amarok:
 	Development package of python needs to be installed.	
 
-To build the server binary for the music player FOOBAR, execute:
+To build the server binary for the music player FOOPLAYER, execute:
 
-$ make FOOBAR
+$ make FOOPLAYER
 
 A specific example:
 
@@ -49,13 +49,13 @@ Install
 
 To install, execute:
 
-$ make FOOBAR_install
+$ make FOOPLAYER_install
 
 A specific example:
 
 $ make xmms2_install
 
-This will install the binary into $(BIN_DIR) and possible other needed files
+This will install the binary into $(BIN_DIR) and possibly other needed files
 into $(REM_DIR)/PLAYER. The variables BIN_DIR and REM_DIR get defined in the
 Makefile. The default values are:
 BIN_DIR := /usr/local/bin
@@ -63,36 +63,11 @@ REM_DIR := /usr/local/lib/remuco
 These variables must not be changed between build and install!
 
 *******************************************************************************
-How to use
+Usage
 *******************************************************************************
 
-Requirements to run the server binaries:
-
-- General:
-	libbluetooth
-
-- XMMS:
-	xmms, libid3tag
-
-- XMMS2:
-	libxmms2client
-	
-- Amarok:
-	python,  python-dcop
-
-If the requirements are fulfilled, just start the server binary you want to use.
-
-$ remuco-FOOBAR
-
-A specific example:
-
-$ remuco-xmms2
-
-Execute
-
-$ remuco-PLAYER -h
-
-to see how to configure the Remuco server.
+See the sections 'Requirements' and 'Usage' in the file README.FOOPLAYER
+where FOOPLAYER is the music player you want to control.
 
 Trouble / Questions:
 ********************
