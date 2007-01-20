@@ -11,7 +11,7 @@ LIB_DIR	:= $(PREFIX)/lib
 BIN_DIR := $(PREFIX)/bin
 REM_DIR := $(LIB_DIR)/remuco
 
-LOGLEVEL := LL_NOISE
+LOGLEVEL := LL_DEBUG
 
 STRIP := strip
 #STRIP := touch
@@ -126,15 +126,19 @@ xmms2_bindist:
 TEMPLATE_CLFAGS :=
 TEMPLATE_LFLAGS :=
 
+# target to build the server binary for player 'template'
 template: .built-server rem-pp-template.o
 	$(CC) -o remuco-template rem-pp-template.o $(CFLAGS) $(LFLAGS) \
 		$(TEMPLATE_CLFAGS) $(TEMPLATE_LFLAGS)
 	$(STRIP) remuco-template
 	chmod +x remuco-template
 
+# target to install the server binary for player 'template'
 template_install: template
 	install remuco-template $(DESTDIR)$(BIN_DIR)
 
+# target to create a binary distribution package of the server for player
+#'template'
 template_bindist:
 	BINDIST_PP=template BINDIST_BIN_FILES=remuco-template \
 		BINDIST_LIB_FILES= make bindist
@@ -186,18 +190,21 @@ python_install: python
 #
 ###############################################################################
 
+# target to build the server binary for player 'template_py'
 template_py:
 	PP_NAME="template" PP_VERSION="0.4.0" make python
 
+# target to install the server binary for player 'template_py'
 template_py_install: template_py
 	PP_NAME="template" PP_VERSION="0.4.0" \
 		PY_EXTRA_FILES="" make python_install
 
+# target to create a binary distribution package of the server for player
+#'template_py'
 template_py_bindist:
 	BINDIST_PP=template BINDIST_BIN_FILES=remuco-template \
 		BINDIST_LIB_FILES="rem.py rem-pp-template.py" make bindist
 		
-	
 ###############################################################################
 #
 # PP AMAROK (a python pp)
@@ -237,7 +244,8 @@ bindist: clean $(BINDIST_PP)
 	fi
 	cp COPYING build/remuco-$(BINDIST_PP)-$(VERSION)/lib
 	if [ -e "README.$(BINDIST_PP)" ] ; then \
-		cp README.$(BINDIST_PP) build/remuco-$(BINDIST_PP)-$(VERSION)/lib; \
+		cp README.$(BINDIST_PP) \
+			build/remuco-$(BINDIST_PP)-$(VERSION)/lib/README; \
 	fi
 	sed Makefile.bindist -e "s/PP :=.*/PP := $(BINDIST_PP)/" \
 		> build/remuco-$(BINDIST_PP)-$(VERSION)/Makefile

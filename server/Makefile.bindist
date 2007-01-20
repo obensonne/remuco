@@ -3,7 +3,7 @@ PP :=
 # DO NOT CHANGE THIS. !!!
 # If you would like to use other values here, download the source package and
 # recompile with adjusted values.
-# This unfexibility may be dropped in later releases of Remuco.
+# This unflexibility may be dropped in later releases of Remuco.
 
 PREFIX	:= /usr/local
 LIB_DIR	:= $(PREFIX)/lib
