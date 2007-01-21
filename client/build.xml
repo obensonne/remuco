@@ -239,7 +239,7 @@
             <fileset file="dist/${midlet.jad}" />
             <fileset dir="doc" />
         </copy>
-        <tar destfile="dist/${dist.pkg-name}.bin.tar.gz"
+        <tar destfile="dist/${dist.pkg-name}.tar.gz"
             compression="gzip" basedir="build/dist" />
     </target>
     
