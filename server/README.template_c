@@ -1,0 +1,43 @@
+Remuco (remuco.sf.net) - Server for FooPlayer
+-------------------------------------------------------------------------------
+
+Requirements
+************
+
+libbluetooth
+...
+
+Installation
+************
+
+Run
+
+$ make install
+
+to install the server (you need super user rights to do that).
+
+Uninstallation
+**************
+
+Run
+
+$ make uninstall
+
+to uninstall the server (you need super user rights to do that).
+
+Usage
+*****
+
+Run
+
+$ remuco-fooplayer
+
+to start the server (make sure bluetooth is active on your system).
+Now start the client on your mobile device and connect to your computer.
+
+You can adjust the behaviour of the server with some command line options.
+Run
+
+$ remuco-fooplayer -h
+
+to see a list of available options.
