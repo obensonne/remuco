@@ -47,9 +47,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define PP_NAME			"template"	// adjust !!
-#define PP_VERSION		"0.4.0"
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // global vars
@@ -195,26 +192,6 @@ void rem_pp_dispose()
 	// This function gets called if the Remuco server shuts down.
 	// Do some clean up work if needed.
 	
-}
-
-const char* rem_pp_get_name()
-{
-	LOG_NOISE("called\n");
-
-	// You can leave this funtion as it is. Instead adjust the macro
-	// PP_NAME above.
-
-	return PP_NAME;
-}
-
-const char* rem_pp_get_version()
-{
-	LOG_NOISE("called\n");
-
-	// You can leave this funtion as it is. Instead adjust the macro
-	// PP_VERSION above.
-
-	return PP_VERSION;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

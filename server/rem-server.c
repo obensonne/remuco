@@ -51,12 +51,25 @@
 // macros remuco
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef REM_VER
-#error "Define REM_VER !"
+
+#ifndef REM_RELEASE_MAIN
+#error "Define REM_RELEASE !"
+#endif
+
+#ifndef REM_RELEASE_SERVER
+#error "Define REM_RELEASE !"
+#endif
+
+#ifndef REM_RELEASE_PP
+#error "Define REM_RELEASE !"
+#endif
+
+#ifndef REM_PP_NAME
+#error "Define REM_RELEASE !"
 #endif
 
 #define REM_SVC_NAME	"Remuco Server"
-#define REM_SVC_DESC	"Bluetooth server for Remuco clients (v " REM_VER ")"
+#define REM_SVC_DESC	"Bluetooth server for Remuco clients (v " REM_RELEASE_MAIN ")"
 #define REM_SVC_PROV	"remuco.sf.net"
 
 #define REM_MAX_CLIENTS	10
@@ -114,10 +127,9 @@ static int			interrupted;
 static void
 rem_server_usage()
 {
-	const char *pp_name = rem_pp_get_name();
-	printf("Remuco Server " REM_VER " for %s\n", pp_name);
-	printf("Usage: remuco-%s [-p POLL-IVAL] [-e PP-ENC]\n", pp_name);
-	printf("   or: remuco-%s {-h|--help}\n", pp_name);
+	printf("Remuco Server " REM_RELEASE_MAIN " for " REM_PP_NAME "\n");
+	printf("Usage: remuco-" REM_PP_NAME " [-p POLL-IVAL] [-e PP-ENC]\n");
+	printf("   or: remuco-" REM_PP_NAME " {-h|--help}\n");
 	printf("Options:\n");
 	printf("  -p POLL-IVAL (in seconds)\n");
 	printf("	intervall to poll the player for state changes (def: 2)\n");
@@ -635,9 +647,9 @@ main(int argc, char **argv)
 		return EXIT_OK;
 	}
 	
-	LOG_INFO("Remuco Server " REM_VER "\n");
-	LOG_INFO("Player Proxy: %s %s\n\n", rem_pp_get_name(),
-							rem_pp_get_version());
+	LOG_INFO("Remuco Server " REM_RELEASE_MAIN "." REM_RELEASE_SERVER "\n");
+	LOG_INFO("Player Proxy " REM_PP_NAME " " REM_RELEASE_MAIN "."
+							REM_RELEASE_PP "\n\n");
 
 	if (arg_get_val_int(argc, argv, "-p", &ret) >= 0)
 		rsc.ps_poll_ival = ret;

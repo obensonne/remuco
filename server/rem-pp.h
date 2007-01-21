@@ -131,16 +131,6 @@ int rem_pp_process_cmd(struct rem_pp_pc *pc);
 void rem_pp_dispose(void);
 
 /**
- * The player proxy's name.
- */
-const char* rem_pp_get_name(void);
-
-/**
- * The player proxy's version.
- */
-const char* rem_pp_get_version(void);
-
-/**
  * A request by the server to a player proxy to get the current player state.
  * 
  * @param ps

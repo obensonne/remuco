@@ -41,11 +41,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-//#define PP_NAME		defined on compile time
-//#define PP_VERSION		defined on compile time
-
 #define ENV_PYTHONPATH_NAME	"PYTHONPATH"
-#define ENV_PYTHONPATH_VAL	PYTHON_PATH
+#define ENV_PYTHONPATH_VAL	".:" PYTHON_PATH
 
 #define REM_PP_PYTHON_FUNC_CHECK(_fo, _fn, _err)			\
 	if (!PyCallable_Check(_fo)) {					\
@@ -131,13 +128,13 @@ rem_pp_init(void)
 	// Adjust environment variable ENV_PYTHONPATH_NAME to find needed module
 	py_path = getenv(ENV_PYTHONPATH_NAME);
 	if (!py_path) py_path = "";
-	n = strlen(py_path) + strlen(ENV_PYTHONPATH_VAL) + 1;
+	n = strlen(py_path) + strlen(ENV_PYTHONPATH_VAL) + 2;
 	py_path_new = malloc(n);
 	if (!py_path_new) {
 		LOG_ERROR("malloc failed\n");
 		return -1;
 	}
-	sprintf(py_path_new, "%s:%s:.", ENV_PYTHONPATH_VAL, py_path);
+	sprintf(py_path_new, "%s:%s", ENV_PYTHONPATH_VAL, py_path);
 	setenv(ENV_PYTHONPATH_NAME, py_path_new, 1);
 	LOG_INFO("%s=%s\n", ENV_PYTHONPATH_NAME, py_path_new);
 	free(py_path_new);
@@ -229,18 +226,6 @@ rem_pp_dispose(void)
 {
 	PyObject_CallObject(pFunc_dispose, NULL);
 	rem_pp_python_clean_python();
-}
-
-const char*
-rem_pp_get_name(void)
-{
-	return PP_NAME;
-}
-
-const char*
-rem_pp_get_version(void)
-{
-	return PP_VERSION;
 }
 
 int

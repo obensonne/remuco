@@ -37,9 +37,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define PP_NAME			"xmms2"
-#define PP_VERSION		"0.4.0"
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // global vars
@@ -425,18 +422,6 @@ void rem_pp_dispose()
 	LOG_DEBUG("called\n");
 	rem_pp_xmms2_disconnect("");
 	return;
-}
-
-const char* rem_pp_get_name()
-{
-	LOG_DEBUG("called\n");
-	return PP_NAME;
-}
-
-const char* rem_pp_get_version()
-{
-	LOG_NOISE("called\n");
-	return PP_VERSION;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

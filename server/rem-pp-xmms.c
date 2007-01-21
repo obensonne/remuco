@@ -38,9 +38,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define PP_NAME			"xmms"
-#define PP_VERSION		"0.4.0"
-
 #define MAX_XMMS_SESSIONS	16
 
 #define REM_PP_XMMS_TAG_NAMES_COUNT	7
@@ -262,18 +259,6 @@ void rem_pp_dispose()
 {
 	free(tag_names);
 	LOG_NOISE("called\n");
-}
-
-const char* rem_pp_get_name()
-{
-	LOG_NOISE("called\n");
-	return PP_NAME;
-}
-
-const char* rem_pp_get_version()
-{
-	LOG_NOISE("called\n");
-	return PP_VERSION;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

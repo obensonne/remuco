@@ -34,11 +34,11 @@ Requirements to build server binaries:
 
 To build the server binary for the music player FOOPLAYER, execute:
 
-$ make FOOPLAYER
+$ make PP=FOOPLAYER
 
 A specific example:
 
-$ make xmms2
+$ make PP=xmms2
 
 This creates a Remuco server binary you can use to control xmms2. The binary
 is called 'remuco-xmms2'.
@@ -49,11 +49,11 @@ Install
 
 To install, execute:
 
-$ make FOOPLAYER_install
+$ make PP=FOOPLAYER install
 
 A specific example:
 
-$ make xmms2_install
+$ make PP=xmms2 install
 
 This will install the binary into $(BIN_DIR) and possibly other needed files
 into $(REM_DIR)/PLAYER. The variables BIN_DIR and REM_DIR get defined in the
