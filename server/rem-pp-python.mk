@@ -23,4 +23,4 @@ install: server
 		$(DESTDIR)$(REM_DIR)/$(PP_NAME)
 
 PP_EXTRA_BIN_FILES :=
-PP_EXTRA_LIB_FILES := $(PY_EXTRA_FILES)
+PP_EXTRA_LIB_FILES := rem.py rem-pp-$(PP_NAME).py $(PY_EXTRA_FILES)

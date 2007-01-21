@@ -16,15 +16,16 @@ all:
 	@echo "  'uninstall' to uninstall the Remuco server for $(PP)"
 
 install:
-	ls lib/* 2>&1 > /dev/null && for F in bin/* ; do \
+	install -d $(BIN_DIR) $(REM_DIR)/$(PP)
+	cd bin ; ls 2>&1 > /dev/null && for F in * ; do \
 		install $${F} $(BIN_DIR); \
 	done || true
-	ls lib/* 2>&1 > /dev/null && for F in lib/* ; do \
-		install $${F} $(REM_DIR)/$(PP); \
+	cd lib ; ls 2>&1 > /dev/null && for F in * ; do \
+		install -m 644 $${F} $(REM_DIR)/$(PP); \
 	done || true
 
 uninstall:
 	rm -rf $(REM_DIR)/$(PP)
-	ls lib/* 2>&1 > /dev/null && for F in bin/* ; do \
+	cd bin ; ls 2>&1 > /dev/null && for F in * ; do \
 		rm -rf $(BIN_DIR)/$${F}; \
 	done || true
