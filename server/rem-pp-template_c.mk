@@ -14,7 +14,7 @@ RELEASE_PP := 0
 
 # Uncomment if the PP makes use of the functions offered by 'rem-dbus.h' (to
 # communicate with a music player via DBUS)
-USE_REM_DBUS := yes
+#USE_REM_DBUS := yes
 
 # PP specific compile and link flags
 PP_CFLAGS := 

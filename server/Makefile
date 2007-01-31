@@ -80,7 +80,7 @@ CFLAGS	+= -Wall -Wshadow -Wmissing-prototypes -Wextra -O2
 LFLAGS	= $(COMMON_OBJ_FILES) -lbluetooth
 
 # Prerequisites needed for every server (independent of specific player proxy)
-PREREQS = .built-server
+PREREQS = clean .built-server
 
 # for player proxies reading music meta data from music files:
 ifeq "$(strip $(USE_REM_TAG))" "yes"
