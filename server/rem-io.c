@@ -155,7 +155,7 @@ rem_recv_pc(int sd, struct rem_pp_pc *pc)
 
 int rem_recv_ci(int sd, struct rem_ci *ci)
 {
-	u_int8_t		buf[255];
+	u_int8_t		buf[REM_TD_HDR_LEN + REM_CI_TD_LEN + 2];
 	struct rem_tdhdr	th;
 	u_int8_t		*data;
 	int			ret;
