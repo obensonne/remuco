@@ -7,7 +7,7 @@ def: all
 ###############################################################################
 
 # List of available PPs
-PP_LIST := template_c template_py xmms xmms2
+PP_LIST := template_c template_py xmms xmms2 rhythmbox
 PP_LIST_EXECUTABLES := $(patsubst %,remuco-%,$(PP_LIST))
 
 # Main release number:
