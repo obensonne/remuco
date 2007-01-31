@@ -4,12 +4,15 @@
 #
 ###############################################################################
 
+
 RELEASE_PP := 0
 
-PP_CFLAGS := $(shell xmms-config --cflags)
-PP_LFLAGS := $(shell xmms-config --libs) $(TAG_LFLAGS)
+USE_REM_TAG := yes
 
-server: .built-server .built-tag rem-pp-$(PP_NAME).c
+PP_CFLAGS := $(shell xmms-config --cflags)
+PP_LFLAGS := $(shell xmms-config --libs)
+
+server: prereqs rem-pp-$(PP_NAME).c
 	$(CC) -o remuco-$(PP_NAME) rem-pp-$(PP_NAME).c $(CFLAGS) $(LFLAGS) \
 		$(PP_CFLAGS) $(PP_LFLAGS)
 	$(STRIP) remuco-$(PP_NAME)

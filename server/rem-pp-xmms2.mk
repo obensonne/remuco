@@ -9,7 +9,7 @@ RELEASE_PP := 0
 PP_CFLAGS := $(shell pkg-config --cflags xmms2-client)
 PP_LFLAGS := $(shell pkg-config --libs xmms2-client)
 
-server: .built-server rem-pp-$(PP_NAME).c
+server: prereqs rem-pp-$(PP_NAME).c
 	$(CC) -o remuco-$(PP_NAME) rem-pp-$(PP_NAME).c $(CFLAGS) $(LFLAGS) \
 		$(PP_CFLAGS) $(PP_LFLAGS)
 	$(STRIP) remuco-$(PP_NAME)

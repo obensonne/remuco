@@ -8,11 +8,19 @@
 # $(RELEASE_MAIN) in 'Makefile')
 RELEASE_PP := 0
 
+# Uncomment if the PP makes use of the functions offered by 'rem-tags.h'
+# (reading music meta data - e.g. id3 - from music files)
+#USE_REM_TAG := yes
+
+# Uncomment if the PP makes use of the functions offered by 'rem-dbus.h' (to
+# communicate with a music player via DBUS)
+USE_REM_DBUS := yes
+
 # PP specific compile and link flags
 PP_CFLAGS := 
 PP_LFLAGS := 
 
-server: .built-server rem-pp-$(PP_NAME).c
+server: prereqs rem-pp-$(PP_NAME).c
 	$(CC) -o remuco-$(PP_NAME) rem-pp-$(PP_NAME).c $(CFLAGS) $(LFLAGS) \
 		$(PP_CFLAGS) $(PP_LFLAGS)
 	$(STRIP) remuco-$(PP_NAME)
