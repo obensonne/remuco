@@ -10,7 +10,7 @@ PP_LFLAGS := -lpython$(PYTHON_VERSION)
 
 .PHONY: server
 
-server: .built-server rem-pp-python.c
+server: prereqs rem-pp-python.c
 	$(CC) -o remuco-$(PP_NAME) rem-pp-python.c $(CFLAGS) $(LFLAGS) \
 		$(PP_CFLAGS) $(PP_LFLAGS)
 	$(STRIP) remuco-$(PP_NAME)
