@@ -236,7 +236,8 @@ rem_tags_id3_get_tag(const struct id3_tag *tag, const char *frame_name)
 		 string = id3_genre_name (string);
 	}
 
-	rtn = id3_ucs4_utf8duplicate (string);
+	rtn = (char*) id3_ucs4_utf8duplicate (string);
+	
 	return rtn;
 }
 

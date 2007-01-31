@@ -37,8 +37,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static int sock_read(int sd, char* buf, int len);
-static int sock_write(int sd, char* buf, int len);
+static int sock_read(int sd, u_int8_t* buf, int len);
+static int sock_write(int sd, u_int8_t* buf, int len);
 static void rem_dump_song(u_int8_t *sd, int len);
 static void rem_dump_pl(struct rem_ps_bin *ps);
 static void rem_dump_ps(struct rem_ps_bin *ps, int with_pl);
@@ -185,6 +185,7 @@ int rem_recv_ci(int sd, struct rem_ci *ci)
 	REM_CI_TD_GET(data, ci);
 	
 	LOG_DEBUG("received client info (enc: %s)\n", ci->enc);
+	
 	return REM_IORET_OK;
 }
 
@@ -196,7 +197,7 @@ int rem_recv_ci(int sd, struct rem_ci *ci)
  * 	 1: data successfully read
  */
 static int
-sock_read(int sd, char* buf, int len)
+sock_read(int sd, u_int8_t* buf, int len)
 {
 	int ret = 0;
 
@@ -233,7 +234,7 @@ sock_read(int sd, char* buf, int len)
  * 	 1: data successfully written
  */
 static int
-sock_write(int sd, char* buf, int len)
+sock_write(int sd, u_int8_t* buf, int len)
 {
 	int ret;
 	
@@ -281,15 +282,15 @@ rem_dump_song(u_int8_t *sd, int len)
 	u_int8_t *ptr, *sd_end;
 	sd_end = sd + len;
 	printf("---------- SONG DATA (%i bytes) BEGIN -\n", len);
-	for (i = 0, ptr = sd; ptr < sd_end; i++, ptr += strlen(ptr) + 1) {
+	for (i = 0, ptr = sd; ptr < sd_end; i++, ptr += strlen((char*) ptr) + 1) {
 		if (i % 2) {
-			printf("%s\n", ptr);
-			n = strlen(ptr);
+			printf("%s\n", (char*) ptr);
+			n = strlen((char*) ptr);
 			for (j = 0; j < n; j++)
 				printf("%hhX ", ptr[j]);
 			printf("\n");
 		} else {
-			printf("%-20s : ", ptr);
+			printf("%-20s : ", (char*) ptr);
 		}
 	}
 	printf("---------- SONG DATA END -----------------\n");
@@ -407,7 +408,7 @@ rem_convert_pl_enc(struct rem_ps_bin *psb, u_int8_t **pl_c, u_int32_t *pl_c_size
 	
 	buf_out = ptr_pl_c;
 	bytes_out_left = pl_size * 2;
-	buf_in = psb->pl;
+	buf_in = (char*) psb->pl;
 	for (i = 0; i < pl_len; i++) {
 		LOG_NOISE("converting song %i .. ", i);
 		bytes_in_left = ntohl(*((u_int32_t*) buf_in));
@@ -480,17 +481,21 @@ rem_song_get_bin_size(struct rem_pp_song *song)
  * allocated memory at 'ba' with the method 'rem_song_get_bin_size()' !!!
  * 
  * @return
- * 	size in bytes of binary data needed or -1 if something failed
+ * 	size in bytes of binary data needed or < 0 if something failed
  */
 int
 rem_song_get_bin(struct rem_pp_song *song, u_int8_t *ba)
 {
-	int i;
+	int i, ret;
 	u_int8_t *p = ba;
 	
 	for (i = 0; i < song->tag_count; i++) {
-		p += sprintf(p, "%s", song->tag_names[i]) + 1;
-		p += sprintf(p, "%s", song->tag_values[i]) + 1;
+		ret = sprintf((char*) p, "%s", song->tag_names[i]);
+		if (ret < 0) return -1;
+		p += (unsigned int) ret + 1;
+		ret = sprintf((char*) p, "%s", song->tag_values[i]);
+		if (ret < 0) return -1;
+		p += (unsigned int) ret + 1;
 	}
 	
 	return (p - ba);

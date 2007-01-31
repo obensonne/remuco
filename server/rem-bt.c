@@ -239,7 +239,7 @@ int rfcomm_srv_sock_setup(u_int8_t *port, int npc)
 int
 rfcomm_srv_sock_accept(int ss, struct rfcomm_srv_client *rec)
 {
-	int len;
+	socklen_t len;
 	
 	len = SOCK_RC_SIZE;
 	struct sockaddr_rc addr_client;
