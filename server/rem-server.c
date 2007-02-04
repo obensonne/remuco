@@ -292,10 +292,10 @@ rem_server_client_disconnect(struct rem_client *rec)
 
 	if (rec->rfcc.sock) close(rec->rfcc.sock);
 		
+	LOG_INFO("client %s disconnected\n", rec->rfcc.addr_str);
+	
 	free(rec);
 	client_list[i] = NULL;
-	
-	LOG_INFO("client %s disconnected\n", rec->rfcc.addr_str);
 	
 	return 0;
 }
