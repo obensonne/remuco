@@ -28,6 +28,13 @@ Requirements to build server binaries:
 
 - XMMS2:
 	Development package of libxmms2client needs to be installed.
+	If you build and installed XMMS2 from source and it should be ok too
+	(important is that 'pkg-config' can be used as in 'rem-pp-xmms2.mk'
+	and the header files are where gcc expects it - if not, adjust
+	the var 'PP_CFLAGS' in 'rem-pp-xmms2.mk').
+
+- Rhythmbox:
+	Development package of libdbus-glib needs to be installed.
 
 - Amarok:
 	Development package of python needs to be installed.	
