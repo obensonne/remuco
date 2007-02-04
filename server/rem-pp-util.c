@@ -51,18 +51,14 @@ rem_song_append_tag(struct rem_pp_song *song, const char *name, const char *val)
 	
 	LOG_NOISE("append '%s'='%s'\n", name, val);
 
-	song->tag_names[song->tag_count] = malloc(strlen(name) + 1);
-	if (song->tag_names[song->tag_count] == NULL) {
+	song->tag_names[song->tag_count] = strdup(name);
+	song->tag_values[song->tag_count] = strdup(val);
+
+	if (!song->tag_names[song->tag_count] ||
+					!song->tag_values[song->tag_count]) {
+		LOG_ERRNO("strdup failed");
 		return -2;
 	}
-	sprintf(song->tag_names[song->tag_count], "%s", name);
-	
-	song->tag_values[song->tag_count] = malloc(strlen(val) + 1);
-	if (song->tag_values[song->tag_count] == NULL) {
-		free(song->tag_names[song->tag_count]);
-		return -2;
-	}
-	sprintf(song->tag_values[song->tag_count], "%s", val);
 		
 	song->tag_count++;
 	
