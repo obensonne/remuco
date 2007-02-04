@@ -20,9 +20,9 @@ package remuco.proto;
 
 /**
  * This interfaces clones the client side relevant constants from
- * <code>rem.h</code>. For description and usage of these constants as well
- * as detailed information about the Remuco data-transfer protocol have a look
- * into that file.
+ * <code>rem.h</code> (can be found in the server source). For description and
+ * usage of these constants as well as detailed information about the Remuco 
+ * data-transfer protocol have a look into that file.
  * 
  * @author Christian Buennig
  * 
