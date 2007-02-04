@@ -1,6 +1,12 @@
 Remuco (remuco.sf.net) - Server for Rhythmbox
 -------------------------------------------------------------------------------
 
+Note:
+The Remuco server for Rhythmbox currently does not support it to browse
+the player's playlist on the client. This is because Rhythmbox does not offer
+a method to get the current playlist via D-Bus. Once this is possible the 
+Remuco server for Rhythmbox will support playlist browsing too.
+
 Requirements
 ************
 

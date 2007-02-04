@@ -4,6 +4,9 @@
 	
 	* changed building process: reorganized prerequisites
 
+	* added D-Bus support for PPs using D-BUS to communicate with music
+	players
+
 0.4.0	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* initial 0.4.0 release
