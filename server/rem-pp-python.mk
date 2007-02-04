@@ -8,8 +8,6 @@ PP_CFLAGS += -DPYTHON_VERSION=$(subst .,,$(PYTHON_VERSION))
 PP_CFLAGS += -DPYTHON_PATH=\"$(REM_DIR)/$(PP_NAME)\"
 PP_LFLAGS := -lpython$(PYTHON_VERSION)
 
-.PHONY: server
-
 server: prereqs rem-pp-python.c
 	$(CC) -o remuco-$(PP_NAME) rem-pp-python.c $(CFLAGS) $(LFLAGS) \
 		$(PP_CFLAGS) $(PP_LFLAGS)
