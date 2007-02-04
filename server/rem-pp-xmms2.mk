@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-RELEASE_PP := 0
+RELEASE_PP := 1
 
 PP_CFLAGS := $(shell pkg-config --cflags xmms2-client)
 PP_LFLAGS := $(shell pkg-config --libs xmms2-client)

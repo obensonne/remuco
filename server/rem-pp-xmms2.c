@@ -357,9 +357,11 @@ int rem_pp_process_cmd(struct rem_pp_pc *pc)
 				result = xmmsc_playback_start(connection);
 				REM_PP_XMMS2_WAT_RESULT;
 				xmmsc_result_unref(result);
-				result = xmmsc_playback_tickle(connection);
-				REM_PP_XMMS2_WAT_RESULT;
-				xmmsc_result_unref(result);
+				if (u == XMMS_PLAYBACK_STATUS_PAUSE) {
+					result = xmmsc_playback_tickle(connection);
+					REM_PP_XMMS2_WAT_RESULT;
+					xmmsc_result_unref(result);
+				}
 			}
 			break;
 		case REM_PC_CMD_STOP:
