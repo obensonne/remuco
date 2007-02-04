@@ -96,10 +96,10 @@ endif
 # for player proxies using dbus to communicate with music player
 ifeq "$(strip $(USE_REM_DBUS))" "yes"
 PREREQS += .built-dbus
-DBUS_OBJ_FILES :=
-DBUS_HDR_FILES :=
-#DBUS_OBJ_FILES := rem-dbus.o
-#DBUS_HDR_FILES := rem-dbus.h
+#DBUS_OBJ_FILES :=
+#DBUS_HDR_FILES :=
+DBUS_OBJ_FILES := rem-dbus.o
+DBUS_HDR_FILES := rem-dbus.h
 DBUS_CFLAGS := $(shell pkg-config --cflags dbus-glib-1)
 DBUS_LFLAGS := $(shell pkg-config --libs dbus-glib-1) $(DBUS_OBJ_FILES)
 CFLAGS += $(DBUS_CFLAGS)
@@ -116,9 +116,10 @@ endif
 
 all: check clean server
 
-# Make the server prerequisites
+# Make the server prerequisites.
 prereqs: $(PREREQS)
 
+# Checks if a PP has been specified.
 check:
 	@if [ -z "$(PP_NAME)" ] ; then \
 		echo "" ; \
@@ -130,12 +131,15 @@ check:
 		@false; \
 	fi
 
+# Builds the common server components.
 .built-server: $(COMMON_OBJ_FILES) $(COMMON_HDR_FILES)
 	touch .built-server
 
+# Builds the ID3 tag components.
 .built-tag: $(TAG_OBJ_FILES) $(TAG_HDR_FILES)
 	touch .built-tag
 
+# Builds the DBUS components.
 .built-dbus: $(DBUS_OBJ_FILES) $(DBUS_HDR_FILES)
 	touch .built-dbus
 
@@ -143,12 +147,20 @@ clean:
 	rm -f *~ *.o *.pyc $(PP_LIST_EXECUTABLES) .built-*
 	rm -rf build
 
+# Creates a binary duistribution package.
 dist: clean server
-	mkdir -p build/$(PKG_NAME)/{bin,lib}
+	mkdir -p build/$(PKG_NAME)/bin build/$(PKG_NAME)/lib
 	cp remuco-$(PP_NAME) $(PP_EXTRA_BIN_FILES) build/$(PKG_NAME)/bin
 	if [ -n "$(PP_EXTRA_LIB_FILES)" ] ; then \
 		cp $(PP_EXTRA_LIB_FILES) build/$(PKG_NAME)/lib; \
 	fi
+	echo "Server" > build/$(PKG_NAME)/lib/changelog
+	echo >> build/$(PKG_NAME)/lib/changelog
+	cat changelog.server >> build/$(PKG_NAME)/lib/changelog
+	echo >> build/$(PKG_NAME)/lib/changelog
+	echo "PP $(PP_NAME)" >> build/$(PKG_NAME)/lib/changelog
+	echo >> build/$(PKG_NAME)/lib/changelog
+	cat changelog.pp.$(PP_NAME) >> build/$(PKG_NAME)/lib/changelog
 	cp COPYING build/$(PKG_NAME)/lib
 	if [ -e "README.$(PP_NAME)" ] ; then \
 		cp README.$(PP_NAME) build/$(PKG_NAME)/lib/README; \
@@ -158,5 +170,26 @@ dist: clean server
 	mkdir -p dist
 	tar zcf dist/$(PKG_NAME).tar.gz -C build $(PKG_NAME)
 
+# This targets creates a new PP based on the template for C PPs.
+# The user gets prompted for the PP's name.
+create_pp_c:
+	@echo -n "Enter PP name: " && read PPN ; \
+	cp rem-pp-template_c.mk rem-pp-$${PPN}.mk ; \
+	cp rem-pp-template_c.c rem-pp-$${PPN}.c ; \
+	cp README.template_c README.$${PPN} ; \
+	cp changelog.pp.template_c changelog.pp.$${PPN} ; \
+	sed -i Makefile -e "s/^PP_LIST :=\(.*\)$$/PP_LIST :=\1 $${PPN}/"
+
+# This targets creates a new PP based on the template for Python PPs.
+# The user gets prompted for the PP's name.
+create_pp_py:
+	@echo -n "Enter PP name: " && read PPN ; \
+	cp rem-pp-template_py.mk rem-pp-$${PPN}.mk ; \
+	cp rem-pp-template_py.py rem-pp-$${PPN}.py ; \
+	cp README.template_py README.$${PPN} ; \
+	cp changelog.pp.template_py changelog.pp.$${PPN} ; \
+	sed -i Makefile -e "s/^PP_LIST :=\(.*\)$$/PP_LIST :=\1 $${PPN}/"
+
+# Prints out the release number of a specific server - PP combination.
 release_no: check
 	@echo "$(RELEASE)"
