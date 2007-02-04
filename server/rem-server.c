@@ -172,6 +172,8 @@ rem_server_init()
 	
 	rem_pp_init(); // init player proxy
 	
+	LOG_NOISE("init ok\n");
+
 	interrupted = 0;
 	
 	return 0;
@@ -574,6 +576,8 @@ rem_server_sockets_process(fd_set *sds)
 static void
 rem_server_main_loop()
 {	
+	LOG_NOISE("called\n");
+	
 	int			i, ret, sd_max;
 	fd_set			sds_r, sds_e;
 	struct rem_client	*rec;
@@ -596,9 +600,11 @@ rem_server_main_loop()
 		}
 				
 		// wait for any socket activity or timeout
-		ret = select(sd_max + 1, &sds_r, NULL, &sds_e, &tv);
 		tv.tv_sec = rsc.ps_poll_ival;
 		tv.tv_usec = 0;	
+		LOG_NOISE("select..\n");
+		ret = select(sd_max + 1, &sds_r, NULL, &sds_e, &tv);
+		LOG_NOISE("select returned\n");
 		if (ret < 0) {
 			if (errno == EINTR) {
 				continue; // if there was SIGINT, we won't loop

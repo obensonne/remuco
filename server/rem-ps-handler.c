@@ -87,6 +87,8 @@ rem_get_pl_bin(struct rem_pp_ps *ps_pp, u_int8_t **pl_data, u_int32_t *pl_size);
 int
 rem_update_ps(struct rem_ps_bin *ps_bin)
 {
+	LOG_NOISE("called\n");
+
 	int			ret, changed = 0;
 	u_int8_t		ps_state, ps_volume, ps_flags = 0, *pl_data;
 	u_int16_t		ps_pl_pos, ps_pl_len;
