@@ -58,6 +58,8 @@ public class RatingScreen implements IScreen {
         } else if (c == CMD_OK) {
             player.control(new PlayerControl(PlayerControl.CODE_RATE,
                     (short) ratingGauge.getValue()));
+            ops.getCurrentSong().setRating(ratingGauge.getValue(),
+                    ratingGauge.getMaxValue());
             setActive(false);
             pcl.commandAction(IScreen.CMD_DISPOSE, d);
         } else {

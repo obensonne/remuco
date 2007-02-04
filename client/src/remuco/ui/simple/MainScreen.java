@@ -97,7 +97,10 @@ public class MainScreen implements IScreen {
         } else if (c == CMD_SHOW_VOLUME) {
             screenVolume.setActive(true);
         } else if (c == CMD_SHOW_RATE) {
+            // set current song to null => this will rerender the song screen
+            // if rating screen returna
             screenRating.setActive(true);
+            sf.setSong(null);
         } else {
             pcl.commandAction(c, d);
         }
