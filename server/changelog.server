@@ -1,0 +1,14 @@
+0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* adopted to libbluetooth2 (libbluetooth1 should still work too)
+	
+	* changed building process: reorganized prerequisites
+
+0.4.0	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* initial 0.4.0 release
+	
+	* introduced new concept to support music player
+	
+	* introduced templates for developing player proxies (formerly
+	player adapter)
