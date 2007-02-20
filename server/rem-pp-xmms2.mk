@@ -4,9 +4,11 @@
 #
 ###############################################################################
 
-RELEASE_PP := 1
+RELEASE_PP := 2
 
 PP_CFLAGS := $(shell pkg-config --cflags xmms2-client)
+# uncomment next line if you use the devel tree of xmms2
+#PP_CFLAGS += -DREM_XMMS2_DEVEL
 PP_LFLAGS := $(shell pkg-config --libs xmms2-client)
 
 server: prereqs rem-pp-$(PP_NAME).c

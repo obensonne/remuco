@@ -1,3 +1,11 @@
+0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* fixed wrong playlist and main-screen display on client if the xmms2
+	playlist has been cleared but xmms2 still plays a song (has a current
+	song)
+	* added compilation flags in 'rem-pp-xmms2.mk' to build for the devel
+	tree of xmms2
+	
 0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* fixed bug which made the play command fail when xmms2d

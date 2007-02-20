@@ -82,7 +82,7 @@ int
 rem_pp_get_ps(struct rem_pp_ps *ps)
 {
 	int		ret;
-	unsigned int	u, sid, sid_cur;
+	unsigned int	u, sid, sid_cur, pl_prefix = 0;
 	u_int32_t	n, m;
 	xmmsc_result_t	*result;
 
@@ -146,8 +146,13 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 	}
 	
 	n = 50; m = 50;
+#ifdef REM_XMMS2_DEVEL
+	ret =	xmmsc_result_get_dict_entry_uint(result, "left", &n) &&
+		xmmsc_result_get_dict_entry_uint(result, "right", &m);
+#else
 	ret =	xmmsc_result_get_dict_entry_uint32(result, "left", &n) &&
 		xmmsc_result_get_dict_entry_uint32(result, "right", &m);
+#endif
 	xmmsc_result_unref(result);
 	if (!ret) {
 		LOG_WARN("volume: result broken\n");
@@ -172,15 +177,55 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 		return -1;
 	}
 	ret = xmmsc_result_get_uint(result, &sid_cur);
+	LOG_DEBUG("sud cur = %u\n", sid_cur);
 	xmmsc_result_unref(result);
 	if (!ret) {
 		LOG_WARN("cid: result broken");
 		return -1;
 	}
 	
+	// get playlist position
+	LOG_NOISE("get playlist position\n");
+#ifdef REM_XMMS2_DEVEL
+	result = xmmsc_playlist_current_pos(connection, XMMS_ACTIVE_PLAYLIST);
+#else
+	result = xmmsc_playlist_current_pos(connection);
+#endif
+	xmmsc_result_wait (result);
+	if (xmmsc_result_iserror (result)) {
+		// none of the songs in the pl is active
+		if (sid_cur && (ps->state == REM_PS_STATE_PLAY ||
+				ps->state == REM_PS_STATE_PAUSE)) {
+			// another song (outside the pl) is active
+			// XXX: xmms2 says there is an active song also in the
+			//      case that the playback state is "stop", however,
+			//      this song is not playable anymore, which is
+			//      equal to the situation when there is no
+			//      active/current song
+			pl_prefix = 1;
+			ps->pl_pos = 0;
+		} else {
+			// no song is active
+			ps->pl_pos = REM_PS_PL_POS_NONE;
+		}
+	} else {
+		ret = xmmsc_result_get_uint(result, &u);
+		if (!ret) {
+			LOG_WARN("current pl pos: result broken");
+			xmmsc_result_unref(result);
+			return -1;
+		}
+		ps->pl_pos = u;
+	}
+	xmmsc_result_unref(result);
+	 
 	// get playlist
 	LOG_NOISE("get playlist\n");
+#ifdef REM_XMMS2_DEVEL
+	result = xmmsc_playlist_list_entries (connection, XMMS_ACTIVE_PLAYLIST);
+#else
 	result = xmmsc_playlist_list (connection);
+#endif
 	xmmsc_result_wait (result);
 	if (xmmsc_result_iserror (result)) {
 		LOG_WARN("command failed: %s\n", xmmsc_result_get_error(result));
@@ -189,7 +234,7 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 
 	// get length of playlist
 	LOG_NOISE("get length of playlist\n");
-	for (u = 0, xmmsc_result_list_first(result);
+	for (u = pl_prefix, xmmsc_result_list_first(result);
 				xmmsc_result_list_valid (result);
 				xmmsc_result_list_next(result), u++);
 	ps->pl_len = u;
@@ -199,13 +244,16 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 	}
 
 	// create sid_list and get pl_pos
-	LOG_NOISE("create uid_list and get pl_pos\n");
+	LOG_NOISE("create sid list\n");
 	ps->pl_sid_list = malloc(ps->pl_len * sizeof(union rem_pp_sid));
 	if (!ps->pl_sid_list) {
 		LOG_ERROR("malloc failed\n");
 		return -1;
 	}
-	for (u = 0, xmmsc_result_list_first(result);
+	if (pl_prefix) {
+		ps->pl_sid_list[0].uint = sid_cur;
+	}
+	for (u = pl_prefix, xmmsc_result_list_first(result);
 					xmmsc_result_list_valid (result);
 					xmmsc_result_list_next(result), u++) {
 		ret = xmmsc_result_get_uint (result, &sid);
@@ -216,10 +264,6 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 			return -1;
 		}
 		ps->pl_sid_list[u].uint = sid;
-		// detect pl_pos
-		if (sid == sid_cur) {
-			ps->pl_pos = u;
-		}		
 	}
 	xmmsc_result_unref(result);
 		
@@ -275,7 +319,11 @@ rem_pp_get_song(const union rem_pp_sid *sid, struct rem_pp_song *song)
 							REM_TAG_NAME_LENGTH);
 	rem_pp_xmms2_add_tag_to_song(song, result, xrt_int, "bitrate",
 							REM_TAG_NAME_BITRATE);
+#ifdef REM_XMMS2_DEVEL
+	if (!xmmsc_result_get_dict_entry_int(result, "rating", &i))
+#else
 	if (!xmmsc_result_get_dict_entry_int32(result, "rating", &i))
+#endif
 		i = 0;
 	snprintf(str, REM_MAX_STR_LEN, "%i/5", i);
 	rem_song_append_tag(song, REM_TAG_NAME_RATING, str);
@@ -357,11 +405,11 @@ int rem_pp_process_cmd(struct rem_pp_pc *pc)
 				result = xmmsc_playback_start(connection);
 				REM_PP_XMMS2_WAT_RESULT;
 				xmmsc_result_unref(result);
-				if (u == XMMS_PLAYBACK_STATUS_PAUSE) {
-					result = xmmsc_playback_tickle(connection);
-					REM_PP_XMMS2_WAT_RESULT;
-					xmmsc_result_unref(result);
-				}
+//				if (u == XMMS_PLAYBACK_STATUS_PAUSE) {
+//					result = xmmsc_playback_tickle(connection);
+//					REM_PP_XMMS2_WAT_RESULT;
+//					xmmsc_result_unref(result);
+//				}
 			}
 			break;
 		case REM_PC_CMD_STOP:
@@ -473,7 +521,11 @@ rem_pp_xmms2_add_tag_to_song(struct rem_pp_song *s, xmmsc_result_t *result,
 	int i;
 	switch (res_type) {
 		case XMMSC_RESULT_VALUE_TYPE_STRING:
+#ifdef REM_XMMS2_DEVEL
+			if (xmmsc_result_get_dict_entry_string(result,
+#else
 			if (xmmsc_result_get_dict_entry_str(result,
+#endif
 						tag_name_mlib, &val_mlib)) {
 				val_final = val_mlib;
 			} else {
@@ -481,7 +533,11 @@ rem_pp_xmms2_add_tag_to_song(struct rem_pp_song *s, xmmsc_result_t *result,
 			}
 			break;
 		case XMMSC_RESULT_VALUE_TYPE_INT32:
+#ifdef REM_XMMS2_DEVEL
+			if (xmmsc_result_get_dict_entry_int(result,
+#else
 			if (xmmsc_result_get_dict_entry_int32(result,
+#endif
 						tag_name_mlib, &i)) {
 				snprintf(val_my, REM_MAX_STR_LEN, "%i", i);
 				val_final = val_my;
