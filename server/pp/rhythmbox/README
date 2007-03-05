@@ -1,0 +1,51 @@
+Remuco (remuco.sf.net) - Server for Rhythmbox
+-------------------------------------------------------------------------------
+
+Note:
+The Remuco server for Rhythmbox currently does not support it to browse
+the player's playlist on the client. This is because Rhythmbox does not offer
+a method to get the current playlist via D-Bus. Once this is possible the 
+Remuco server for Rhythmbox will support playlist browsing too.
+
+Requirements
+************
+
+libc
+libbluetooth
+libdbus-glib-1-2
+rhythmbox >= 0.9.6
+
+Installation
+************
+
+Run
+
+$ make install
+
+to install the server (you need super user rights to do that).
+
+Uninstallation
+**************
+
+Run
+
+$ make uninstall
+
+to uninstall the server (you need super user rights to do that).
+
+Usage
+*****
+
+Run
+
+$ remuco-rhythmbox
+
+to start the server (make sure bluetooth is active on your system).
+Now start the client on your mobile device and connect to your computer.
+
+You can adjust the behaviour of the server with some command line options.
+Run
+
+$ remuco-rhythmbox -h
+
+to see a list of available options.
