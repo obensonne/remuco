@@ -13,7 +13,7 @@ PP_LIST_EXECUTABLES := $(patsubst %,remuco-%,$(PP_LIST))
 # Main release number:
 RELEASE_MAIN := 0.4
 # Server sub release (relative to main release)
-RELEASE_SERVER := 1
+RELEASE_SERVER := 2
 # PP sub release (relative to main release)
 #RELEASE_PP := gets defined in PP specific make file
 
