@@ -1,0 +1,164 @@
+Remuco (remuco.sf.net) - Server
+-------------------------------------------------------------------------------
+
+Content
+*******
+
+1. Introduction
+2. Compilation
+	2.1 Requirements
+	2.2 Build
+	2.3 Player Specific Notes
+3. Installation
+	3.1 Player Specific Notes
+4. Usage
+	4.1 Player Specific Notes
+5. Development
+6. Trouble / Questions
+
+*******************************************************************************
+1. Introduction
+*******************************************************************************
+
+Remuco is a system to remotely control music player software with bluetooth
+enabled mobile devices.
+
+With Remuco you can control your favourite music player (playback, song
+rating, ...) and read music player state information (playback, playlist, ...)
+on your mobile device. You can use Remuco simultaneously with two or more
+mobile devices - that's a nice feature for a party when you want to set up a DJ
+crew ;). 
+
+You can use Remuco with all mobile devices with a Bluetooth adapter and Java
+Microediton (JavaME) support (MIDP 2.0).
+
+This is the Remuco server. The Remuco server runs on a computer to interact
+between a Remuco client (running on a mobile device) and a music player to
+control.
+
+*******************************************************************************
+2. Compilation
+*******************************************************************************
+
+2.1 Requirements:
+*****************
+
+To compile Remuco server you need the devlopment packages of libbluetooth2 and
+libc. E.g. on a debian system you can get them via:
+
+ $ apt-get libbluetooth2-dev libc6-dev
+
+Depending on the music player to build the Remuco server for, there are further
+requirements:
+
+XMMS:
+	Development packages of xmms and libid3tag
+
+Xmms2:
+	Development package of libxmms2client needs to be installed. If you build
+	and installed XMMS2 from source everyting should be fine already.
+
+Rhythmbox:
+	Development package of libdbus-glib (e.g. libdbus-glib-1-dev)
+
+Amarok:
+	Development package of python (e.g. python-dev)
+
+2.2 Build:
+**********
+
+To build a server binary for the music player FooPlay, run:
+
+ $ make PP=fooplay
+
+A specific example:
+
+ $ make PP=xmms2
+
+This creates a Remuco server binary you can use to control xmms2. The binary
+is called 'remuco-xmms2'.
+
+2.3 Player specific notes
+*************************
+
+Xmms2:
+	If you want to build for XMMS2 from the devel tree, adjust
+	'rem-pp-xmms2.mk' as documented within that file!
+
+*******************************************************************************
+3. Installation
+*******************************************************************************
+
+To install, execute:
+
+$ make PP=fooplay install
+
+A specific example:
+
+$ make PP=xmms2 install
+
+This will install the binary into $(BIN_DIR) and possibly other needed files
+into $(REM_DIR)/PLAYER. The variables BIN_DIR and REM_DIR get defined in the
+Makefile. The default values are:
+BIN_DIR := /usr/local/bin
+REM_DIR := /usr/local/lib/remuco
+These variables must not be changed between build and install!
+
+*******************************************************************************
+4. Usage
+*******************************************************************************
+
+You can start the Remuco server for the music player FooPlay by running:
+
+ $ remuco-fooplay
+
+A specific example:
+
+ $ remuco-xmms2
+
+There are 2 options to configure the server:
+
+-p POLL_IVAL
+	This is the interval in seconds to poll the music player for state changes.
+	The default is 2 seconds.
+
+-e PP-ENC
+	This specifies the character encoding of the data from the music player.
+	The default is UTF-8 which should work in most cases. If _all_ special
+	characters are displayed wrong on your mobile device, changes this option,
+	a goog choice is then probably LATIN1. Run 'iconv -l' on a command line
+	to see a list of possible encodings.
+	Note: If only some special characters are displayed wrong, this is probably
+	      because the tags of your music files use not allways the same
+	      encoding. Try first to adjust the tag encodings of your music files
+	      or music library.
+
+Usage example:
+
+ $ remuco-fooplay -p 5 -e LATIN1
+
+This runs the Remuco server for FooPlay. The server polls FooPlay for state
+informations every 5 seconds and assumes that the textual data from FooPlay
+is encoded in LATIN1.
+
+4.1 Player specific notes
+*************************
+
+Amarok:
+	Before running remuco-amarok, make sure 'dcop-server' is runnning! This
+	is the case if you once started Amarok.
+	
+	The Remuco server for Amarok needs python (>= 2.4) and python-dcop
+	to be installed!
+
+*******************************************************************************
+5. Development
+*******************************************************************************
+
+See section 'Development' on remuco.sf.net .
+
+*******************************************************************************
+6. Trouble / Questions:
+*******************************************************************************
+
+See the Remuco mailing list at remuc.sf.net .
