@@ -90,7 +90,7 @@ public class Song {
      */
     public synchronized int getLen() {
         try {
-            return Integer.parseInt(getTag(Song.TAG_LENGTH)) / 1000;
+            return Integer.parseInt(getTag(Song.TAG_LENGTH));
         } catch (NumberFormatException e) {
             return -1;
         } catch (NullPointerException e) {
