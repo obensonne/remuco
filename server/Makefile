@@ -165,11 +165,8 @@ dist: clean server
 	echo >> build/$(PKG_NAME)/lib/changelog
 	echo "PP $(PP_NAME)" >> build/$(PKG_NAME)/lib/changelog
 	echo >> build/$(PKG_NAME)/lib/changelog
-	cat changelog.pp.$(PP_NAME) >> build/$(PKG_NAME)/lib/changelog
+	cat pp/$(PP_NAME)/changelog >> build/$(PKG_NAME)/lib/changelog
 	cp COPYING build/$(PKG_NAME)/lib
-	if [ -e "README.$(PP_NAME)" ] ; then \
-		cp README.$(PP_NAME) build/$(PKG_NAME)/lib/README; \
-	fi
 	sed bin-dist.mk \
 		-e "s/PP :=.*/PP := $(PP_NAME)/" > build/$(PKG_NAME)/Makefile
 	mkdir -p dist

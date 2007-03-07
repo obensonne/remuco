@@ -6,7 +6,7 @@
 
 # release version of the PP relative to the main release (see var
 # $(RELEASE_MAIN) in 'Makefile')
-RELEASE_PP := 0
+RELEASE_PP := 1
 
 USE_REM_DBUS := yes
 
