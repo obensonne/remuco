@@ -119,6 +119,7 @@ public class RemotePlayer implements Runnable {
 
         Log.ln(this, "connection error");
         ops.setState(PlayerState.ST_ERROR);
+        ops.changed();
         con.close();
     }
 

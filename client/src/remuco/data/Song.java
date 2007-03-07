@@ -106,7 +106,7 @@ public class Song {
         StringBuffer sb = new StringBuffer();
         int l, s;
         try {
-            l = Integer.parseInt(getTag(Song.TAG_LENGTH)) / 1000;
+            l = Integer.parseInt(getTag(Song.TAG_LENGTH));
             s = l % 60;
             sb.append((int) (l / 60)).append(":");
             sb.append(s < 10 ? "0" : "").append(s);
@@ -130,10 +130,10 @@ public class Song {
             try {
                 return Integer.parseInt(sa[0]);
             } catch (NumberFormatException e) {
-                return -1;
+                return RATING_NONE;
             }
         } else {
-            return -1;
+            return RATING_NONE;
         }
     }
 
@@ -149,10 +149,10 @@ public class Song {
             try {
                 return Integer.parseInt(sa[1]);
             } catch (NumberFormatException e) {
-                return -1;
+                return RATING_NONE;
             }
         } else {
-            return -1;
+            return RATING_NONE;
         }
     }
 

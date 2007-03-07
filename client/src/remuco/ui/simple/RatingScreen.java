@@ -82,13 +82,13 @@ public class RatingScreen implements IScreen {
                 return;
             }
             int i = s.getRatingMax();
-            if (i == -1) {
+            if (i == Song.RATING_NONE) {
                 display.setCurrent(errorForm);
                 return;
             }
             ratingGauge.setMaxValue(i);
             i = s.getRating();
-            if (i == -1) {
+            if (i == Song.RATING_NONE) {
                 display.setCurrent(errorForm);
                 return;
             }

@@ -22,7 +22,7 @@ public interface IScreen extends CommandListener, IPlayerStateObserver {
      * Command to delegate to the parent command listener if the screen has done
      * what ever it wanted to do and the screen may be removed from the display.
      */
-    public static final Command CMD_DISPOSE = new Command("DISPOSE",
+    public static final Command CMD_DISPOSE = new Command("Exit",
             Command.OK, 99);
 
     /**

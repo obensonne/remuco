@@ -142,10 +142,11 @@ public class Main extends MIDlet implements CommandListener {
         if (connection == null || !connection.isOpen()) {
             // error handling
             Alert alert = new Alert("Error");
-            alert.setString("No connection to host!");
+            alert.setString("No connection to Remuco server! Inspect the log " +
+            		"for error analysis.");
             alert.setTimeout(Alert.FOREVER);
             display.setCurrent(alert);
-            Tools.sleep(1000);
+            Tools.sleep(2000);
             
             // show the log, so the user can see what failed
             logForm.removeCommand(CMD_BACK);

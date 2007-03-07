@@ -16,39 +16,39 @@ import remuco.ui.IScreen;
 public class MainScreen implements IScreen {
 
     /** RemucoCommand on main screen: Exit */
-    private static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
+    protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
             90);
 
     /** Play-control command: Skip to next currentSong */
-    private static final Command CMD_PC_NEXT = new Command("Next",
+    protected static final Command CMD_PC_NEXT = new Command("Next",
             Command.SCREEN, 1);
 
     /** Play-control command : Toogle play/pause */
-    private static final Command CMD_PC_PLAYPAUSE = new Command("Play/Pause",
+    protected static final Command CMD_PC_PLAYPAUSE = new Command("Play/Pause",
             Command.SCREEN, 3);
 
     /** Play-control command: Skip to next currentSong */
-    private static final Command CMD_PC_PREV = new Command("Previous",
+    protected static final Command CMD_PC_PREV = new Command("Previous",
             Command.SCREEN, 2);
 
     /** Play-control command: Toogle play/pause */
-    private static final Command CMD_PC_RESTART = new Command("Restart",
+    protected static final Command CMD_PC_RESTART = new Command("Restart",
             Command.SCREEN, 5);
 
     /** Play-control command: Toogle play/pause */
-    private static final Command CMD_PC_STOP = new Command("Stop",
+    protected static final Command CMD_PC_STOP = new Command("Stop",
             Command.SCREEN, 4);
 
     /** Show the playlist screen */
-    private static final Command CMD_SHOW_PL = new Command("PlayList",
+    protected static final Command CMD_SHOW_PL = new Command("PlayList",
             Command.SCREEN, 10);
 
     /** Show the rating screen */
-    private static final Command CMD_SHOW_RATE = new Command("Rate",
+    protected static final Command CMD_SHOW_RATE = new Command("Rate",
             Command.SCREEN, 20);
 
     /** Show the volume screen */
-    private static final Command CMD_SHOW_VOLUME = new Command("Volume",
+    protected static final Command CMD_SHOW_VOLUME = new Command("Volume",
             Command.SCREEN, 20);
 
     private boolean active;
@@ -66,7 +66,7 @@ public class MainScreen implements IScreen {
     private IScreen screenPlaylist, screenVolume, screenRating;
 
     private SongForm sf;
-
+    
     public MainScreen() {
     }
 
@@ -93,10 +93,13 @@ public class MainScreen implements IScreen {
             // sf.setTitle(stateToString(RemotePlayer.ST_INBETWEEN));
             player.control(PlayerControl.PC_STOP);
         } else if (c == CMD_SHOW_PL) {
+        	setActive(false);
             screenPlaylist.setActive(true);
         } else if (c == CMD_SHOW_VOLUME) {
+        	setActive(false);
             screenVolume.setActive(true);
         } else if (c == CMD_SHOW_RATE) {
+        	setActive(false);
             // set current song to null => this will rerender the song screen
             // if rating screen returna
             screenRating.setActive(true);
@@ -155,6 +158,7 @@ public class MainScreen implements IScreen {
         screenRating.setUp(this, display, player);
 
         ops.addObserver(this);
+        
     }
 
     /**
@@ -173,7 +177,6 @@ public class MainScreen implements IScreen {
                 }
             }
             sf.setTitle(stateToString(ops.getState()));
-
         }
     }
 

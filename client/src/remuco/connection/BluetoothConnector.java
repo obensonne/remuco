@@ -51,230 +51,230 @@ import remuco.util.Log;
  * 
  */
 public class BluetoothConnector implements Runnable, CommandListener,
-        DiscoveryListener, IConnector {
+		DiscoveryListener, IConnector {
 
-    /** User issues a remote device scan */
-    private static final Command CMD_SCAN = new Command("Scan", Command.SCREEN,
-            20);
+	/** User issues a remote device scan */
+	private static final Command CMD_SCAN = new Command("Scan", Command.SCREEN,
+			20);
 
-    /** Services to search.. looking for services in 'Serial Port Profile' */
-    private static final UUID[] UUID_LIST = new UUID[] { new UUID(0x1101) };
+	/** Services to search.. looking for services in 'Serial Port Profile' */
+	private static final UUID[] UUID_LIST = new UUID[] { new UUID(0x1101) };
 
-    /** User wants to cancel connection creation */
-    protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
-            30);
+	/** User wants to cancel connection creation */
+	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
+			30);
 
-    private DiscoveryAgent agent;
+	private DiscoveryAgent agent;
 
-    private GenericStreamConnection connection;
+	private GenericStreamConnection connection;
 
-    private Display d;
+	private Display d;
 
-    private Form f;
+	private Form f;
 
-    private LocalDevice localDevice;
+	private LocalDevice localDevice;
 
-    private Vector remoteDevices;
+	private Vector remoteDevices;
 
-    private List screenDevices;
+	private List screenDevices;
 
-    private Vector serviceRecords;
+	private Vector serviceRecords;
 
-    private Thread thisThread;
+	private Thread thisThread;
 
-    RemoteDevice remoteDevice;
+	RemoteDevice remoteDevice;
 
-    public synchronized void commandAction(Command c, Displayable d) {
-        if (c == List.SELECT_COMMAND) {
-            remoteDevice = (RemoteDevice) remoteDevices.elementAt(screenDevices
-                    .getSelectedIndex());
-            // wake up our thread to proceed with service search on that device
-            this.notify();
-        } else if (c == CMD_EXIT) {
-            connection.close();
-            synchronized (connection) {
-                connection.notify();
-            }
-        } else if (c == CMD_SCAN) {
-            if (thisThread != null && thisThread.isAlive()) {
-                f.append("..");
-            } else {
-                thisThread = new Thread(this);
-                thisThread.start();
-            }
-        }
-    }
+	public synchronized void commandAction(Command c, Displayable d) {
+		if (c == List.SELECT_COMMAND) {
+			remoteDevice = (RemoteDevice) remoteDevices.elementAt(screenDevices
+					.getSelectedIndex());
+			// wake up our thread to proceed with service search on that device
+			this.notify();
+		} else if (c == CMD_EXIT) {
+			connection.close();
+			synchronized (connection) {
+				connection.notify();
+			}
+		} else if (c == CMD_SCAN) {
+			if (thisThread == null || !thisThread.isAlive()) {
+				thisThread = new Thread(this);
+				thisThread.start();
+			}
+		}
+	}
 
-    public void createConnection() {
-        /*
-         * We now do nothing else than setting up UI - the user shall issue the
-         * creating with the UI and then the extra creation thread gets started
-         */
-        d.setCurrent(f);
-    }
+	public void createConnection() {
+		/*
+		 * We now do nothing else than setting up UI - the user shall issue the
+		 * creating with the UI and then the extra creation thread gets started
+		 */
+		d.setCurrent(f);
+	}
 
-    public void deviceDiscovered(RemoteDevice dev, DeviceClass devClass) {
-        remoteDevices.addElement(dev);
-    }
+	public void deviceDiscovered(RemoteDevice dev, DeviceClass devClass) {
+		remoteDevices.addElement(dev);
+	}
 
-    public GenericStreamConnection getConnection() {
-        return connection;
-    }
+	public GenericStreamConnection getConnection() {
+		return connection;
+	}
 
-    public boolean init(Display d) {
+	public boolean init(Display d) {
 
-        this.d = d;
-        connection = new GenericStreamConnection();
+		this.d = d;
+		connection = new GenericStreamConnection();
 
-        try {
-            localDevice = LocalDevice.getLocalDevice();
-        } catch (BluetoothStateException e) {
-            Log.ln(this, "Could not get local device");
-            return false;
-        }
-        agent = localDevice.getDiscoveryAgent();
-        Log.ln(this, "initialized");
+		try {
+			localDevice = LocalDevice.getLocalDevice();
+		} catch (BluetoothStateException e) {
+			Log.ln(this, "Could not get local device");
+			return false;
+		}
+		agent = localDevice.getDiscoveryAgent();
+		Log.ln(this, "initialized");
 
-        f = new Form("BT Connector");
-        f.addCommand(CMD_EXIT);
-        f.addCommand(CMD_SCAN);
-        f.setCommandListener(this);
+		f = new Form("BT Connector");
+		f.addCommand(CMD_EXIT);
+		f.addCommand(CMD_SCAN);
+		f.setCommandListener(this);
 
-        remoteDevices = new Vector();
-        screenDevices = new List("Choose a device", Choice.IMPLICIT);
-        screenDevices.setCommandListener(this);
+		remoteDevices = new Vector();
+		screenDevices = new List("Choose a device", Choice.IMPLICIT);
+		screenDevices.setCommandListener(this);
+		screenDevices.addCommand(CMD_EXIT);
 
-        serviceRecords = new Vector();
+		serviceRecords = new Vector();
 
-        return true;
+		return true;
 
-    }
+	}
 
-    public synchronized void inquiryCompleted(int arg0) {
-        // wake up our thread to proceed with device selection
-        this.notify();
-    }
+	public synchronized void inquiryCompleted(int arg0) {
+		// wake up our thread to proceed with device selection
+		this.notify();
+	}
 
-    public synchronized void run() {
-        synchronized (connection) {
-            try {
-                f.deleteAll();
-                d.setCurrent(f);
+	public synchronized void run() {
+		synchronized (connection) {
+			try {
+				f.deleteAll();
+				d.setCurrent(f);
 
-                // find remote devices
+				// find remote devices
 
-                remoteDevices.removeAllElements();
-                output("=> Search devices.. ");
-                try {
-                    agent.startInquiry(DiscoveryAgent.GIAC, this);
-                    this.wait();
-                } catch (BluetoothStateException e) {
-                    output("failed\n");
-                    output("!! Error starting inquiry\n");
-                    connection.notify(); // signalize that we are done
-                    return;
-                }
-                output("ok\n");
+				remoteDevices.removeAllElements();
 
-                int n = remoteDevices.size();
-                if (n == 0) {
-                    output("!! Error: No devices found!\n");
-                    connection.notify(); // signalize that we are done
-                    return;
-                }
+				output("=> Search devices.. ");
+				try {
+					agent.startInquiry(DiscoveryAgent.GIAC, this);
+					this.wait();
+				} catch (BluetoothStateException e) {
+					output("failed\n");
+					output("!! Error starting inquiry\n");
+					connection.notify(); // signalize that we are done
+					return;
+				}
+				output("ok\n");
 
-                // select a device
+				int n = remoteDevices.size();
+				if (n == 0) {
+					output("!! Error: No devices found!\n");
+					connection.notify(); // signalize that we are done
+					return;
+				}
 
-                screenDevices.deleteAll();
-                for (int i = 0; i < n; i++) {
-                    screenDevices.append(
-                            getDeviceName((RemoteDevice) remoteDevices
-                                    .elementAt(i)), null);
-                }
+				// select a device
 
-                d.setCurrent(screenDevices);
-                this.wait();
-                d.setCurrent(f);
-                output("=> Device: ");
-                output(getDeviceName(remoteDevice) + "\n");
+				screenDevices.deleteAll();
+				for (int i = 0; i < n; i++) {
+					screenDevices.append(
+							getDeviceName((RemoteDevice) remoteDevices
+									.elementAt(i)), null);
+				}
 
-                // search services
+				d.setCurrent(screenDevices);
+				this.wait();
+				d.setCurrent(f);
+				output("=> Device: ");
+				output(getDeviceName(remoteDevice) + "\n");
 
-                output("=> Search service.. ");
-                serviceRecords.removeAllElements();
-                try {
-                    agent.searchServices(null, UUID_LIST, remoteDevice, this);
-                } catch (BluetoothStateException e) {
-                    output("!! Error starting service search\n");
-                    connection.notify(); // signalize that we are done
-                    return;
-                }
-                this.wait();
+				// search services
 
-                output("ok\n");
+				output("=> Search service.. ");
+				serviceRecords.removeAllElements();
+				try {
+					agent.searchServices(null, UUID_LIST, remoteDevice, this);
+				} catch (BluetoothStateException e) {
+					output("!! Error starting service search\n");
+					connection.notify(); // signalize that we are done
+					return;
+				}
+				this.wait();
 
-                n = serviceRecords.size();
-                if (n == 0) {
-                    output("!! Error: No services found!\n");
-                    connection.notify(); // signalize that we are done
-                    return;
-                } else if (n > 1) {
-                    output("Found more than 1 suitable service - use first");
-                }
+				output("ok\n");
 
-                ServiceRecord sr = (ServiceRecord) serviceRecords.elementAt(0);
-                String url = sr.getConnectionURL(
-                        ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-                output("SR-URL: " + url);
+				n = serviceRecords.size();
+				if (n == 0) {
+					output("!! Error: No services found!\n");
+					connection.notify(); // signalize that we are done
+					return;
+				} else if (n > 1) {
+					output("Found more than 1 suitable service - use first");
+				}
 
-                // create connection
+				ServiceRecord sr = (ServiceRecord) serviceRecords.elementAt(0);
+				String url = sr.getConnectionURL(
+						ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+				output("SR-URL: " + url);
 
-                output("=> Create connection.. ");
-                try {
-                    StreamConnection scon = (StreamConnection) Connector
-                            .open(url);
-                    connection.setStreams(scon.openDataInputStream(), scon
-                            .openDataOutputStream());
-                    output("ok\n");
-                } catch (IOException e) {
-                    output("failed (" + e.getMessage() + ")\n");
-                    connection.notify(); // signalize that we are done
-                    return;
-                }
+				// create connection
 
-                connection.notify(); // signalize that we are done (successful)
+				output("=> Create connection.. ");
+				try {
+					StreamConnection scon = (StreamConnection) Connector
+							.open(url);
+					connection.setStreams(scon.openDataInputStream(), scon
+							.openDataOutputStream());
+					output("ok\n");
+				} catch (IOException e) {
+					output("failed (" + e.getMessage() + ")\n");
+					connection.notify(); // signalize that we are done
+					return;
+				}
 
-            } catch (InterruptedException e) {
-                Log.ln(this, "I have been interrupted");
-            }
-        }
-    }
+				connection.notify(); // signalize that we are done
+				// (successful)
 
-    public void servicesDiscovered(int tid, ServiceRecord[] srs) {
-        int n = srs.length;
-        for (int i = 0; i < n; i++) {
-            serviceRecords.addElement(srs[i]);
+			} catch (InterruptedException e) {
+				Log.ln(this, "I have been interrupted");
+			}
+		}
+	}
 
-        }
-    }
+	public void servicesDiscovered(int tid, ServiceRecord[] srs) {
+		int n = srs.length;
+		for (int i = 0; i < n; i++) {
+			serviceRecords.addElement(srs[i]);
+		}
+	}
 
-    public synchronized void serviceSearchCompleted(int arg0, int arg1) {
-        // wake up our thread to proceed with using the found services
-        this.notify();
-    }
+	public synchronized void serviceSearchCompleted(int arg0, int arg1) {
+		// wake up our thread to proceed with using the found services
+		this.notify();
+	}
 
-    private String getDeviceName(RemoteDevice rd) {
-        try {
-            return rd.getFriendlyName(false);
-        } catch (IOException e) {
-            return rd.getBluetoothAddress();
-        }
-    }
+	private String getDeviceName(RemoteDevice rd) {
+		try {
+			return rd.getFriendlyName(false);
+		} catch (IOException e) {
+			return rd.getBluetoothAddress();
+		}
+	}
 
-    private void output(String msg) {
-        f.append(msg);
-        Log.l(msg);
+	private void output(String msg) {
+		f.append(msg);
+		Log.l(msg);
 
-    }
+	}
 
 }

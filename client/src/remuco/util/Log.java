@@ -41,10 +41,10 @@ public class Log {
 
     private static String toClassName(Object o) {
         String s;
-        int i, len;
-        StringBuffer sb = new StringBuffer();
+        int i;
+        StringBuffer sb = new StringBuffer("[");
         if (o == null) {
-            s = "NULL";
+            s = "X";
         } else if (o instanceof Class) {
             s = ((Class) o).getName();
         } else {
@@ -54,13 +54,7 @@ public class Log {
         if (i > 0) {
             sb.append(s.substring(i));
         }
-
-        len = 30;
-        i = sb.length();
-        while (i < len) {
-            sb.append(" ");
-            i++;
-        }
+        sb.append("]");
 
         return sb.toString();
     }

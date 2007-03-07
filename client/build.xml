@@ -80,9 +80,6 @@
     <property name="cldc.ver" value="CLDC-1.1"/>
     <property name="jsr082.lib" value="${wtk.home}/lib/jsr082.jar"/>
 
-    <property name="base.home" value="../../base" />
-    <property name="base.src" value="${base.home}/src" />
-    
     <!-- Classpath for build -->
     <path id="build.cp">
         <fileset dir="${wtk.home}/lib">
@@ -109,8 +106,9 @@
     <property name="midlet.jar" value="${midlet.name.lc}.jar"/>
     <property name="midlet.jad" value="${midlet.name.lc}.jad"/>
     <property name="midlet.class" value="remuco.Main"/>
+	<property name="midlet.icon" value="monkey_12x12.png"/>
     <property name="midlet.version" value="0.4.2"/>
-    <property name="midlet.vendor" value="${user.name}"/>
+    <property name="midlet.vendor" value="remuco.sf.net"/>
     
     <property name="dist.pkg-name"
         value="remuco-client-${midlet.version}"/>
@@ -126,6 +124,8 @@
             <!-- sources -->
             <src path="src" />
             <exclude name="remuco/server/**"/> <!-- contains only test-classes -->
+            <exclude name="remuco/ui/canvas/**"/> <!-- contains only test-classes -->
+            <exclude name="remuco/Cat.java"/> <!-- contains only test-classes -->
             <!-- classpath -->
             <classpath refid="build.cp" />
         </javac>
@@ -197,7 +197,8 @@
             <attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
             <attribute name="MicroEdition-Profile" value="${midp.ver}" />
             
-            <attribute name="MIDlet-1" value="${midlet.name},,${midlet.class}"/>
+            <attribute name="MIDlet-1"
+            	value="${midlet.name},${midlet.icon},${midlet.class}"/>
             <attribute name="MIDlet-Name" value="${midlet.name}" />
             <attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
             <attribute name="MIDlet-Version" value="${midlet.version}" />
@@ -282,8 +283,6 @@
                 debug="true">
             <!-- sources -->
             <src path="src" />
-            <src path="${base.src}" />
-            <exclude name="remuco/clients/**"/>
             <!-- classpath -->
             <classpath refid="build.cp" />
         </javac>

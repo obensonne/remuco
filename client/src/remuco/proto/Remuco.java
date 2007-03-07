@@ -103,35 +103,35 @@ public interface Remuco {
 
     public static final byte REM_DATA_TYPE_UNKNOWN = (byte) 0xFF;
 
-    public static final String REM_TAG_NAME_UID = "uid";
-
     // ////////////////////////////////////////////////////////////////////////
     //
     // song (tags)
     //
     // ////////////////////////////////////////////////////////////////////////
 
-    public static final String REM_TAG_NAME_TITLE = "title";
+    public static final String REM_TAG_NAME_UID = "UID";
 
-    public static final String REM_TAG_NAME_ARTIST = "artist";
+    public static final String REM_TAG_NAME_TITLE = "Title";
 
-    public static final String REM_TAG_NAME_ALBUM = "album";
+    public static final String REM_TAG_NAME_ARTIST = "Artist";
 
-    public static final String REM_TAG_NAME_GENRE = "genre";
+    public static final String REM_TAG_NAME_ALBUM = "Album";
 
-    public static final String REM_TAG_NAME_YEAR = "year";
+    public static final String REM_TAG_NAME_GENRE = "Genre";
 
-    public static final String REM_TAG_NAME_RATING = "rating";
+    public static final String REM_TAG_NAME_YEAR = "Year";
 
-    public static final String REM_TAG_NAME_COMMENT = "comment";
+    public static final String REM_TAG_NAME_RATING = "Rating";
 
-    public static final String REM_TAG_NAME_BITRATE = "bitrate";
+    public static final String REM_TAG_NAME_COMMENT = "Comment";
 
-    public static final String REM_TAG_NAME_LENGTH = "length";
+    public static final String REM_TAG_NAME_BITRATE = "Bitrate";
 
-    public static final String REM_TAG_NAME_TRACK = "track";
+    public static final String REM_TAG_NAME_LENGTH = "Length";
 
-    public static final String REM_TAG_VAL_RATING_UNRATED = "-1";
+    public static final String REM_TAG_NAME_TRACK = "Track";
+
+    public static final String REM_TAG_VAL_RATING_UNRATED = "-100";
 
     // ////////////////////////////////////////////////////////////////////////
     //

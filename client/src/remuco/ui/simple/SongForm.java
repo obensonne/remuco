@@ -12,80 +12,82 @@ import remuco.data.Song;
  */
 public class SongForm extends Form {
 
-    private static final String[] EXTRA_TAGS = new String[] { Song.TAG_GENRE,
-            Song.TAG_YEAR };
-    private static final int EXTRA_TAGS_LEN = EXTRA_TAGS.length;
+	private static final String[] RATING_STRINGS = new String[] { "-", "*",
+			"**", "***", "****", "*****", "***** *", "***** **", "***** ***",
+			"***** ****", "***** *****"};
 
-    private Song song;
+	private static final int RATING_STRINGS_MAX = RATING_STRINGS.length - 1;
 
-    public SongForm(String title) {
-        super(title);
-    }
+	private static final String[] EXTRA_TAGS = new String[] { Song.TAG_GENRE,
+			Song.TAG_YEAR };
 
-    public Song getSong() {
-        return song;
-    }
+	private static final int EXTRA_TAGS_LEN = EXTRA_TAGS.length;
 
-    public void setSong(Song s) {
+	private Song song;
 
-        this.song = s;
+	public SongForm(String title) {
+		super(title);
+	}
 
-        // remove current currentSong descriptions
-        int n = this.size();
-        for (int i = 0; i < n; i++) {
-            this.delete(0);
-        }
+	public Song getSong() {
+		return song;
+	}
 
-        if (s == null) {
-            return;
-        }
+	public void setSong(Song s) {
 
-        final String lb = "\n";
-        StringBuffer sb = new StringBuffer();
-        int l;
+		this.song = s;
 
-        sb.append(s.getTag(Song.TAG_TITLE)).append(" (").append(
-                s.getTag(Song.TAG_ARTIST)).append(")");
+		// remove current currentSong descriptions
+		int n = this.size();
+		for (int i = 0; i < n; i++) {
+			this.delete(0);
+		}
 
-        // write standard currentSong descriptions
+		if (s == null) {
+			return;
+		}
 
-        sb.delete(0, sb.length());
-        sb.append(s.getTag(Song.TAG_ARTIST)).append(": ");
-        sb.append(s.getTag(Song.TAG_TITLE));
-        sb.append(" (").append(s.getTag(Song.TAG_ALBUM)).append(")");
-        sb.append(lb);
-        sb.append("Rating: ").append(ratingtoString(s.getRating()));
-        sb.append(lb);
-        sb.append("Length: ").append(s.getLenFormatted());
+		final String lb = "\n";
+		StringBuffer sb = new StringBuffer();
 
-        // write extra s descriptions
-        n = EXTRA_TAGS_LEN;
-        for (int i = 0; i < n; i++) {
-            sb.append(lb);
-            sb.append(translateTagName(EXTRA_TAGS[i])).append(": ");
-            sb.append(s.getTag(EXTRA_TAGS[i]));
-        }
+		sb.append(s.getTag(Song.TAG_TITLE)).append(" (").append(
+				s.getTag(Song.TAG_ARTIST)).append(")");
 
-        this.append(sb.toString());
+		// write standard currentSong descriptions
 
-    }
+		sb.delete(0, sb.length());
+		sb.append(s.getTag(Song.TAG_ARTIST)).append(": ");
+		sb.append(s.getTag(Song.TAG_TITLE));
+		sb.append(" (").append(s.getTag(Song.TAG_ALBUM)).append(")");
+		sb.append(lb);
+		sb.append("Rating: ").append(ratingtoString(s.getRating()));
+		sb.append(lb);
+		sb.append("Length: ").append(s.getLenFormatted());
 
-    private String ratingtoString(int rating) {
-        if (rating == Song.RATING_NONE) {
-            return "unrated";
-        } else if (rating == 0) {
-            return "-";
-        } else {
-            String s = "";
-            for (int i = 0; i < rating; i++) {
-                s = s + "*";
-            }
-            return s;
-        }
-    }
+		// write extra song descriptions
+		n = EXTRA_TAGS_LEN;
+		for (int i = 0; i < n; i++) {
+			sb.append(lb);
+			sb.append(translateTagName(EXTRA_TAGS[i])).append(": ");
+			sb.append(s.getTag(EXTRA_TAGS[i]));
+		}
 
-    private String translateTagName(String tagName) {
-        return tagName;
-    }
+		this.append(sb.toString());
+
+	}
+
+	private String ratingtoString(int rating) {
+		if (rating >= 0 && rating <= RATING_STRINGS_MAX) {
+			return RATING_STRINGS[rating];
+		} else if (rating == Song.RATING_NONE) {
+			return "unrated";
+		} else {
+			return Integer.toString(rating);
+		}
+	}
+
+	private String translateTagName(String tagName) {
+		return tagName;
+	}
 
 }
