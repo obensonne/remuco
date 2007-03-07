@@ -24,14 +24,19 @@ Installation
 If you've got or built a binary package, unpack it and copy the jar and jad file
 on your J2ME capable and Bluetooth enabled mobile device.
 
-Installing the Remuco client on the mobile device is device dependent.
-On my Sony Ericsson k750i, I select the jad file with the file browser and
-choose option 'Install' on it.
+Once they are on your mobile device, you need to install them. This is device
+dependent. For example on a Sony Ericsson K750i, you browse to the copied files
+and choose install on the jad file. The process should be similar for other
+devices.
+
+On some mobiles you may instead make use of special software to install applications
+on the mobile. The documentation of your mobile should be the best place to
+find out how to install java applications on the mobile.
 
 How to use
 **********
 
-Once the cleint is installed and started on your mobile device, you get prompted
+Once the client is installed and started on your mobile device, you get prompted
 with a screen to scan for a device running the Remuco server. So push the
 button 'Scan' and .. wait. After some seconds, a list of neighbour devices is
 found. Choose your computer which runs the Remuco server (make sure the
