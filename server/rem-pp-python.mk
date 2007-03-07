@@ -23,4 +23,5 @@ install: server
 	$(INSTALL_DATA) rem.py pp/$(PP_NAME)/pp.py $(DESTDIR)$(REM_DIR)/$(PP_NAME)
 
 PP_EXTRA_BIN_FILES :=
-PP_EXTRA_LIB_FILES := rem.py rem-pp-$(PP_NAME).py $(PY_EXTRA_FILES)
+PP_EXTRA_LIB_FILES := rem.py pp/$(PP_NAME)/pp.py \
+	$(patsubst %,pp/$(PP_NAME)/%,$(PY_EXTRA_FILES))
