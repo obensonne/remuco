@@ -5,6 +5,7 @@
 	song)
 	* added compilation flags in 'rem-pp-xmms2.mk' to build for the devel
 	tree of xmms2
+	* minor internal (non-functional) changes
 	
 0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
 

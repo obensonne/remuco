@@ -23,21 +23,21 @@ REM_PS_PL_POS_NONE = 0
 
 """ Music meta data (Tags) """
 
-REM_TAG_NAME_UID = "uid"        # the song id
-REM_TAG_NAME_TITLE = "title"
-REM_TAG_NAME_ARTIST = "artist"
-REM_TAG_NAME_ALBUM = "album"
-REM_TAG_NAME_GENRE = "genre"
-REM_TAG_NAME_YEAR = "year"
-REM_TAG_NAME_RATING = "rating"   # format: 'n/m'
+REM_TAG_NAME_UID = "UID"        # the song id
+REM_TAG_NAME_TITLE = "Title"
+REM_TAG_NAME_ARTIST = "Artist"
+REM_TAG_NAME_ALBUM = "Album"
+REM_TAG_NAME_GENRE = "Genre"
+REM_TAG_NAME_YEAR = "Year"
+REM_TAG_NAME_RATING = "Rating"   # format: 'n/m'
                                  # n: rating (-1: unrated)
                                  # m: max possible rating
-REM_TAG_NAME_COMMENT = "comment"
-REM_TAG_NAME_BITRATE = "bitrate"
-REM_TAG_NAME_LENGTH = "length"   # in s
-REM_TAG_NAME_TRACK = "track"
+REM_TAG_NAME_COMMENT = "Comment"
+REM_TAG_NAME_BITRATE = "Bitrate"
+REM_TAG_NAME_LENGTH = "Length"   # in s
+REM_TAG_NAME_TRACK = "Track"
 
-REM_TAG_VAL_RATING_UNRATED = "-1"
+REM_TAG_VAL_RATING_UNRATED = "-100"
 
 REM_MAX_TAGS = 20
 

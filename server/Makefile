@@ -42,6 +42,7 @@ CC		:= gcc
 INSTALL := install
 INSTALL_PROG := $(INSTALL)
 INSTALL_DATA := $(INSTALL) -m 664
+INSTALL_DIR := $(INSTALL) -d
 
 STRIP := strip
 #STRIP := touch

@@ -1,6 +1,7 @@
 0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* some internal (non-functional) changes
+	* restructured player proxy files and building
 	
 0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
 

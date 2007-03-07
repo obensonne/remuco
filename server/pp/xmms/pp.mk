@@ -19,6 +19,7 @@ server: prereqs pp/$(PP_NAME)/pp.c
 	chmod +x remuco-$(PP_NAME)
 
 install: server
+	$(INSTALL_DIR) $(DESTDIR)$(BIN_DIR)
 	$(INSTALL_PROG) remuco-$(PP_NAME) $(DESTDIR)$(BIN_DIR)
 	
 PP_EXTRA_BIN_FILES :=

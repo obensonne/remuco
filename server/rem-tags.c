@@ -185,6 +185,16 @@ rem_tags_id3_read(const char *file, const char **tag_names, const int tag_count,
 		frame = rem_tags_id3_map_tag_to_frame_name(tag_names[i]);
 		val = rem_tags_id3_get_tag(id3_tag, frame);
 		val = val ? val : &null_char;
+		// convert track length from msec to sec
+		if (strcmp(tag_names[i], REM_TAG_NAME_LENGTH) == 0) {
+			int sl = strlen(val);
+			if (sl > 3) {
+				val[sl - 3] = 0;
+			} else if (val != &null_char) {
+				free(val);
+				val = strdup("1");
+			}
+		}
 		rem_song_append_tag(song, tag_names[i], val);
 		if (val != &null_char) free(val);
 	}

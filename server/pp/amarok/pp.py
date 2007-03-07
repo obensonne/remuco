@@ -78,7 +78,7 @@ def rem_pp_get_ps():
     
     ret = rem_pp_check_amarok_connection()
     if ret <= 0:
-        return ps;
+        return [ REM_PS_STATE_OFF, 50, 0, 0, REM_PS_PL_POS_NONE, [ ] ]
 
     state = pputil.app.player.status()
     if state == 0:

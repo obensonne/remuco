@@ -64,21 +64,21 @@
 //////////////////////////////////////////////////////////////////////////////
 
 /** standard tags */
-#define REM_TAG_NAME_UID	"uid"
-#define REM_TAG_NAME_TITLE	"title"
-#define REM_TAG_NAME_ARTIST	"artist"
-#define REM_TAG_NAME_ALBUM	"album"
-#define REM_TAG_NAME_GENRE	"genre"
-#define REM_TAG_NAME_YEAR	"year"
-#define REM_TAG_NAME_RATING	"rating"	// format: 'n/m'
+#define REM_TAG_NAME_UID	"UID"
+#define REM_TAG_NAME_TITLE	"Title"
+#define REM_TAG_NAME_ARTIST	"Artist"
+#define REM_TAG_NAME_ALBUM	"Album"
+#define REM_TAG_NAME_GENRE	"Genre"
+#define REM_TAG_NAME_YEAR	"Year"
+#define REM_TAG_NAME_RATING	"Rating"	// format: 'n/m'
 						// n: rating (-1: unrated)
 						// m: max possible rating
-#define REM_TAG_NAME_COMMENT	"comment"
-#define REM_TAG_NAME_BITRATE	"bitrate"
-#define REM_TAG_NAME_LENGTH	"length"	// in ms
-#define REM_TAG_NAME_TRACK	"track"
+#define REM_TAG_NAME_COMMENT	"Comment"
+#define REM_TAG_NAME_BITRATE	"Bitrate"
+#define REM_TAG_NAME_LENGTH	"Length"	// in ms
+#define REM_TAG_NAME_TRACK	"Track"
 
-#define REM_TAG_VAL_RATING_UNRATED	"-1"
+#define REM_TAG_VAL_RATING_UNRATED	"-100"
 
 #define REM_MAX_TAGS		20
 

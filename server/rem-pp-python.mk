@@ -15,8 +15,8 @@ server: prereqs rem-pp-python.c
 	chmod +x remuco-$(PP_NAME)
 
 install: server
+	$(INSTALL_DIR) $(DESTDIR)$(BIN_DIR) $(DESTDIR)$(REM_DIR)/$(PP_NAME)
 	$(INSTALL_PROG) remuco-$(PP_NAME) $(DESTDIR)$(BIN_DIR)
-	$(INSTALL) -d $(DESTDIR)$(REM_DIR)/$(PP_NAME)
 	for FILE in $(PY_EXTRA_FILES) ; do \
 		$(INSTALL_DATA) pp/$(PP_NAME)/$$FILE $(DESTDIR)$(REM_DIR)/$(PP_NAME) ; \
 	done

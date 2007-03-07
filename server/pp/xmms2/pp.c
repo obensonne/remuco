@@ -177,7 +177,7 @@ rem_pp_get_ps(struct rem_pp_ps *ps)
 		return -1;
 	}
 	ret = xmmsc_result_get_uint(result, &sid_cur);
-	LOG_DEBUG("sud cur = %u\n", sid_cur);
+	LOG_NOISE("sud cur = %u\n", sid_cur);
 	xmmsc_result_unref(result);
 	if (!ret) {
 		LOG_WARN("cid: result broken");
@@ -504,7 +504,7 @@ rem_pp_xmms2_setup_connection()
 		LOG_INFO("xmms2d is running\n");
 		xmmsc_disconnect_callback_set(connection, rem_pp_xmms2_disconnect, NULL);
 	} else {
-		LOG_INFO("xmms2d is down (%s)\n",
+		LOG_NOISE("xmms2d is down (%s)\n",
 					xmmsc_get_last_error (connection));
 		xmmsc_unref(connection);
 		connection = NULL;
@@ -539,6 +539,10 @@ rem_pp_xmms2_add_tag_to_song(struct rem_pp_song *s, xmmsc_result_t *result,
 			if (xmmsc_result_get_dict_entry_int32(result,
 #endif
 						tag_name_mlib, &i)) {
+				// convert track length from msec to sec:
+				if (strcmp(tag_name_rem, REM_TAG_NAME_LENGTH) == 0) {
+					i = i / 1000;
+				}
 				snprintf(val_my, REM_MAX_STR_LEN, "%i", i);
 				val_final = val_my;
 			} else {
