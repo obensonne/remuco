@@ -92,7 +92,7 @@ def rem_pp_get_ps():
 
     volume = pputil.app.player.getVolume()
     
-    if pputil.app.player.repeatTrackStatus():
+    if pputil.app.player.repeatPlaylistStatus():
         repeat = 1
     else:
         repeat = 0
