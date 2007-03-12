@@ -182,14 +182,37 @@
     <target name="jar" depends="preverify,write-metafile">
         <mkdir dir="build/jar"/>
         <copy file="build/MF" tofile="build/jar/MANIFEST.MF" />
-        <manifest file="build/jar/MANIFEST.MF" mode="update">
-        </manifest>
+		<!-- dirty hack to move empty lines to the end of the manifest
+			 otherwise jar would fail 
+    	<exec executable="sort" os="Linux">
+            <arg line="-r -o build/jar/MANIFEST.MF build/MF " />
+        </exec-->
         <jar jarfile="build/jar/${midlet.jar}" manifest="build/jar/MANIFEST.MF">
             <fileset dir="build/preverified" />
-            <fileset dir="res" />
+            <fileset dir="res/final" />
+            <fileset dir="res/vlc" />
+            <fileset file="res/monkey_12x12.png" />
         </jar>
     </target>
 
+	<target name="theme.setup.simple">
+	</target>
+	
+	<target name="theme.setup.canvas">
+		<manifest file="build/MF" mode="update">
+			<attribute name="remuco-ui-canvas-theme"
+	        	value="${remuco-ui-canvas-theme}" />
+		</manifest>
+		<concat destfile="build/MF2" fixlastline="yes">
+			<fileset file="res/themes/${remuco-ui-canvas-theme}/theme.props" />
+			<fileset file="build/MF" />
+		</concat>
+		<rename dest="build/MF" src="build/MF2" replace="true"/>
+		<copy todir="res/final">
+			<fileset dir="res/themes/${remuco-ui-canvas-theme}/icons" />
+		</copy>
+	</target>
+	
     <!-- Creates a basic meta file. The jar manifest file and the jad file
          extend this file. -->
     <target name="write-metafile">
@@ -206,6 +229,9 @@
             <attribute name="remuco-connection" value="${remuco-connection}" />
             <attribute name="remuco-ui" value="${remuco-ui}" />
         </manifest>
+
+    	<!-- now set ui specifc properties -->
+    	<antcall target="theme.setup.${remuco-ui}" />
     </target>
     
     <!-- =================== Dist ========================================= -->
@@ -267,8 +293,8 @@
     
     <target name="run" depends="dist"
             description="--> run the client in WTK emulation environment">
-        <exec executable="${wtk.home}/bin/emulator">
-            <arg line="-Xdescriptor:dist/${midlet.jad}" />
+        <exec executable="${wtk.home}/bin/emulator" dir="dist">
+            <arg line="-Xdevice:MediaControlSkin -Xdescriptor:${midlet.jad}" />
         </exec>            
     </target>
     

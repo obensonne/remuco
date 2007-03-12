@@ -15,7 +15,7 @@ public class RemucoIO implements Remuco {
 
     private static final String REM_CI_ENC_DEFAULT = "ASCII";
 
-    private static final String LOGPRE = "RIO: ";
+    private static final String LOGPRE = "[RIO]: ";
 
     /**
      * 
@@ -76,7 +76,7 @@ public class RemucoIO implements Remuco {
         boolean plIncl;
 
         // fixed fields
-        Log.l(LOGPRE + "read fixed part of player state .. ");
+        Log.ln(LOGPRE + "read PS .. fix");
         ps.setState((byte) data[0]);
         ps.setVolume(data[1]);
         ps.playlistSetRepeat((data[2] & Remuco.REM_PS_FLAG_PL_REPEAT) != 0);
@@ -94,7 +94,7 @@ public class RemucoIO implements Remuco {
         // playlist
         pos = REM_PS_TD_LEN; // == 12 (first playlist data byte - if any)
         if (plIncl) {
-            Log.l("create playlist (" + plLen + " songs) .. ");
+            Log.l("create pl (" + plLen + " songs) .. ");
             ps.playlistClear();
             n = data.length;
             for (i = 0, pos = REM_PS_TD_LEN; i < plLen && pos < n; i++) {
@@ -122,7 +122,7 @@ public class RemucoIO implements Remuco {
                                 + " songs)");
             }
         } else {
-            Log.l("no playlist change .. ");
+            Log.l("no pl incl .. ");
         }
         ps.playlistSetPosition(plPos);
         Log.ln("ok");

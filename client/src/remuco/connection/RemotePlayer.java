@@ -85,11 +85,11 @@ public class RemotePlayer implements Runnable {
 
         // hello dialog
         try {
-            Log.l(this, "sending client info .. ");
+            Log.l(this, "tx client info .. ");
             RemucoIO.sendClientInfo(dos, ci);
-            Log.l(this, "ok\n");
+            Log.ln("ok\n");
         } catch (IOException e) {
-            Log.ln(this, "sending client info failed: " + e.getMessage());
+            Log.ln("failed: " + e.getMessage());
             con.close();
             return;
         }
@@ -97,22 +97,22 @@ public class RemotePlayer implements Runnable {
         // wait for player states
         while (ioErrors <= MAX_IO_ERRORS && con.isOpen()) {
             try {
-                Log.ln(this, "waiting for new player state .. ");
+                //Log.ln(this, "waiting for new player state .. ");
                 RemucoIO.recvPlayerState(dis, ops);
-                Log.ln(this, "received new player state (" + ops + ")");
+                Log.ln(this, "rxed new ps (" + ops + ")");
                 ops.changed();
                 ioErrors = 0;
                 if (ops.getState() == Remuco.REM_PS_STATE_SRVOFF) {
-                    Log.ln("server has shutdown");
+                    Log.ln("server shutdown");
                     con.close();
                     ops.changed();
                     return;
                 }
             } catch (TransferDataException e) {
-                Log.ln(this, "receiving player state failed:" + e.getMessage());
+                Log.ln(this, "rx ps failed:" + e.getMessage());
                 ioErrors++;
             } catch (IOException e) {
-                Log.ln(this, "receiving player state failed:" + e.getMessage());
+                Log.ln(this, "rx ps failed:" + e.getMessage());
                 ioErrors++;
             }
         }
