@@ -163,8 +163,8 @@ public class MainScreen implements IScreen, KeyListener {
 		if (ops != null)
 			ops.addObserver(this);
 		this.pc = new PlayerControl();
-
-		sc = new SongScreen(this);
+        
+		sc = new SongScreen(this, new Theme(Theme.DEFAULT));
 		sc.addCommand(CMD_EXIT);
 		sc.setCommandListener(this);
 

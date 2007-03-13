@@ -1,127 +1,158 @@
+
 package remuco.ui.canvas;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.Main;
-import remuco.util.Log;
-
 public class Theme {
 
-	//////////////////////////////////////////////////////////////////////////
-	// colors
-	//////////////////////////////////////////////////////////////////////////
+    protected static final byte COLOR_BG = 0, COLOR_TEXT = 1, COLOR_TITLE = 2,
+            COLOR_ARTIST = 3, COLOR_ALBUM = 4;
+    
+    protected static final String DEFAULT = "vlc";
 
-	public static final int COLOR_BG = 0;
+    protected static final Font FONT = Font.getDefaultFont();
 
-	public static final int COLOR_LINES = 1;
+    protected static final Font FONT_ALBUM = FONT;
 
-	public static final int COLOR_TEXT = 2;
+    protected static final Font FONT_ARTIST = FONT;
 
-	private static final int COLORS_COUNT = 3;
+    protected static final Font FONT_TITLE = Font.getFont(Font.FACE_SYSTEM,
+            Font.STYLE_BOLD, Font.SIZE_LARGE);
 
-	private static final int[] colorFallBacks = { 0, 0x902020, 0xAA2222 };
+    protected static final byte IMGID_BORDER_TOP = 0, IMGID_BORDER_BOTTOM = 1,
+            IMGID_BORDER_LEFT = 2, IMGID_BORDER_RIGHT = 3,
+            IMGID_CORNER_TOP_LEFT = 4, IMGID_CORNER_TOP_RIGHT = 5,
+            IMGID_CORNER_BOTTOM_LEFT = 6, IMGID_CORNER_BOTTOM_RIGHT = 7,
+            IMGID_SONG_AREA = 8, IMGID_TOP_LEFT = 9, IMGID_TOP_RIGHT = 10,
+            IMGID_TOP_SPACER = 11, IMGID_REPEAT_OFF = 12, IMGID_REPEAT_ON = 13,
+            IMGID_SHUFFLE_OFF = 14, IMGID_SHUFFLE_ON = 15,
+            IMGID_VOLUME_SYMBOL = 16, IMGID_VOLUME_LEFT = 17,
+            IMGID_VOLUME_RIGHT = 18, IMGID_VOLUME_OFF = 19,
+            IMGID_VOLUME_ON = 20, IMGID_STATE_PLAY = 21,
+            IMGID_STATE_PAUSE = 22, IMGID_STATE_STOP = 23,
+            IMGID_STATE_OFF = 24, IMGID_STATE_SRVOFF = 25,
+            IMGID_STATE_PROBLEM = 26, IMGID_STATE_ERROR = 27,
+            IMGID_RATE_OFF = 28, IMGID_RATE_ON = 29, IMGID_COLORS = 30;
 
-	private static final String[] colorNames = {
-			"remuco-ui-canvas-color-background",
-			"remuco-ui-canvas-color-lines", "remuco-ui-canvas-color-text" };
+    private static final int COLORS_COUNT = 5;
 
-	private static final int[] colors = new int[COLORS_COUNT];
+    private static final String[] imgName = { "border-top.png",
+            "border-bottom.png", "border-left.png", "border-right.png",
+            "corner-top-left.png", "corner-top-right.png",
+            "corner-bottom-left.png", "corner-bottom-right.png",
+            "song-area.png", "top-left.png", "top-right.png", "top-spacer.png",
+            "repeat-off.png", "repeat-on.png", "shuffle-off.png",
+            "schuffle-on.png", "volume-symbol.png", "volume-left.png",
+            "volume-right.png", "volume-off.png", "volume-on.png",
+            "state-play.png", "state-pause.png", "state-stop.png",
+            "state-off.png", "state-srvoff.png", "state-problem.png",
+            "state-error.png", "rate-off.png", "rate-on.png", "colors.png", };
 
-	//////////////////////////////////////////////////////////////////////////
-	// state icons
-	//////////////////////////////////////////////////////////////////////////
+    private static final int IMGS_COUNT = imgName.length;
 
-	protected static final int IMG_ST_OTHER = -1;
+    protected static String[] splitString(String s, int maxWidth, Font f) {
 
-	protected static final int IMG_ST_PLAY = 0;
+        if (f.stringWidth(s) <= maxWidth) {
+            return new String[] { s };
+        }
 
-	protected static final int IMG_ST_PAUSE = 1;
+        int w, slen, i, n, goodBreakPos;
 
-	protected static final int IMG_ST_STOP = 2;
+        String cSpace = " ", cCurrent;
 
-	protected static final int IMG_ST_OFF = 3;
+        String[] sa;
 
-	protected static final int IMG_ST_SRVOFF = 4;
+        Vector v = new Vector(3);
 
-	protected static final int IMG_ST_PROBLEM = 5;
+        w = f.stringWidth(s);
 
-	protected static final int IMG_ST_ERROR = 6;
+        while ((slen = s.length()) > 0) {
 
-	protected static final int IMG_ST_COUNT = 7;
+            goodBreakPos = 0;
+            i = 1;
+            w = 0;
+            while (w < maxWidth && i < slen) {
+                cCurrent = s.substring(i, i + 1);
+                if (cCurrent.equals(cSpace))
+                    goodBreakPos = i;
+                w = f.substringWidth(s, 0, i);
+                i++;
+            }
+            if (w >= maxWidth) {
+                if (goodBreakPos > 0) {
+                    v.addElement(s.substring(0, goodBreakPos));
+                    s = s.substring(goodBreakPos < slen - 1 ? goodBreakPos + 1
+                            : goodBreakPos);
+                } else {
+                    v.addElement(s.substring(0, i - 1));
+                    s = s.substring(i - 1);
+                }
+            } else {
+                break;
+            }
+        }
 
-	private static final String[] stateImageFiles = { "play", "pause", "stop",
-			"off", "srvoff", "problem", "error" };
+        if (slen > 0) {
+            v.addElement(s);
+        }
 
-	private static Image fallBackImage;
+        n = v.size();
+        sa = new String[n];
+        for (i = 0; i < n; i++) {
+            sa[i] = (String) v.elementAt(i);
+        }
 
-	private static final Image[] stateImages = new Image[IMG_ST_COUNT];
+        return sa;
 
-	//////////////////////////////////////////////////////////////////////////
-	// fonts
-	//////////////////////////////////////////////////////////////////////////
+    }
 
-	protected static final Font FONT_TITLE = Font.getFont(Font.FACE_SYSTEM,
-			Font.STYLE_BOLD, Font.SIZE_LARGE);
+    protected int[] colors;
 
-	protected static final Font FONT_STD = Font.getDefaultFont();
+    protected Image[] img;
 
-	protected static final Font FONT_ALBUM = FONT_STD;
+    protected Image imgFallBack;
 
-	protected static final Font FONT_ARTIST = FONT_STD;
-	
-	//////////////////////////////////////////////////////////////////////////
-	// methods
-	//////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
+    // methods
+    // ////////////////////////////////////////////////////////////////////////
 
-	protected static int getColor(int type) {
+    protected Theme(String name) {
+        init(name);
+    }
 
-		if (type < 0 || type >= COLORS_COUNT)
-			return 0x123456;
+    private void createFallBackImage() {
+        imgFallBack = Image.createImage(12, 12);
+        Graphics g = imgFallBack.getGraphics();
+        g.setColor(0);
+        g.drawLine(0, 0, 11, 11);
+        g.drawLine(11, 0, 0, 11);
+    }
 
-		return colors[type];
+    private void init(String name) {
 
-	}
+        int i;
 
-	protected static Image getIcon(int type) {
+        createFallBackImage();
 
-		if (type < 0 || type >= IMG_ST_COUNT)
-			return fallBackImage;
+        img = new Image[IMGS_COUNT];
+        for (i = 0; i < IMGS_COUNT; i++) {
+            try {
+                img[i] = Image.createImage(name + "/" + imgName[i]);
+            } catch (IOException e) {
+                System.out.println("loading image " + imgName[i] + " failed!");
+                img[i] = imgFallBack;
+            }
+        }
 
-		return stateImages[type];
-	}
+        colors = new int[COLORS_COUNT];
+        img[IMGID_COLORS]
+                .getRGB(colors, 0, COLORS_COUNT, 0, 0, COLORS_COUNT, 1);
 
-	protected static void init() {
-
-		int i;
-
-		fallBackImage = getFallBackImage();
-
-		for (i = 0; i < IMG_ST_COUNT; i++) {
-			try {
-				stateImages[i] = Image.createImage(stateImageFiles[i] + ".png");
-			} catch (IOException e) {
-				Log.ln("Loading " + stateImageFiles[i] + ".png" + " failed !");
-				stateImages[i] = fallBackImage;
-			}
-		}
-
-		for (i = 0; i < COLORS_COUNT; i++) {
-			colors[i] = Main.getAPropInt(colorNames[i], colorFallBacks[i]);
-		}
-
-	}
-
-	private static Image getFallBackImage() {
-		Image img = Image.createImage(12, 12);
-		Graphics g = img.getGraphics();
-		g.setColor(0);
-		g.drawLine(0, 0, 11, 11);
-		g.drawLine(11, 0, 0, 11);
-		return img;
-	}
+    }
 
 }
