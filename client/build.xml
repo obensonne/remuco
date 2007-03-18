@@ -106,8 +106,8 @@
     <property name="midlet.jar" value="${midlet.name.lc}.jar"/>
     <property name="midlet.jad" value="${midlet.name.lc}.jad"/>
     <property name="midlet.class" value="remuco.Main"/>
-	<property name="midlet.icon" value="monkey_12x12.png"/>
-    <property name="midlet.version" value="0.4.2"/>
+	<property name="midlet.icon" value="logo.png"/>
+    <property name="midlet.version" value="0.5.0"/>
     <property name="midlet.vendor" value="remuco.sf.net"/>
     
     <property name="dist.pkg-name"
@@ -204,6 +204,9 @@
             
             <attribute name="remuco-connection" value="${remuco-connection}" />
             <attribute name="remuco-ui" value="${remuco-ui}" />
+            <attribute name="remuco-ui-canvas-theme-list"
+            	value="${remuco-ui-canvas-theme-list}" />
+        	
         </manifest>
     </target>
     

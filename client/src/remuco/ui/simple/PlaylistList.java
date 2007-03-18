@@ -1,7 +1,6 @@
 package remuco.ui.simple;
 
 import javax.microedition.lcdui.Choice;
-import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.List;
 
 import remuco.data.PlayerState;
@@ -38,8 +37,6 @@ public class PlaylistList extends List {
                         s = ps.playlistGetSong(i);
                         this.append(s.getTag(Song.TAG_TITLE) + " ("
                                 + s.getTag(Song.TAG_ARTIST) + ")", null);
-                        this.setFont(i, Font.getFont(Font.FACE_PROPORTIONAL,
-                                Font.STYLE_PLAIN, Font.SIZE_SMALL));
                     }
                 }
             }

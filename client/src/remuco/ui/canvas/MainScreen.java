@@ -1,22 +1,35 @@
 package remuco.ui.canvas;
 
+import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.List;
 
+import remuco.Main;
 import remuco.connection.RemotePlayer;
 import remuco.data.ObservablePlayerState;
 import remuco.data.PlayerControl;
 import remuco.data.Song;
 import remuco.ui.IScreen;
+import remuco.ui.simple.PlaylistScreen;
 import remuco.util.Log;
+import remuco.util.Tools;
 
 public class MainScreen implements IScreen, KeyListener {
 
 	/** RemucoCommand on main screen: Exit */
 	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
-			90);
+			1);
+
+	/** RemucoCommand on main screen: Theme change */
+	private static final Command CMD_THEME = new Command("Themes",
+			Command.SCREEN, 2);
+
+	/** RemucoCommand on main screen: Theme change */
+	private static final Command CMD_BACK_FROM_THEME_LIST = new Command("Back",
+			Command.BACK, 1);
 
 	private boolean active;
 
@@ -32,22 +45,44 @@ public class MainScreen implements IScreen, KeyListener {
 
 	private RemotePlayer player;
 
-	private SongScreen sc;
+	private IScreen screenPlaylist;
+
+	private SongScreen ss;
 
 	private long volumeAdjustStart;
 
 	public MainScreen() {
 	}
 
+	private String[] themeName;
+
 	public void commandAction(Command c, Displayable d) {
-		if (c == CMD_EXIT)
+		int i;
+		if (c == CMD_EXIT) {
 			pcl.commandAction(IScreen.CMD_DISPOSE, d);
-		else
+		} else if (c == CMD_THEME) {
+			setActive(false);
+			display.setCurrent(themeList);
+			displayable = themeList;
+		} else if (c == CMD_BACK_FROM_THEME_LIST) {
+			setActive(true);
+		} else if (c == List.SELECT_COMMAND && d == themeList) {
+			i = themeList.getSelectedIndex();
+			Theme.load(themeName[i]);
+			ss.updateTheme();
+			ss.updatePlayerState(ops);
+			setActive(true);
+			System.gc(); // free the old theme data
+		} else if (c == IScreen.CMD_DISPOSE) {
+			// a screen set by us, sent this command
+			setActive(true);
+		} else {
 			pcl.commandAction(c, d);
+		}
 	}
 
 	public Displayable getDisplayable() {
-		return sc;
+		return ss;
 	}
 
 	public void keyPressed(int key) {
@@ -84,8 +119,8 @@ public class MainScreen implements IScreen, KeyListener {
 				pc.set(PlayerControl.CODE_RATE, (short) (i + 1));
 				player.control(pc);
 				s.setRating(i + 1, s.getRatingMax());
-				sc.update(ops);
-				sc.repaint();
+				ss.updatePlayerState(ops);
+				ss.repaint();
 			}
 			break;
 		case KEY_RATE_DOWN:
@@ -95,12 +130,15 @@ public class MainScreen implements IScreen, KeyListener {
 				pc.set(PlayerControl.CODE_RATE, (short) (i - 1));
 				player.control(pc);
 				s.setRating(i - 1, s.getRatingMax());
-				sc.update(ops);
-				sc.repaint();
+				ss.updatePlayerState(ops);
+				ss.repaint();
 			}
 			break;
 		case KEY_SHOW_PLAYLIST:
 			Log.ln("show pl");
+			setActive(false);
+			screenPlaylist.setActive(true);
+			display.setCurrent(screenPlaylist.getDisplayable());
 			break;
 		}
 	}
@@ -133,18 +171,18 @@ public class MainScreen implements IScreen, KeyListener {
 	}
 
 	public void notifyPlayerStateChange() {
-		sc.update(ops);
-		if (displayable == sc) {
-			sc.repaint();
+		ss.updatePlayerState(ops);
+		if (displayable == ss) {
+			ss.repaint();
 		}
 	}
 
 	public void setActive(boolean active) {
 		this.active = active;
 		if (active) {
-			display.setCurrent(sc);
-			displayable = sc;
-			sc.repaint();
+			display.setCurrent(ss);
+			displayable = ss;
+			ss.repaint();
 		}
 
 	}
@@ -156,23 +194,38 @@ public class MainScreen implements IScreen, KeyListener {
 		init();
 	}
 
+	private List themeList;
+
 	private int init() {
 
-		if (player != null)
-			this.ops = player.getObservablePlayerState();
-		if (ops != null)
-			ops.addObserver(this);
-		this.pc = new PlayerControl();
-        
-		sc = new SongScreen(this, new Theme(Theme.DEFAULT));
-		sc.addCommand(CMD_EXIT);
-		sc.setCommandListener(this);
+		Log.ln("Free mem: " + Runtime.getRuntime().freeMemory());
+
+		int i;
+
+		themeName = Tools.splitString(Main.getAPropString(
+				Main.APP_PROP_UI_THEME_LIST, "default"), ",");
+		Theme.load(themeName[0]);
+
+		ops = player.getObservablePlayerState();
+		ops.addObserver(this);
+		pc = new PlayerControl();
+
+		ss = new SongScreen(this);
+		ss.addCommand(CMD_EXIT);
+		ss.addCommand(CMD_THEME);
+		ss.setCommandListener(this);
+
+		screenPlaylist = new PlaylistScreen();
+		screenPlaylist.setUp(this, display, player);
+
+		themeList = new List("Themes", Choice.IMPLICIT);
+		themeList.addCommand(CMD_BACK_FROM_THEME_LIST);
+		themeList.setCommandListener(this);
+		for (i = 0; i < themeName.length; i++) {
+			themeList.append(themeName[i], null);
+		}
 
 		return 0;
 	}
-
-	// private static int mapKeyToCommand(int key) {
-	//		
-	// }
 
 }

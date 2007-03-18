@@ -91,7 +91,7 @@ public interface Remuco {
 
     public static final int REM_TD_HDR_LEN = 6;
 
-    public static final byte REM_PROTO_VERSION = 0x02;
+    public static final byte REM_PROTO_VERSION = 0x03;
 
     public static final byte REM_DATA_TYPE_PLAYER_CTRL = 0x01;
 

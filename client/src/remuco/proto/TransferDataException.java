@@ -18,6 +18,7 @@
  */
 package remuco.proto;
 
+
 /**
  * Exception to throw if conversion between an data object and its byte
  * representation fails (e.g. if byte array data is malformed).
@@ -27,17 +28,71 @@ package remuco.proto;
  */
 public class TransferDataException extends Exception {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+	/**
+	 * Indicates a mjor problem. Furhter communication most probably not
+	 * posible.
+	 */
+	public static final int MAJOR = 10;
 
-    public TransferDataException() {
-        super();
-    }
+	/**
+	 * Indicates a minor problem. Subsequent communication may work.
+	 */
+	public static final int MINOR = 20;
 
-    public TransferDataException(String message) {
-        super(message);
-    }
+	/**
+	 * Indicates a problem because of insufficient free memory.
+	 */
+	public static final int NOMEM = 30;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private int type;
+
+	/**
+	 * Exception with no message and of type {@link #MINOR}.
+	 *
+	 */
+	public TransferDataException() {
+		super();
+		type = MINOR;
+	}
+
+	/**
+	 * Exception with no message and type <code>type</code>.
+	 *
+	 */
+	public TransferDataException(int type) {
+		super();
+		this.type = type;
+	}
+
+	/**
+	 * Exception with a message and of type {@link #MINOR}.
+	 *
+	 */
+	public TransferDataException(String message) {
+		super(message);
+		type = MINOR;
+	}
+
+	/**
+	 * Exception with a message and type <code>type</code>.
+	 *
+	 */
+	public TransferDataException(String message, int type) {
+		super(message);
+		this.type = type;
+	}
+
+	/**
+	 * Get the exception type.
+	 * @return one of {@link #MINOR}, {@link #MAJOR} or {@link #NOMEM}
+	 */
+	public int getType() {
+		return type;
+	}
 
 }

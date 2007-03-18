@@ -110,7 +110,15 @@ public class RemotePlayer implements Runnable {
                 }
             } catch (TransferDataException e) {
                 Log.ln(this, "rx ps failed:" + e.getMessage());
-                ioErrors++;
+                if (e.getType() == TransferDataException.MINOR) {
+                	ioErrors++;
+                } else if (e.getType() == TransferDataException.MAJOR) {
+                	break;
+                } else { // warning
+                    ops.setState(PlayerState.ST_PROBLEM);
+                    ops.playlistClear();
+                    ops.changed();
+                }
             } catch (IOException e) {
                 Log.ln(this, "rx ps failed:" + e.getMessage());
                 ioErrors++;

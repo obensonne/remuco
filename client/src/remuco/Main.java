@@ -1,6 +1,7 @@
 package remuco;
 
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -23,6 +24,8 @@ public class Main extends MIDlet implements CommandListener {
 
 	private static final String APP_PROP_CONNTYPE = "remuco-connection";
 
+	public static final String APP_PROP_UI_THEME_LIST = "remuco-ui-canvas-theme-list";
+
 	private static final String APP_PROP_UI = "remuco-ui";
 
 	private static final Command CMD_BACK = new Command("Ok", Command.BACK, 10);
@@ -32,6 +35,11 @@ public class Main extends MIDlet implements CommandListener {
 
 	private static MIDlet midlet;
 
+	protected Main() {
+		super();
+		midlet = this;
+	}
+	
 	/**
 	 * This method is to offer access to application properties outside this
 	 * class.
@@ -71,17 +79,20 @@ public class Main extends MIDlet implements CommandListener {
 	 */
 	public static String getAPropString(String name, String def) {
 
+		String s;
+
 		if (midlet == null) {
-			Log.ln("no midlet singleton");
 			return def;
 		}
 
-		String s;
-
 		s = midlet.getAppProperty(name);
-		if (s == null)
+		
+		if (s == null) {
 			Log.ln("Property " + name + " is not set!");
-		return def;
+			return def;
+		}
+		
+		return s;
 	}
 
 	protected RemotePlayer player;
@@ -100,6 +111,11 @@ public class Main extends MIDlet implements CommandListener {
 			notifyDestroyed();
 		} else if (c == CMD_BACK) { // back from log form
 			screenMain.setActive(true);
+		} else if (c == Alert.DISMISS_COMMAND) { // back from error alert
+			logForm.removeCommand(CMD_BACK);
+			logForm.addCommand(IScreen.CMD_DISPOSE);
+			logForm.setCommandListener(this);
+			display.setCurrent(logForm);
 		} else if (c == CMD_SHOW_LOG) {
 			screenMain.setActive(false);
 			display.setCurrent(logForm);
@@ -115,8 +131,6 @@ public class Main extends MIDlet implements CommandListener {
 	}
 
 	protected void startApp() throws MIDletStateChangeException {
-		
-		midlet = this;
 
 		if (init()) {
 			screenMain.setActive(true);
@@ -215,18 +229,12 @@ public class Main extends MIDlet implements CommandListener {
 		if (connection == null || !connection.isOpen()) {
 			// error handling
 			Alert alert = new Alert("Error");
-			alert.setString("No connection to Remuco server! Inspect the log "
-					+ "for error analysis.");
+			alert.setType(AlertType.ERROR);
+			alert.setString("Connecting failed. You will now see some log "
+					+ "messages, which may help you.");
 			alert.setTimeout(Alert.FOREVER);
+			alert.setCommandListener(this);
 			display.setCurrent(alert);
-			Tools.sleep(2000);
-
-			// show the log, so the user can see what failed
-			logForm.removeCommand(CMD_BACK);
-			logForm.addCommand(IScreen.CMD_DISPOSE);
-			logForm.setCommandListener(this);
-			display.setCurrent(logForm);
-
 			return false;
 		}
 

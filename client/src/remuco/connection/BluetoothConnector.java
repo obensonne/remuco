@@ -31,12 +31,16 @@ import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Gauge;
+import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 
 import remuco.util.Log;
@@ -53,6 +57,10 @@ import remuco.util.Log;
 public class BluetoothConnector implements Runnable, CommandListener,
 		DiscoveryListener, IConnector {
 
+	/** User wants to cancel connection creation */
+	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
+			30);
+
 	/** User issues a remote device scan */
 	private static final Command CMD_SCAN = new Command("Scan", Command.SCREEN,
 			20);
@@ -60,19 +68,21 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	/** Services to search.. looking for services in 'Serial Port Profile' */
 	private static final UUID[] UUID_LIST = new UUID[] { new UUID(0x1101) };
 
-	/** User wants to cancel connection creation */
-	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
-			30);
+	RemoteDevice remoteDevice;
 
 	private DiscoveryAgent agent;
+
+	private Alert alert;
 
 	private GenericStreamConnection connection;
 
 	private Display d;
 
-	private Form f;
-
 	private LocalDevice localDevice;
+
+	private Gauge pb;
+
+	private Form pbf;
 
 	private Vector remoteDevices;
 
@@ -82,8 +92,6 @@ public class BluetoothConnector implements Runnable, CommandListener,
 
 	private Thread thisThread;
 
-	RemoteDevice remoteDevice;
-
 	public synchronized void commandAction(Command c, Displayable d) {
 		if (c == List.SELECT_COMMAND) {
 			remoteDevice = (RemoteDevice) remoteDevices.elementAt(screenDevices
@@ -91,6 +99,11 @@ public class BluetoothConnector implements Runnable, CommandListener,
 			// wake up our thread to proceed with service search on that device
 			this.notify();
 		} else if (c == CMD_EXIT) {
+			connection.close();
+			synchronized (connection) {
+				connection.notify();
+			}
+		} else if (c == Alert.DISMISS_COMMAND) {
 			connection.close();
 			synchronized (connection) {
 				connection.notify();
@@ -104,11 +117,8 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	}
 
 	public void createConnection() {
-		/*
-		 * We now do nothing else than setting up UI - the user shall issue the
-		 * creating with the UI and then the extra creation thread gets started
-		 */
-		d.setCurrent(f);
+		thisThread = new Thread(this);
+		thisThread.start();
 	}
 
 	public void deviceDiscovered(RemoteDevice dev, DeviceClass devClass) {
@@ -127,16 +137,25 @@ public class BluetoothConnector implements Runnable, CommandListener,
 		try {
 			localDevice = LocalDevice.getLocalDevice();
 		} catch (BluetoothStateException e) {
-			Log.ln(this, "Could not get local device");
+			Log.ln(this, "Could not get local device - is Bluetooth off?");
 			return false;
 		}
 		agent = localDevice.getDiscoveryAgent();
 		Log.ln(this, "initialized");
 
-		f = new Form("BT Connector");
-		f.addCommand(CMD_EXIT);
-		f.addCommand(CMD_SCAN);
-		f.setCommandListener(this);
+		pb = new Gauge("", false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING);
+		pb.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_VCENTER);
+
+		pbf = new Form("Remuco");
+		pbf.addCommand(CMD_EXIT);
+		pbf.setCommandListener(this);
+		pbf.append(pb);
+
+		d.setCurrent(pbf);
+
+		alert = new Alert("Error", "", null, AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
+		alert.setCommandListener(this);
 
 		remoteDevices = new Vector();
 		screenDevices = new List("Choose a device", Choice.IMPLICIT);
@@ -157,29 +176,29 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	public synchronized void run() {
 		synchronized (connection) {
 			try {
-				f.deleteAll();
-				d.setCurrent(f);
+				pb.setLabel("Search devices");
 
 				// find remote devices
 
 				remoteDevices.removeAllElements();
 
-				output("=> Search devices.. ");
+				Log.l("Scan for devices.. ");
 				try {
 					agent.startInquiry(DiscoveryAgent.GIAC, this);
 					this.wait();
 				} catch (BluetoothStateException e) {
-					output("failed\n");
-					output("!! Error starting inquiry\n");
-					connection.notify(); // signalize that we are done
+					showAlert("Search failed\n"
+							+ "If other Bluetooth applications are currently "
+							+ "running, they may block the device search.");
 					return;
 				}
-				output("ok\n");
+				Log.ln("ok");
 
 				int n = remoteDevices.size();
 				if (n == 0) {
-					output("!! Error: No devices found!\n");
-					connection.notify(); // signalize that we are done
+					showAlert("Found no devices!\n"
+							+ "Make sure Bluetooth is enabled on your mobile device and your computer.\n"
+							+ "Also check that your computer's Bluetooth adapter is not in 'hidden' mode.");
 					return;
 				}
 
@@ -193,52 +212,54 @@ public class BluetoothConnector implements Runnable, CommandListener,
 				}
 
 				d.setCurrent(screenDevices);
+
 				this.wait();
-				d.setCurrent(f);
-				output("=> Device: ");
-				output(getDeviceName(remoteDevice) + "\n");
+
+				pb.setLabel("Search services");
+				d.setCurrent(pbf);
+				Log.ln("Device: " + getDeviceName(remoteDevice));
 
 				// search services
 
-				output("=> Search service.. ");
+				Log.l("Search service.. ");
 				serviceRecords.removeAllElements();
 				try {
 					agent.searchServices(null, UUID_LIST, remoteDevice, this);
 				} catch (BluetoothStateException e) {
-					output("!! Error starting service search\n");
-					connection.notify(); // signalize that we are done
+					showAlert("Service search failed!");
 					return;
 				}
 				this.wait();
 
-				output("ok\n");
+				Log.ln("ok");
 
 				n = serviceRecords.size();
 				if (n == 0) {
-					output("!! Error: No services found!\n");
-					connection.notify(); // signalize that we are done
+					showAlert("Found no services!\n"
+							+ "Make sure Remuco server is running on your computer.");
 					return;
 				} else if (n > 1) {
-					output("Found more than 1 suitable service - use first");
+					Log.ln("Found more than 1 suitable service - use first");
 				}
 
 				ServiceRecord sr = (ServiceRecord) serviceRecords.elementAt(0);
 				String url = sr.getConnectionURL(
 						ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-				output("SR-URL: " + url);
+				Log.ln("SR-URL: " + url);
 
 				// create connection
 
-				output("=> Create connection.. ");
+				pb.setLabel("Create connection");
+				Log.l("Create connection.. ");
 				try {
 					StreamConnection scon = (StreamConnection) Connector
 							.open(url);
 					connection.setStreams(scon.openDataInputStream(), scon
 							.openDataOutputStream());
-					output("ok\n");
+					Log.ln("ok\n");
 				} catch (IOException e) {
-					output("failed (" + e.getMessage() + ")\n");
-					connection.notify(); // signalize that we are done
+					Log.ln("failed (" + e.getMessage() + ")\n");
+					showAlert("Connecting to server failed!");
 					return;
 				}
 
@@ -247,6 +268,8 @@ public class BluetoothConnector implements Runnable, CommandListener,
 
 			} catch (InterruptedException e) {
 				Log.ln(this, "I have been interrupted");
+				showAlert("An unkown error occured!");
+				return;
 			}
 		}
 	}
@@ -271,10 +294,10 @@ public class BluetoothConnector implements Runnable, CommandListener,
 		}
 	}
 
-	private void output(String msg) {
-		f.append(msg);
-		Log.l(msg);
-
+	private void showAlert(String msg) {
+		Log.ln(msg);
+		alert.setString(msg);
+		d.setCurrent(alert);
 	}
 
 }
