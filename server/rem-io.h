@@ -43,12 +43,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#define REM_PROTO_VERSION		0x02
+#define REM_FEATURE_PL_BROWSE		0x0001
+#define REM_FEATURE_PL_REPEAT		0x0002
+#define REM_FEATURE_PL_SHUFFLE		0x0004
+#define REM_FEATURE_RATING			0x0008
+
+#define REM_TRANSFER_PREAMBLE		0x12345678
+
+#define REM_PROTO_VERSION			0x03
 
 #define REM_DATA_TYPE_PLAYER_CTRL	0x01
 #define REM_DATA_TYPE_PLAYER_STATE	0x02
 #define REM_DATA_TYPE_CLIENT_INFO	0x03
-#define REM_DATA_TYPE_NULL		0x10
+#define REM_DATA_TYPE_PLAYER_INFO	0x04
+#define REM_DATA_TYPE_NULL			0x10
 #define REM_DATA_TYPE_UNKNOWN		0xFF
 
 //////////////////////////////////////////////////////////////////////////////
