@@ -681,6 +681,9 @@ main(int argc, char **argv)
 
 	////// start loop //////
 	
+	printf("\n");
+	LOG_INFO("Ok. Clients may connect now.\n");
+	
 	rem_server_main_loop();
 	
 	////// shut down //////
