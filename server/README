@@ -15,6 +15,7 @@ Content
 	4.1 Player Specific Notes
 5. Development
 6. Trouble / Questions
+7. Bugs
 
 *******************************************************************************
 1. Introduction
@@ -162,3 +163,16 @@ See section 'Development' on remuco.sf.net .
 *******************************************************************************
 
 See the Remuco mailing list at remuc.sf.net .
+
+*******************************************************************************
+7. Bugs:
+*******************************************************************************
+
+7.1 Player specific notes
+*************************
+
+Amarok:
+	Sometimes Amarok delivers wrong rating values. In that case it might help
+	if you slightly change your playlist (e.g. reorder a song) so that the
+	playlist gets transfered again to the client - then mostly the rating
+	values are correct.
