@@ -31,7 +31,6 @@ import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -97,11 +96,6 @@ public class BluetoothConnector implements Runnable, CommandListener,
 			Log.ln("Connceting canceled by user");
 			interruptFlag = true;
 			this.notify();
-		} else if (c == Alert.DISMISS_COMMAND) {
-			connection.close();
-			synchronized (connection) {
-				connection.notify();
-			}
 		}
 	}
 
@@ -208,7 +202,6 @@ public class BluetoothConnector implements Runnable, CommandListener,
 
 				// select a device
 
-				screenDevices.deleteAll();
 				for (int i = 0; i < n; i++) {
 					screenDevices.append(
 							getDeviceName((RemoteDevice) remoteDevices
