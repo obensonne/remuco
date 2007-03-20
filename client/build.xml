@@ -271,8 +271,8 @@
     
     <target name="run" depends="dist"
             description="--> run the client in WTK emulation environment">
-        <exec executable="${wtk.home}/bin/emulator" dir="dist">
-            <arg line="-Xdevice:MediaControlSkin -Xdescriptor:${midlet.jad}" />
+        <exec executable="${wtk.home}/bin/emulator" dir="dist/${remuco-profile}">
+            <arg line="-Xdevice:DefaultColorPhone -Xdescriptor:${midlet.jad}" />
         </exec>            
     </target>
     
