@@ -8,6 +8,7 @@
 	  - simple (text based UI)
 	  - canvas (graphical UI using keys and joystick)
 	  - legacy (CLDC-1.0 and MIDP-1.0 compliant version, text based UI)
+	* adjusted protocol version (this client needs a server >= 0.4.3)
 
 0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
 
