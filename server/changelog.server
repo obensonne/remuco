@@ -1,3 +1,8 @@
+0.4.3	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* some internal (non-functional) changes
+	* adjusted protocol version number (this server needs a client >= 0.5)
+
 0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* some internal (non-functional) changes
