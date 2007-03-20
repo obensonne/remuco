@@ -176,6 +176,8 @@ public class SongScreen extends Canvas {
 		imgSongAreaBG = Image
 				.createImage(seSong.getWidth(), seSong.getHeigth());
 		Graphics gTmp = imgSongAreaBG.getGraphics();
+		gTmp.setColor(Theme.colors[Theme.COLOR_BG]);
+		gTmp.fillRect(0, 0, seSong.getWidth(), seSong.getHeigth());
 		p.y = 0;
 		while (p.y < height) {
 			p.x = 0;

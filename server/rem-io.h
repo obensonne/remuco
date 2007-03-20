@@ -46,17 +46,17 @@
 #define REM_FEATURE_PL_BROWSE		0x0001
 #define REM_FEATURE_PL_REPEAT		0x0002
 #define REM_FEATURE_PL_SHUFFLE		0x0004
-#define REM_FEATURE_RATING			0x0008
+#define REM_FEATURE_RATING		0x0008
 
-#define REM_TRANSFER_PREAMBLE		0x12345678
+#define REM_TRANSFER_PREAMBLE		0xFF00FF00
 
-#define REM_PROTO_VERSION			0x03
+#define REM_PROTO_VERSION		0x03
 
 #define REM_DATA_TYPE_PLAYER_CTRL	0x01
 #define REM_DATA_TYPE_PLAYER_STATE	0x02
 #define REM_DATA_TYPE_CLIENT_INFO	0x03
 #define REM_DATA_TYPE_PLAYER_INFO	0x04
-#define REM_DATA_TYPE_NULL			0x10
+#define REM_DATA_TYPE_NULL		0x10
 #define REM_DATA_TYPE_UNKNOWN		0xFF
 
 //////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#define REM_TD_HDR_LEN		6
+#define REM_TD_HDR_LEN	6
 
 struct rem_tdhdr {
 	u_int8_t	pver;
@@ -173,6 +173,31 @@ struct rem_ps_bin {
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// player info: as binary transfer data
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#define REM_PI_NAMESTR_LEN	256
+#define REM_PI_TD_LEN		(REM_PI_NAMESTR_LEN + 2)
+
+struct rem_pi {
+	u_int16_t	features;
+	u_int16_t	padding;
+	char		name[REM_PI_NAMESTR_LEN];
+};
+
+#define REM_PI_TD_SET(_d, _pi) do { 			\
+	(*((u_int16_t*)(_d))) = htons((_pi)->features); \
+	((u_int8_t*)(_d)) += 2; 			\
+	((u_int8_t*)(_d)) += 2; 			\
+	memset(_d, 0, REM_PI_NAMESTR_LEN);		\
+	memcpy(_d, (_pi)->name, REM_PI_NAMESTR_LEN);	\
+	((u_int8_t*)(_d)) += REM_PI_NAMESTR_LEN; 	\
+} while(0);
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // player control: as transfer data
 //
 // bytes	num	content
@@ -212,13 +237,38 @@ struct rem_ci {
 };
 
 #define REM_CI_TD_GET(_d, _ci) do {					\
-	(_ci)->pl_len_max = ntohs(*((u_int16_t*) _d));			\
-	(_d) += 2;							\
-	memset((_ci)->enc, 0, REM_CI_ENCSTR_LEN);			\
-	memcpy((_ci)->enc, _d, REM_CI_ENCSTR_LEN);			\
-	(_ci)->enc[REM_CI_ENCSTR_LEN - 1] = '\0';			\
-	(_d) += REM_CI_ENCSTR_LEN;					\
+	(_ci)->pl_len_max = ntohs(*((u_int16_t*) _d));	\
+	(_d) += 2;										\
+	memset((_ci)->enc, 0, REM_CI_ENCSTR_LEN);		\
+	memcpy((_ci)->enc, _d, REM_CI_ENCSTR_LEN);		\
+	(_ci)->enc[REM_CI_ENCSTR_LEN - 1] = '\0';		\
+	(_d) += REM_CI_ENCSTR_LEN;						\
 } while(0)
+
+//////////////////////////////////////////////////////////////////////////////
+
+/*
+struct rem_strcol_bin {
+	u_int32_t	len;
+	u_int8_t	data;
+};
+
+#define REM_SC_TD_GET(_d, _sc) do {		\
+	(_sc)->len = ntohl((u_int32_t*)(_d));	\
+	((u_int8_t*)(_d)) += 4 ;		\
+	(_sc)->data = (u_int8_t*) (_d);		\
+	((u_int8_t*)(_d)) += (_sc)->len;	\
+} while(0)
+	
+#define REM_SC_TD_SET(_d, _sc) do {		\
+	((u_int32_t*)(_d)) = htonl((_sc)->len);	\
+	((u_int32_t*)(_d)) = htonl((_sc)->len);	\
+	(_sc)->len = ntohl((u_int32_t*)(_d));	\
+	((u_int8_t*)(_d)) += 4 ;		\
+	(_sc)->data = (u_int8_t*) (_d);		\
+	((u_int8_t*)(_d)) += (_sc)->len;	\
+} while(0)
+*/
 
 //////////////////////////////////////////////////////////////////////////////
 //

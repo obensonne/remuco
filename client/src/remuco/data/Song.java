@@ -100,7 +100,7 @@ public class Song {
 	}
 
 	/**
-	 * Get the songs's playing length formatted: 'mm:ss' or '??' if no length
+	 * Get the songs's playing length formatted: 'mm:ss' or '' if no length
 	 * information is present.
 	 */
 	public synchronized String getLenFormatted() {
@@ -112,9 +112,9 @@ public class Song {
 			sb.append((int) (l / 60)).append(":");
 			sb.append(s < 10 ? "0" : "").append(s);
 		} catch (NumberFormatException e) {
-			sb.append("??");
+			sb.append("");
 		} catch (NullPointerException e) {
-			sb.append("??");
+			sb.append("");
 		}
 		return sb.toString();
 	}

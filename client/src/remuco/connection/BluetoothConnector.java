@@ -61,10 +61,6 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
 			30);
 
-	/** User issues a remote device scan */
-	private static final Command CMD_SCAN = new Command("Scan", Command.SCREEN,
-			20);
-
 	/** Services to search.. looking for services in 'Serial Port Profile' */
 	private static final UUID[] UUID_LIST = new UUID[] { new UUID(0x1101) };
 
@@ -79,6 +75,8 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	private Display d;
 
 	private LocalDevice localDevice;
+
+	private boolean interruptFlag;
 
 	private Gauge pb;
 
@@ -99,24 +97,19 @@ public class BluetoothConnector implements Runnable, CommandListener,
 			// wake up our thread to proceed with service search on that device
 			this.notify();
 		} else if (c == CMD_EXIT) {
-			connection.close();
-			synchronized (connection) {
-				connection.notify();
-			}
+			Log.ln("Connceting canceled by user");
+			interruptFlag = true;
+			this.notify();
 		} else if (c == Alert.DISMISS_COMMAND) {
 			connection.close();
 			synchronized (connection) {
 				connection.notify();
 			}
-		} else if (c == CMD_SCAN) {
-			if (thisThread == null || !thisThread.isAlive()) {
-				thisThread = new Thread(this);
-				thisThread.start();
-			}
 		}
 	}
 
 	public void createConnection() {
+		interruptFlag = false;
 		thisThread = new Thread(this);
 		thisThread.start();
 	}
@@ -194,6 +187,11 @@ public class BluetoothConnector implements Runnable, CommandListener,
 				}
 				Log.ln("ok");
 
+				if (interruptFlag) {
+					connection.notify();
+					return;
+				}
+
 				int n = remoteDevices.size();
 				if (n == 0) {
 					showAlert("Found no devices!\n"
@@ -214,6 +212,11 @@ public class BluetoothConnector implements Runnable, CommandListener,
 				d.setCurrent(screenDevices);
 
 				this.wait();
+
+				if (interruptFlag) {
+					connection.notify();
+					return;
+				}
 
 				pb.setLabel("Search services");
 				d.setCurrent(pbf);

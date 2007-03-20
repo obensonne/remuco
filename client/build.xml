@@ -106,7 +106,7 @@
     <property name="midlet.jar" value="${midlet.name.lc}.jar"/>
     <property name="midlet.jad" value="${midlet.name.lc}.jad"/>
     <property name="midlet.class" value="remuco.Main"/>
-	<property name="midlet.icon" value="logo.png"/>
+    <property name="midlet.icon" value="logo.png"/>
     <property name="midlet.version" value="0.5.0"/>
     <property name="midlet.vendor" value="remuco.sf.net"/>
     
@@ -120,12 +120,11 @@
         <javac  destdir="build/classes" 
                 target="1.1" source="1.3"
                 bootclasspath="${midp.lib}"
-                debug="true">
+                debug="true" verbose="no">
             <!-- sources -->
             <src path="src" />
             <exclude name="remuco/server/**"/> <!-- contains only test-classes -->
-            <exclude name="remuco/ui/canvas/**"/> <!-- contains only test-classes -->
-            <exclude name="remuco/Cat.java"/> <!-- contains only test-classes -->
+            <exclude name="remuco/test/**"/> <!-- contains only test-classes -->
             <!-- classpath -->
             <classpath refid="build.cp" />
         </javac>
@@ -214,7 +213,7 @@
 
     <target name="dist.jar" depends="clean,jar"
             description="--> create a jar deployable on a JME device">
-        <mkdir dir="dist"/>
+        <mkdir dir="dist/${remuco-ui}"/>
         <copy file="build/MF" tofile="build/${midlet.jad}" />
         <exec executable="stat" outputproperty="midlet.jar.size" os="Linux">
             <arg line="-c %s build/jar/${midlet.jar}" />
@@ -224,8 +223,8 @@
             <attribute name="MIDlet-Jar-URL" value="${midlet.jar}"/>
             <attribute name="MIDlet-Jar-Size" value="${midlet.jar.size}"/>
         </manifest>
-        <copy todir="dist" file="build/${midlet.jad}" />
-        <copy todir="dist" file="build/jar/${midlet.jar}" />
+        <copy todir="dist/${remuco-ui}" file="build/${midlet.jad}" />
+        <copy todir="dist/${remuco-ui}" file="build/jar/${midlet.jar}" />
         <echo>
             --------------------------------------------------------------------
             Computing size of the jar file does only work under Linux.
@@ -234,13 +233,21 @@
         </echo>
     </target>
     
-    <target name="dist" depends="dist.jar"
+    <target name="dist" depends=""
             description="--> create a pkg including all files, which are worth to deploy" >
         <mkdir dir="build/dist/${dist.pkg-name}"/>
         <copy todir="build/dist/${dist.pkg-name}">
-            <fileset file="dist/${midlet.jar}" />
-            <fileset file="dist/${midlet.jad}" />
             <fileset dir="doc" />
+        </copy>
+        <mkdir dir="build/dist/${dist.pkg-name}/simple"/>
+        <copy todir="build/dist/${dist.pkg-name}/simple">
+            <fileset file="dist/simple/${midlet.jar}" />
+            <fileset file="dist/simple/${midlet.jad}" />
+        </copy>
+        <mkdir dir="build/dist/${dist.pkg-name}/canvas"/>
+        <copy todir="build/dist/${dist.pkg-name}/canvas">
+            <fileset file="dist/canvas/${midlet.jar}" />
+            <fileset file="dist/canvas/${midlet.jad}" />
         </copy>
         <tar destfile="dist/${dist.pkg-name}.tar.gz"
             compression="gzip" basedir="build/dist" />
@@ -334,15 +341,15 @@
 
     <target name="clean">
         <delete dir="build" />
-        <delete dir="dist" />
+        <!--<delete dir="dist" />-->
     </target>
 
     <target name="install" 
                 description="--> copy MIDlet jar to dir">
         <mkdir dir="${install.dest}" />
         <copy todir="${install.dest}" overwrite="true">
-            <fileset file="dist/${midlet.jar}" />
-            <fileset file="dist/${midlet.jad}" />
+            <fileset file="dist/${remuco-ui}/${midlet.jar}" />
+            <fileset file="dist/${remuco-ui}/${midlet.jad}" />
         </copy>
     </target>
 
