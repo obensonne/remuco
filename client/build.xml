@@ -70,23 +70,20 @@
     </description>
 
     <property file="build.properties" />
+    <property file="profile.${remuco-profile}" />
 
     <!-- =================== Libraries and Classpath ====================== -->
-    
+
     <!-- Some libraries we need -->
-    <property name="midp.lib" value="${wtk.home}/lib/midpapi20.jar"/>
-    <property name="midp.ver" value="MIDP-2.0"/>
-    <property name="cldc.lib" value="${wtk.home}/lib/cldcapi11.jar"/>
-    <property name="cldc.ver" value="CLDC-1.1"/>
+    <property name="midp.lib" value="${wtk.home}/lib/midpapi${midp.ver.num}.jar"/>
+    <property name="cldc.lib" value="${wtk.home}/lib/cldcapi${cldc.ver.num}.jar"/>
     <property name="jsr082.lib" value="${wtk.home}/lib/jsr082.jar"/>
 
     <!-- Classpath for build -->
     <path id="build.cp">
-        <fileset dir="${wtk.home}/lib">
-            <include name="cldcapi11.jar"/>
-            <include name="midpapi20.jar"/>
-            <include name="jsr082.jar"/>
-        </fileset>
+        <fileset file="${midp.lib}" />
+        <fileset file="${cldc.lib}" />
+        <fileset file="${jsr082.lib}" />
     </path>
 
     <!-- Classpath for build to use on command line-->
@@ -120,7 +117,8 @@
         <javac  destdir="build/classes" 
                 target="1.1" source="1.3"
                 bootclasspath="${midp.lib}"
-                debug="true" verbose="no">
+                debug="true" verbose="no"
+                excludes="${remuco-build-excludes}">
             <!-- sources -->
             <src path="src" />
             <exclude name="remuco/server/**"/> <!-- contains only test-classes -->
@@ -143,6 +141,9 @@
             <outjar path="build/obfuscated"/>
             <libraryjar refid="build.cp"/>
             <keep access="public" extends="javax.microedition.midlet.MIDlet"/>
+            <keepclasseswithmembers name="remuco.ui.*.MainScreen">
+                <constructor name="MainScreen" />
+            </keepclasseswithmembers>
         </proguard>
     </target>
 
@@ -203,9 +204,8 @@
             
             <attribute name="remuco-connection" value="${remuco-connection}" />
             <attribute name="remuco-ui" value="${remuco-ui}" />
-            <attribute name="remuco-ui-canvas-theme-list"
-            	value="${remuco-ui-canvas-theme-list}" />
-        	
+            <attribute name="remuco-ui-canvas-themes"
+            	value="${remuco-ui-canvas-themes}" />
         </manifest>
     </target>
     
@@ -213,7 +213,7 @@
 
     <target name="dist.jar" depends="clean,jar"
             description="--> create a jar deployable on a JME device">
-        <mkdir dir="dist/${remuco-ui}"/>
+        <mkdir dir="dist/${remuco-profile}"/>
         <copy file="build/MF" tofile="build/${midlet.jad}" />
         <exec executable="stat" outputproperty="midlet.jar.size" os="Linux">
             <arg line="-c %s build/jar/${midlet.jar}" />
@@ -223,8 +223,8 @@
             <attribute name="MIDlet-Jar-URL" value="${midlet.jar}"/>
             <attribute name="MIDlet-Jar-Size" value="${midlet.jar.size}"/>
         </manifest>
-        <copy todir="dist/${remuco-ui}" file="build/${midlet.jad}" />
-        <copy todir="dist/${remuco-ui}" file="build/jar/${midlet.jar}" />
+        <copy todir="dist/${remuco-profile}" file="build/${midlet.jad}" />
+        <copy todir="dist/${remuco-profile}" file="build/jar/${midlet.jar}" />
         <echo>
             --------------------------------------------------------------------
             Computing size of the jar file does only work under Linux.
@@ -238,16 +238,11 @@
         <mkdir dir="build/dist/${dist.pkg-name}"/>
         <copy todir="build/dist/${dist.pkg-name}">
             <fileset dir="doc" />
-        </copy>
-        <mkdir dir="build/dist/${dist.pkg-name}/simple"/>
-        <copy todir="build/dist/${dist.pkg-name}/simple">
-            <fileset file="dist/simple/${midlet.jar}" />
-            <fileset file="dist/simple/${midlet.jad}" />
-        </copy>
-        <mkdir dir="build/dist/${dist.pkg-name}/canvas"/>
-        <copy todir="build/dist/${dist.pkg-name}/canvas">
-            <fileset file="dist/canvas/${midlet.jar}" />
-            <fileset file="dist/canvas/${midlet.jad}" />
+            <fileset dir="dist">
+                <filename name="canvas"/>
+                <filename name="simple"/>
+                <filename name="legacy"/>
+            </fileset>
         </copy>
         <tar destfile="dist/${dist.pkg-name}.tar.gz"
             compression="gzip" basedir="build/dist" />

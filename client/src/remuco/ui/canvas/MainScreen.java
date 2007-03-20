@@ -23,13 +23,15 @@ public class MainScreen implements IScreen, KeyListener {
 	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,
 			1);
 
-	/** RemucoCommand on main screen: Theme change */
-	private static final Command CMD_THEME = new Command("Themes",
-			Command.SCREEN, 2);
+	private static final String APP_PROP_UI_THEME_LIST = "remuco-ui-canvas-themes";
 
 	/** RemucoCommand on main screen: Theme change */
 	private static final Command CMD_BACK_FROM_THEME_LIST = new Command("Back",
 			Command.BACK, 1);
+
+	/** RemucoCommand on main screen: Theme change */
+	private static final Command CMD_THEME = new Command("Themes",
+			Command.SCREEN, 2);
 
 	private boolean active;
 
@@ -49,12 +51,14 @@ public class MainScreen implements IScreen, KeyListener {
 
 	private SongScreen ss;
 
+	private List themeList;
+
+	private String[] themeName;
+
 	private long volumeAdjustStart;
 
 	public MainScreen() {
 	}
-
-	private String[] themeName;
 
 	public void commandAction(Command c, Displayable d) {
 		int i;
@@ -194,8 +198,6 @@ public class MainScreen implements IScreen, KeyListener {
 		init();
 	}
 
-	private List themeList;
-
 	private int init() {
 
 		Log.ln("Free mem: " + Runtime.getRuntime().freeMemory());
@@ -203,7 +205,7 @@ public class MainScreen implements IScreen, KeyListener {
 		int i;
 
 		themeName = Tools.splitString(Main.getAPropString(
-				Main.APP_PROP_UI_THEME_LIST, "default"), ",");
+				APP_PROP_UI_THEME_LIST, "default"), ",");
 		Theme.load(themeName[0]);
 
 		ops = player.getObservablePlayerState();

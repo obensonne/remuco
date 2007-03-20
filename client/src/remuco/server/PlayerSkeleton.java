@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import remuco.connection.GenericStreamConnection;
-import remuco.connection.RemotePlayer;
 import remuco.data.ClientInfo;
 import remuco.data.IPlayerStateObserver;
 import remuco.data.ObservablePlayerState;

@@ -15,18 +15,13 @@ import remuco.connection.GenericStreamConnection;
 import remuco.connection.IConnector;
 import remuco.connection.RemotePlayer;
 import remuco.data.PlayerControl;
+import remuco.ui.DummyScreen;
 import remuco.ui.IScreen;
 import remuco.util.FormLogPrinter;
 import remuco.util.Log;
 import remuco.util.Tools;
 
 public class Main extends MIDlet implements CommandListener {
-
-	private static final String APP_PROP_CONNTYPE = "remuco-connection";
-
-	public static final String APP_PROP_UI_THEME_LIST = "remuco-ui-canvas-theme-list";
-
-	private static final String APP_PROP_UI = "remuco-ui";
 
 	private static final Command CMD_BACK = new Command("Ok", Command.BACK, 10);
 
@@ -35,11 +30,6 @@ public class Main extends MIDlet implements CommandListener {
 
 	private static MIDlet midlet;
 
-	protected Main() {
-		super();
-		midlet = this;
-	}
-	
 	/**
 	 * This method is to offer access to application properties outside this
 	 * class.
@@ -86,16 +76,18 @@ public class Main extends MIDlet implements CommandListener {
 		}
 
 		s = midlet.getAppProperty(name);
-		
+
 		if (s == null) {
 			Log.ln("Property " + name + " is not set!");
 			return def;
 		}
-		
+
 		return s;
 	}
 
 	protected RemotePlayer player;
+
+	private GenericStreamConnection connection;
 
 	private Display display;
 
@@ -105,6 +97,11 @@ public class Main extends MIDlet implements CommandListener {
 
 	private IScreen screenMain;
 
+	protected Main() {
+		super();
+		midlet = this;
+	}
+
 	public void commandAction(Command c, Displayable d) {
 		if (c == IScreen.CMD_DISPOSE) {
 			cleanUp();
@@ -112,6 +109,7 @@ public class Main extends MIDlet implements CommandListener {
 		} else if (c == CMD_BACK) { // back from log form
 			screenMain.setActive(true);
 		} else if (c == Alert.DISMISS_COMMAND) { // back from error alert
+			// show the log which exits the app if the user says 'exit'
 			logForm.removeCommand(CMD_BACK);
 			logForm.addCommand(IScreen.CMD_DISPOSE);
 			logForm.setCommandListener(this);
@@ -132,8 +130,11 @@ public class Main extends MIDlet implements CommandListener {
 
 	protected void startApp() throws MIDletStateChangeException {
 
-		if (init()) {
+		String s = init();
+		if (s.length() == 0) {
 			screenMain.setActive(true);
+		} else {
+			showAlert(s); // this results in exit
 		}
 	}
 
@@ -142,6 +143,7 @@ public class Main extends MIDlet implements CommandListener {
 			player.control(PlayerControl.PC_LOGOFF);
 			Tools.sleep(200); // prevent connection shutdown before logoff has
 			// been send
+			connection.close();
 		}
 		Log.ln(this, "bye bye!");
 	}
@@ -153,13 +155,12 @@ public class Main extends MIDlet implements CommandListener {
 	 * 
 	 * @return connection to host system
 	 */
-	private GenericStreamConnection getConnection() {
+	private IConnector getConnector() {
 		String s;
 		IConnector connector;
-		GenericStreamConnection connection;
 
 		// detect which connector to use
-		s = getAppProperty(APP_PROP_CONNTYPE);
+		s = getAppProperty(IConnector.APP_PROP_CONNTYPE);
 		if (s == null) {
 			Log.ln(this, "No Connector specified in application descriptor !");
 			return null;
@@ -170,22 +171,10 @@ public class Main extends MIDlet implements CommandListener {
 			return null;
 		}
 
-		// create a connection
 		if (!connector.init(display)) {
-			Log.ln(this, "initializing connector failed");
 			return null;
 		} else {
-			connection = connector.getConnection();
-			synchronized (connection) {
-				connector.createConnection();
-				try {
-					connection.wait();
-					return connection;
-				} catch (InterruptedException e) {
-					Log.ln(this, "I have been interrupted");
-					return null;
-				}
-			}
+			return connector;
 		}
 	}
 
@@ -197,23 +186,33 @@ public class Main extends MIDlet implements CommandListener {
 	 */
 	private IScreen getMainScreen() {
 		String s;
-		s = getAppProperty(APP_PROP_UI);
-		if (s == null) {
-			Log.ln(this, "No UI specified in apllication descriptor !");
-			return new remuco.ui.simple.MainScreen();
-		} else if (s.equals(IScreen.UI_SIMPLE)) {
-			return new remuco.ui.simple.MainScreen();
-		} else if (s.equals(IScreen.UI_CANVAS)) {
-			return new remuco.ui.canvas.MainScreen();
-		} else {
-			Log.ln(this, "UI type " + s + " unknown !");
-			return new remuco.ui.simple.MainScreen();
+		Class c;
+		IScreen sc;
+		s = getAppProperty(IScreen.APP_PROP_UI);
+
+		try {
+			c = Class.forName("remuco.ui." + s + ".MainScreen");
+			sc = (IScreen) c.newInstance();
+			return sc;
+		} catch (ClassNotFoundException e) {
+			Log.ln("MainScreen class not found: " + e.getMessage());
+		} catch (InstantiationException e) {
+			Log.ln("MainScreen class instantiation failed: " + e.getMessage());
+		} catch (IllegalAccessException e) {
+			Log.ln("MainScreen class instantiation access error: "
+					+ e.getMessage());
 		}
+		return new DummyScreen();
+
 	}
 
-	private boolean init() {
+	private String init() {
+
+		String s = "";
+		IConnector connector;
+
 		if (initialized) {
-			return true;
+			return s;
 		}
 
 		// logging
@@ -224,31 +223,56 @@ public class Main extends MIDlet implements CommandListener {
 
 		display = Display.getDisplay(this);
 
-		// create connection
-		GenericStreamConnection connection = getConnection();
-		if (connection == null || !connection.isOpen()) {
-			// error handling
-			Alert alert = new Alert("Error");
-			alert.setType(AlertType.ERROR);
-			alert.setString("Connecting failed. You will now see some log "
-					+ "messages, which may help you.");
-			alert.setTimeout(Alert.FOREVER);
-			alert.setCommandListener(this);
-			display.setCurrent(alert);
-			return false;
+		// create connector
+		connector = getConnector();
+		if (connector == null) {
+			return "Connecting failed. Please review the log messages to "
+					+ "see what's wrong.";
 		}
 
-		Log.ln(this, "connection to host established.");
+		// create a connection
+		connection = connector.getConnection();
+		synchronized (connection) {
+			connector.createConnection();
+			try {
+				connection.wait();
+			} catch (InterruptedException e) {
+				Log.ln(this, "I have been interrupted");
+				return "Connecting failed. Please review the log "
+						+ "messages to see what's wrong.";
+			}
+		}
+		if (connector.getReturnCode() == IConnector.RETURN_USER_CANCEL) {
+			commandAction(IScreen.CMD_DISPOSE, null);
+			return "x";
+		}
+		if (connector.getReturnCode() != IConnector.RETURN_OK) {
+			return "Connecting failed!\n" + connector.getUserMsg();
+		}
+		if (!connection.isOpen()) {
+			return "Connecting failed. Please review the log messages to "
+					+ "see what's wrong.";
+		}
+
+		Log.ln("Cconnection to host established.");
 
 		player = new RemotePlayer(connection);
 
 		screenMain = getMainScreen();
-		if (screenMain == null)
-			return false;
 		screenMain.setUp(this, display, player);
 		screenMain.getDisplayable().addCommand(CMD_SHOW_LOG); // logging
 
 		initialized = true;
-		return true;
+		return s;
 	}
+
+	private void showAlert(String msg) {
+		Alert alert = new Alert("Error");
+		alert.setType(AlertType.ERROR);
+		alert.setString(msg);
+		alert.setTimeout(Alert.FOREVER);
+		alert.setCommandListener(this);
+		display.setCurrent(alert);
+	}
+
 }

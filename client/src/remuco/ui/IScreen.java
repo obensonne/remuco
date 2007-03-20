@@ -16,11 +16,7 @@ import remuco.data.IPlayerStateObserver;
  */
 public interface IScreen extends CommandListener, IPlayerStateObserver {
 
-	
-	
-	public static final String UI_SIMPLE = "simple";
-
-	public static final String UI_CANVAS = "canvas";
+	public static final String APP_PROP_UI = "remuco-ui";
 
 	/**
 	 * Command to delegate to the parent command listener if the screen has done
@@ -28,6 +24,12 @@ public interface IScreen extends CommandListener, IPlayerStateObserver {
 	 */
 	public static final Command CMD_DISPOSE = new Command("Exit", Command.OK,
 			99);
+
+	public static final String UI_CANVAS = "canvas";
+
+	public static final String UI_SIMPLE = "simple";
+
+	public Displayable getDisplayable();
 
 	/**
 	 * Inform the screen, if it is currently active, i.e. if it is shown on the
@@ -52,7 +54,5 @@ public interface IScreen extends CommandListener, IPlayerStateObserver {
 	 */
 	public void setUp(CommandListener pcl, Display d,
 			RemotePlayer player);
-
-	public Displayable getDisplayable();
 
 }

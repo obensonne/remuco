@@ -6,7 +6,6 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
-import remuco.connection.RemotePlayer;
 import remuco.ui.canvas.MainScreen;
 
 public class Cat extends MIDlet implements CommandListener {

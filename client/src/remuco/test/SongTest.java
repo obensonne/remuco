@@ -8,7 +8,6 @@ import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
 import remuco.ui.canvas.MainScreen;
-import remuco.ui.canvas.SongScreen;
 
 public class SongTest extends MIDlet implements CommandListener {
 
