@@ -4,6 +4,10 @@
 	* improved user interface and interaction and error handling when
 	  connecting to the server
 	* discard player state data if there is not enough memory to process it
+	* client packages contains now 3 client versions:
+	  - simple (text based UI)
+	  - canvas (graphical UI using keys and joystick)
+	  - legacy (CLDC-1.0 and MIDP-1.0 compliant version, text based UI)
 
 0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
 
