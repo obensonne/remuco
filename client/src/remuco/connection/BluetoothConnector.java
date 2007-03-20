@@ -167,6 +167,9 @@ public class BluetoothConnector implements Runnable, CommandListener,
 	}
 
 	public synchronized void run() {
+
+		long inquiryDuration;
+
 		synchronized (connection) {
 			try {
 				pb.setLabel("Search devices");
@@ -178,13 +181,17 @@ public class BluetoothConnector implements Runnable, CommandListener,
 				Log.l("Scan for devices.. ");
 				try {
 					agent.startInquiry(DiscoveryAgent.GIAC, this);
-					this.wait();
 				} catch (BluetoothStateException e) {
 					showAlert("Search failed\n"
 							+ "If other Bluetooth applications are currently "
 							+ "running, they may block the device search.");
 					return;
 				}
+
+				inquiryDuration = System.currentTimeMillis();
+				this.wait(); // wait for device search finish
+				inquiryDuration = System.currentTimeMillis() - inquiryDuration;
+
 				Log.ln("ok");
 
 				if (interruptFlag) {
@@ -194,9 +201,13 @@ public class BluetoothConnector implements Runnable, CommandListener,
 
 				int n = remoteDevices.size();
 				if (n == 0) {
-					showAlert("Found no devices!\n"
-							+ "Make sure Bluetooth is enabled on your mobile device and your computer.\n"
-							+ "Also check that your computer's Bluetooth adapter is not in 'hidden' mode.");
+					if (inquiryDuration < 1000) {
+						showAlert("Found no devices!\n"
+							+ "Bluetooth seems to be off (on this device).");
+					} else {
+						showAlert("Found no devices!\n"
+							+ "Bluetooth seems to be off or in 'hidden' mode (on the server side).");
+					}
 					return;
 				}
 
@@ -211,20 +222,20 @@ public class BluetoothConnector implements Runnable, CommandListener,
 
 				d.setCurrent(screenDevices);
 
-				this.wait();
+				this.wait(); // wait for user device selection
 
 				if (interruptFlag) {
 					connection.notify();
 					return;
 				}
 
-				pb.setLabel("Search services");
-				d.setCurrent(pbf);
 				Log.ln("Device: " + getDeviceName(remoteDevice));
 
 				// search services
 
 				Log.l("Search service.. ");
+				pb.setLabel("Search services");
+				d.setCurrent(pbf);
 				serviceRecords.removeAllElements();
 				try {
 					agent.searchServices(null, UUID_LIST, remoteDevice, this);
@@ -232,7 +243,13 @@ public class BluetoothConnector implements Runnable, CommandListener,
 					showAlert("Service search failed!");
 					return;
 				}
-				this.wait();
+
+				this.wait(); // wait for service search finish
+
+				if (interruptFlag) {
+					connection.notify();
+					return;
+				}
 
 				Log.ln("ok");
 
@@ -263,6 +280,12 @@ public class BluetoothConnector implements Runnable, CommandListener,
 				} catch (IOException e) {
 					Log.ln("failed (" + e.getMessage() + ")\n");
 					showAlert("Connecting to server failed!");
+					return;
+				}
+
+				if (interruptFlag) {
+					connection.close();
+					connection.notify();
 					return;
 				}
 
