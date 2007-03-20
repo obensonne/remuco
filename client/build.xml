@@ -343,8 +343,8 @@
                 description="--> copy MIDlet jar to dir">
         <mkdir dir="${install.dest}" />
         <copy todir="${install.dest}" overwrite="true">
-            <fileset file="dist/${remuco-ui}/${midlet.jar}" />
-            <fileset file="dist/${remuco-ui}/${midlet.jad}" />
+            <fileset file="dist/${remuco-profile}/${midlet.jar}" />
+            <fileset file="dist/${remuco-profile}/${midlet.jad}" />
         </copy>
     </target>
 
