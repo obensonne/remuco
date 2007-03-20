@@ -1,7 +1,7 @@
 0.4.1	Christain Buennig <mondai@users.sourceforge.net>
 
 	* fixed bug: wrong rating values on first player state reading
-	  after amarok has been started
+	  after amarok has been started (hope so)
 
 0.4.0	Christain Buennig <mondai@users.sourceforge.net>
 
