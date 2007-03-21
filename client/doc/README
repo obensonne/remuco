@@ -30,23 +30,23 @@ The client package contains three versions of the client:
    Client with a graphical and themeable user interface.
    Uses joystick and numpad keys for controlling.
    Runs on mobile devices with CLDC >= 1.1 and MIDP >= 2.0.
-   For this client a screen of at least ..x.. pixel is recommended!
+   For this client a screen of at least 120x150 pixel is recommended!
 3. Legacy
    Client similar to simple, but adopted to be compatible with older mobile
-   devices which only support only CLDC 1.0 and MIDP 1.0.
+   devices which only support CLDC 1.0 and MIDP 1.0.
    Runs on mobile devices with CLDC >= 1.0 and MIDP >= 1.0.
    (In theory, I could not test this client on a real device. Please give me
    some feedback if this client works or not on your CLDC-1.0/MIDP-1.0 device.)
    
 Pick the client that fits most to your mobile.
-The Java ME device table at sun
+The Java ME device table at the Sun website
 (http://developers.sun.com/techtopics/mobility/device/device) may help you to
 decide which client is the best choice.
 
 The two files remuco.jar and remuco.jad (on some devices you only need the
-jar-file) needs to be installed on your mobile. How this is done is device
-dependent. Inspect the manual of your mobile for how to install Java ME
-applications.
+jar-file) of a particluar client version needs to be installed on your mobile.
+How this is done is device dependent. Inspect the manual of your mobile for how
+to install Java ME applications.
 
 E.g. on a Sony Ericcson K750i you copy the files onto the memory stick. Then
 you browse to that file with the mobiles file browser and select 'install'
@@ -58,7 +58,7 @@ something on the mobile.
 How to use
 **********
 
-When your start the Remuco client, it automatically scans for near bluetooth
+When you start the Remuco client, it automatically scans for near bluetooth
 devices. After a few seconds it presents you a list of detected devices.
 Choose your computer which runs the Remuco server.
 
@@ -71,7 +71,7 @@ a) Legacy and Simple:
    The user interface is easy to understand. Just browse the menu to remotely
    control your music player.
 b) Canvas
-   U can use your joystick and numpad to remotely control your music player.
+   U can use your joystick and numpad to remotely control your music player:
    - use up and down keys to switch to previous / next song
    - use left and right keys to adjust volume (the longer your press, the bigger
      the adjustment)
