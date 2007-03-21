@@ -62,16 +62,3 @@ Index: src/remuco/ui/WaitingScreen.java
  	}
  
  }
-Index: build.properties
-===================================================================
---- build.properties	(revision 91)
-+++ build.properties	(working copy)
-@@ -20,6 +20,6 @@
- # UI 'simple' should work on all devices
- #remuco.ui=simple
- 
--#remuco-profile=legacy
--remuco-profile=simple
-+remuco-profile=legacy
-+#remuco-profile=simple
- #remuco-profile=canvas
