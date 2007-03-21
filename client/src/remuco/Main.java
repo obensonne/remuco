@@ -23,9 +23,6 @@ import remuco.util.Tools;
 
 public class Main extends MIDlet implements CommandListener {
 
-	private static final Command CMD_ALERT_DISMISS = new Command("Ok",
-			Command.OK, 1);
-
 	private static final Command CMD_BACK = new Command("Ok", Command.BACK, 10);
 
 	private static final Command CMD_SHOW_LOG = new Command("Logs",
@@ -111,7 +108,7 @@ public class Main extends MIDlet implements CommandListener {
 			notifyDestroyed();
 		} else if (c == CMD_BACK) { // back from log form
 			screenMain.setActive(true);
-		} else if (c == CMD_ALERT_DISMISS) { // back from error alert
+		} else if (c == Alert.DISMISS_COMMAND) { // back from error alert
 			// show the log which exits the app if the user says 'exit'
 			logForm.removeCommand(CMD_BACK);
 			logForm.addCommand(IScreen.CMD_DISPOSE);
@@ -274,7 +271,6 @@ public class Main extends MIDlet implements CommandListener {
 		alert.setType(AlertType.ERROR);
 		alert.setString(msg);
 		alert.setTimeout(Alert.FOREVER);
-		alert.addCommand(CMD_ALERT_DISMISS);
 		alert.setCommandListener(this);
 		display.setCurrent(alert);
 	}
