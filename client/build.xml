@@ -233,9 +233,9 @@
         <copy todir="build/dist/${dist.pkg-name}">
             <fileset dir="doc" />
             <fileset dir="dist">
-                <filename name="canvas"/>
-                <filename name="simple"/>
-                <filename name="legacy"/>
+                <include name="canvas/**"/>
+                <include name="simple/**"/>
+                <include name="legacy/**"/>
             </fileset>
         </copy>
         <tar destfile="dist/${dist.pkg-name}.tar.gz"
@@ -251,6 +251,7 @@
                 <include name="doc/**/*"/>
                 <include name="res/**/*"/>
                 <include name="build.*"/>
+                <include name="profile.*"/>
                 <exclude name="**/.*"/> <!-- IDE,CVS,SVN data -->
             </fileset>
         </copy>
