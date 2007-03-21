@@ -175,3 +175,6 @@ dist: clean server
 # Prints out the release number of a specific server - PP combination.
 release_no: check_for_pp_name
 	@echo "$(RELEASE)"
+
+release_no_server:
+	@echo "$(RELEASE_MAIN).$(RELEASE_SERVER)"
