@@ -1,0 +1,7 @@
+midp.ver=MIDP-1.0
+midp.ver.num=10
+cldc.ver=CLDC-1.0
+cldc.ver.num=10
+
+remuco-ui=simple
+remuco-build-excludes=remuco/ui/canvas/**
