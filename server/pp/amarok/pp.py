@@ -144,25 +144,16 @@ def rem_pp_get_song(sid):
     
 def rem_pp_check_amarok_connection():
     logging.debug("check amarok connection")
-    requestPl = 0 # see comment below
     if not pputil.app:
         logging.debug("no connection, try to connect..")
-        requestPl = 1 # see comment below
         pputil.app = pydcop.anyAppCalled("amarok")
     if not pputil.app:
         logging.debug("could not connect, amarok seems to be down")
         return 0
     try:
         logging.debug("amarok connection is there, test it...")
-        # next: a test if the connection to amarok works and at the same time
-        # a method to be sure to reuqest the playlist the second time when
-        # rem_pp_get_sidlist() is called the first time after amarok has come
-        # up .. this is because amarok seems to deliver wrong raitng values
-        # when requesting the playlist the first time
-        if requestPl == 1:
-            pputil.app.playlist.saveCurrentPlaylist()
-        else:
-            pputil.app.player.getVolume()
+        # next: a test if the connection to amarok works
+        pputil.app.player.getVolume()
         logging.debug("connection works")
         return 1
     except:
