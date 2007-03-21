@@ -7,7 +7,8 @@
 RELEASE_PP := 2
 
 PP_CFLAGS := $(shell pkg-config --cflags xmms2-client)
-# uncomment next line if you use the devel tree of xmms2
+# uncomment next line if you use the devel tree of xmms2 (or a stable release
+# newer than 0.2 DrHouse)
 #PP_CFLAGS += -DREM_XMMS2_DEVEL
 PP_LFLAGS := $(shell pkg-config --libs xmms2-client)
 
