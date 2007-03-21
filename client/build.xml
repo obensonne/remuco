@@ -7,26 +7,20 @@
                    
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-     Creating a binary package:
-     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     Building the client:
+     ^^^^^^^^^^^^^^^^^^^^
      
-     In order to create a binary package you either need the obfuscater ProGuard
+     In order to build the client you either need the obfuscater ProGuard
      installed or you must skip obfuscating. See target 'obfuscate' for how
      to select an obfuscation strategy.
 
      Edit file 'build.properties' as described within that file.
 
-     Run target 'dist'.
+     Run target 'dist.jar'.
      
-     This will create a jar and jad file in the directory 'dist' which can be
-     copied to and installed on a J2ME capable device.
-     Further a compressed package is created in 'dist' containing the jar and
-     jad file.
-     
-     !!! If you build a binary package on a system other than Linux you
-     have to set the option 'MIDlet-Jar-Size' in the created jad file manually.
-     Set the option with size in bytes of the created jar file (do not forget
-     to do this for the jad file in the compressed package too) !!!
+     This will create a jar and jad file in the directory 'dist/<profile>'
+     (profile ? -> see build.properties) which can be installed on a J2ME
+     capable device.
      
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -10,7 +10,7 @@ controlled (playlist, infos about the current song). If the music player
 supports that, it is even possible to rate your songs remotely. 
 
 This is the Remuco client, an application running on a mobile device with J2ME
-and Bluetooth support.
+and Bluetooth (JSR 82) support.
 
 Building
 ********
@@ -21,40 +21,72 @@ how to build a binary pacakge.
 Installation
 ************
 
-If you've got or built a binary package, unpack it and copy the jar and jad file
-from directory 'canvas' or 'simple' on your J2ME capable and Bluetooth enabled
-mobile device. Choose 'canvas' if you like nice and themeable GUIs, choose
-'simple' if the canvas-client doest not work for you or looks ugly on your
-mobile device.
+The client package contains three versions of the client:
 
-Once the files are on your mobile device, you need to install them.
-This is device dependent. For example on a Sony Ericsson K750i, you browse to
-the copied files and choose install on the jad file. The process should be
-similar for other devices.
+1. Simple
+   Client with a simple, mostly text based user interface.
+   Runs on mobile devices with CLDC >= 1.1 and MIDP >= 2.0.
+2. Canvas
+   Client with a graphical and themeable user interface.
+   Uses joystick and numpad keys for controlling.
+   Runs on mobile devices with CLDC >= 1.1 and MIDP >= 2.0.
+   For this client a screen of at least ..x.. pixel is recommended!
+3. Legacy
+   Client similar to simple, but adopted to be compatible with older mobile
+   devices which only support only CLDC 1.0 and MIDP 1.0.
+   Runs on mobile devices with CLDC >= 1.0 and MIDP >= 1.0.
+   (In theory, I could not test this client on a real device. Please give me
+   some feedback if this client works or not on your CLDC-1.0/MIDP-1.0 device.)
+   
+Pick the client that fits most to your mobile.
+The Java ME device table at sun
+(http://developers.sun.com/techtopics/mobility/device/device) may help you to
+decide which client is the best choice.
 
-On some mobiles you may instead make use of special software to install applications
-on the mobile. The documentation of your mobile should be the best place to
-find out how to install java applications on the mobile.
+The two files remuco.jar and remuco.jad (on some devices you only need the
+jar-file) needs to be installed on your mobile. How this is done is device
+dependent. Inspect the manual of your mobile for how to install Java ME
+applications.
+
+E.g. on a Sony Ericcson K750i you copy the files onto the memory stick. Then
+you browse to that file with the mobiles file browser and select 'install'
+on the jad-file.
+Some Nokia phones require to use special software on your computer to install
+something on the mobile.
+.. as said, please inspect your mobile's manual.
 
 How to use
 **********
 
-Once the client is installed and started on your mobile device, you get prompted
-with a screen to scan for a device running the Remuco server. So push the
-button 'Scan' and .. wait. After some seconds, a list of neighbour devices is
-found. Choose your computer which runs the Remuco server (make sure the
-server is running!).
+When your start the Remuco client, it automatically scans for near bluetooth
+devices. After a few seconds it presents you a list of detected devices.
+Choose your computer which runs the Remuco server.
 
-After 2 more seconds you should see some infos about your music player (the one
-you specified, when started the server on the computer). There may be
-a song (if the player currently has an active song) and there should be the
-players state (playing, stopped, ..).
+The client then connects to the server. Once the connection is up, you see
+the current music player state displayed on your device.
 
-Now explore the severel commands, listed in the menu. I hope they are self
-explaining. Have fun !
+How to use the client from now depends on the version:
+
+a) Legacy and Simple:
+   The user interface is easy to understand. Just browse the menu to remotely
+   control your music player.
+b) Canvas
+   U can use your joystick and numpad to remotely control your music player.
+   - use up and down keys to switch to previous / next song
+   - use left and right keys to adjust volume (the longer your press, the bigger
+     the adjustment)
+   - use fire/select key to toogle play and pause
+   - use * and # to adjust rating
+   - use 0 to show the music player's current playlist
+   In addition there are some menu-commands similar to the 'Simple' client.
+   There you can change the Theme (or Skin) and inspect the log messages (if
+   something does not work as you would like to).
 
 Trouble / Questions:
 ********************
 
-See the Remuco mailing list at remuc.sf.net .
+Help resources:
+
+- online documentation at remuco.sf.net
+- Remuco mailing list at remuc.sf.net .
 
