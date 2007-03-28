@@ -37,6 +37,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#define REM_PS_SIZE_WARN	100000 // a ps > 100k should raise a warning
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// private functions prototypes
+//
+///////////////////////////////////////////////////////////////////////////////
+
 static int sock_read(int sd, u_int8_t* buf, int len);
 static int sock_write(int sd, u_int8_t* buf, int len);
 static void rem_dump_song(u_int8_t *sd, int len);
@@ -437,6 +445,10 @@ rem_convert_pl_enc(struct rem_ps_bin *psb, u_int8_t **pl_c, u_int32_t *pl_c_size
 	
 	*pl_c_size = (pl_size * 2) - bytes_out_left;
 	*pl_c = realloc(ptr_pl_c, *pl_c_size);
+
+	if (*pl_c_size >= REM_PS_SIZE_WARN) {
+		LOG_WARN("very big ps data (%i bytes)\n", *pl_c_size);
+	}
 
 	LOG_NOISE("allocated %u bytes for converted pl, used %u\n", (pl_size * 2), *pl_c_size);
 
