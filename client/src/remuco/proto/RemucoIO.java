@@ -3,6 +3,7 @@ package remuco.proto;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import remuco.data.ClientInfo;
 import remuco.data.PlayerControl;
@@ -10,12 +11,22 @@ import remuco.data.PlayerState;
 import remuco.data.Song;
 import remuco.util.ByteArray;
 import remuco.util.Log;
+import remuco.util.Tools;
 
 public class RemucoIO implements Remuco {
 
 	private static final String REM_CI_ENC_DEFAULT = "ASCII";
 
 	private static final Runtime rt = Runtime.getRuntime();
+
+	/**
+	 * This is the bottom limit of free memory we 'require' after receiving a
+	 * new player state. So if receiving an incoming player state would result
+	 * in free memory below this limit, we call the garbe collector.
+	 * 
+	 * @see #recvPlayerState(DataInputStream, PlayerState)
+	 */
+	private static final long FREE_MEM_LIMIT = rt.freeMemory() / 10;
 
 	/**
 	 * 
@@ -34,6 +45,7 @@ public class RemucoIO implements Remuco {
 		byte version;
 		byte dataType;
 		int dataLen;
+		long freeMem;
 
 		dis.readFully(hdr);
 
@@ -43,31 +55,142 @@ public class RemucoIO implements Remuco {
 		Log.ln("[IO]: PS size " + dataLen);
 
 		if (version != REM_PROTO_VERSION) {
-			dis.skipBytes(dis.available());
+			freeStream(dis);
 			throw new TransferDataException("versions differ",
 					TransferDataException.MAJOR);
 		}
 		if (dataType != REM_DATA_TYPE_PLAYER_STATE) {
-			dis.skipBytes(dis.available());
+			freeStream(dis);
 			throw new TransferDataException("unexpected data type");
 		}
 		if (dataLen < REM_PS_TD_LEN) {
-			dis.skipBytes(dis.available());
+			freeStream(dis);
 			throw new TransferDataException("not enough data");
 		}
 
 		// Check if there is enough free memory to recevie the player state
 		// data. This is a guess: if we keep 100 kb free, everything should
 		// be ok..
-		if (dataLen > rt.freeMemory() - 100000) {
-			dis.skipBytes(dis.available());
-			throw new TransferDataException("playlist probably too long: "
-					+ "not enough free memory", TransferDataException.NOMEM);
+		freeMem = rt.freeMemory();
+		if (dataLen > freeMem - 100000) {
+			Log.ln("[IO]: free mem too small (" + freeMem + ") -> run gc");
+			System.gc();
+			freeMem = rt.freeMemory();
+			if (dataLen > freeMem - FREE_MEM_LIMIT) {
+				Log.ln("[IO]: free mem still too small (" + freeMem
+						+ ") -> skip incoming data");
+				freeStream(dis);
+				throw new TransferDataException("ps data too big", TransferDataException.NOMEM);
+			} else {
+				Log.ln("[IO]: gc was successful");
+			}
 		}
 
 		data = new byte[dataLen];
 		dis.readFully(data);
 		setPlayerState(data, ps);
+
+	}
+
+	/**
+	 * 
+	 * @param dos
+	 * @param ci
+	 * @throws IOException
+	 */
+	public static void sendClientInfo(DataOutputStream dos, ClientInfo ci)
+			throws IOException {
+
+		byte[] encBa;
+		byte[] encBaPlusPadding = new byte[REM_CI_ENCSTR_LEN];
+
+		dos.writeByte(REM_PROTO_VERSION);
+		dos.writeByte(REM_DATA_TYPE_CLIENT_INFO);
+		dos.writeInt(REM_CI_TD_LEN);
+
+		dos.writeShort(ci.getMaxPlaylistLen());
+
+		if (ci.getEncoding().length() >= REM_CI_ENCSTR_LEN - 1) {
+			ci.setEncoding(REM_CI_ENC_DEFAULT);
+		}
+		encBa = ci.getEncoding().getBytes();
+		ByteArray.copy(encBa, 0, encBaPlusPadding, 0, encBa.length);
+		ByteArray.set(encBaPlusPadding, encBa.length, (byte) 0,
+				encBaPlusPadding.length - encBa.length);
+		dos.write(encBaPlusPadding);
+
+		dos.flush();
+
+		// a bit logging:
+
+		Log.ln("[IO] Free mem: " + rt.freeMemory() + ", free mem limit: "
+				+ FREE_MEM_LIMIT);
+
+	}
+
+	/**
+	 * 
+	 * @param dos
+	 * @param pc
+	 * @throws IOException
+	 */
+	public static void sendPlayerControl(DataOutputStream dos, PlayerControl pc)
+			throws IOException {
+
+		dos.writeByte(REM_PROTO_VERSION);
+		dos.writeByte(REM_DATA_TYPE_PLAYER_CTRL);
+		dos.writeInt(REM_PC_TD_LEN);
+
+		dos.writeShort(pc.getCmd());
+		dos.writeShort(pc.getParam());
+
+		dos.flush();
+
+	}
+
+	private static Song createSong(byte[] data, int offset, int len) {
+
+		int pos, lss;
+		Song s = new Song();
+		String tagName = null, tagValue = null;
+
+		for (pos = offset, lss = pos; pos < offset + len; pos++) {
+			if (data[pos] == 0) {
+				if (tagName == null) {
+					tagName = new String(ByteArray.sub(data, lss, pos - lss));
+					lss = pos + 1;
+				} else {
+					tagValue = new String(ByteArray.sub(data, lss, pos - lss));
+					lss = pos + 1;
+					s.setTag(tagName, tagValue);
+					tagName = null;
+					tagValue = null;
+				}
+			}
+		}
+		if (tagName != null || tagValue != null) {
+			Log.ln("[IO]: warning - malformed song data");
+		}
+
+		return s;
+	}
+
+	/**
+	 * Skips all incomng data from stream <code>is</code>
+	 * 
+	 * @param is
+	 *            the stream to skip incoming data from
+	 * @throws IOException
+	 */
+	private static void freeStream(InputStream is) throws IOException {
+
+		int bytesAvailable = 0;
+
+		while ((bytesAvailable = is.available()) > 0) {
+			is.skip(bytesAvailable);
+			Log.ln("[IO]: Skipped " + bytesAvailable + " bytes");
+			Tools.sleep(50); // wait a bit to ensure stream gets really freed
+		}
 
 	}
 
@@ -140,83 +263,5 @@ public class RemucoIO implements Remuco {
 		}
 		ps.playlistSetPosition(plPos);
 		Log.ln("ok");
-	}
-
-	private static Song createSong(byte[] data, int offset, int len) {
-
-		int pos, lss;
-		Song s = new Song();
-		String tagName = null, tagValue = null;
-
-		for (pos = offset, lss = pos; pos < offset + len; pos++) {
-			if (data[pos] == 0) {
-				if (tagName == null) {
-					tagName = new String(ByteArray.sub(data, lss, pos - lss));
-					lss = pos + 1;
-				} else {
-					tagValue = new String(ByteArray.sub(data, lss, pos - lss));
-					lss = pos + 1;
-					s.setTag(tagName, tagValue);
-					tagName = null;
-					tagValue = null;
-				}
-			}
-		}
-		if (tagName != null || tagValue != null) {
-			Log.ln("[IO]: warning - malformed song data");
-		}
-
-		return s;
-	}
-
-	/**
-	 * 
-	 * @param dos
-	 * @param pc
-	 * @throws IOException
-	 */
-	public static void sendPlayerControl(DataOutputStream dos, PlayerControl pc)
-			throws IOException {
-
-		dos.writeByte(REM_PROTO_VERSION);
-		dos.writeByte(REM_DATA_TYPE_PLAYER_CTRL);
-		dos.writeInt(REM_PC_TD_LEN);
-
-		dos.writeShort(pc.getCmd());
-		dos.writeShort(pc.getParam());
-
-		dos.flush();
-
-	}
-
-	/**
-	 * 
-	 * @param dos
-	 * @param ci
-	 * @throws IOException
-	 */
-	public static void sendClientInfo(DataOutputStream dos, ClientInfo ci)
-			throws IOException {
-
-		byte[] encBa;
-		byte[] encBaPlusPadding = new byte[REM_CI_ENCSTR_LEN];
-
-		dos.writeByte(REM_PROTO_VERSION);
-		dos.writeByte(REM_DATA_TYPE_CLIENT_INFO);
-		dos.writeInt(REM_CI_TD_LEN);
-
-		dos.writeShort(ci.getMaxPlaylistLen());
-
-		if (ci.getEncoding().length() >= REM_CI_ENCSTR_LEN - 1) {
-			ci.setEncoding(REM_CI_ENC_DEFAULT);
-		}
-		encBa = ci.getEncoding().getBytes();
-		ByteArray.copy(encBa, 0, encBaPlusPadding, 0, encBa.length);
-		ByteArray.set(encBaPlusPadding, encBa.length, (byte) 0,
-				encBaPlusPadding.length - encBa.length);
-		dos.write(encBaPlusPadding);
-
-		dos.flush();
-
 	}
 }
