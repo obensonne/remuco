@@ -1,3 +1,7 @@
+0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* internal: fixed a probably forgotten g_free()
+	
 0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* minor internal (non-functional) changes
