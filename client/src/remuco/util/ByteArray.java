@@ -18,6 +18,13 @@
  */
 package remuco.util;
 
+/**
+ * Static methods to read and write (especially integers) from a byte array
+ * while taking care of byte ordering.
+ * 
+ * @author Christian Buennig
+ *
+ */
 public class ByteArray {
 
     public static byte[] concat(byte[] b1, byte[] b2, int len2) {

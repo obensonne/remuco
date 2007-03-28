@@ -17,7 +17,7 @@ import remuco.ui.simple.PlaylistScreen;
 import remuco.util.Log;
 import remuco.util.Tools;
 
-public class MainScreen implements IScreen, KeyListener {
+public class MainScreen implements IScreen, IKeyListener {
 
 	/** RemucoCommand on main screen: Exit */
 	protected static final Command CMD_EXIT = new Command("Exit", Command.EXIT,

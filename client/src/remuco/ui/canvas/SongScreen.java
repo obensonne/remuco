@@ -20,7 +20,7 @@ public class SongScreen extends Canvas {
 
 	private Image imgScreenBG, imgSongAreaBG;
 
-	private KeyListener kl;
+	private IKeyListener kl;
 
 	private ScreenElement seState, seRepeat, seShuffle, seVolume, seSong;
 
@@ -32,7 +32,7 @@ public class SongScreen extends Canvas {
 	 * @param pcl
 	 *            the parent {@link CommandListener} to delegate commands to
 	 */
-	public SongScreen(KeyListener kl) {
+	public SongScreen(IKeyListener kl) {
 
 		super();
 
@@ -352,36 +352,36 @@ public class SongScreen extends Canvas {
 	private int translateKey(int key) {
 		switch (key) {
 		case Canvas.KEY_STAR:
-			Log.ln("*");
-			return KeyListener.KEY_RATE_DOWN;
+			//Log.ln("*");
+			return IKeyListener.KEY_RATE_DOWN;
 		case Canvas.KEY_POUND:
-			Log.ln("#");
-			return KeyListener.KEY_RATE_UP;
+			//Log.ln("#");
+			return IKeyListener.KEY_RATE_UP;
 		case Canvas.KEY_NUM0:
-			Log.ln("0");
-			return KeyListener.KEY_SHOW_PLAYLIST;
+			//Log.ln("0");
+			return IKeyListener.KEY_SHOW_PLAYLIST;
 		}
 		int ga = getGameAction(key);
 		if (ga != 0) {
 			switch (ga) {
 			case Canvas.FIRE:
-				Log.ln("GA fire");
-				return KeyListener.KEY_PLAY_PAUSE;
+				//Log.ln("GA fire");
+				return IKeyListener.KEY_PLAY_PAUSE;
 			case Canvas.RIGHT:
-				Log.ln("GA right");
-				return KeyListener.KEY_VOLUME_UP;
+				//Log.ln("GA right");
+				return IKeyListener.KEY_VOLUME_UP;
 			case Canvas.LEFT:
-				Log.ln("GA left");
-				return KeyListener.KEY_VOLUME_DOWN;
+				//Log.ln("GA left");
+				return IKeyListener.KEY_VOLUME_DOWN;
 			case Canvas.UP:
-				Log.ln("GA up");
-				return KeyListener.KEY_PREV;
+				//Log.ln("GA up");
+				return IKeyListener.KEY_PREV;
 			case Canvas.DOWN:
-				Log.ln("GA down");
-				return KeyListener.KEY_NEXT;
+				//Log.ln("GA down");
+				return IKeyListener.KEY_NEXT;
 			}
 		}
-		return KeyListener.KEY_NOOP;
+		return IKeyListener.KEY_NOOP;
 	}
 
 	private void updateSongArea() {

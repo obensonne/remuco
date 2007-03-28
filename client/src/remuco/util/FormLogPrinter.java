@@ -5,7 +5,7 @@ import javax.microedition.lcdui.Form;
 
 /**
  * A {@link remuco.util.ILogPrinter} implementation which prints out log
- * messages to STDOUT and a Form. This is useful for inspecting what happens
+ * messages to a {@link Form}. This is useful for inspecting what happens
  * on a mobile device where STDOUT cannot be inspected.
  * 
  * @author Christian Buennig
@@ -23,19 +23,19 @@ public class FormLogPrinter implements ILogPrinter {
 
     public void print(String s) {
         checkFormSize();
-        System.out.print(s);
+        //System.out.print(s);
         f.append(s);
     }
 
     public void println(String s) {
         checkFormSize();
-        System.out.println(s);
+        //System.out.println(s);
         f.append(s + "\n");
     }
 
     public void println() {
         checkFormSize();
-        System.out.println();
+        //System.out.println();
         f.append("\n");
     }
 
