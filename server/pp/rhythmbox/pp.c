@@ -499,7 +499,10 @@ rem_pp_rhythmbox_dbus_getcurrenturi()
 				G_TYPE_STRING, &uri, G_TYPE_INVALID);
 	REM_DBUS_CHECK_RET(ret, g_err);
 	LOG_NOISE("current uri: %s\n", uri);
-	if (!ret || !uri || strlen(uri) == 0) {
+	if (!ret || !uri ) {
+		return NULL;
+	} else if (strlen(uri) == 0) {
+		g_free(uri);
 		return NULL;
 	} else {
 		return uri;
