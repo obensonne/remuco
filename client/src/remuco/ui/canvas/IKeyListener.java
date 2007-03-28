@@ -1,6 +1,6 @@
 package remuco.ui.canvas;
 
-public interface KeyListener {
+public interface IKeyListener {
 
 	
 	public static final int
