@@ -14,7 +14,8 @@ In principle no threading is necessary when implementing a player proxy.
 If threading is needed it should get initialized in the init function.
 
 More documentation about these functions can be found in rem-pp.h and
-rem-pp-template.c.
+rem-pp-template.c. - name and purpose of these functions equal in Python and C
+player proxies!
 """
 
 import logging
@@ -49,7 +50,7 @@ def rem_pp_get_ps():
 def rem_pp_get_song(sid):
     """
     This function shall return the meta data information of the song with id
-    'sid' as a dictionary. The dictionary may contain only strings.
+    'sid' as a dictionary. The dictionary must contain only strings.
     """
     
     """ Example song to return: """

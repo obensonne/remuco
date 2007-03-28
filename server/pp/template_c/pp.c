@@ -140,11 +140,12 @@ rem_pp_get_song(const union rem_pp_sid *sid, struct rem_pp_song *song)
 {
 	LOG_NOISE("called\n");
 
-	// This function gets called by the Remuco server after it has called
-	// rem_pp_get_ps() and recognized a change in the playlist. The server
-	// iterates the song ids contained in the player state returned by
-	// rem_pp_get_ps() and calls this function for every song id in the
-	// player state's song id list.
+	// This function gets called by the Remuco server _after_ it has called
+	// rem_pp_get_ps(). But _only_ if it recognized a change in the playlist
+	// (i.e. the list of song ids) returned by rem_pp_get_ps()
+	// The server iterates the song ids contained in the player state
+	// returned by rem_pp_get_ps() and calls this function for _every_
+	// song id in the player state's song id list.
 	// You have to fill the structure 'song' with meta data of the song
 	// with the song id 'sid'.
 	// Below is an example (not realistic, because it returns the same meta
