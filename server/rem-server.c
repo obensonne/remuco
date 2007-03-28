@@ -203,11 +203,12 @@ rem_server_shutdown()
 		sdp_svc_del(sdp_session);
 	}
 	
+	// inform all clients that the serer goes down
 	REM_PSB_RESET(&ps_bin, REM_PS_STATE_SRVOFF);
 	REM_PSB_SET_PLINCL(&ps_bin, 1);
 	rem_server_tx_ps_broadcast();
-	REM_SLEEP_MS(100);	// before closing client connections, give clients
-			// a chance to rx final player state
+	REM_SLEEP_MS(100);	// before closing client connections, give
+				// clients a chance to rx final player state
 
 	// disconnect all clients
 	for (i = 0; i < REM_MAX_CLIENTS; i++) {
