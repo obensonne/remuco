@@ -26,7 +26,9 @@ public class RemucoIO implements Remuco {
 	 * 
 	 * @see #recvPlayerState(DataInputStream, PlayerState)
 	 */
-	private static final long FREE_MEM_LIMIT = rt.freeMemory() / 10;
+	private static final long FREE_MEM_LIMIT = Math.min(rt.freeMemory() / 10,
+			25000);
+
 
 	/**
 	 * 
@@ -45,7 +47,6 @@ public class RemucoIO implements Remuco {
 		byte version;
 		byte dataType;
 		int dataLen;
-		long freeMem;
 
 		dis.readFully(hdr);
 
@@ -68,22 +69,11 @@ public class RemucoIO implements Remuco {
 			throw new TransferDataException("not enough data");
 		}
 
-		// Check if there is enough free memory to recevie the player state
-		// data. This is a guess: if we keep 100 kb free, everything should
-		// be ok..
-		freeMem = rt.freeMemory();
-		if (dataLen > freeMem - 100000) {
-			Log.ln("[IO]: free mem too small (" + freeMem + ") -> run gc");
-			System.gc();
-			freeMem = rt.freeMemory();
-			if (dataLen > freeMem - FREE_MEM_LIMIT) {
-				Log.ln("[IO]: free mem still too small (" + freeMem
-						+ ") -> skip incoming data");
-				freeStream(dis);
-				throw new TransferDataException("ps data too big", TransferDataException.NOMEM);
-			} else {
-				Log.ln("[IO]: gc was successful");
-			}
+		// Check if there is enough free memory to recevie the ps data
+		if (!checkMem(dataLen)) {
+			freeStream(dis);
+			throw new TransferDataException("not enough mem for ps data",
+					TransferDataException.NOMEM);
 		}
 
 		data = new byte[dataLen];
@@ -145,6 +135,34 @@ public class RemucoIO implements Remuco {
 		dos.writeShort(pc.getParam());
 
 		dos.flush();
+
+	}
+
+	private static boolean checkMem(int dataLen) {
+
+		long freeMem;
+
+		if (dataLen < 1000) {
+			// small data packet, don't care about mem
+			return true;
+		}
+
+		freeMem = rt.freeMemory();
+
+		if (dataLen > freeMem - FREE_MEM_LIMIT) {
+			Log.ln("[MC]: free mem too small (" + freeMem + ") -> run gc");
+			System.gc();
+			freeMem = rt.freeMemory();
+			if (dataLen > freeMem - FREE_MEM_LIMIT) {
+				Log.ln("[MC]: free mem still too small (" + freeMem + ")");
+				return false;
+			} else {
+				Log.ln("[MC]: gc was successful (" + freeMem + ")");
+				return true;
+			}
+		} else {
+			return true;
+		}
 
 	}
 
