@@ -200,8 +200,6 @@ public class MainScreen implements IScreen, IKeyListener {
 
 	private int init() {
 
-		Log.ln("Free mem: " + Runtime.getRuntime().freeMemory());
-
 		int i;
 
 		themeName = Tools.splitString(Main.getAPropString(

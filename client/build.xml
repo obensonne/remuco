@@ -264,7 +264,7 @@
     <!-- =================== Run ========================================== -->
 
     
-    <target name="run" depends="dist"
+    <target name="run" depends="dist.jar"
             description="--> run the client in WTK emulation environment">
         <exec executable="${wtk.home}/bin/emulator" dir="dist/${remuco-profile}">
             <arg line="-Xdevice:DefaultColorPhone -Xdescriptor:${midlet.jad}" />
