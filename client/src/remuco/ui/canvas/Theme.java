@@ -7,6 +7,8 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import remuco.util.Log;
+
 public class Theme {
 
 	protected static final byte COLOR_BG = 0, COLOR_TEXT = 1, COLOR_TITLE = 2,
@@ -169,9 +171,9 @@ public class Theme {
 
 		for (i = 0; i < IMGS_COUNT; i++) {
 			try {
-				img[i] = Image.createImage(name + "/" + imgName[i]);
+				img[i] = Image.createImage("/" + name + "/" + imgName[i]);
 			} catch (IOException e) {
-				System.out.println("loading image " + imgName[i] + " failed!");
+				Log.ln("[TH]: loading image " + imgName[i] + " failed!");
 				img[i] = imgFallBack;
 			}
 		}
