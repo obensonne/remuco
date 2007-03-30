@@ -164,10 +164,14 @@ public class MainScreen implements IScreen, IKeyListener {
 		if (key == KEY_VOLUME_UP) {
 			if (volCurrent >= 100)
 				return;
+			if (volDiff > 100 - volCurrent)
+				volDiff = 100 - volCurrent;
 			pc.set(PlayerControl.CODE_VOL, (short) (volCurrent + volDiff));
 		} else {
 			if (volCurrent <= 0)
 				return;
+			if (volDiff > volCurrent)
+				volDiff = volCurrent;
 			pc.set(PlayerControl.CODE_VOL, (short) (volCurrent - volDiff));
 		}
 		player.control(pc);
