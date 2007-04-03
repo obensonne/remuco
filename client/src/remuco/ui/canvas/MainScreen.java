@@ -158,7 +158,7 @@ public class MainScreen implements IScreen, IKeyListener {
 		long volDiff;
 		int volCurrent;
 
-		volDiff = (int) (System.currentTimeMillis() - volumeAdjustStart) / 100;
+		volDiff = (int) (System.currentTimeMillis() - volumeAdjustStart) / 50;
 		volCurrent = ops.getVolume();
 
 		if (key == KEY_VOLUME_UP) {
