@@ -14,7 +14,7 @@ public class SongScreen extends Canvas {
 
 	private int currentRating;
 
-	private Song currentSong;
+	private Song currentSong, songDefault, songError, songSrvOff;
 
 	private byte currentVolume;
 
@@ -23,8 +23,6 @@ public class SongScreen extends Canvas {
 	private IKeyListener kl;
 
 	private ScreenElement seState, seRepeat, seShuffle, seVolume, seSong;
-
-	private Song songDefault;
 
 	/**
 	 * Create a new SongScreen.
@@ -40,6 +38,17 @@ public class SongScreen extends Canvas {
 
 		songDefault = new Song();
 		songDefault.setTag(Remuco.REM_TAG_NAME_TITLE, "Remuco");
+
+		songError = new Song();
+		songError.setTag(Remuco.REM_TAG_NAME_ARTIST, "An error occured");
+		songError.setTag(Remuco.REM_TAG_NAME_ALBUM,
+				"Please restart client (and check if the server is running)");
+
+		songSrvOff = new Song();
+		songSrvOff.setTag(Remuco.REM_TAG_NAME_ARTIST, "The server is down");
+		songSrvOff.setTag(Remuco.REM_TAG_NAME_ALBUM,
+				"Once the server is up again, restart the client");
+
 		currentSong = songDefault;
 		currentVolume = 55;
 
@@ -47,6 +56,10 @@ public class SongScreen extends Canvas {
 	}
 
 	public void updatePlayerState(PlayerState ps) {
+
+		Song cs = ps.getCurrentSong();
+		if (cs == null)
+			cs = songDefault;
 
 		switch (ps.getState()) {
 		case Remuco.REM_PS_STATE_PLAY:
@@ -63,12 +76,14 @@ public class SongScreen extends Canvas {
 			break;
 		case Remuco.REM_PS_STATE_SRVOFF:
 			seState.setImage(Theme.img[Theme.IMGID_STATE_SRVOFF]);
+			cs = songSrvOff;
 			break;
 		case Remuco.REM_PS_STATE_PROBLEM:
 			seState.setImage(Theme.img[Theme.IMGID_STATE_PROBLEM]);
 			break;
 		case Remuco.REM_PS_STATE_ERROR:
 			seState.setImage(Theme.img[Theme.IMGID_STATE_ERROR]);
+			cs = songError;
 			break;
 		default:
 			seState.setImage(Theme.img[Theme.IMGID_STATE_PROBLEM]);
@@ -93,12 +108,9 @@ public class SongScreen extends Canvas {
 			updateVolumeBar();
 		}
 
-		Song s = ps.getCurrentSong();
-		if (s == null)
-			s = songDefault;
-		if (currentSong != s || currentRating != s.getRating()) {
-			currentSong = s;
-			currentRating = s.getRating();
+		if (currentSong != cs || currentRating != cs.getRating()) {
+			currentSong = cs;
+			currentRating = cs.getRating();
 			updateSongArea();
 		}
 
@@ -352,32 +364,32 @@ public class SongScreen extends Canvas {
 	private int translateKey(int key) {
 		switch (key) {
 		case Canvas.KEY_STAR:
-			//Log.ln("*");
+			// Log.ln("*");
 			return IKeyListener.KEY_RATE_DOWN;
 		case Canvas.KEY_POUND:
-			//Log.ln("#");
+			// Log.ln("#");
 			return IKeyListener.KEY_RATE_UP;
 		case Canvas.KEY_NUM0:
-			//Log.ln("0");
+			// Log.ln("0");
 			return IKeyListener.KEY_SHOW_PLAYLIST;
 		}
 		int ga = getGameAction(key);
 		if (ga != 0) {
 			switch (ga) {
 			case Canvas.FIRE:
-				//Log.ln("GA fire");
+				// Log.ln("GA fire");
 				return IKeyListener.KEY_PLAY_PAUSE;
 			case Canvas.RIGHT:
-				//Log.ln("GA right");
+				// Log.ln("GA right");
 				return IKeyListener.KEY_VOLUME_UP;
 			case Canvas.LEFT:
-				//Log.ln("GA left");
+				// Log.ln("GA left");
 				return IKeyListener.KEY_VOLUME_DOWN;
 			case Canvas.UP:
-				//Log.ln("GA up");
+				// Log.ln("GA up");
 				return IKeyListener.KEY_PREV;
 			case Canvas.DOWN:
-				//Log.ln("GA down");
+				// Log.ln("GA down");
 				return IKeyListener.KEY_NEXT;
 			}
 		}
@@ -446,8 +458,8 @@ public class SongScreen extends Canvas {
 			}
 
 			s = currentSong.getTag(Song.TAG_GENRE);
-			g.drawString(s, width/2, y, Graphics.HCENTER | Graphics.BOTTOM);
-			
+			g.drawString(s, width / 2, y, Graphics.HCENTER | Graphics.BOTTOM);
+
 			s = currentSong.getLenFormatted();
 			g.drawString(s, width, y, Graphics.RIGHT | Graphics.BOTTOM);
 
