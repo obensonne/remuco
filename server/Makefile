@@ -78,7 +78,8 @@ CFLAGS  += -DREM_RELEASE_SERVER=\"$(RELEASE_SERVER)\"
 CFLAGS  += -DREM_RELEASE_PP=\"$(RELEASE_PP)\" -DREM_PP_NAME=\"$(PP_NAME)\"
 CFLAGS	+= -DREM_DO_TESTS
 CFLAGS	+= -Wall -Wshadow -Wmissing-prototypes -Wextra -O2
-LFLAGS	= $(COMMON_OBJ_FILES) -lbluetooth
+CFLAGS  += $(shell pkg-config --cflags bluez)
+LFLAGS	= $(COMMON_OBJ_FILES) $(shell pkg-config --libs bluez)
 
 # Prerequisites needed for every server (independent of specific player proxy)
 PREREQS = clean .built-server
@@ -88,8 +89,8 @@ ifeq "$(strip $(USE_REM_TAG))" "yes"
 PREREQS += .built-tag 
 TAG_OBJ_FILES := rem-tags.o
 TAG_HDR_FILES := rem-tags.h
-TAG_CFLAGS := 
-TAG_LFLAGS := -lid3tag $(TAG_OBJ_FILES)
+TAG_CFLAGS := $(shell pkg-config --cflags id3tag)
+TAG_LFLAGS := $(TAG_OBJ_FILES) $(shell pkg-config --libs id3tag)
 CFLAGS += $(TAG_CFLAGS)
 LFLAGS += $(TAG_LFLAGS)
 endif
@@ -152,7 +153,7 @@ clean:
 	rm -rf build
 	
 
-# Creates a binary duistribution package.
+# Creates a binary distribution package.
 dist: clean server
 	mkdir -p build/$(PKG_NAME)/bin build/$(PKG_NAME)/lib
 	cp remuco-$(PP_NAME) $(PP_EXTRA_BIN_FILES) build/$(PKG_NAME)/bin
@@ -176,5 +177,6 @@ dist: clean server
 release_no: check_for_pp_name
 	@echo "$(RELEASE)"
 
+# Prints out the release number of the server
 release_no_server:
 	@echo "$(RELEASE_MAIN).$(RELEASE_SERVER)"
