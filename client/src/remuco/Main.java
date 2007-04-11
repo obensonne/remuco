@@ -223,6 +223,13 @@ public class Main extends MIDlet implements CommandListener {
 
 		display = Display.getDisplay(this);
 
+		String sa[] = Tools.getSupportedEncodings();
+		Log.l("Supported encodings: ");
+		for (int i = 0; i < sa.length; i++) {
+			 Log.l(sa[i] + ", ");
+		}
+		Log.ln();
+		
 		// create connector
 		connector = getConnector();
 		if (connector == null) {
