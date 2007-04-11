@@ -28,107 +28,108 @@ import remuco.util.Log;
  */
 public class RemotePlayer implements Runnable {
 
-    /**
-     * Number of subsequent IO errors before closing the connection
-     */
-    private static final int MAX_IO_ERRORS = 10;
+	/**
+	 * Number of subsequent IO errors before closing the connection
+	 */
+	private static final int MAX_IO_ERRORS = 10;
 
-    private GenericStreamConnection con;
+	private GenericStreamConnection con;
 
-    private DataInputStream dis;
+	private DataInputStream dis;
 
-    private DataOutputStream dos;
+	private DataOutputStream dos;
 
-    private int ioErrors = 0;
+	private int ioErrors = 0;
 
-    private ObservablePlayerState ops;
+	private ObservablePlayerState ops;
 
-    public RemotePlayer(GenericStreamConnection con) {
-        this.con = con;
-        dis = con.getIn();
-        dos = con.getOut();
+	public RemotePlayer(GenericStreamConnection con) {
+		this.con = con;
+		dis = con.getIn();
+		dos = con.getOut();
 
-        ops = new ObservablePlayerState();
+		ops = new ObservablePlayerState();
 
-        Thread t = new Thread(this);
-        t.start();
+		Thread t = new Thread(this);
+		t.start();
 
-    }
+	}
 
-    public void control(PlayerControl pc) {
-        if (ops.getState() == Remuco.REM_PS_STATE_SRVOFF) {
-            return;
-        }
-        try {
-            RemucoIO.sendPlayerControl(dos, pc);
-            ioErrors = 0;
-        } catch (IOException e) {
-            Log.ln(this, "sending PC[" + pc + "] failed: " + e.getMessage());
-            if (ioErrors++ >= MAX_IO_ERRORS || !con.isOpen()) {
-                Log.ln(this, "connection error");
-                ops.setState(PlayerState.ST_ERROR);
-                con.close();
-            }
-        }
-    }
+	public void control(PlayerControl pc) {
+		if (ops.getState() == Remuco.REM_PS_STATE_SRVOFF) {
+			return;
+		}
+		try {
+			RemucoIO.sendPlayerControl(dos, pc);
+			ioErrors = 0;
+		} catch (IOException e) {
+			Log.ln(this, "sending PC[" + pc + "] failed: " + e.getMessage());
+			if (ioErrors++ >= MAX_IO_ERRORS || !con.isOpen()) {
+				Log.ln(this, "connection error");
+				ops.setState(PlayerState.ST_ERROR);
+				con.close();
+			}
+		}
+	}
 
-    public ObservablePlayerState getObservablePlayerState() {
-        return ops;
-    }
+	public ObservablePlayerState getObservablePlayerState() {
+		return ops;
+	}
 
-    public void run() {
+	public void run() {
 
-        // meta infos about us (the client)
-        ClientInfo ci = new ClientInfo();
-        String s = System.getProperty("microedition.encoding");
-        ci.setEncoding(s == null ? ClientInfo.DEF_ENC : s);
+		// meta infos about us (the client)
+		ClientInfo ci = new ClientInfo();
+		String s = System.getProperty("microedition.encoding");
+		Log.ln("[RP] Enocding: " + s);
+		ci.setEncoding(s == null ? ClientInfo.DEF_ENC : s);
 
-        // hello dialog
-        try {
-            Log.l(this, "tx client info .. ");
-            RemucoIO.sendClientInfo(dos, ci);
-            Log.ln("ok\n");
-        } catch (IOException e) {
-            Log.ln("failed: " + e.getMessage());
-            con.close();
-            return;
-        }
+		// hello dialog
+		try {
+			Log.l(this, "tx client info .. ");
+			RemucoIO.sendClientInfo(dos, ci);
+			Log.ln("ok\n");
+		} catch (IOException e) {
+			Log.ln("failed: " + e.getMessage());
+			con.close();
+			return;
+		}
 
-        // wait for player states
-        while (ioErrors <= MAX_IO_ERRORS && con.isOpen()) {
-            try {
-                //Log.ln(this, "waiting for new player state .. ");
-                RemucoIO.recvPlayerState(dis, ops);
-                Log.ln(this, "rxed new ps (" + ops + ")");
-                ops.changed();
-                ioErrors = 0;
-                if (ops.getState() == Remuco.REM_PS_STATE_SRVOFF) {
-                    Log.ln("server shutdown");
-                    con.close();
-                    ops.changed();
-                    return;
-                }
-            } catch (TransferDataException e) {
-                Log.ln(this, "rx ps failed:" + e.getMessage());
-                if (e.getType() == TransferDataException.MINOR) {
-                	ioErrors++;
-                } else if (e.getType() == TransferDataException.MAJOR) {
-                	break;
-                } else { // warning
-                    ops.setState(PlayerState.ST_PROBLEM);
-                    ops.playlistClear();
-                    ops.changed();
-                }
-            } catch (IOException e) {
-                Log.ln(this, "rx ps failed:" + e.getMessage());
-                ioErrors++;
-            }
-        }
+		// wait for player states
+		while (ioErrors <= MAX_IO_ERRORS && con.isOpen()) {
+			try {
+				// Log.ln(this, "waiting for new player state .. ");
+				RemucoIO.recvPlayerState(dis, ops);
+				Log.ln(this, "rxed new ps (" + ops + ")");
+				ops.changed();
+				ioErrors = 0;
+				if (ops.getState() == Remuco.REM_PS_STATE_SRVOFF) {
+					Log.ln("server shutdown");
+					con.close();
+					ops.changed();
+					return;
+				}
+			} catch (TransferDataException e) {
+				Log.ln(this, "rx ps failed:" + e.getMessage());
+				if (e.getType() == TransferDataException.MINOR) {
+					ioErrors++;
+				} else if (e.getType() == TransferDataException.MAJOR) {
+					break;
+				} else { // warning
+					ops.setState(PlayerState.ST_PROBLEM);
+					ops.playlistClear();
+					ops.changed();
+				}
+			} catch (IOException e) {
+				Log.ln(this, "rx ps failed:" + e.getMessage());
+				ioErrors++;
+			}
+		}
 
-        Log.ln(this, "connection error");
-        ops.setState(PlayerState.ST_ERROR);
-        ops.changed();
-        con.close();
-    }
+		Log.ln(this, "connection error");
+		ops.setState(PlayerState.ST_ERROR);
+		ops.changed();
+		con.close();
+	}
 
 }
