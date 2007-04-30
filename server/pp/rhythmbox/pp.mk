@@ -29,7 +29,12 @@ install: server
 	$(INSTALL_DIR) $(DESTDIR)$(RB_PLUGIN_DIR)/remuco
 	cd pp/$(PP_NAME)/rb-plugin/src/remuco && \
 		$(INSTALL_DATA) *.py remuco.rb-plugin $(DESTDIR)$(RB_PLUGIN_DIR)/remuco
+
+uninstall:
+	rm -f $(DESTDIR)$(BIN_DIR)/remuco-$(PP_NAME)
+	rm -rf $(DESTDIR)$(RB_PLUGIN_DIR)/remuco
 	
+
 # When calling target 'dist' the file remuco-$(PP_NAME) will be inclueded in
 # the distribution packages per default. If further files are needed they must
 # be specified here.
