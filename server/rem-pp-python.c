@@ -23,10 +23,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#if PYTHON_VERSION == 24
-#include <python2.4/Python.h>
-#elif PYTHON_VERSION == 23
+#if PYTHON_VERSION == 23
 #include <python2.3/Python.h>
+#elif PYTHON_VERSION == 24
+#include <python2.4/Python.h>
+#elif PYTHON_VERSION == 25
+#include <python2.5/Python.h>
 #else
 #include <python/Python.h>
 #endif
