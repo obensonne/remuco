@@ -1,3 +1,7 @@
+0.4.3	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* make playlist readable on client (though browsing is not yet possible)
+	
 0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* internal: fixed a probably forgotten g_free()
