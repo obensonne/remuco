@@ -1,3 +1,8 @@
+0.4.4	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* updated python pp for python 2.5
+	* very minor changes
+
 0.4.3	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* some internal (non-functional) changes
