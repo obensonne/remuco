@@ -7,7 +7,7 @@ def: all
 ###############################################################################
 
 # List of available PPs
-PP_LIST := template_c template_py xmms xmms2 rhythmbox amarok
+PP_LIST := template_c template_py xmms xmms2 rhythmbox amarok mpd
 PP_LIST_EXECUTABLES := $(patsubst %,remuco-%,$(PP_LIST))
 
 # Main release number:
@@ -18,7 +18,7 @@ RELEASE_SERVER := 4
 #RELEASE_PP := gets defined in PP specific make file
 
 # Log level: LL_FATAL, LL_ERROR, LL_WARN, LL_INFO, LL_DEBUG, LL_NOISE
-LOGLEVEL ?= LL_INFO
+LOGLEVEL ?= LL_DEBUG
 
 ###############################################################################
 #

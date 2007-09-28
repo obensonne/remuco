@@ -79,6 +79,8 @@ public abstract class Tools {
 			ea[i] = (String) v.elementAt(i);
 		}
 
+		assert true;
+		
 		return ea;
 	}
 

@@ -1,5 +1,7 @@
 package remuco;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -136,8 +138,40 @@ public class Main extends MIDlet implements CommandListener {
 		} else {
 			showAlert(s); // this results in exit
 		}
+		
+		
 	}
 
+	private void tempEC() {
+		// temp begin
+		String b = "axá";
+		Log.l("ETc: " + b + "(");
+		for (int i = 0; i < b.length(); i++) {
+			Log.l(Integer.toHexString(b.charAt(i)) + ".");
+			
+		}
+		Log.ln(")");
+		byte[] ba;
+		
+		ba = b.getBytes();
+		Log.l("ETb: " + b + "(");
+		for (int i = 0; i < ba.length; i++) {
+			Log.l(Integer.toHexString((int)(ba[i])) + ".");
+			
+		}
+		Log.ln(")");
+		
+		try {
+			b = new String(new byte[] {0x61, 78, (byte)0xc3, (byte)0xa1, 0x0a}, "UTF8");
+		} catch (UnsupportedEncodingException e) {
+			Log.ln("failed: " + e.getMessage());
+		}
+		
+		Log.ln("ECu: " + b);
+		// temp end
+
+	}
+	
 	private void cleanUp() {
 		if (player != null) {
 			player.control(PlayerControl.PC_LOGOFF);
@@ -221,6 +255,8 @@ public class Main extends MIDlet implements CommandListener {
 		logForm.setCommandListener(this);
 		Log.setOut(new FormLogPrinter(logForm));
 
+		tempEC();
+		
 		display = Display.getDisplay(this);
 
 		String sa[] = Tools.getSupportedEncodings();

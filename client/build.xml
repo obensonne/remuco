@@ -109,7 +109,7 @@
     <target name="compile">
         <mkdir dir="build/classes" />
         <javac  destdir="build/classes" 
-                target="1.1" source="1.3"
+                target="1.4" source="1.4"
                 bootclasspath="${midp.lib}"
                 debug="true" verbose="no"
                 excludes="${remuco-build-excludes}">

@@ -7,6 +7,9 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import remuco.connection.RemotePlayer;
+import remuco.data.ObservablePlayerState;
+import remuco.server.VirutalPlayer;
 import remuco.ui.canvas.MainScreen;
 
 public class SongTest extends MIDlet implements CommandListener {

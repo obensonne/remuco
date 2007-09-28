@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.6.2
+Ant-Version: Apache Ant 1.6.5
 Created-By: 1.5.0_02-b09 (Sun Microsystems Inc.)
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
@@ -11,5 +11,5 @@ remuco-connection: bluetooth
 remuco-ui: canvas
 remuco-ui-canvas-themes: default,tiles
 MIDlet-Jar-URL: remuco.jar
-MIDlet-Jar-Size: 68265
+MIDlet-Jar-Size: 68585
 
