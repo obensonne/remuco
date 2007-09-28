@@ -1,0 +1,109 @@
+#ifndef REMPLOB_H_
+#define REMPLOB_H_
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// includes
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#include "../../util/rem-common.h"
+
+#include "../basic/rem-sv.h"
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// types
+//
+///////////////////////////////////////////////////////////////////////////////
+
+typedef struct {
+	gchar		*pid;
+	rem_sv_t	*meta;
+	gchar		*img;
+} rem_plob_t;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// constants
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#define REM_PLOB_META_ALBUM "Album"
+#define REM_PLOB_META_ARTIST "Artist"
+#define REM_PLOB_META_BITRATE "Bitrate"
+#define REM_PLOB_META_COMMENT "Comment"
+#define REM_PLOB_META_GENRE "Genre"
+#define REM_PLOB_META_LENGTH "Length"
+#define REM_PLOB_META_TITLE "Title"
+#define REM_PLOB_META_TRACK "Track"
+#define REM_PLOB_META_YEAR "Year"
+#define REM_PLOB_META_RATING "Rating"
+#define REM_PLOB_META_TAGS "Tags"
+#define REM_PLOB_META_TYPE "Type"
+#define REM_PLOB_META_TYPE_AUDIO "Audio"
+#define REM_PLOB_META_TYPE_VIDEO "Video"
+#define REM_PLOB_META_ANY "__any__"
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// create and destroy plobs
+//
+///////////////////////////////////////////////////////////////////////////////
+
+rem_plob_t*
+rem_plob_new(gchar *pid);
+
+void
+rem_plob_destroy(rem_plob_t *p);
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// working with plobs
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void
+rem_plob_meta_add(rem_plob_t *p, gchar *mtn, gchar *mtv);
+
+#define rem_plob_meta_num(_p) ((_p)->meta->l / 2)
+
+#define rem_plob_meta_get_mtn(_p, _n) (_p)->meta->v[_n * 2]
+#define rem_plob_meta_get_mtv(_p, _n) (_p)->meta->v[_n * 2 + 1]
+
+G_CONST_RETURN gchar*
+rem_plob_meta_get(rem_plob_t *p, const gchar *mtn);
+
+rem_plob_t*
+rem_plob_new_unknown(const gchar *pid);
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// serialization
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#ifdef REM_NEED_SERIALIZATION_FUNCTIONS
+
+GByteArray*
+rem_plob_serialize(const rem_plob_t *plob,
+		   const gchar *se,
+		   const rem_sv_t *pte,
+		   guint img_width_max,
+		   guint img_height_max);
+
+rem_plob_t*
+rem_plob_unserialize(const GByteArray *ba, const gchar *te);
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// debug
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void
+rem_plob_dump(const rem_plob_t *p);
+
+#endif /*REMPLOB_H_*/

@@ -1,0 +1,16 @@
+Source: libremuco
+Section: sound
+Priority: extra
+Maintainer: Christian Buennig <mondai@users.sourceforge.net>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: libremuco
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Remuco server library
+ Remuco is a bluetooth remote control system for Linux media player.
+ .
+ This is the server library needed by player proxies.
+ .
+ See http://remuco.sf.net for more information.
