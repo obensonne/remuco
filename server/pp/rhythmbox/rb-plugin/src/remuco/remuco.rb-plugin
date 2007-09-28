@@ -1,9 +1,0 @@
-[RB Plugin]
-Loader=python
-Module=remuco
-IAge=1
-Name=Remuco
-Description=Extends Rhythmbox with some logic used by Remuco to request data which cannot be retreived via the D-Bus interface.
-Authors=Christian Bünnig <mondai@users.sourceforge.net>
-Copyright=Copyright © 2007 Christian Bünnig
-Website=http://remuco.sf.net/

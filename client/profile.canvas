@@ -1,7 +1,0 @@
-midp.ver=MIDP-2.0
-midp.ver.num=20
-cldc.ver=CLDC-1.1
-cldc.ver.num=11
-
-remuco-ui=canvas
-remuco-ui-canvas-themes=default,tiles
