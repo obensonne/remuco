@@ -1,0 +1,120 @@
+
+Remuco Client 0.6
+     _________________________________________________________
+
+   Table of Contents
+   1. Introduction
+   2. Building
+   3. Installation
+   4. Usage
+   A. General Information
+
+        A.1. Feedback, Help, Bugs, Discussion etc.
+        A.2. Source Code Access
+
+   Remuco is a bluetooh remote control system for linux media
+   players. With Remuco you can remotely control your favourite
+   media player - amongst others you can switch to the next,
+   previous or any other media within the current playlist,
+   browse your media library, rate your media and adjust volume.
+   On the mobile (i.e. the remote control) it displays
+   information about the current media, including cover art.
+   Visit remuco.sf.net for a complete feature list, screenshots
+   and a list of supported media players.
+     _________________________________________________________
+
+1. Introduction
+
+   This documentation is about the Remuco client, an application
+   running on a mobile device with J2ME and Bluetooth (JSR 82)
+   support. The Remuco client communicates with the Remuco server
+   (respectively a specific player proxy) to remotely control
+   (music) players.
+     _________________________________________________________
+
+2. Building
+
+   If you've got source package see documentation within the file
+   'build.xml' for how to build a binary pacakge.
+     _________________________________________________________
+
+3. Installation
+
+   The two files remuco.jar and remuco.jad (on some devices you
+   only need the jar-file) of a particluar client variant needs
+   to be installed on your mobile. How this is done is device
+   dependent. Inspect the manual of your mobile for how to
+   install Java ME applications.
+
+   E.g. on a Sony Ericcson K750i you copy the files onto the
+   memory stick. Then you browse to that file with the mobiles
+   file browser and select 'install' on the jad-file. Some Nokia
+   phones require to use special software on your computer to
+   install something on the mobile. .. as said, please inspect
+   your mobile's manual.
+     _________________________________________________________
+
+4. Usage
+
+   When you start the Remuco client, it automatically scans for
+   near bluetooth devices. After a few seconds it presents you a
+   list of detected devices. Choose your computer which runs the
+   Remuco server.
+
+   The client then connects to the server. Once the connection is
+   up, you see the current music player state displayed on your
+   device.
+     _________________________________________________________
+
+A. General Information
+
+   The Remuco project is hosted on SourceForge at
+   http://remuco.sf.net. It is licensed under the GPLv2 or any
+   newer version.
+     _________________________________________________________
+
+A.1. Feedback, Help, Bugs, Discussion etc.
+
+   You can get support and help at the help forum:
+
+   https://sourceforge.net/forum/forum.php?forum_id=568227
+
+   To file bugs please visit the bug tracker:
+
+   https://sourceforge.net/tracker/?group_id=166515&atid=839315
+
+   If you miss a nice feature, take a look at the feature request
+   tracker:
+
+   https://sourceforge.net/tracker/?group_id=166515&atid=839318
+
+   For all other things to talk about, use the discussion forum:
+
+   https://sourceforge.net/forum/forum.php?forum_id=568226
+     _________________________________________________________
+
+A.2. Source Code Access
+
+   You can get the source code via SVN. The SVN root is:
+
+   https://remuco.svn.sourceforge.net:443/svnroot/remuco/rem/
+
+   To browse the SVN repository visit:
+
+   http://remuco.svn.sourceforge.net/viewvc/remuco/rem/
+
+   The most current code is located in 'trunk'. Note that this
+   code is not allways stable or in a working state. The sources
+   of specific releases are located in 'tags' -- getting code
+   from 'tags' ensures to have working code.
+
+   Example A-1. Checkout the current development version of the
+   server into the directory remuco-server-trunk: 
+
+   $ svn co <SVN-ROOT>/trunk/server remuco-server-trunk
+
+   Example A-2. Check out the client source from release 0.6.0
+   into the directory remuco-client-0.6.0: 
+
+   $ svn co <SVN-ROOT>/tags/remuco-client-0.6.0 \
+   remuco-client-0.6.0

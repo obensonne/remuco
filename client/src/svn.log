@@ -1,0 +1,1151 @@
+------------------------------------------------------------------------
+r192 | mondai | 2007-09-11 22:33:47 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/ICurrentPlobListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+
+- changed ICurrentPlobListener
+------------------------------------------------------------------------
+r191 | mondai | 2007-09-11 22:30:40 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+
+- made access to player current plob direct (instead by a get method)
+------------------------------------------------------------------------
+r190 | mondai | 2007-09-11 22:28:50 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/IPlaylistListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/IQueueListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlQuScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+
+- made access to player current plob direct (instead by a get method)
+------------------------------------------------------------------------
+r189 | mondai | 2007-09-11 22:15:09 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   D /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+
+- made access to player state, info, queue and playlist direct (instead by a get method)
+------------------------------------------------------------------------
+r188 | mondai | 2007-09-11 22:14:39 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ImageScreeny.java
+
+- for plob images as fullscreen
+------------------------------------------------------------------------
+r187 | mondai | 2007-09-11 22:13:53 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PloblistDispel.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlQuScreen.java
+
+- playlist support
+------------------------------------------------------------------------
+r186 | mondai | 2007-09-11 22:13:04 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/VolumeController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/RatingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/VolumeScreen.java
+
+- made access to player state, info, queue and playlist direct (instead by a get method)
+------------------------------------------------------------------------
+r185 | mondai | 2007-09-11 21:59:09 +0200 (Tue, 11 Sep 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   M /rem/branches/remuco-client-0.6/src/remuco/UserException.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/BaIn.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/BaOut.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceConnector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Net.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobLists.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/canvas
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlayerDispel.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlobDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobDescScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/RateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/StartScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/Theme.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistList.java
+   D /rem/branches/remuco-client-0.6/src/remuco/util/Assert.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Log.java
+
+- bulk of changes
+------------------------------------------------------------------------
+r184 | mondai | 2007-08-10 10:50:29 +0200 (Fri, 10 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.properties
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/BinaryDataExecption.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/EmulatedServer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/IStructuredData.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/KeySetDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobDescScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/RateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/KeyConfigScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/Theme.java
+
+- bulk of changes / dev snapshot
+------------------------------------------------------------------------
+r183 | mondai | 2007-08-09 13:42:08 +0200 (Thu, 09 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.properties
+   M /rem/branches/remuco-client-0.6/build.xml
+   M /rem/branches/remuco-client-0.6/doc/README
+   M /rem/branches/remuco-client-0.6/doc/README.plain
+   M /rem/branches/remuco-client-0.6/doc/THEME-DESIGNER-GUIDE
+   M /rem/branches/remuco-client-0.6/doc/THEME-DESIGNER-GUIDE.plain
+   M /rem/branches/remuco-client-0.6/doc/html/README.html
+   M /rem/branches/remuco-client-0.6/doc/html/THEME-DESIGNER-GUIDE.html
+   D /rem/branches/remuco-client-0.6/res/themes/Default
+   A /rem/branches/remuco-client-0.6/res/themes/Korama
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/colors.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.border-bottom.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.border-top.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.corner-bottom-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.corner-bottom-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.corner-top-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.corner-top-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.rate-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/plob.rate-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-error.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-pause.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-play.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-problem.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-srvoff.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.gps-stop.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.repeat-album.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.repeat-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.repeat-pl.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.repeat-plob.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.schuffle-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.shuffle-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.volume-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.volume-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.volume-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Korama/state.volume-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/colors.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.border-bottom.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.border-top.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.corner-bottom-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.corner-bottom-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.corner-top-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.corner-top-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.rate-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/plob.rate-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-error.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-pause.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-play.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-problem.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-srvoff.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.gps-stop.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.repeat-album.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.repeat-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.repeat-pl.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.repeat-plob.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.schuffle-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.shuffle-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.volume-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.volume-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.volume-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Vilanco/state.volume-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/tiles
+   A /rem/branches/remuco-client-0.6/src/remuco/Config.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/EmulatedServer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/KeySetDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlayerDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobDescScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/RateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Screeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateSubScreeny.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Theme.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/VolumeScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/KeyConfigScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/StartScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/Theme.java
+   D /rem/branches/remuco-client-0.6/src/remuco/util/Config.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/FormLogger.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Keys.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Tools.java
+
+- bulk of changes / dev snapshot
+------------------------------------------------------------------------
+r182 | mondai | 2007-08-07 15:36:42 +0200 (Tue, 07 Aug 2007) | 1 line
+Changed paths:
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobDescScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/RateScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ScreenyException.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateSubScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/VolumeScreeny.java
+
+- bulk of changes / dev snapshot
+------------------------------------------------------------------------
+r181 | mondai | 2007-08-07 15:35:50 +0200 (Tue, 07 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.properties
+   M /rem/branches/remuco-client-0.6/build.xml
+   M /rem/branches/remuco-client-0.6/doc/README
+   A /rem/branches/remuco-client-0.6/doc/README.plain
+   A /rem/branches/remuco-client-0.6/doc/THEME-DESIGNER-GUIDE
+   A /rem/branches/remuco-client-0.6/doc/THEME-DESIGNER-GUIDE.plain
+   A /rem/branches/remuco-client-0.6/doc/connection-states.png
+   A /rem/branches/remuco-client-0.6/doc/html
+   A /rem/branches/remuco-client-0.6/doc/html/README.html
+   A /rem/branches/remuco-client-0.6/doc/html/THEME-DESIGNER-GUIDE.html
+   A /rem/branches/remuco-client-0.6/doc/html/style.css
+   D /rem/branches/remuco-client-0.6/doc/src
+   D /rem/branches/remuco-client-0.6/res/themes/Default/border-bottom.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/border-left.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/border-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/border-top.png
+   M /rem/branches/remuco-client-0.6/res/themes/Default/colors.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/corner-bottom-left.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/corner-bottom-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/corner-top-left.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/corner-top-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.border-bottom.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.border-top.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.corner-bottom-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.corner-bottom-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.corner-top-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.corner-top-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.rate-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/plob.rate-on.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/rate-off.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/rate-on.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/repeat-off.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/repeat-on.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/schuffle-on.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/shuffle-off.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/song-area.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-error.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-off.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-pause.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-play.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-problem.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-srvoff.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/state-stop.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.border-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.border-right.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-error.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-pause.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-play.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-problem.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-srvoff.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.gps-stop.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.repeat-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.repeat-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.schuffle-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.shuffle-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.volume-left.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.volume-off.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.volume-on.png
+   A /rem/branches/remuco-client-0.6/res/themes/Default/state.volume-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/top-left.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/top-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/top-spacer.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-left.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-off.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-on.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-right.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-symbol.png
+   D /rem/branches/remuco-client-0.6/res/themes/Default/volume-value-area.png
+   M /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/EmulatedServer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Message.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Net.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/SerializerTest.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   D /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/SongScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlayerDispel.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/CounterScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ProgressBarScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Screeny.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/SimpleScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Theme.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/StartScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+
+- bulk of changes / dev snapshot
+------------------------------------------------------------------------
+r180 | mondai | 2007-08-03 12:35:36 +0200 (Fri, 03 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.properties
+   M /rem/branches/remuco-client-0.6/build.xml
+   D /rem/branches/remuco-client-0.6/dist
+   A /rem/branches/remuco-client-0.6/doc/CHANGELOG
+   M /rem/branches/remuco-client-0.6/doc/README
+   D /rem/branches/remuco-client-0.6/doc/changelog
+   A /rem/branches/remuco-client-0.6/doc/src
+   A /rem/branches/remuco-client-0.6/doc/src/README.tex
+   A /rem/branches/remuco-client-0.6/doc/src/generate-doc.sh
+   A /rem/branches/remuco-client-0.6/doc/src/style.css
+   D /rem/branches/remuco-client-0.6/profile.canvas
+   D /rem/branches/remuco-client-0.6/profile.legacy
+   D /rem/branches/remuco-client-0.6/profile.simple
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/EmulatedServer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+
+- dev snapshot
+------------------------------------------------------------------------
+r179 | mondai | 2007-08-02 11:31:54 +0200 (Thu, 02 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jad
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jar
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceConnector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/EmulatedServer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/ICurrentPlobListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlayerDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/CounterScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ProgressBarScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Screeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/SimpleScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Theme.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/screens/Screen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/StartScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screens/VolumeController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Config.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Keys.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Tools.java
+
+- dev snapshot
+------------------------------------------------------------------------
+r178 | mondai | 2007-08-01 13:14:37 +0200 (Wed, 01 Aug 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jad
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jar
+   A /rem/branches/remuco-client-0.6/res/themes/Default (from /rem/branches/remuco-client-0.6/res/themes/default:173)
+   D /rem/branches/remuco-client-0.6/res/themes/default
+   M /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/IKeyListener.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/IScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/PlayerScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/PlobDispel.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/StartScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/Theme.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingDispel.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/IKeyListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/SongScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/Theme.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/PlayerDispel.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/dispels/WaitingDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/CounterScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ProgressBarScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Screeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/SimpleScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/StateScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Theme.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/PlayerScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/Screen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/StartScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screens/VolumeController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Config.java
+
+- bulk of changes, dev snapshot
+------------------------------------------------------------------------
+r176 | mondai | 2007-07-31 11:19:40 +0200 (Tue, 31 Jul 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   A /rem/branches/remuco-client-0.6/src/remuco/controller/ICCEventListener.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/ICommEventListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/PlayerScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/PlobDispel.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/StartScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingDispel.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/ScreenElement.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/SongScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/CounterScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/PlobScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/ProgressBarScreeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/Screeny.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/screenies/SimpleScreeny.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/RatingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/VolumeScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Keys.java
+
+- dev snapshot
+------------------------------------------------------------------------
+r174 | mondai | 2007-07-30 14:21:58 +0200 (Mon, 30 Jul 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.xml
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jad
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jar
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/PlayerScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/StartScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/Theme.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/start
+   A /rem/branches/remuco-client-0.6/src/remuco/util/Config.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/ConsoleLogger.java
+   D /rem/branches/remuco-client-0.6/src/remuco/util/FormLogPrinter.java
+   A /rem/branches/remuco-client-0.6/src/remuco/util/FormLogger.java
+   A /rem/branches/remuco-client-0.6/src/remuco/util/Keys.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/KnownDevicesManager.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Log.java
+   D /rem/branches/remuco-client-0.6/src/remuco/util/Storage.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Tools.java
+
+- bulk of changes
+------------------------------------------------------------------------
+r173 | mondai | 2007-07-27 13:21:10 +0200 (Fri, 27 Jul 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/build.properties
+   M /rem/branches/remuco-client-0.6/build.xml
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jad
+   M /rem/branches/remuco-client-0.6/dist/canvas/remuco.jar
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   A /rem/branches/remuco-client-0.6/src/remuco/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/UserException.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/BaIn.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/BaOut.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceConnector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/IDeviceSearcher.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Net.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobLists.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+   D /rem/branches/remuco-client-0.6/src/remuco/ui/DummyScreen.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/PlayerScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/start/DeviceSelector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Assert.java
+   A /rem/branches/remuco-client-0.6/src/remuco/util/KnownDevicesManager.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Storage.java
+
+- bulk of changes
+------------------------------------------------------------------------
+r172 | mondai | 2007-07-26 13:15:17 +0200 (Thu, 26 Jul 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Message.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/SerializerTest.java
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/IPlobListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPlobRequestor.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/IPloblistListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPloblistRequestor.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPloblistsRequestor.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/ISearchRequestor.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/ISearchResultListener.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/IVotelistListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/PlobLists.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/IScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/WaitingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/SongScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/SongForm.java
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/start
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/start/DeviceSelector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Assert.java
+   A /rem/branches/remuco-client-0.6/src/remuco/util/Storage.java
+
+- bulk of changes
+------------------------------------------------------------------------
+r152 | mondai | 2007-07-09 17:05:27 +0200 (Mon, 09 Jul 2007) | 1 line
+Changed paths:
+   M /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+
+- work in progress
+------------------------------------------------------------------------
+r149 | mondai | 2007-06-25 15:07:58 +0200 (Mon, 25 Jun 2007) | 1 line
+Changed paths:
+   D /rem/branches/remuco-client-0.6/src/rem
+   A /rem/branches/remuco-client-0.6/src/remuco/Common.java
+   A /rem/branches/remuco-client-0.6/src/remuco/HostClient.java
+   M /rem/branches/remuco-client-0.6/src/remuco/Main.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/AllTests.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/BaIn.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/BaInOutTest.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/BaOut.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/BinaryDataExecption.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceConnector.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/IMessageSender.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/IStructuredData.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Message.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Net.java
+   M /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/SerializerTest.java
+   D /rem/branches/remuco-client-0.6/src/remuco/connection
+   A /rem/branches/remuco-client-0.6/src/remuco/controller/ClientInfo.java
+   A /rem/branches/remuco-client-0.6/src/remuco/controller/CommController.java
+   D /rem/branches/remuco-client-0.6/src/remuco/controller/Controller.java
+   A /rem/branches/remuco-client-0.6/src/remuco/controller/PlayerInfo.java
+   D /rem/branches/remuco-client-0.6/src/remuco/data
+   D /rem/branches/remuco-client-0.6/src/remuco/player/ClientInfo.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/ICurrentPlobListener.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/IInfoListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPlobListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/IPloblistListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/ISearchResultListener.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/SimpleControl.java
+   M /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/StringParam.java
+   D /rem/branches/remuco-client-0.6/src/remuco/player/Tags.java
+   D /rem/branches/remuco-client-0.6/src/remuco/proto
+   D /rem/branches/remuco-client-0.6/src/remuco/server
+   D /rem/branches/remuco-client-0.6/src/remuco/test
+   A /rem/branches/remuco-client-0.6/src/remuco/ui/ICommEventListener.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/RatingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/VolumeScreen.java
+   D /rem/branches/remuco-client-0.6/src/remuco/util/ByteArray.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Tools.java
+
+- unbelievable bulk of changes 5
+------------------------------------------------------------------------
+r140 | mondai | 2007-05-24 11:40:01 +0200 (Thu, 24 May 2007) | 1 line
+Changed paths:
+   A /rem/branches/remuco-client-0.6/src/rem
+   A /rem/branches/remuco-client-0.6/src/rem/Common.java
+   A /rem/branches/remuco-client-0.6/src/rem/exceptions
+   A /rem/branches/remuco-client-0.6/src/remuco/UserException.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/Comm.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceConnector.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/DeviceFinder.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/IMessageReceiver.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/IMessageSender.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/Message.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/Net.java
+   A /rem/branches/remuco-client-0.6/src/remuco/comm/Serializer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/connection/RemotePlayer.java
+   A /rem/branches/remuco-client-0.6/src/remuco/controller
+   A /rem/branches/remuco-client-0.6/src/remuco/controller/Controller.java
+   A /rem/branches/remuco-client-0.6/src/remuco/data/BinaryDataMalformedExecption.java
+   M /rem/branches/remuco-client-0.6/src/remuco/data/IPlayerStateObserver.java
+   M /rem/branches/remuco-client-0.6/src/remuco/data/ObservablePlayerState.java
+   D /rem/branches/remuco-client-0.6/src/remuco/data/PlayerState.java
+   D /rem/branches/remuco-client-0.6/src/remuco/data/Song.java
+   A /rem/branches/remuco-client-0.6/src/remuco/data/StringVector.java
+   D /rem/branches/remuco-client-0.6/src/remuco/data/Tags.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player
+   A /rem/branches/remuco-client-0.6/src/remuco/player/ClientInfo.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IInfoListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPlaylistListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IPloblistListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IQueueListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IStateListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/IVotelistListener.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/Info.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/Player.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/Plob.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/PlobList.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/RemotePlayer.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/State.java
+   A /rem/branches/remuco-client-0.6/src/remuco/player/Tags.java
+   M /rem/branches/remuco-client-0.6/src/remuco/proto/Remuco.java
+   M /rem/branches/remuco-client-0.6/src/remuco/proto/RemucoIO.java
+   M /rem/branches/remuco-client-0.6/src/remuco/server/VirutalPlayer.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/canvas/SongScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/MainScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistList.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/PlaylistScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/RatingScreen.java
+   M /rem/branches/remuco-client-0.6/src/remuco/ui/simple/SongForm.java
+   A /rem/branches/remuco-client-0.6/src/remuco/util/Assert.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Log.java
+   M /rem/branches/remuco-client-0.6/src/remuco/util/Tools.java
+
+- devel snapshot
+------------------------------------------------------------------------
+r136 | mondai | 2007-05-17 15:55:05 +0200 (Thu, 17 May 2007) | 1 line
+Changed paths:
+   A /rem/branches/remuco-client-0.6 (from /rem/trunk/client:135)
+
+- branching devel for new client
+------------------------------------------------------------------------
+r129 | mondai | 2007-04-11 19:24:41 +0200 (Wed, 11 Apr 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/Main.java
+
+- log supported encodings at start up
+------------------------------------------------------------------------
+r128 | mondai | 2007-04-11 19:23:57 +0200 (Wed, 11 Apr 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/util/Tools.java
+
+- added method to get supported encodings
+------------------------------------------------------------------------
+r127 | mondai | 2007-04-11 19:22:39 +0200 (Wed, 11 Apr 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/connection/RemotePlayer.java
+
+- minor (code formatting)
+------------------------------------------------------------------------
+r123 | mondai | 2007-04-03 18:58:01 +0200 (Tue, 03 Apr 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+
+- fasten volume adjustment
+------------------------------------------------------------------------
+r122 | mondai | 2007-04-03 18:57:23 +0200 (Tue, 03 Apr 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+
+- display a msg if server is down or an error occured (i.e. the connection crashed)
+------------------------------------------------------------------------
+r118 | mondai | 2007-03-30 16:57:21 +0200 (Fri, 30 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+
+- fixed wrong volume adjustment in canvas variant when done adjustment exceeds possible adjustment
+------------------------------------------------------------------------
+r117 | mondai | 2007-03-29 22:07:34 +0200 (Thu, 29 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/proto/RemucoIO.java
+
+- further improved handling of memory problems when rx'ing player state data
+------------------------------------------------------------------------
+r116 | mondai | 2007-03-29 22:04:55 +0200 (Thu, 29 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/canvas/Theme.java
+
+- fixed image loading bug
+------------------------------------------------------------------------
+r115 | mondai | 2007-03-29 22:03:57 +0200 (Thu, 29 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/build.xml
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+
+- minor
+------------------------------------------------------------------------
+r110 | mondai | 2007-03-28 22:54:24 +0200 (Wed, 28 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+   M /rem/trunk/client/src/remuco/util/ByteArray.java
+   M /rem/trunk/client/src/remuco/util/FormLogPrinter.java
+   M /rem/trunk/client/src/remuco/util/Log.java
+
+- misc minor chagnes and a bit more java-doc
+------------------------------------------------------------------------
+r108 | mondai | 2007-03-28 22:51:47 +0200 (Wed, 28 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/proto/RemucoIO.java
+
+- better handling if memory is low while receiving data
+------------------------------------------------------------------------
+r107 | mondai | 2007-03-28 22:50:47 +0200 (Wed, 28 Mar 2007) | 1 line
+Changed paths:
+   A /rem/trunk/client/src/remuco/ui/canvas/IKeyListener.java
+   D /rem/trunk/client/src/remuco/ui/canvas/KeyListener.java
+
+- renaming
+------------------------------------------------------------------------
+r96 | mondai | 2007-03-21 13:00:16 +0100 (Wed, 21 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/ui/WaitingScreen.java
+
+- redo legacy changes (these changes are described by the legacy patch file)
+------------------------------------------------------------------------
+r94 | mondai | 2007-03-20 22:21:24 +0100 (Tue, 20 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/ui/WaitingScreen.java
+   A /rem/trunk/client/svn.client-revision-93.legacy-diff.diff
+
+- add legacy diff
+------------------------------------------------------------------------
+r91 | mondai | 2007-03-20 22:01:04 +0100 (Tue, 20 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+
+- minor
+------------------------------------------------------------------------
+r86 | mondai | 2007-03-20 21:47:07 +0100 (Tue, 20 Mar 2007) | 4 lines
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/build.xml
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+   M /rem/trunk/client/src/remuco/connection/IConnector.java
+   M /rem/trunk/client/src/remuco/server/PlayerSkeleton.java
+   M /rem/trunk/client/src/remuco/test/Cat.java
+   M /rem/trunk/client/src/remuco/test/SongTest.java
+   A /rem/trunk/client/src/remuco/ui/DummyScreen.java
+   M /rem/trunk/client/src/remuco/ui/IScreen.java
+   A /rem/trunk/client/src/remuco/ui/WaitingScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+
+- further improved initial scanning and error handling dialogs
+- adjusted build.xml to build different clients: simple, canvas and legacy
+- additional minor changes
+
+------------------------------------------------------------------------
+r84 | mondai | 2007-03-20 12:46:46 +0100 (Tue, 20 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+
+- improved scan dialog
+------------------------------------------------------------------------
+r82 | mondai | 2007-03-20 11:08:55 +0100 (Tue, 20 Mar 2007) | 3 lines
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/build.xml
+   M /rem/trunk/client/doc/README
+   A /rem/trunk/client/res/themes/tiles
+   A /rem/trunk/client/res/themes/tiles/border-bottom.png
+   A /rem/trunk/client/res/themes/tiles/border-left.png
+   A /rem/trunk/client/res/themes/tiles/border-right.png
+   A /rem/trunk/client/res/themes/tiles/border-top.png
+   A /rem/trunk/client/res/themes/tiles/colors.png
+   A /rem/trunk/client/res/themes/tiles/corner-bottom-left.png
+   A /rem/trunk/client/res/themes/tiles/corner-bottom-right.png
+   A /rem/trunk/client/res/themes/tiles/corner-top-left.png
+   A /rem/trunk/client/res/themes/tiles/corner-top-right.png
+   A /rem/trunk/client/res/themes/tiles/rate-off.png
+   A /rem/trunk/client/res/themes/tiles/rate-on.png
+   A /rem/trunk/client/res/themes/tiles/repeat-off.png
+   A /rem/trunk/client/res/themes/tiles/repeat-on.png
+   A /rem/trunk/client/res/themes/tiles/schuffle-on.png
+   A /rem/trunk/client/res/themes/tiles/shuffle-off.png
+   A /rem/trunk/client/res/themes/tiles/song-area.png
+   A /rem/trunk/client/res/themes/tiles/state-error.png
+   A /rem/trunk/client/res/themes/tiles/state-off.png
+   A /rem/trunk/client/res/themes/tiles/state-pause.png
+   A /rem/trunk/client/res/themes/tiles/state-play.png
+   A /rem/trunk/client/res/themes/tiles/state-problem.png
+   A /rem/trunk/client/res/themes/tiles/state-srvoff.png
+   A /rem/trunk/client/res/themes/tiles/state-stop.png
+   A /rem/trunk/client/res/themes/tiles/top-left.png
+   A /rem/trunk/client/res/themes/tiles/top-right.png
+   A /rem/trunk/client/res/themes/tiles/top-spacer.png
+   A /rem/trunk/client/res/themes/tiles/volume-left.png
+   A /rem/trunk/client/res/themes/tiles/volume-off.png
+   A /rem/trunk/client/res/themes/tiles/volume-on.png
+   A /rem/trunk/client/res/themes/tiles/volume-right.png
+   A /rem/trunk/client/res/themes/tiles/volume-symbol.png
+   A /rem/trunk/client/res/themes/tiles/volume-value-area.png
+   D /rem/trunk/client/res/themes/vlc
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+   M /rem/trunk/client/src/remuco/data/Song.java
+   A /rem/trunk/client/src/remuco/test
+   A /rem/trunk/client/src/remuco/test/Cat.java
+   A /rem/trunk/client/src/remuco/test/SongTest.java
+   M /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+   M /rem/trunk/server/README
+   M /rem/trunk/server/pp/amarok/pp.py
+   M /rem/trunk/server/rem-io.h
+
+- added new theme
+- fixed bug: exit button on connection creation does not work
+
+------------------------------------------------------------------------
+r81 | mondai | 2007-03-18 23:28:59 +0100 (Sun, 18 Mar 2007) | 7 lines
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/build.xml
+   M /rem/trunk/client/doc/changelog
+   A /rem/trunk/client/res/themes/default
+   A /rem/trunk/client/res/themes/default/border-bottom.png
+   A /rem/trunk/client/res/themes/default/border-left.png
+   A /rem/trunk/client/res/themes/default/border-right.png
+   A /rem/trunk/client/res/themes/default/border-top.png
+   A /rem/trunk/client/res/themes/default/colors.png
+   A /rem/trunk/client/res/themes/default/corner-bottom-left.png
+   A /rem/trunk/client/res/themes/default/corner-bottom-right.png
+   A /rem/trunk/client/res/themes/default/corner-top-left.png
+   A /rem/trunk/client/res/themes/default/corner-top-right.png
+   A /rem/trunk/client/res/themes/default/rate-off.png
+   A /rem/trunk/client/res/themes/default/rate-on.png
+   A /rem/trunk/client/res/themes/default/repeat-off.png
+   A /rem/trunk/client/res/themes/default/repeat-on.png
+   A /rem/trunk/client/res/themes/default/schuffle-on.png
+   A /rem/trunk/client/res/themes/default/shuffle-off.png
+   A /rem/trunk/client/res/themes/default/song-area.png
+   A /rem/trunk/client/res/themes/default/state-error.png
+   A /rem/trunk/client/res/themes/default/state-off.png
+   A /rem/trunk/client/res/themes/default/state-pause.png
+   A /rem/trunk/client/res/themes/default/state-play.png
+   A /rem/trunk/client/res/themes/default/state-problem.png
+   A /rem/trunk/client/res/themes/default/state-srvoff.png
+   A /rem/trunk/client/res/themes/default/state-stop.png
+   A /rem/trunk/client/res/themes/default/top-left.png
+   A /rem/trunk/client/res/themes/default/top-right.png
+   A /rem/trunk/client/res/themes/default/top-spacer.png
+   A /rem/trunk/client/res/themes/default/volume-left.png
+   A /rem/trunk/client/res/themes/default/volume-off.png
+   A /rem/trunk/client/res/themes/default/volume-on.png
+   A /rem/trunk/client/res/themes/default/volume-right.png
+   A /rem/trunk/client/res/themes/default/volume-symbol.png
+   A /rem/trunk/client/res/themes/default/volume-value-area.png
+   M /rem/trunk/client/res/themes/vlc/colors.png
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+   M /rem/trunk/client/src/remuco/connection/RemotePlayer.java
+   M /rem/trunk/client/src/remuco/proto/Remuco.java
+   M /rem/trunk/client/src/remuco/proto/RemucoIO.java
+   M /rem/trunk/client/src/remuco/proto/TransferDataException.java
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/Theme.java
+   M /rem/trunk/client/src/remuco/ui/simple/PlaylistList.java
+   M /rem/trunk/client/src/remuco/ui/simple/PlaylistScreen.java
+
+- introduced new themeable GUI based on canvas
+- improved user interface and interaction and error handling when
+  connecting to the server
+- discard player state data if there is not enough memory to process it
+  (needs to be tested)
+
+
+------------------------------------------------------------------------
+r76 | mondai | 2007-03-13 19:18:58 +0100 (Tue, 13 Mar 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/build.xml
+   A /rem/trunk/client/res/logo.png
+   D /rem/trunk/client/res/monkey_12x12.png
+   A /rem/trunk/client/res/themes
+   A /rem/trunk/client/res/themes/vlc
+   A /rem/trunk/client/res/themes/vlc/border-bottom.png
+   A /rem/trunk/client/res/themes/vlc/border-left.png
+   A /rem/trunk/client/res/themes/vlc/border-right.png
+   A /rem/trunk/client/res/themes/vlc/border-top.png
+   A /rem/trunk/client/res/themes/vlc/colors.png
+   A /rem/trunk/client/res/themes/vlc/corner-bottom-left.png
+   A /rem/trunk/client/res/themes/vlc/corner-bottom-right.png
+   A /rem/trunk/client/res/themes/vlc/corner-top-left.png
+   A /rem/trunk/client/res/themes/vlc/corner-top-right.png
+   A /rem/trunk/client/res/themes/vlc/rate-off.png
+   A /rem/trunk/client/res/themes/vlc/rate-on.png
+   A /rem/trunk/client/res/themes/vlc/repeat-off.png
+   A /rem/trunk/client/res/themes/vlc/repeat-on.png
+   A /rem/trunk/client/res/themes/vlc/schuffle-on.png
+   A /rem/trunk/client/res/themes/vlc/shuffle-off.png
+   A /rem/trunk/client/res/themes/vlc/song-area.png
+   A /rem/trunk/client/res/themes/vlc/state-error.png
+   A /rem/trunk/client/res/themes/vlc/state-off.png
+   A /rem/trunk/client/res/themes/vlc/state-pause.png
+   A /rem/trunk/client/res/themes/vlc/state-play.png
+   A /rem/trunk/client/res/themes/vlc/state-problem.png
+   A /rem/trunk/client/res/themes/vlc/state-srvoff.png
+   A /rem/trunk/client/res/themes/vlc/state-stop.png
+   A /rem/trunk/client/res/themes/vlc/top-left.png
+   A /rem/trunk/client/res/themes/vlc/top-right.png
+   A /rem/trunk/client/res/themes/vlc/top-spacer.png
+   A /rem/trunk/client/res/themes/vlc/volume-left.png
+   A /rem/trunk/client/res/themes/vlc/volume-off.png
+   A /rem/trunk/client/res/themes/vlc/volume-on.png
+   A /rem/trunk/client/res/themes/vlc/volume-right.png
+   A /rem/trunk/client/res/themes/vlc/volume-symbol.png
+   A /rem/trunk/client/res/themes/vlc/volume-value-area.png
+   D /rem/trunk/client/res/vlc
+   M /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+   M /rem/trunk/client/src/remuco/ui/canvas/Theme.java
+   M /rem/trunk/client/src/remuco/ui/simple/PlaylistList.java
+
+- working on themes
+------------------------------------------------------------------------
+r74 | mondai | 2007-03-12 22:12:47 +0100 (Mon, 12 Mar 2007) | 3 lines
+Changed paths:
+   M /rem/trunk/client/build.properties
+   M /rem/trunk/client/build.xml
+   A /rem/trunk/client/res/vlc
+   A /rem/trunk/client/res/vlc/border-bottom.png
+   A /rem/trunk/client/res/vlc/border-left.png
+   A /rem/trunk/client/res/vlc/border-right.png
+   A /rem/trunk/client/res/vlc/border-top.png
+   A /rem/trunk/client/res/vlc/colors.png
+   A /rem/trunk/client/res/vlc/corner-bottom-left.png
+   A /rem/trunk/client/res/vlc/corner-bottom-right.png
+   A /rem/trunk/client/res/vlc/corner-top-left.png
+   A /rem/trunk/client/res/vlc/corner-top-right.png
+   A /rem/trunk/client/res/vlc/rate-off.png
+   A /rem/trunk/client/res/vlc/rate-on.png
+   A /rem/trunk/client/res/vlc/repeat-off.png
+   A /rem/trunk/client/res/vlc/repeat-on.png
+   A /rem/trunk/client/res/vlc/schuffle-on.png
+   A /rem/trunk/client/res/vlc/shuffle-off.png
+   A /rem/trunk/client/res/vlc/song-area.png
+   A /rem/trunk/client/res/vlc/state-error.png
+   A /rem/trunk/client/res/vlc/state-off.png
+   A /rem/trunk/client/res/vlc/state-pause.png
+   A /rem/trunk/client/res/vlc/state-play.png
+   A /rem/trunk/client/res/vlc/state-problem.png
+   A /rem/trunk/client/res/vlc/state-srvoff.png
+   A /rem/trunk/client/res/vlc/state-stop.png
+   A /rem/trunk/client/res/vlc/top-left.png
+   A /rem/trunk/client/res/vlc/top-right.png
+   A /rem/trunk/client/res/vlc/top-spacer.png
+   A /rem/trunk/client/res/vlc/volume-left.png
+   A /rem/trunk/client/res/vlc/volume-off.png
+   A /rem/trunk/client/res/vlc/volume-on.png
+   A /rem/trunk/client/res/vlc/volume-right.png
+   A /rem/trunk/client/res/vlc/volume-symbol.png
+   A /rem/trunk/client/res/vlc/volume-value-area.png
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/connection/RemotePlayer.java
+   M /rem/trunk/client/src/remuco/data/PlayerState.java
+   M /rem/trunk/client/src/remuco/data/Song.java
+   M /rem/trunk/client/src/remuco/data/Tags.java
+   M /rem/trunk/client/src/remuco/proto/RemucoIO.java
+   M /rem/trunk/client/src/remuco/ui/IScreen.java
+   A /rem/trunk/client/src/remuco/ui/canvas
+   A /rem/trunk/client/src/remuco/ui/canvas/KeyListener.java
+   A /rem/trunk/client/src/remuco/ui/canvas/MainScreen.java
+   A /rem/trunk/client/src/remuco/ui/canvas/Point.java
+   A /rem/trunk/client/src/remuco/ui/canvas/ScreenElement.java
+   A /rem/trunk/client/src/remuco/ui/canvas/SongScreen.java
+   A /rem/trunk/client/src/remuco/ui/canvas/Theme.java
+
+- simplified logging
+- started development of new client skin
+
+------------------------------------------------------------------------
+r69 | mondai | 2007-03-07 23:13:32 +0100 (Wed, 07 Mar 2007) | 4 lines
+Changed paths:
+   M /rem/trunk/client/build.xml
+   M /rem/trunk/client/doc/changelog
+   A /rem/trunk/client/res/monkey_12x12.png
+   M /rem/trunk/client/src/remuco/Main.java
+   M /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+   M /rem/trunk/client/src/remuco/connection/RemotePlayer.java
+   M /rem/trunk/client/src/remuco/data/Song.java
+   M /rem/trunk/client/src/remuco/proto/Remuco.java
+   M /rem/trunk/client/src/remuco/ui/IScreen.java
+   M /rem/trunk/client/src/remuco/ui/simple/MainScreen.java
+   M /rem/trunk/client/src/remuco/ui/simple/RatingScreen.java
+   M /rem/trunk/client/src/remuco/ui/simple/SongForm.java
+   M /rem/trunk/client/src/remuco/util/Log.java
+
+- some internal changes
+- logging improved
+- added icon
+
+------------------------------------------------------------------------
+r65 | mondai | 2007-03-05 12:54:27 +0100 (Mon, 05 Mar 2007) | 2 lines
+Changed paths:
+   M /rem/trunk/client/src/remuco/data/Song.java
+
+- track length from msec to sec
+
+------------------------------------------------------------------------
+r26 | mondai | 2007-02-04 18:11:14 +0100 (Sun, 04 Feb 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/ui/simple/MainScreen.java
+   M /rem/trunk/client/src/remuco/ui/simple/RatingScreen.java
+
+- make rate adjustments visible immediately
+------------------------------------------------------------------------
+r25 | mondai | 2007-02-04 18:06:49 +0100 (Sun, 04 Feb 2007) | 1 line
+Changed paths:
+   M /rem/trunk/client/src/remuco/proto/Remuco.java
+
+- minor doc changes
+------------------------------------------------------------------------
+r3 | (no author) | 2007-01-18 21:52:49 +0100 (Thu, 18 Jan 2007) | 2 lines
+Changed paths:
+   A /rem
+   A /rem/branches
+   A /rem/tags
+   A /rem/trunk
+   A /rem/trunk/client
+   A /rem/trunk/client/build.properties
+   A /rem/trunk/client/build.xml
+   A /rem/trunk/client/doc
+   A /rem/trunk/client/doc/COPYING
+   A /rem/trunk/client/doc/README
+   A /rem/trunk/client/res
+   A /rem/trunk/client/src
+   A /rem/trunk/client/src/remuco
+   A /rem/trunk/client/src/remuco/Main.java
+   A /rem/trunk/client/src/remuco/connection
+   A /rem/trunk/client/src/remuco/connection/BluetoothConnector.java
+   A /rem/trunk/client/src/remuco/connection/GenericStreamConnection.java
+   A /rem/trunk/client/src/remuco/connection/IConnector.java
+   A /rem/trunk/client/src/remuco/connection/RemotePlayer.java
+   A /rem/trunk/client/src/remuco/data
+   A /rem/trunk/client/src/remuco/data/ClientInfo.java
+   A /rem/trunk/client/src/remuco/data/IPlayerStateObserver.java
+   A /rem/trunk/client/src/remuco/data/ObservablePlayerState.java
+   A /rem/trunk/client/src/remuco/data/PlayerControl.java
+   A /rem/trunk/client/src/remuco/data/PlayerState.java
+   A /rem/trunk/client/src/remuco/data/Song.java
+   A /rem/trunk/client/src/remuco/data/Tags.java
+   A /rem/trunk/client/src/remuco/proto
+   A /rem/trunk/client/src/remuco/proto/Remuco.java
+   A /rem/trunk/client/src/remuco/proto/RemucoIO.java
+   A /rem/trunk/client/src/remuco/proto/TransferDataException.java
+   A /rem/trunk/client/src/remuco/server
+   A /rem/trunk/client/src/remuco/server/PlayerSkeleton.java
+   A /rem/trunk/client/src/remuco/server/Server.java
+   A /rem/trunk/client/src/remuco/server/TestHost.java
+   A /rem/trunk/client/src/remuco/server/VirutalPlayer.java
+   A /rem/trunk/client/src/remuco/ui
+   A /rem/trunk/client/src/remuco/ui/IScreen.java
+   A /rem/trunk/client/src/remuco/ui/simple
+   A /rem/trunk/client/src/remuco/ui/simple/MainScreen.java
+   A /rem/trunk/client/src/remuco/ui/simple/PlaylistList.java
+   A /rem/trunk/client/src/remuco/ui/simple/PlaylistScreen.java
+   A /rem/trunk/client/src/remuco/ui/simple/RatingScreen.java
+   A /rem/trunk/client/src/remuco/ui/simple/SongForm.java
+   A /rem/trunk/client/src/remuco/ui/simple/VolumeScreen.java
+   A /rem/trunk/client/src/remuco/util
+   A /rem/trunk/client/src/remuco/util/ByteArray.java
+   A /rem/trunk/client/src/remuco/util/ConsoleLogger.java
+   A /rem/trunk/client/src/remuco/util/FormLogPrinter.java
+   A /rem/trunk/client/src/remuco/util/ILogPrinter.java
+   A /rem/trunk/client/src/remuco/util/Log.java
+   A /rem/trunk/client/src/remuco/util/Tools.java
+   A /rem/trunk/server
+   A /rem/trunk/server/COPYING
+   A /rem/trunk/server/Makefile
+   A /rem/trunk/server/Makefile.bindist
+   A /rem/trunk/server/README
+   A /rem/trunk/server/rem-bt.c
+   A /rem/trunk/server/rem-bt.h
+   A /rem/trunk/server/rem-io.c
+   A /rem/trunk/server/rem-io.h
+   A /rem/trunk/server/rem-log.h
+   A /rem/trunk/server/rem-pp-python.c
+   A /rem/trunk/server/rem-pp-template.c
+   A /rem/trunk/server/rem-pp-template.py
+   A /rem/trunk/server/rem-pp-util.c
+   A /rem/trunk/server/rem-pp-util.h
+   A /rem/trunk/server/rem-pp-xmms.c
+   A /rem/trunk/server/rem-pp-xmms2.c
+   A /rem/trunk/server/rem-pp.h
+   A /rem/trunk/server/rem-ps-handler.c
+   A /rem/trunk/server/rem-ps-handler.h
+   A /rem/trunk/server/rem-server.c
+   A /rem/trunk/server/rem-tags.c
+   A /rem/trunk/server/rem-tags.h
+   A /rem/trunk/server/rem-util.c
+   A /rem/trunk/server/rem-util.h
+   A /rem/trunk/server/rem.h
+   A /rem/trunk/server/rem.py
+
+- inital import of remuco source for the sourceforge repo
+
+------------------------------------------------------------------------
