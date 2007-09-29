@@ -9,7 +9,7 @@ Package: libremuco
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: Remuco server library
- Remuco is a bluetooth remote control system for Linux media player.
+ Remuco is a Bluetooth remote control system for Linux media player.
  .
  This is the server library needed by player proxies.
  .

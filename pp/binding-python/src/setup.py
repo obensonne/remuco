@@ -37,7 +37,7 @@ module1 = Extension('remuco',
 
 
 setup (name = 'Remuco',
-       version = '0.5',
+       version = '0.6.0',
        author = 'Christian Buennig',
        author_email = 'mondai@users.sourceforge.net',
        url = 'http://remuco.sourceforge.net',

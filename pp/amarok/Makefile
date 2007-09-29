@@ -1,6 +1,6 @@
 
 FILES := doc/* remuco-amarok.spec remuco-amarok.py
-VERSION := 0.5.0
+VERSION := 0.6.0
 PKG_DIR := remuco-amarok-$(VERSION)
 
 dist: clean

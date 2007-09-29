@@ -12,8 +12,8 @@ Remuco Server 0.5 - Python Binding
         A.1. Feedback, Help, Bugs, Discussion etc.
         A.2. Source Code Access
 
-   Remuco is a bluetooh remote control system for linux media
-   players. With Remuco you can remotely control your favourite
+   Remuco is a Bluetooth remote control system for Linux media
+   players. With Remuco you can remotely control your favorite
    media player - amongst others you can switch to the next,
    previous or any other media within the current playlist,
    browse your media library, rate your media and adjust volume.
@@ -88,21 +88,22 @@ A.2. Source Code Access
 
    You can get the source code via SVN. The SVN root is:
 
-   https://remuco.svn.sourceforge.net:443/svnroot/remuco/rem/
+   https://remuco.svn.sourceforge.net/svnroot/remuco
 
    To browse the SVN repository visit:
 
-   http://remuco.svn.sourceforge.net/viewvc/remuco/rem/
+   http://remuco.svn.sourceforge.net/viewvc/remuco
 
    The most current code is located in 'trunk'. Note that this
-   code is not allways stable or in a working state. The sources
-   of specific releases are located in 'tags' -- getting code
-   from 'tags' ensures to have working code.
+   code is not always stable or in a working state. The sources
+   of specific releases of the several parts of the Remuco system
+   (server library, client, ...) are located in 'tags' -- getting
+   code from 'tags' ensures to have working code.
 
-   Example A-1. Checkout the current development version of the
-   server into the directory remuco-server-trunk: 
+   Example A-1. Check out the current development version of the
+   server library into the directory remuco-lib-trunk: 
 
-   $ svn co <SVN-ROOT>/trunk/server remuco-server-trunk
+   $ svn co <SVN-ROOT>/trunk/lib remuco-lib-trunk
 
    Example A-2. Check out the client source from release 0.6.0
    into the directory remuco-client-0.6.0: 

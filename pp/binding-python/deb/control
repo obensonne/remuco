@@ -9,9 +9,9 @@ Package: remuco-python
 Architecture: any
 Depends: ${shlibs:Depends}, libremuco (>= 0.6) ,libremuco (<< 0.7), python2.5
 Description: Python binding for the Remuco server library
- Remuco is a bluetooth remote control system for Linux media player.
+ Remuco is a Bluetooth remote control system for Linux media player.
  .
- This is a Python interface to the Remuco server library for player proxies
+ This is the Python interface to the Remuco server library for player proxies
  written in Python.
  .
  See http://remuco.sourceforge.net for more information.

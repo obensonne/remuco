@@ -7,7 +7,7 @@
 PREFIX ?= /usr
 DEBUG ?= yes
 
-PKG_VERSION := 0.5
+PKG_VERSION := 0.6.0
 PKG_BASENAME := libremuco
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
