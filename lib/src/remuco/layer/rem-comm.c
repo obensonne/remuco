@@ -58,7 +58,7 @@ rem_comm_serialize(rem_comm_t *comm, rem_msg_t *msg, const rem_cinfo_t *ci)
 	
 	GByteArray	*ba = NULL;
 	rem_ploblist_t	*pl;
-	rem_library_t	*pls;
+	rem_library_t	*lib;
 	rem_plob_t	*plob;
 	const gchar	*srv_enc = comm->priv->srv_enc;
 	const rem_sv_t	*pte = ci->encodings;
@@ -113,9 +113,9 @@ rem_comm_serialize(rem_comm_t *comm, rem_msg_t *msg, const rem_cinfo_t *ci)
 		
 	case REM_MSG_ID_REQ_LIBRARY:
 	
-		pls = (rem_library_t*) msg->data;
+		lib = (rem_library_t*) msg->data;
 		
-		ba = rem_library_serialize(pls, srv_enc, pte);
+		ba = rem_library_serialize(lib, srv_enc, pte);
 		
 		break;
 	

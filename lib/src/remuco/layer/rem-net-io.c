@@ -67,7 +67,7 @@ rem_net_recv_priv(rem_net_t *net, guint cn, guint8 *buf, guint len)
 		ret = read(sd, buf, len);
 		LOG_NOISE("read returned %i\n", ret);
 		if (ret > 0 && ret < len) {
-			LOG_DEBUG("could not read all data, retry\n");
+			LOG_NOISE("could not read all data, retry\n");
 			g_usleep(REM_IO_WAIT);
 			retry++;
 			buf += ret;
