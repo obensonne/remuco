@@ -266,7 +266,7 @@ class PlayerProxy:
 ##############################################################################
 
 
-def __catch_sig(signum, frame):
+def __catch_exit_sig(signum, frame):
     
     global __pp
     
@@ -450,15 +450,12 @@ def pp_get_library(pp):
                 continue
             logging.debug("found %s", name)
             if library_pids.__contains__(name):
-                logging.warning("playlist name %s occurs twice, this may result in strange behaviour when loading a playlist with a client" % name)
+                logging.warning("playlist name %s occurs twice" % name)
             else:
                 library_pids.append(name);
                 library_names.append(name);
                 library_flags.append(0);
     
-    print "return %s" % str(library_pids)
-    print "return %s" % str(library_names)
-    print "return %s" % str(library_flags)
     return (library_pids, library_names, library_flags)
     
 def pp_ctrl(pp, cmd, param):
@@ -579,13 +576,9 @@ def pp_play_ploblist(pp, plid):
     if not pp.updateAmarokConnection():
         return
 
-    try:
-        name = "".split(".", 2)[1]
-    except:
-        loggin.warning("invalid PLID: %" % plid)
-        return
+    pp.app.playlist.clearPlaylist()
     
-    pp.app.playlistbrowser.loadPlaylist(name)
+    pp.app.playlistbrowser.loadPlaylist(plid) # note: we have plid == name
     
 def pp_search(pp, meta):
     
@@ -627,18 +620,19 @@ def main():
     __pp = PlayerProxy()
     
 #    try:
-    __pp.server = remuco.start(__pp, FEATURES, "Aamrok", 0, 10, 0, __name__)
+    __pp.server = remuco.start(__pp, FEATURES, "Amarok", 0, 10, 0, __name__)
     logging.info("server started")
 #    except:
 #        print(str(sys.exc_traceback))
 #        logging.error("could not start server");
 #        exit()
     
-    signal.signal(signal.SIGINT, __catch_sig)
-    signal.signal(signal.SIGTERM, __catch_sig)
+    signal.signal(signal.SIGINT, __catch_exit_sig)
+    signal.signal(signal.SIGTERM, __catch_exit_sig)
     
     logging.info("here we go")
     
+    # sleep until we get an signal to stop
     while not __pp.interrupted:
         signal.pause()
 
