@@ -60,38 +60,32 @@ Remuco Server 0.5 - Python Binding
 A. General Information
 
    The Remuco project is hosted on SourceForge at
-   http://remuco.sf.net. It is licensed under the GPLv2 or any
-   newer version.
+   http://remuco.sourceforge.net. It is licensed under the GPLv2
+   or any newer version.
      _________________________________________________________
 
 A.1. Feedback, Help, Bugs, Discussion etc.
 
    You can get support and help at the help forum:
-
    https://sourceforge.net/forum/forum.php?forum_id=568227
 
    To file bugs please visit the bug tracker:
-
    https://sourceforge.net/tracker/?group_id=166515&atid=839315
 
    If you miss a nice feature, take a look at the feature request
    tracker:
-
    https://sourceforge.net/tracker/?group_id=166515&atid=839318
 
    For all other things to talk about, use the discussion forum:
-
    https://sourceforge.net/forum/forum.php?forum_id=568226
      _________________________________________________________
 
 A.2. Source Code Access
 
    You can get the source code via SVN. The SVN root is:
-
    https://remuco.svn.sourceforge.net/svnroot/remuco
 
    To browse the SVN repository visit:
-
    http://remuco.svn.sourceforge.net/viewvc/remuco
 
    The most current code is located in 'trunk'. Note that this
