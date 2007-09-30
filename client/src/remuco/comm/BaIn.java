@@ -77,7 +77,7 @@ public final class BaIn extends ByteArrayInputStream {
 	 * 
 	 * @return the int
 	 * @throws BinaryDataExecption
-	 *             if the int couldn ot be read because there is not enough data
+	 *             if the int could not be read because there is not enough data
 	 */
 	public int readInt() throws BinaryDataExecption {
 
@@ -86,6 +86,43 @@ public final class BaIn extends ByteArrayInputStream {
 
 		return (((read() & 0xff) << 24) | ((read() & 0xff) << 16)
 				| ((read() & 0xff) << 8) | (read() & 0xff));
+
+	}
+
+	/**
+	 * Read an int vector.
+	 * 
+	 * @return the int vector or <code>null</code> if the null pointer flag is
+	 *         0
+	 * @throws BinaryDataExecption
+	 *             if the int vector could not be read because there is not
+	 *             enough data
+	 */
+	public int[] readIntV() throws BinaryDataExecption {
+
+		int i, j, len;
+		int[] iv = null;
+
+		if (pos >= count)
+			throw new BinaryDataExecption(
+					"cannot read int vector (already reached end of data)");
+
+		i = read(); // read null pointer flag
+
+		if (i != 0) {
+
+			len = readInt() / 4; // number of ints
+
+			iv = new int[len];
+
+			for (j = 0; j < len; j++) {
+
+				iv[j] = readInt();
+
+			}
+		}
+
+		return iv;
 
 	}
 

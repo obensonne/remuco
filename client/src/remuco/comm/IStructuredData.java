@@ -62,5 +62,9 @@ public interface IStructuredData {
 	 *            the structured data to use for setting the attributes
 	 */
 	public void sdSet(Object[] bdv);
-
+	/*
+	 * @throws BinaryDataExecption if the data in the binary data vector is
+	 * malformed (e.g. some data is null) - this exception is caused by data
+	 * errors that do not break the format of binary data but it's semantics
+	 */
 }

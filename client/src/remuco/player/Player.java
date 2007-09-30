@@ -7,7 +7,7 @@ import remuco.util.Log;
 
 /**
  * Objects of this class mirror the state of a remote player and provide methods
- * to control the remote player (methods starting with <code>ctrl..</code>,
+ * to control the remote player (methods starting with <code>ctrl</code>,
  * e.g. {@link #ctrlStop()}). To get notifications about player state changes
  * use the <code>register..</code> methods, e.g.
  * {@link #registerCurrentPlobListener(ICurrentPlobListener)}.
@@ -243,9 +243,7 @@ public final class Player implements IMessageReceiver {
 
 		case Message.ID_REQ_LIBRARY:
 
-			Log.debug("forward lib to lr");
 			if (libraryRequestor != null) {
-				Log.debug("forward lib to lr . now");
 				respLibrary.sdSet(m.sd);
 				libraryRequestor.handleLibrary(respLibrary);
 				libraryRequestor = null;
@@ -325,12 +323,8 @@ public final class Player implements IMessageReceiver {
 	 */
 	public synchronized boolean reqLibrary(ILibraryRequestor lr) {
 
-		Log.debug("library request");
-		
 		if (libraryRequestor != null)
 			return false;
-
-		Log.debug("library request . do now");
 
 		libraryRequestor = lr;
 		msg.id = Message.ID_REQ_LIBRARY;

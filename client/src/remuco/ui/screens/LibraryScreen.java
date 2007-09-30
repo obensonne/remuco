@@ -12,7 +12,6 @@ import remuco.player.Library;
 import remuco.player.Player;
 import remuco.player.PlobList;
 import remuco.ui.UI;
-import remuco.util.Log;
 
 public final class LibraryScreen extends List implements CommandListener,
 		IPloblistRequestor {
@@ -80,7 +79,7 @@ public final class LibraryScreen extends List implements CommandListener,
 		 * right after he requested some info about a plob).
 		 */
 		if (isShown()) {
-			
+
 			screenPloblist.updatePloblist(pl);
 
 			display.setCurrent(screenPloblist);
@@ -89,19 +88,9 @@ public final class LibraryScreen extends List implements CommandListener,
 
 	public void updateLibrary(Library lib) {
 
-		Log.debug("update maself (lib)");
-		
 		this.lib = lib;
 
-		try {
-			updateList();
-		} catch (Exception e) {
-			
-			Log.debug("EX:" + e.getMessage());
-			e.printStackTrace();
-		}
-
-		Log.debug("update maself (lib), ok");
+		updateList();
 	}
 
 	private void updateList() {
@@ -126,11 +115,9 @@ public final class LibraryScreen extends List implements CommandListener,
 			} else {
 				removeCommand(CMD_SHOW_CONTENT);
 			}
-			
+
 			for (int i = 0; i < len; i++) {
-
 				append(lib.getPloblistName(i), null);
-
 			}
 		}
 

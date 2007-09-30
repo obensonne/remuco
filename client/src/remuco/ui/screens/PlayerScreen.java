@@ -87,8 +87,6 @@ public final class PlayerScreen extends Canvas {
 	 */
 	public void updateTheme() {
 
-		Log.debug("[PD] update theme");
-
 		initScreenies();
 
 	}
@@ -102,8 +100,6 @@ public final class PlayerScreen extends Canvas {
 	}
 
 	protected void paint(Graphics g) {
-
-		Log.debug("[PD] paint called");
 
 		if (screenTooSmall) {
 
@@ -133,8 +129,6 @@ public final class PlayerScreen extends Canvas {
 	protected void sizeChanged(int w, int h) {
 
 		super.sizeChanged(w, h);
-
-		Log.debug("PlayerScreen.sizeChanged() called");
 
 		initScreenies();
 

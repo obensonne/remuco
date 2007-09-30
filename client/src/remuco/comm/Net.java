@@ -97,8 +97,7 @@ public final class Net {
 			m.id = dis.readInt();
 			size = dis.readInt();
 
-			Log.debug("[NT] rxed message with id " + m.id + " and " + size
-					+ "bytes");
+			Log.debug("[NT] rxed message (ID " + m.id + ", SIZE " + size + ")");
 
 			if (size > 0) {
 

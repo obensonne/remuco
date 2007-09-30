@@ -273,7 +273,6 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 		} else if (c == List.SELECT_COMMAND && d == screenDeviceSelector) {
 
 			s = screenDeviceSelector.getSelectedDevice();
-			Log.debug("selected dev " + s);
 			if (s != null) {
 				cc.connect(s);
 				// the "connecting" screen will appear automatically because
@@ -439,14 +438,10 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 
 	public void handleLibrary(Library lib) {
 
-		Log.debug("got a lib update");
-		
 		screenLibrary.updateLibrary(lib);
 
 		display.setCurrent(screenLibrary);
 		
-		Log.debug("so, on the screen now .. ?");
-
 	}
 
 	public void keyPressed(int key) {

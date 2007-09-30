@@ -6,7 +6,7 @@ import remuco.util.Log;
 /**
  * The player's library. Actually just a list of ploblists.
  * 
- * @author mondai
+ * @author Christian Buennig
  * 
  */
 public final class Library implements IStructuredData {
@@ -26,7 +26,7 @@ public final class Library implements IStructuredData {
 
 	public int getLength() {
 
-		return flags.length;
+		return flags[0].length;
 
 	}
 
@@ -62,11 +62,21 @@ public final class Library implements IStructuredData {
 
 		flags = (int[][]) bdv[1];
 
+//		if (plidsAndNames[0] == null || plidsAndNames[1] == null
+//				|| flags[0] == null) {
+//			throw new BinaryDataExecption("some library attributes are null");
+//		}
+//		if (plidsAndNames[0].length != plidsAndNames[1].length
+//				|| plidsAndNames[0].length != flags[0].length) {
+//			throw new BinaryDataExecption(
+//					"some library attributes format error");
+//		}
+
 	}
 
-	public String toString() {
+	 public String toString() {
 
-		StringBuffer sb = new StringBuffer("Ploblists: ");
+		StringBuffer sb = new StringBuffer("Library: ");
 
 		for (int i = 0; i < plidsAndNames[0].length; i++) {
 			sb.append(plidsAndNames[0][i]).append(" - ");

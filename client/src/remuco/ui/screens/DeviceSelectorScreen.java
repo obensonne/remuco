@@ -81,8 +81,6 @@ public final class DeviceSelectorScreen extends List implements
 
 		int index;
 
-		Log.debug("cmd: " + c.getLabel());
-
 		if (c == List.SELECT_COMMAND) { // DEVICE SELECTE //
 
 			index = getSelectedIndex();

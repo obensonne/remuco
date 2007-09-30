@@ -14,11 +14,9 @@ public final class ImageScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		Log.debug(toString());
-
 		setImage(Image.createImage(width, height));
 
-		// fill with backgorund color
+		// fill with background color
 
 		g.setColor(theme.getColor(Theme.COLOR_BG));
 		g.fillRect(0, 0, width, height);

@@ -41,7 +41,10 @@ public final class Serializer {
 	 */
 	protected synchronized void bd2sd(Message m) throws BinaryDataExecption {
 
-		Log.asssert(m != null && m.bd != null && m.sd == null);
+		Log.asssert(m != null && m.sd == null);
+
+		if (m.bd == null)
+			return;
 
 		try {
 			m.sd = unserialize(Message.DSFVAin[m.id], m.bd);
@@ -163,6 +166,7 @@ public final class Serializer {
 				break;
 			case IStructuredData.DT_IV:
 
+				Log.ln("BUG: need IV serialization");
 				// TODO: implement IV serialization
 
 				break;
@@ -298,7 +302,13 @@ public final class Serializer {
 				break;
 			case IStructuredData.DT_IV:
 
-				// TODO: implement IV unserialization
+				int[][] ivv = new int[dc][];
+				
+				for (j = 0; j < ivv.length; j++) {
+					ivv[j] = bis.readIntV();
+				}
+
+				bdv[i] = ivv;
 
 				break;
 			case IStructuredData.DT_STR:
