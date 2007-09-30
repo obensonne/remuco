@@ -33,133 +33,124 @@ Amarok Player Proxy for Remuco Server 0.5
 
 2. Features
 
-   The Remuco system offers various media player related remote
-   control features. Most player proxies only implement a subset
-   of these features, since not every feature makes sense for
-   every media player. The Amarok player proxy supports the
-   following Remuco features:
+   At http://remuco.sourceforge.net/index.php?title=Features you
+   can find a list of all Remuco features.
 
-     * Inspect and browse the playlist.
-     * Display album art of the currently played track.
-     * Rate your tracks.
-     * Display repeat and shuffle status (see also sec. Known
-       Issues ).
-     * Browse and load predefined playlists.
-     * Edit track meta information (see also sec. Known Issues ).
+   The Amarok player proxy supports the following of these
+   features:
+
+     * View and browse the playlist.
+     * Album art.
+     * Rating.
+     * View repeat and shuffle status (see also Known Issues).
+     * Browse and load predefined playlists (see also Known
+       Issues).
+     * Edit track meta information (see also Known Issues).
      _________________________________________________________
 
 3. Installation
 
-   Before you install the Remuco Amarok player proxy, make sure
-   the Remuco server library and the Python binding for the
-   Remuco server library are already installed.
+   Prerequisites:
+
+     * Remuco server library 0.5.x
+     * Remuco server library - Python binding 0.5.x
+     * DCOP tool (on Debian/Ubuntu contained in kdelibs4c2a)
+     * Python DCOP interface (for Python 2.5)
+     * Python KDE interface (for Python 2.5)
 
    Start Amarok's script manager (Tools -> Script Manager) and
-   choose 'Install Script'. Then select the Remuco Amarok package
+   choose "Install Script". Then select the Remuco Amarok package
    you've downloaded, e.g. remuco-amarok-123.amarokscript.tar.gz.
      _________________________________________________________
 
 4. Usage
 
    In Amarok's script manager select the Remuco script and press
-   'Run'. Once running, the script will get started automatically
+   "Run". Once running, the script will get started automatically
    when you start Amarok the next time.
      _________________________________________________________
 
 5. Known Issues
 
-   Editing track meta information:
+   This is a seemingly long list of issues. However, the issues
+   mostly relate to quite exotic situations. Most of the features
+   work very well.
 
-   Unfortunately editing track meta information (artist, title,
-   ..) with the Remuco client works not allways as expected. The
-   changes you make with the Remuco client will be applied to the
-   Amarok database (not to the music files), but Amarok does not
-   immediatly reflect the changes on its application window.
-   Further, all changes made by the Remuco client are lost once
-   you edit some other meta information within Amarok. For
-   instance you change the album of a track from 'A' to 'B' using
-   Remuco. Then this change is in the DB but not in the MP3 file
-   (or OGG or ..). After a while you edit the title of the same
-   track from 'X' to 'Y'. Amarok changes the title in the DB and
-   in the MP3 file and sets album back to 'A' because this value
-   is still stored in the actual MP3 file.
-
-   Editing the 'comment' of track is not possible.
-
-   Repeat status:
-
-   Amarok has some kind of 'album repeat' but this state is
-   hidden outside Amarok and so hidden for the Remuco client.
-
-   Loading a playlist with the client:
-
-   The DCOP interface of Amarok only provides the playlists a
-   user has added, not the ones already present in a fresh Amarok
-   installation. So with the client you can only load these user
-   added playlists.
-
-   If 2 playlists have the same name, it is not sure which list
-   Amarok actually loads.
-
-   When listening to streams, Amarok sometimes seems to be very
-   busy so that the Remuco server respectively the Amrok player
-   proxy cannot talk to Amarok. In this case the whole Remuco
-   system seems to block.
+     * Editing a song's meta information (artist, title, ..) with
+       the Remuco client is possible, but not recommended. The
+       reason is that the changes you made are applied to the
+       Amarok database but not to the music files (MP3, ..).
+       Well, that's no big problem so far. However, once you edit
+       the meta information of a song within Amarok, you will
+       lost the changes you made previously with the Remuco
+       client. Amarok writes the information you just changed to
+       the music file, and then copies all information from the
+       file to the database, this is the moment your previous
+       Remuco-made changes die.
+     * Two more issues on editing meta information with the
+       client: The changes you make are not immediately visible
+       in Amarok. Editing the comment to a song is not possible.
+     * Amarok has some kind of album repeat mode but this mode is
+       hidden outside Amarok and so hidden for the Remuco system.
+     * The library you can see on the client only contains
+       playlists added by you. The lists contained in a fresh
+       Amarok installation are not included.
+     * In case you have two or more playlists in Amarok with the
+       same name, it is not sure which playlist Amarok will play
+       when you load the list with the client.
+     * When you play an imported playlist, you won't see any meta
+       info about the contained songs. Amarok does not correlate
+       the songs in imported playlists to appropriate songs in
+       its database (which is the source where Remuco gets song
+       meta information from).
      _________________________________________________________
 
 6. Troubleshooting
 
-   If there are some errors with the Remuco script and the
-   displayed error message is no help for you or there is no
-   message at all, try to start the script from a console (while
-   Amarok is up):
+   If you have problems running the player proxy, try to start
+   the script from the command line (while Amarok is up):
+$ cd ~/kde/share/apps/amarok/scripts/remuco
 
    $ cd ~/kde/share/apps/amarok/scripts/remuco
 
    $ ./remuco-amarok.py
 
-   Virtually this is the same as if you start the Remuco Amarok
-   player proxy within Amarok but it will give you some logging
-   output that hopefully helps you detecting your problem.
-   However, feel free to ask for support at the help forum (see
-   appendix below).
+   Virtually this is the same as if you start the player proxy
+   within Amarok but it will give you some logging output that
+   hopefully helps you detecting your problem. However, feel free
+   to ask for support at the help forum (see Feedback, Help,
+   Bugs, Discussion etc.).
      _________________________________________________________
 
 A. General Information
 
    The Remuco project is hosted on SourceForge at
-   http://remuco.sf.net. It is licensed under the GPLv2 or any
-   newer version.
+   http://remuco.sourceforge.net. It is licensed under the GPLv2
+   or any newer version.
      _________________________________________________________
 
 A.1. Feedback, Help, Bugs, Discussion etc.
 
    You can get support and help at the help forum:
-
    https://sourceforge.net/forum/forum.php?forum_id=568227
 
    To file bugs please visit the bug tracker:
-
    https://sourceforge.net/tracker/?group_id=166515&atid=839315
 
    If you miss a nice feature, take a look at the feature request
    tracker:
-
    https://sourceforge.net/tracker/?group_id=166515&atid=839318
 
    For all other things to talk about, use the discussion forum:
-
    https://sourceforge.net/forum/forum.php?forum_id=568226
      _________________________________________________________
 
 A.2. Source Code Access
 
    You can get the source code via SVN. The SVN root is:
-
    https://remuco.svn.sourceforge.net/svnroot/remuco
 
    To browse the SVN repository visit:
-
    http://remuco.svn.sourceforge.net/viewvc/remuco
 
    The most current code is located in 'trunk'. Note that this
