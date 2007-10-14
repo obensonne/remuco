@@ -31,10 +31,10 @@ install: all
 uninstall:
 	PREFIX=$(PREFIX) make -C src uninstall
 
-dist: clean
+dist: clean doc
 	mkdir -p build/$(PKG_FULLNAME)
 	cp Makefile build/$(PKG_FULLNAME)/
-	cp -r doc src build/$(PKG_FULLNAME)/
+	cp -r doc src include build/$(PKG_FULLNAME)/
 	mkdir dist
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
 
@@ -43,6 +43,17 @@ clean:
 	rm -rf build dist
 
 
+##############################################################################
+#
+# Doc Targets
+#
+##############################################################################
+
+doc: api
+
+api:
+	rm -f doc/api/*
+	doxygen doc.src/api.doxyfile
 
 ##############################################################################
 #
