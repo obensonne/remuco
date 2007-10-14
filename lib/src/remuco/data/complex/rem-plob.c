@@ -8,53 +8,52 @@
 #include "../../util/rem-img.h"
 #include "../basic/rem-bin.h"
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // create and destroy a plob
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-rem_plob_t*
-rem_plob_new(gchar *pid)
+RemPlob*
+rem_plob_new(const gchar *pid)
 {
-	rem_plob_t* p;
+	RemPlob* plob;
 	
-	p = g_malloc(sizeof(rem_plob_t));
+	plob = g_slice_new0(RemPlob);
 	
-	p->pid = pid;
+	plob->pid = g_strdup(pid);
 	
-	p->meta = rem_sv_new();
+	plob->meta = rem_sl_new();
 	
-	p->img = NULL;
-	
-	return p;
+	return plob;
 }
 
-rem_plob_t*
+RemPlob*
 rem_plob_new_unknown(const gchar *pid)
 {
-	rem_plob_t *p;
+	RemPlob *plob;
 	
-	p = rem_plob_new(g_strdup(pid));
-	rem_plob_meta_add(p, g_strdup(REM_PLOB_META_TITLE), g_strdup("No Info"));
-	rem_plob_meta_add(p, g_strdup(REM_PLOB_META_ARTIST), g_strdup("No Info"));
-	rem_plob_meta_add(p, g_strdup(REM_PLOB_META_ALBUM), g_strdup("No Info"));
+	plob = rem_plob_new(pid);
+	rem_plob_meta_add_const(plob, REM_PLOB_META_TITLE, "No Info");
+	rem_plob_meta_add_const(plob, REM_PLOB_META_ARTIST, "No Info");
+	rem_plob_meta_add_const(plob, REM_PLOB_META_ALBUM, "No Info");
 	
-	return p;
+	return plob;
 }
 
 void
-rem_plob_destroy(rem_plob_t *p)
+rem_plob_destroy(RemPlob *plob)
 {
-	if (!p) return;
+	if (!plob) return;
 	
-	if (p->pid) g_free(p->pid);
+	g_assert_debug(!plob->img);
 	
-	rem_sv_destroy(p->meta);
+	if (plob->pid) g_free(plob->pid);
 	
-	if (p->img) g_free(p->img);
+	rem_sl_destroy(plob->meta);
 	
-	g_free(p);
+	g_slice_free(RemPlob, plob);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,35 +62,75 @@ rem_plob_destroy(rem_plob_t *p)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- * @param mtn
- * 	meta information tag name
- * @param mtv
- * 	meta information tag value
- */
 void
-rem_plob_meta_add(rem_plob_t *p, gchar *mtn, gchar *mtv)
+rem_plob_meta_add(RemPlob *plob, gchar *name, gchar *value)
 {
-	g_assert(p && mtn && mtv);
+	g_return_if_fail(plob && name);
 	
-	rem_sv_append(p->meta, mtn);
-	rem_sv_append(p->meta, mtv);
+	rem_sl_append(plob->meta, name);
+	
+	if (value)
+		rem_sl_append(plob->meta, value);
+	else
+		rem_sl_append_const(plob->meta, "");
 }
 
-G_CONST_RETURN gchar*
-rem_plob_meta_get(rem_plob_t *p, const gchar *mtn)
+void
+rem_plob_meta_add_const(RemPlob *plob, const gchar *name, const gchar *value)
 {
-	g_assert(p && mtn);
+	g_return_if_fail(plob && name);
 	
-	guint u;
+	rem_sl_append_const(plob->meta, name);
+	rem_sl_append_const(plob->meta, value ? value : "");
+}
+
+guint
+rem_plob_meta_num(const RemPlob *plob)
+{
+	g_return_val_if_fail(plob, 0);
 	
-	for (u = 0; u < p->meta->l; u += 2)
+	return rem_sl_length(plob->meta) / 2;
+}
+
+const gchar*
+rem_plob_meta_get_name(const RemPlob *plob, guint index)
+{
+	g_return_val_if_fail(plob, NULL);
+	
+	return rem_sl_get(plob->meta, index * 2);
+}
+
+const gchar*
+rem_plob_meta_get_value(const RemPlob *plob, guint index)
+{
+	g_return_val_if_fail(plob, NULL);
+	
+	return rem_sl_get(plob->meta, index * 2 + 1);
+}
+
+const gchar*
+rem_plob_meta_get(const RemPlob *plob, const gchar *name)
+{
+	const gchar	*n, *v;
+	
+	g_return_val_if_fail(plob && name, "");
+
+	rem_sl_iterator_reset(plob->meta);
+	
+	n = rem_sl_iterator_next(plob->meta);
+	v = rem_sl_iterator_next(plob->meta);
+
+	while(n) {
 		
-		if (g_str_equal(mtn, p->meta->v[u]))
+		if (g_str_equal(name, n)) return v;
 		
-			return p->meta->v[u + 1];
+		n = rem_sl_iterator_next(plob->meta);
+		v = rem_sl_iterator_next(plob->meta);		
+		
+	};
 	
-	return "";
+	
+	return ""; // 'name' not found
 	
 }
 
@@ -101,45 +140,43 @@ rem_plob_meta_get(rem_plob_t *p, const gchar *mtn)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint rem_data_medel_t_bfv[] = {
+static const guint rem_data_plob_t_bfv[] = {
 	REM_BIN_DT_STR, 1,
 	REM_BIN_DT_SV, 1,
-	REM_BIN_DT_BA, 1,	// actually a string, but before serialization
-				// this pointer is set to a GByteArray
+	REM_BIN_DT_BA, 1,
 	REM_BIN_DT_NONE
 };
 
 
 GByteArray*
-rem_plob_serialize(const rem_plob_t *plob,
-		   const gchar *se,
-		   const rem_sv_t *pte,
-		   guint img_width_max,
-		   guint img_height_max)
+rem_plob_serialize(const RemPlob *plob,
+				   const gchar *se,
+				   const RemStringList *pte,
+				   guint img_width_max,
+				   guint img_height_max)
 {
-	gchar		*img_file;
+	const gchar	*img_file;
+	RemPlob	*plob_tmp;
 	GByteArray	*ba;
 	
+	plob_tmp = (RemPlob*) plob;
 	
-	if (plob->img) {
+	img_file = rem_plob_meta_get(plob, REM_PLOB_META_ART);
+	
+	if (img_file) {
 		
-		// temporary replace img file by the resized img data
-		
-		img_file = plob->img;
-		
-		((rem_plob_t*) plob)->img = (gchar*) rem_img_get(
-				img_file, img_width_max, img_height_max);
+		plob_tmp->img = rem_img_get(img_file, img_width_max, img_height_max);
 				
-		ba = rem_bin_serialize(plob, rem_data_medel_t_bfv, se, pte);
+		ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
 		
-		if (plob->img)
-			g_byte_array_free((GByteArray*) plob->img, TRUE);
+		if (plob->img) {
+			g_byte_array_free(plob->img, TRUE);
+			plob_tmp->img = NULL;
+		}
 	
-		((rem_plob_t*) plob)->img = img_file;
-
 	} else {
 		
-		ba = rem_bin_serialize(plob, rem_data_medel_t_bfv, se, pte);
+		ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
 		
 	}
 	
@@ -147,22 +184,26 @@ rem_plob_serialize(const rem_plob_t *plob,
 	
 }
 
-rem_plob_t*
+RemPlob*
 rem_plob_unserialize(const GByteArray *ba, const gchar *te)
 {
-	rem_plob_t *plob;
+	RemPlob *plob;
 	guint ret;
 
 	plob = NULL;
-	ret = rem_bin_unserialize(ba, sizeof(rem_plob_t),
-				rem_data_medel_t_bfv, (gpointer) &plob, te);
+	ret = rem_bin_unserialize(ba, sizeof(RemPlob),
+				rem_data_plob_t_bfv, (gpointer) &plob, te);
 
 	if (ret < 0 && plob) {
 		rem_plob_destroy(plob);
 		plob = NULL;
 	}
 
-	g_assert(plob->img == NULL); // plobs from client have no img data
+	if (plob->img) {
+		g_byte_array_free(plob->img, TRUE);
+		LOG_WARN("client send art image within plob\n");
+		plob->img = NULL;
+	}
 	
 	return plob;
 }
@@ -174,15 +215,15 @@ rem_plob_unserialize(const GByteArray *ba, const gchar *te)
 ///////////////////////////////////////////////////////////////////////////////
 
 void
-rem_plob_dump(const rem_plob_t *p)
+rem_plob_dump(const RemPlob *p)
 {
-	DUMP_HDR("rem_plob_t", p);
+	REM_DATA_DUMP_HDR("rem_plob_t", p);
 	
 	LOG("pid = %s\n", p->pid);
 	LOG("meta information:\n");
-	rem_sv_dump(p->meta);
-	LOG_INFO("image = '%s'\n", p->img);
+	rem_sl_dump(p->meta);
+	LOG_INFO("image data at %p (%u bytes)\n", p->img, p->img ? p->img->len : 0);
 	
-	DUMP_FTR;
+	REM_DATA_DUMP_FTR;
 }
 

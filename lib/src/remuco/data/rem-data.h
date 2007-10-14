@@ -3,13 +3,14 @@
 
 #include <glib.h>
 
-#include <remuco/data/complex/rem-cinfo.h>
-#include <remuco/data/complex/rem-pinfo.h>
-#include <remuco/data/complex/rem-ps.h>
-#include <remuco/data/complex/rem-plob.h>
-#include <remuco/data/complex/rem-ploblist.h>
-#include <remuco/data/complex/rem-library.h>
-#include <remuco/data/complex/rem-sctrl.h>
-#include <remuco/data/complex/rem-strpar.h>
+#include "complex/rem-cinfo.h"
+#include "complex/rem-pinfo.h"
+#include "complex/rem-pstatus.h"
+#include "complex/rem-pstatus-priv.h"
+#include "complex/rem-plob.h"
+#include "complex/rem-ploblist.h"
+#include "complex/rem-library.h"
+#include "complex/rem-sctrl.h"
+#include "complex/rem-string.h"
 
 #endif /*REMDATA_H_*/

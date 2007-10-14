@@ -1,8 +1,8 @@
 #ifndef REMDATABIN_H_
 #define REMDATABIN_H_
 
-#include "../../util/rem-common.h"
-#include "rem-sv.h"
+#include "../../util/rem-util.h"
+#include "rem-sl.h"
 
 typedef struct {
 	guint	*bfv;
@@ -24,7 +24,7 @@ GByteArray*
 rem_bin_serialize(gconstpointer ds,
 		  const guint *bfv,
 		  const gchar *se,
-		  const rem_sv_t *pte);
+		  const RemStringList *pte);
 
 
 gint

@@ -1,9 +1,9 @@
 #ifndef REMDATABAC_H_
 #define REMDATABAC_H_
 
-#include "../../util/rem-common.h"
+#include "../../util/rem-util.h"
 
-#include "rem-sv.h"
+#include "rem-sl.h"
 
 typedef struct {
 	GByteArray	*ba;
@@ -22,7 +22,7 @@ rem_bac_new(GByteArray *ba)
 	
 	rem_bac_t *bac;
 	
-	bac = g_malloc(sizeof(rem_bac_t));
+	bac = g_slice_new(rem_bac_t);
 	
 	bac->ba = ba;
 	bac->pos_ptr = bac->ba->data;
@@ -33,7 +33,7 @@ rem_bac_new(GByteArray *ba)
 static inline void
 rem_bac_destroy(rem_bac_t *bac)
 {
-	g_free(bac);		
+	g_slice_free(rem_bac_t, bac);		
 }
 
 
@@ -78,7 +78,7 @@ rem_bac_next_sba(rem_bac_t *bac)
 		return NULL;
 	}		
 	
-	sba = g_malloc(sizeof(rem_bac_sba_t));
+	sba = g_slice_new(rem_bac_sba_t);
 	
 	sba->ba = g_byte_array_new();
 	sba->ba->data = bac->pos_ptr;
@@ -126,6 +126,6 @@ rem_sba_destroy(rem_bac_sba_t *sba)
 {
 	g_byte_array_free(sba->ba, FALSE);
 	
-	g_free(sba);
+	g_slice_free(rem_bac_sba_t, sba);
 }
 #endif /*REMDATABAC_H_*/

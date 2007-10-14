@@ -4,7 +4,7 @@
 
 #include "rem-bin.h"
 #include "rem-bin-bac.h"
-#include "rem-iv.h"
+#include "rem-il.h"
 
 
 /**
@@ -68,20 +68,20 @@
  */
 static void
 rem_bin_append_data_to_bac(rem_bac_t *bac,
-			   guint dt, guint dc,
-			   gconstpointer *ds,
-			   const gchar *se,
-			   const rem_sv_t *pte)
+						   guint dt, guint dc,
+						   gconstpointer *ds,
+						   const gchar *se,
+						   const RemStringList *pte)
 {
 	g_assert_debug(bac && ds);
 	
-	guint		size, u, size_pos;
-	gint32		*ds_ptr_int, *ia_nbo, i, *i_ptr;
-	gchar		**ds_ptr_s;
-	rem_iv_t	**ds_ptr_iv;
-	rem_sv_t	*sv;
-	gpointer	*ds_ptr_gen;
-	GByteArray	*ba, **ds_ptr_ba;
+	guint			size, u, size_pos;
+	gint32			*ds_ptr_int, *ia_nbo, i, *i_ptr;
+	gchar			**ds_ptr_s;
+	RemIntList		**ds_ptr_iv;
+	RemStringList	*sl;
+	gpointer		*ds_ptr_gen;
+	GByteArray		*ba, **ds_ptr_ba;
 	
 	const guint8	byte_null = 0;
 	const guint8	byte_one = 1;
@@ -97,13 +97,13 @@ rem_bin_append_data_to_bac(rem_bac_t *bac,
 		rem_bac_prepare_append(bac, dt, dc, size);
 		
 		ds_ptr_int = (gint32*) *ds;
-		ia_nbo = g_malloc(size);
+		ia_nbo = g_slice_alloc(size);
 		for (u = 0; u < dc; u++) {
 			ia_nbo[u] = g_htonl(ds_ptr_int[u]);
 		}
 		g_byte_array_append(bac->ba, (guint8*) ia_nbo, size);
 		
-		g_free(ia_nbo);
+		g_slice_free1(size, ia_nbo);
 		
 		*ds += dc * sizeof(gint32);
 		
@@ -113,14 +113,14 @@ rem_bin_append_data_to_bac(rem_bac_t *bac,
 		
 		ds_ptr_s = (gchar**) *ds;
 		
-		sv = rem_sv_new();
+		sl = rem_sl_new();
 		for (u = 0; u < dc; u++) {
-			rem_sv_append(sv, ds_ptr_s[u]);
+			rem_sl_append(sl, ds_ptr_s[u]);
 		}
 
-		ba = rem_sv_serialize(sv, se, pte);
+		ba = rem_sl_serialize(sl, se, pte);
 		
-		rem_sv_destroy_body(sv);
+		rem_sl_destroy_keep_strings(sl);
 
 		rem_bac_prepare_append(bac, dt, dc, ba->len);
 
@@ -134,14 +134,14 @@ rem_bin_append_data_to_bac(rem_bac_t *bac,
 		
 	case REM_BIN_DT_IV:
 		
-		ds_ptr_iv = (rem_iv_t**) *ds;
+		ds_ptr_iv = (RemIntList**) *ds;
 		for (u = 0; u < dc; u++) {
 			size += 1 + (ds_ptr_iv[u] ? 4 + ds_ptr_iv[u]->l * 4 : 0);
 		}	
 		rem_bac_prepare_append(bac, dt, dc, size);
 		for (u = 0; u < dc; u++) {
 			if (ds_ptr_iv[u]) {
-				ba = rem_iv_serialize(ds_ptr_iv[u]);
+				ba = rem_il_serialize(ds_ptr_iv[u]);
 				g_byte_array_append(bac->ba, &byte_one, 1);
 				i = g_htonl(ba->len);
 				g_byte_array_append(bac->ba, (guint8*) &i, 4);			
@@ -166,8 +166,8 @@ rem_bin_append_data_to_bac(rem_bac_t *bac,
 		for (u = 0; u < dc; u++) {
 			//LOG_DEBUG("process sv no %u at %p\n", u, ds_ptr_gen[u]);
 			if (ds_ptr_gen[u]) {
-				sv = (rem_sv_t*) ds_ptr_gen[u];
-				ba = rem_sv_serialize(sv, se, pte);
+				sl = (RemStringList*) ds_ptr_gen[u];
+				ba = rem_sl_serialize(sl, se, pte);
 				size += 1 + 4 + ba->len;
 				g_byte_array_append(bac->ba, &byte_one, 1);
 				i = g_htonl(ba->len);
@@ -230,9 +230,9 @@ rem_bin_append_data_to_bac(rem_bac_t *bac,
 
 GByteArray*
 rem_bin_serialize(gconstpointer ds,
-		  const guint *bfv,
-		  const gchar *se,
-		  const rem_sv_t *pte)
+				  const guint *bfv,
+				  const gchar *se,
+				  const RemStringList *pte)
 {
 	g_assert_debug(ds && bfv);
 	
@@ -279,7 +279,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	guint8		*sba_walker, *sba_end, *ptr_flag;
 	gpointer	*tds_walker;
 	GByteArray	ba;
-	rem_sv_t	*sv;
+	RemStringList	*sl;
 	
 	LOG_NOISE("unserialize %u data elements of type %u stored at %p as %u "
 		"bytes\n", sba->dc, sba->dt, sba->ba->data,  sba->ba->len);
@@ -307,28 +307,32 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 
 	case REM_BIN_DT_STR:
 		
+		// TODO: using a string list here cause a bit too much copy of
+		// memory .. not dramatic, but not smart too
+		
 		if (*tds + sba->dc * sizeof(gpointer) > tds_end) {
 			LOG_WARN("to much data elements for ds\n");
 			return -1;
 		}
 		
-		sv = rem_sv_unserialize(sba->ba, te);
+		sl = rem_sl_unserialize(sba->ba, te);
 		
 		sba_walker = sba_end;
 		
-		if (sba->dc != sv->l) {
+		if (sba->dc != rem_sl_length(sl)) {
 			LOG_WARN("string count differs\n");
-			rem_sv_destroy_body(sv);
+			rem_sl_destroy(sl);
+			return -1;
 		}
 		
 		tds_walker = *tds;
 		for (u = 0; u < sba->dc; u++, tds_walker++) {
 
-			*tds_walker = (gpointer) sv->v[u];
+			*tds_walker = (gpointer) g_strdup(rem_sl_get(sl, u));
 			
 		}
 		
-		rem_sv_destroy_body(sv);
+		rem_sl_destroy(sl);
 		
 		*tds = tds_walker;
 
@@ -348,7 +352,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 			if (*ptr_flag) {
 				ba.data = sba_walker + 1 + 4;
 				ba.len = g_ntohl(*((gint32*)(sba_walker + 1)));
-				*tds_walker = rem_iv_unserialize(&ba);
+				*tds_walker = rem_il_unserialize(&ba);
 				if (!tds_walker)
 					return -1;
 				sba_walker += 1 + 4 + ba.len;
@@ -376,10 +380,10 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 			if (*ptr_flag) {
 				ba.data = sba_walker + 1 + 4;
 				ba.len = g_ntohl(*((gint32*)(sba_walker + 1)));
-				sv = rem_sv_unserialize(&ba, te);
-				if (!sv)
+				sl = rem_sl_unserialize(&ba, te);
+				if (!sl)
 					return -1;
-				*tds_walker = sv;
+				*tds_walker = sl;
 				sba_walker += 1 + 4 + ba.len;
 			} else {
 				*tds_walker = NULL;
@@ -459,7 +463,7 @@ rem_bin_unserialize(const GByteArray *ba,
 	
 	bac = rem_bac_new((GByteArray *) ba);
 	
-	*tds = g_malloc0(tds_size);
+	*tds = g_slice_alloc0(tds_size);
 	tds_walker = *tds;
 	tds_end = *tds + tds_size;
 	

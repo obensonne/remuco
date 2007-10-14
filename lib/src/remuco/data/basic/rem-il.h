@@ -7,7 +7,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "../../util/rem-common.h"
+#include <remuco.h>
+#include "../../util/rem-util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -18,7 +19,7 @@
 typedef struct {
 	guint l;
 	gint32 *v;
-} rem_iv_t;
+} RemIntList;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -26,20 +27,20 @@ typedef struct {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-rem_iv_t*
-rem_iv_new(void);
+RemIntList*
+rem_il_new(void);
 
-rem_iv_t*
-rem_iv_new_with_values(const gint32 *vals, guint num);
-
-void
-rem_iv_append(rem_iv_t *iv, gint32 i);
+RemIntList*
+rem_il_new_with_values(const gint32 *vals, guint num);
 
 void
-rem_iv_clear(rem_iv_t *iv);
+rem_il_append(RemIntList *iv, gint32 i);
 
 void
-rem_iv_destroy(rem_iv_t *iv);
+rem_il_clear(RemIntList *iv);
+
+void
+rem_il_destroy(RemIntList *iv);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -47,15 +48,11 @@ rem_iv_destroy(rem_iv_t *iv);
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef REM_NEED_SERIALIZATION_FUNCTIONS
-
 GByteArray*
-rem_iv_serialize(const rem_iv_t *iv);
+rem_il_serialize(const RemIntList *iv);
 
-rem_iv_t*
-rem_iv_unserialize(const GByteArray *ba);
-
-#endif
+RemIntList*
+rem_il_unserialize(const GByteArray *ba);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -64,9 +61,9 @@ rem_iv_unserialize(const GByteArray *ba);
 ///////////////////////////////////////////////////////////////////////////////
 
 void
-rem_iv_dump(const rem_iv_t *iv);
+rem_il_dump(const RemIntList *iv);
 
 gboolean
-rem_iv_assert_equals(rem_iv_t *iv1, rem_iv_t *iv2);
+rem_il_assert_equals(RemIntList *iv1, RemIntList *iv2);
 
 #endif /*REMDATAIV_H_*/

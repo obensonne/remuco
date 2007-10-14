@@ -7,9 +7,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "../../util/rem-common.h"
+#include <remuco.h>
 
-#include "../basic/rem-sv.h"
+#include "../../util/rem-util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -17,58 +17,56 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+typedef enum {
+	/** Inspect the current playlist */
+	REM_FEATURE_PLAYLIST			= 1 << 0,
+	/** Edit the current playlist. <i>FUTURE FEATURE</i> */
+	REM_FEATURE_PLAYLIST_EDIT		= 1 << 1,
+	/* Jump to a specific song in the current playlist */
+	REM_FEATURE_PLAYLIST_JUMP		= 1 << 2,
+	/* Show repeat and shuffle status */
+	REM_FEATURE_REPEAT_MODE_PLOB	= 1 << 3,
+	REM_FEATURE_REPEAT_MODE_ALBUM	= 1 << 4,
+	REM_FEATURE_REPEAT_MODE_PL		= 1 << 5,
+	REM_FEATURE_SHUFFLE_MODE		= 1 << 6,
+	/* Inspect the play queue */
+	REM_FEATURE_QUEUE				= 1 << 7,
+	/* Edit the play queue. <i>FUTURE FEATURE</i>  */
+	REM_FEATURE_QUEUE_EDIT			= 1 << 8,
+	/* Jump to a specific song in the play queue */
+	REM_FEATURE_QUEUE_JUMP			= 1 << 9,
+	/* Edit the meta information of plobs */
+	REM_FEATURE_PLOB_EDIT			= 1 << 10,
+	REM_FEATURE_PLOB_TAGS			= 1 << 11,
+	/* Seek to some position within the current plob */
+	REM_FEATURE_SEEK				= 1 << 12, // FUTURE FEATURE
+	/* Rate plobs */
+	REM_FEATURE_RATE				= 1 << 13,
+	REM_FEATURE_PLAY_NEXT			= 1 << 14, // FUTURE FEATURE
+	/* Search plobs */
+	REM_FEATURE_SEARCH				= 1 << 15, // FUTURE FEATURE
+	/* Show predefined ploblists and make them the new playlist */
+	REM_FEATURE_LIBRARY				= 1 << 16,
+	/* Show content of a predefined ploblist */
+	REM_FEATURE_LIBRARY_PL_CONTENT	= 1 << 17,
+	/* Play a certain ploblists */
+	REM_FEATURE_LIBRARY_PL_PLAY		= 1 << 18
+	
+} RemPlayerInfoFeature;
+
+/** Player information for a client. */
 typedef struct {
 	gchar		*name;
 	gint32		features;
 	gint32		rating_max;
-	gint32		rating_none;
 	GByteArray	*icon;
-} rem_pinfo_t;
+} RemPlayerInfo;
 
-/* Inspect the current playlist */
-#define REM_PINFO_FEATURE_PLAYLIST 0x0001
-/* Edit the current playlist */
-#define REM_PINFO_FEATURE_PLAYLIST_EDIT 0x0002 // FUTURE FEATURE
-/* Jump to a specific song in the current playlist */
-#define REM_PINFO_FEATURE_PLAYLIST_JUMP 0x0004
-/* Show repeat and shuffle status */
-#define REM_PINFO_FEATURE_PLAYLIST_MODE_REPEAT_ONE_PLOB 0x0008
-#define REM_PINFO_FEATURE_PLAYLIST_MODE_REPEAT_ALBUM 0x0010
-#define REM_PINFO_FEATURE_PLAYLIST_MODE_REPEAT_PLAYLIST 0x0020
-#define REM_PINFO_FEATURE_PLAYLIST_MODE_SHUFFLE 0x0040
-/* Inspect the play queue */
-#define REM_PINFO_FEATURE_QUEUE 0x0080
-/* Edit the play queue */
-#define REM_PINFO_FEATURE_QUEUE_EDIT 0x0100 // FUTURE FEATURE
-/* Jump to a specific song in the play queue */
-#define REM_PINFO_FEATURE_QUEUE_JUMP 0x0200
-/* Edit the meta information of plobs */
-#define REM_PINFO_FEATURE_PLOB_EDIT 0x0400
-#define REM_PINFO_FEATURE_PLOB_TAGS 0x0800
-/* Seek to some position within the current plob */
-#define REM_PINFO_FEATURE_SEEK 0x1000 // FUTURE FEATURE
-/* Rate plobs */
-#define REM_PINFO_FEATURE_RATE 0x2000
-#define REM_PINFO_FEATURE_PLAY_NEXT_CANDIDATE 0x4000 // FUTURE FEATURE
-/* Search plobs */
-#define REM_PINFO_FEATURE_SEARCH 0x8000 // FUTURE FEATURE
-/* Show predefined ploblists and make them the new playlist */
-#define REM_PINFO_FEATURE_LIBRARY 0x10000
-/* Sow content of a predefined ploblist */
-#define REM_PINFO_FEATURE_LIBRARY_PLOBLIST_CONTENT 0x20000
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// working with mai
-//
-///////////////////////////////////////////////////////////////////////////////
-
-rem_pinfo_t*
-rem_pinfo_new(void);
+RemPlayerInfo*
+rem_player_info_new(const gchar* name);
 
 void
-rem_pinfo_destroy(rem_pinfo_t *mai);
+rem_player_info_destroy(RemPlayerInfo *pi);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -76,17 +74,13 @@ rem_pinfo_destroy(rem_pinfo_t *mai);
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef REM_NEED_SERIALIZATION_FUNCTIONS
-
 GByteArray*
-rem_pinfo_serialize(const rem_pinfo_t *mai,
-		    const gchar *se,
-		    const rem_sv_t *pte);
+rem_player_info_serialize(const RemPlayerInfo *mai,
+						  const gchar *se,
+						  const RemStringList *pte);
 
-rem_pinfo_t*
-rem_pinfo_unserialize(const GByteArray *ba, const gchar *te);
-
-#endif
+RemPlayerInfo*
+rem_player_info_unserialize(const GByteArray *ba, const gchar *te);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -95,6 +89,6 @@ rem_pinfo_unserialize(const GByteArray *ba, const gchar *te);
 ///////////////////////////////////////////////////////////////////////////////
 
 void
-rem_pinfo_dump(const rem_pinfo_t *pi);
+rem_player_info_dump(const RemPlayerInfo *pi);
 
 #endif /*REMPINFO_H_*/

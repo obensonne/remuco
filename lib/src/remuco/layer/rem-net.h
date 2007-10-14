@@ -1,72 +1,63 @@
 #ifndef REMNET_H_
 #define REMNET_H_
 
-#include "../util/rem-common.h"
+/**
+ * \defgroup rem-net Net Layer
+ */
+/*@{*/
 
-#define REM_NET_MAX_CLIENTS	50
+/*@}*/
+/**
+ * Where does this get displayed?
+ */
 
-enum rem_net_client_state_enum {
-	REM_NET_CS_NOACTIVITY,
-	REM_NET_CS_HASDATA,
-	REM_NET_CS_CONNECTED
-};
+#include <remuco.h>
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// types and structs
-//
-///////////////////////////////////////////////////////////////////////////////
+#define REM_PROTO_VERSION			0x05
 
 typedef struct {
 	guint		id;
 	GByteArray	*ba;
-} rem_net_msg_t;
+} RemNetMsg;
+
+typedef struct {
+	GIOChannel	*chan;
+	gchar		addr[18]; // 12 hex digits + 5 colons + term. null -> 18 chars   
+} rem_net_client_t;
 
 typedef struct _rem_net_server_priv rem_net_server_priv_t;
 
 typedef struct {
-	gint			sock;
+	GIOChannel				*chan;
 	rem_net_server_priv_t	*priv;
-} rem_net_server_t;
+} RemNetServer;
 
-typedef struct {
-	gint			sock;
-	gchar			addr_str[48];
-	gboolean		has_data;
-} rem_net_client_t;
 
-typedef struct {
-	rem_net_server_t	server;
-	rem_net_client_t	client[REM_NET_MAX_CLIENTS];
-} rem_net_t;
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// public functions
-//
-///////////////////////////////////////////////////////////////////////////////
-
-rem_net_t*
-rem_net_up(void);
+RemNetMsg*
+rem_net_msg_new(void);
 
 void
-rem_net_down(rem_net_t *net);
-
-gint
-rem_net_client_accept(rem_net_t *net);
-
-#define rem_net_client_is_connected(_net, _cn) ((_net)->client[_cn].sock > 0)
+rem_net_msg_reset(RemNetMsg *msg);
 
 void
-rem_net_client_disconnect(rem_net_t *net, guint cli_num);
+rem_net_msg_destroy(RemNetMsg *msg);
+
+RemNetServer*
+rem_net_server_new();
+
+void
+rem_net_server_destroy(RemNetServer* server);
+
+rem_net_client_t*
+rem_net_client_accept(RemNetServer *server);
+
+void
+rem_net_client_destroy(rem_net_client_t *client);
 
 gint
-rem_net_recv(rem_net_t *net, guint cn, rem_net_msg_t *nmsg);
+rem_net_client_rxmsg(rem_net_client_t *client, RemNetMsg *msg);
 
 gint
-rem_net_send(rem_net_t *net, guint cn, rem_net_msg_t *nmsg);
-
-gint
-rem_net_select(rem_net_t *net, guint select_timeout);
+rem_net_client_txmsg(rem_net_client_t *client, const RemNetMsg *msg);
 
 #endif /*REMNET_H_*/

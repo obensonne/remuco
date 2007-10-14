@@ -7,31 +7,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint rem_sctrl_t_bfv[] = {
+static const guint REM_SIMPLE_CONTROL_BFV[] = {
 	REM_BIN_DT_INT,	2,
 	REM_BIN_DT_NONE
 };
 
 GByteArray*
-rem_sctrl_serialize(const rem_sctrl_t *sctrl,
-		    const gchar *se,
-		    const rem_sv_t *pte)
+rem_simple_control_serialize(const RemSimpleControl *sctrl,
+							 const gchar *charset_from,
+							 const RemStringList *charsets_to)
 {
-	return rem_bin_serialize(sctrl, rem_sctrl_t_bfv, se, pte);
+	return rem_bin_serialize(
+				sctrl, REM_SIMPLE_CONTROL_BFV, charset_from, charsets_to);
 }
 
-rem_sctrl_t*
-rem_sctrl_unserialize(const GByteArray *ba, const gchar *te)
+RemSimpleControl*
+rem_simple_control_unserialize(const GByteArray *ba, const gchar *charset_to)
 {
-	rem_sctrl_t *sctrl;
+	RemSimpleControl *sctrl;
 	guint ret;
 	
 	sctrl = NULL;
-	ret = rem_bin_unserialize(ba, sizeof(rem_sctrl_t), rem_sctrl_t_bfv,
-							(gpointer) &sctrl, te);
+	ret = rem_bin_unserialize(ba, sizeof(RemSimpleControl),
+				REM_SIMPLE_CONTROL_BFV,	(gpointer) &sctrl, charset_to);
 
 	if (ret < 0 && sctrl) {
-		rem_sctrl_destroy(sctrl);
+		rem_simple_control_destroy(sctrl);
 		sctrl = NULL;
 	}
 	

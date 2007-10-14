@@ -5,7 +5,8 @@
 
 #include <unistd.h>
 
-#include <remuco/layer/rem-net.h>
+#include "rem-net.h"
+#include "../util/rem-util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -27,7 +28,7 @@ struct _rem_net_server_priv {
 ///////////////////////////////////////////////////////////////////////////////
 
 #define	REM_NET_BT_SDP_SERVICE_NAME	"Remuco"
-#define REM_NET_BT_SDP_SERVICE_DESC	"REmote MUsic and media COntrol"
+#define REM_NET_BT_SDP_SERVICE_DESC	"Linux Media Player Remote Control"
 #define REM_NET_BT_SDP_SERVICE_PROV	"remuco.sf.net"
 
 static const guint32
@@ -44,16 +45,13 @@ static const guint32
 ///////////////////////////////////////////////////////////////////////////////
 
 static void
-rem_net_bt_server_service_up(rem_net_server_t *srv, u_int8_t port);
+priv_service_up(RemNetServer *srv, u_int8_t port);
 
 static void
-rem_net_bt_server_service_down(rem_net_server_t *srv);
+priv_service_down(RemNetServer *srv);
 
 static gint
-rem_net_bt_server_socket_up(guint8 *port);
-
-static void
-rem_net_bt_server_socket_down(gint sock);
+priv_server_socket_up(guint8 *port);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -61,134 +59,118 @@ rem_net_bt_server_socket_down(gint sock);
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-rem_net_t*
-rem_net_up(void)
+RemNetServer*
+rem_net_server_new(void)
 {
 	LOG_NOISE("called\n");
 
-	rem_net_t *net;
+	gint				sock;
+	RemNetServer	*server;
+	guint8				port = 0;
 	
-	net = g_malloc0(sizeof(rem_net_t));
+	server = g_slice_new0(RemNetServer);
 	
-	guint8 port;
+	////////// creatre rfcomm socket ////////// 
 	
-	// socket (RFCOMM)
+	sock = priv_server_socket_up(&port);
 	
-	port = 100; // choose the next free port
-	net->server.sock = rem_net_bt_server_socket_up(&port);
-	
-	if (!net->server.sock) {
+	if (!sock) {
 		
-		g_free(net);
+		g_free(server);
 		return NULL;
 	}
 	
-	// service (SPP)
+	////////// create/register SDP service //////////
 	
-	net->server.priv = g_malloc0(sizeof(rem_net_server_priv_t));
+	server->priv = g_slice_new0(rem_net_server_priv_t);
 
-	rem_net_bt_server_service_up(&net->server, port);
+	priv_service_up(server, port);
 	
-	if (!net->server.priv->sdp_session) {
+	if (!server->priv->sdp_session) {
 		
-		rem_net_bt_server_socket_down(net->server.sock);
-		g_free(net->server.priv);
-		g_free(net);
+		close(sock);
+		g_free(server->priv);
+		g_free(server);
 		return NULL;
 	}
+	
+	////////// create IO channel //////////
+	
+	server->chan = g_io_channel_unix_new(sock);
+	
+	g_io_channel_set_encoding(server->chan, NULL, NULL);
+	
+	g_io_channel_set_flags(server->chan, G_IO_FLAG_NONBLOCK, NULL);
 	
 	LOG_NOISE("done\n");
 
-	return net;
+	return server;
 }
 
+/**
+ * Destroy the server previously created with rem_bt_server_create().
+ */
 void
-rem_net_down(rem_net_t *net)
+rem_net_server_destroy(RemNetServer *server)
 {
-	g_assert_debug(net && net->server.priv->sdp_session);
-	
-	guint u;
-	
-	LOG_INFO("shutting down net\n");
+	g_assert_debug(server);
 
-	rem_net_bt_server_service_down(&net->server);
-	
-	rem_net_bt_server_socket_down(net->server.sock);
+	LOG_INFO("shutting down server channel\n");
 
-	for (u = 0; u < REM_NET_MAX_CLIENTS; u++) {
-		
-		if (rem_net_client_is_connected(net, u))
-		
-			rem_net_client_disconnect(net, u);
-		
-	}
+	priv_service_down(server);
 	
-	g_free(net->server.priv);
-	
-	g_free(net);
+	g_io_channel_shutdown(server->chan, TRUE, NULL);
+	g_io_channel_unref(server->chan);
+
+	g_slice_free(rem_net_server_priv_t, server->priv);
+	g_slice_free(RemNetServer, server);
 	
 }
 
-gint
-rem_net_client_accept(rem_net_t *net)
+rem_net_client_t*
+rem_net_client_accept(RemNetServer *server)
 {
-	g_assert_debug(net && net->server.sock > 0);
+	g_assert_debug(server);
 	
-	struct sockaddr_rc addr_client;
-	rem_net_client_t *cli;
-	socklen_t len;
-	guint u;
-	gint sock_tmp;
+	rem_net_client_t	*client;
+	struct sockaddr_rc	addr_client;
+	socklen_t			len;
+	gint				sock, sock_server;
 	
 	len = REM_NET_BT_SOCK_RC_SIZE;
 
-	sock_tmp = accept(net->server.sock, (struct sockaddr *) &addr_client, &len);
-	if (sock_tmp < 0) {
+	////////// accept client //////////
+	
+	sock_server = g_io_channel_unix_get_fd(server->chan);
+	sock = accept(sock_server, (struct sockaddr *) &addr_client, &len);
+	if (sock < 0) {
 		LOG_ERRNO("accepting connection failed");
-		return -1;
+		return NULL;
 	}
 
-	for (u = 0; u < REM_NET_MAX_CLIENTS; u++) {
-		
-		if (!net->client[u].sock) break;
-		
-	}
+	client = g_slice_new0(rem_net_client_t);
 	
-	if (u == REM_NET_MAX_CLIENTS) {
-		
-		LOG_WARN("too much clients -> discard connection request\n");
-		
-		close(sock_tmp);
-		
-		return -1;
-	}
-
+	ba2str(&addr_client.rc_bdaddr, client->addr);
 	
-	cli = &net->client[u];
+	////////// create IO channel //////////
 	
-	cli->sock = sock_tmp;
-	cli->has_data = FALSE;
+	client->chan = g_io_channel_unix_new(sock);
 	
-	//memcpy(&cli->addr_hex, &addr_client.rc_bdaddr, sizeof(bdaddr_t));
-	ba2str(&addr_client.rc_bdaddr, cli->addr_str);
+	g_io_channel_set_encoding(client->chan, NULL, NULL);
 	
-	LOG_INFO("client %s has connected\n", cli->addr_str);
+	g_io_channel_set_flags(client->chan, G_IO_FLAG_NONBLOCK, NULL);
 	
-	return u;
+	return client;
 }
 
 void
-rem_net_client_disconnect(rem_net_t *net, guint cn)
+rem_net_client_destroy(rem_net_client_t *client)
 {
-	g_assert_debug(net && net->client[cn].sock > 0);
-	
-	LOG_INFO("disconnect client %s\n", net->client[cn].addr_str);
-	
-	close(net->client[cn].sock);
-	
-	memset(&net->client[cn], 0, sizeof(rem_net_client_t));
+	LOG_INFO("disconnect client %s\n", client->addr);
+	g_io_channel_shutdown(client->chan, TRUE, NULL);
+	g_io_channel_unref(client->chan);
+	g_slice_free(rem_net_client_t, client);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -209,27 +191,27 @@ rem_net_client_disconnect(rem_net_t *net, guint cn)
  * 	deregister the service
  */
 static void
-rem_net_bt_server_service_up(rem_net_server_t *srv, u_int8_t port)
+priv_service_up(RemNetServer *server, guint8 port)
 {
-	g_assert_debug(srv);
+	g_assert_debug(server);
 	
-	gchar			*name, *dsc,*prov;
+	gchar				*name, *dsc,*prov;
 	const guint32		*uuid;
-	uuid_t			root_uuid,
-				l2cap_uuid,
-				rfcomm_uuid,
-				svc_uuid,
-				svc_class_uuid;
+	uuid_t				root_uuid,
+						l2cap_uuid,
+						rfcomm_uuid,
+						svc_uuid,
+						svc_class_uuid;
 				
-	sdp_list_t		*l2cap_list = 0,
-				*rfcomm_list = 0,
-				*root_list = 0,
-				*proto_list = 0,
-				*access_proto_list = 0,
-				*svc_class_list = 0,
-				*profile_list = 0;
+	sdp_list_t			*l2cap_list = 0,
+						*rfcomm_list = 0,
+						*root_list = 0,
+						*proto_list = 0,
+						*access_proto_list = 0,
+						*svc_class_list = 0,
+						*profile_list = 0;
 				
-	sdp_data_t		*channel = 0;
+	sdp_data_t			*channel = 0;
 	sdp_profile_desc_t	profile;
 	sdp_record_t		*record;
 	sdp_session_t		*session = 0;
@@ -246,7 +228,7 @@ rem_net_bt_server_service_up(rem_net_server_t *srv, u_int8_t port)
 	
 	// set the general service ID
 	sdp_uuid128_create( &svc_uuid, &uuid );
-	record = g_malloc0(sizeof(sdp_record_t));
+	record = g_malloc0(sizeof(sdp_record_t)); // no slice, since we don't free the record
 	//memset(record, 0, sizeof(sdp_record_t));
 	sdp_set_service_id( record, svc_uuid );
 	
@@ -300,24 +282,25 @@ rem_net_bt_server_service_up(rem_net_server_t *srv, u_int8_t port)
 	sdp_list_free( access_proto_list, 0 );
 	sdp_list_free( svc_class_list, 0 );
 	
-	srv->priv->sdp_record = record;
-	srv->priv->sdp_session = session;
+	server->priv->sdp_record = record;
+	server->priv->sdp_session = session;
 	
 }
 
 /**
  * Deregister the Remuco servive from the SDP database.
  * 
- * @param srv
- * 	the bluetooth server used when the service has been set up
+ * @param bts
+ *		the bluetooth server used when the service has been set up
  */
 static void
-rem_net_bt_server_service_down(rem_net_server_t *srv)
+priv_service_down(RemNetServer *server)
 {
-	g_assert_debug(srv);
+	g_assert_debug(server && server->priv);
+	g_assert_debug(server->priv->sdp_record && server->priv->sdp_session);
 	
-	sdp_record_unregister(srv->priv->sdp_session, srv->priv->sdp_record);
-	sdp_close(srv->priv->sdp_session);
+	sdp_record_unregister(server->priv->sdp_session, server->priv->sdp_record);
+	sdp_close(server->priv->sdp_session);
 }
 
 /**
@@ -325,77 +308,71 @@ rem_net_bt_server_service_down(rem_net_server_t *srv)
  * connections.
  * 
  * @param port (in/out parameter)
- * 	- if 1 <= port <= 30 then this function trys to bind to that port
- * 	- if port is out of that range, the first free port is used and port
- * 	  will be set to that number
+ * 	- used port will be written into that param
  * 
  * @return
  * 	the server socket descriptor or -1 if something failed
  */
 static gint
-rem_net_bt_server_socket_up(guint8 *port)
+priv_server_socket_up(guint8 *port)
 {
+	gint sock, ret, npc;
 	struct sockaddr_rc addr_server;
+	
+	////////// initialize //////////
+	
 	memset(&addr_server, 0, sizeof(struct sockaddr_rc));
-	gint s, ret, npc;
-	
 	npc = REM_NET_BT_SERVER_CONNECT_NPC;
-	
 	addr_server.rc_family = AF_BLUETOOTH;
 	addr_server.rc_bdaddr = *BDADDR_ANY; // first available bt-adapter
 	
-	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-	if (s < 0) {
+	////////// create socket //////////
+
+	sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+	if (sock < 0) {
 		LOG_ERROR("socket creation failed: %s\n", strerror(errno));
 		return -1;
 	}
 	
+	////////// bind socket (using first free port) //////////
+
 	LOG_DEBUG("bind rfcomm socket\n");
-	if (*port >= 1 && *port <= 30) {
+	for (*port = 1; *port <= 30; (*port)++) {
 		
 		LOG_NOISE("try port %hhu\n", *port);
 		addr_server.rc_channel = *port;
-		ret = bind(s, (struct sockaddr *)&addr_server, REM_NET_BT_SOCK_RC_SIZE);
-		
-	} else {
-		
-		for (*port = 1; *port <= 30; (*port)++) {
-			
-			LOG_NOISE("try port %hhu\n", *port);
-			addr_server.rc_channel = *port;
-			ret = bind(s, (struct sockaddr *) &addr_server,
-								REM_NET_BT_SOCK_RC_SIZE);
-			if (ret == 0) break;
-			
-		}
+		ret = bind(sock, (struct sockaddr *) &addr_server, REM_NET_BT_SOCK_RC_SIZE);
+		if (ret == 0) break;
 		
 	}
-	
-	if (ret < 0) {
+		
+	if (*port > 30) {
+		
+		LOG_ERROR("no free port to bind to\n");
+		close(sock);
+		return -1;
+		
+	} else if (ret < 0) {
 		
 		LOG_ERRNO("bind failed");
-		close(s);
+		close(sock);
 		return -1;
 		
 	}
 	
 	LOG_DEBUG("using port %hhu\n", *port);
 	
-	ret = listen(s, npc);
+	////////// set socket into listen mode //////////
+
+	ret = listen(sock, npc);
 	if (ret == -1) {
 		
 		LOG_ERRNO("set socket listen failed");
-		close(s);
+		close(sock);
 		return -1;
 		
 	}
 
-	return s;
-}
-
-static void
-rem_net_bt_server_socket_down(gint sock)
-{
-	close(sock);
+	return sock;
 }
 

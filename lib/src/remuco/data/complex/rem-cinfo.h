@@ -7,17 +7,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "../../util/rem-common.h"
+#include <remuco.h>
 
-#include "../basic/rem-sv.h"
+#include "../../util/rem-util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
 // constants
 //
 ///////////////////////////////////////////////////////////////////////////////
-
-#define REM_DATA_CLI_FEATURE_IMAGES	1
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -26,9 +24,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
-	gint32		mem_limit, img_width, img_height;
-	rem_sv_t	*encodings;
-} rem_cinfo_t;
+	gint32			mem_limit, img_width, img_height;
+	RemStringList	*charsets;
+} RemClientInfo;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -36,11 +34,11 @@ typedef struct {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-rem_cinfo_t*
-rem_cinfo_new(void);
+RemClientInfo*
+rem_client_info_new(void);
 
 void
-rem_cinfo_destroy(rem_cinfo_t *ci);
+rem_client_info_destroy(RemClientInfo *ci);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -48,15 +46,13 @@ rem_cinfo_destroy(rem_cinfo_t *ci);
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef REM_NEED_SERIALIZATION_FUNCTIONS
-
 GByteArray*
-rem_cinfo_serialize(const rem_cinfo_t *ci, const gchar *se, const rem_sv_t *pte);
+rem_client_info_serialize(const RemClientInfo *ci,
+						  const gchar *se,
+						  const RemStringList *pte);
 
-rem_cinfo_t*
-rem_cinfo_unserialize(const GByteArray *ba, const gchar *te);
-
-#endif
+RemClientInfo*
+rem_client_info_unserialize(const GByteArray *ba, const gchar *te);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -65,6 +61,6 @@ rem_cinfo_unserialize(const GByteArray *ba, const gchar *te);
 ///////////////////////////////////////////////////////////////////////////////
 
 void
-rem_cinfo_dump(const rem_cinfo_t *ci);
+rem_client_info_dump(const RemClientInfo *ci);
 
 #endif /*REMCINFO_H_*/

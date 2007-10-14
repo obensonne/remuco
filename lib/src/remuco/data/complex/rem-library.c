@@ -1,74 +1,85 @@
 #include "rem-library.h"
 #include "../basic/rem-bin.h"
 
-rem_library_t*
+RemLibrary*
 rem_library_new(void)
 {
-	rem_library_t *pls;
+	RemLibrary *lib;
 	
-	pls = g_malloc0(sizeof(rem_library_t));
+	lib = g_slice_new(RemLibrary);
 	
-	pls->plids = rem_sv_new();
-	pls->names = rem_sv_new();
-	pls->flags = rem_iv_new();
+	lib->plids = rem_sl_new();
+	lib->names = rem_sl_new();
+	lib->flags = rem_il_new();
 	
-	return pls;
+	return lib;
 }
 
 void
-rem_library_destroy(rem_library_t *pls)
+rem_library_destroy(RemLibrary *lib)
 {
-	if (!pls) return;
+	if (!lib) return;
 	
-	rem_sv_destroy(pls->plids);
-	rem_sv_destroy(pls->names);
-	rem_iv_destroy(pls->flags);
+	rem_sl_destroy(lib->plids);
+	rem_sl_destroy(lib->names);
+	rem_il_destroy(lib->flags);
 	
-	g_free(pls);
+	g_slice_free(RemLibrary, lib);
 }
 
 void
-rem_library_clear(rem_library_t *pls)
+rem_library_clear(RemLibrary *lib)
 {
-	g_assert(pls);
+	g_return_if_fail(lib);
 	
-	rem_sv_clear(pls->plids);
-	rem_sv_clear(pls->names);
-	rem_iv_clear(pls->flags);
+	rem_sl_clear(lib->plids);
+	rem_sl_clear(lib->names);
+	rem_il_clear(lib->flags);
+}
+
+void
+rem_library_append(RemLibrary *lib, gchar *plid, gchar *name, gint flags)
+{
+	g_return_if_fail(lib && plid && name);
+	
+	rem_sl_append(lib->plids, plid);
+	rem_sl_append(lib->names, name);
+	rem_il_append(lib->flags, flags);
+}
+
+void
+rem_library_append_const(RemLibrary *lib,
+						 const gchar *plid,
+						 const gchar *name,
+						 gint flags)
+{
+	g_return_if_fail(lib && plid && name);
+	
+	rem_sl_append_const(lib->plids, plid);
+	rem_sl_append_const(lib->names, name);
+	rem_il_append(lib->flags, flags);
 }
 
 /**
- * Get the position of a specific ploblist in the library (the library is just a
- * list of ploblists).
- * 
- * @param pls the library
- * @param plid the ploblist to get the position of
- * 
- * @return the position
+ * Get the name of the playlist 'plid'.
  */
-gint
-rem_library_get_pos(const rem_library_t *pls, const gchar *plid)
+const gchar*
+rem_library_get_name(const RemLibrary *pls, const gchar *plid)
 {
-	guint	u;
+	const gchar	*n, *p;
 	
-	if (!pls) return -1;
+	rem_sl_iterator_reset(pls->plids);
+	rem_sl_iterator_reset(pls->names);
 	
-	for (u = 0; u < pls->plids->l; u++) {
-		if (g_str_equal(pls->plids->v[u], plid))
-			return u;
-	}
+	do {
+		p = rem_sl_iterator_next(pls->plids);
+		n = rem_sl_iterator_next(pls->names);
+		
+		if (g_str_equal(plid, p)) return n;
+		
+	} while(p);
 	
-	return -1;
-}
-
-void
-rem_library_append(rem_library_t *pls, gchar *plid, gchar *name, gint flags)
-{
-	g_assert(pls && plid && name);
-	
-	rem_sv_append(pls->plids, plid);
-	rem_sv_append(pls->names, name);
-	rem_iv_append(pls->flags, flags);
+	return NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,33 +88,33 @@ rem_library_append(rem_library_t *pls, gchar *plid, gchar *name, gint flags)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint rem_library_t_bfv[] = {
+static const guint REM_LIBRARY_BFV[] = {
 	REM_BIN_DT_SV, 2,		// plids and names
 	REM_BIN_DT_IV, 1,		// types
 	REM_BIN_DT_NONE
 };
 
 GByteArray*
-rem_library_serialize(const rem_library_t *pls,
-			const gchar *se,
-			const rem_sv_t *pte)
+rem_library_serialize(const RemLibrary *lib,
+					  const gchar *se,
+					  const RemStringList *pte)
 {
-	return rem_bin_serialize(pls, rem_library_t_bfv, se, pte);
+	return rem_bin_serialize(lib, REM_LIBRARY_BFV, se, pte);
 }
 		
-rem_library_t*
+RemLibrary*
 rem_library_unserialize(const GByteArray *ba, const gchar *te)
 {
-	rem_library_t *pls = NULL;
+	RemLibrary *lib = NULL;
 	gint ret;
 	
-	ret = rem_bin_unserialize(ba, sizeof(rem_library_t),
-				rem_library_t_bfv, (gpointer) &pls, te);
+	ret = rem_bin_unserialize(ba, sizeof(RemLibrary),
+				REM_LIBRARY_BFV, (gpointer) &lib, te);
 		
-	if (ret < 0 && pls) {
-		rem_library_destroy(pls);
-		pls = NULL;
+	if (ret < 0 && lib) {
+		rem_library_destroy(lib);
+		lib = NULL;
 	}
 	
-	return pls;
+	return lib;
 }

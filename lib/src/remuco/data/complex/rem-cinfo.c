@@ -9,34 +9,28 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// constants
+// public functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// working with dictionaries
-//
-///////////////////////////////////////////////////////////////////////////////
-
-rem_cinfo_t*
-rem_cinfo_new(void)
+RemClientInfo*
+rem_client_info_new(void)
 {
-	rem_cinfo_t *ci;
+	RemClientInfo *ci;
 	
-	ci = g_malloc0(sizeof(rem_cinfo_t));
+	ci = g_slice_new0(RemClientInfo);
 	
 	return ci;
 }
 
 void
-rem_cinfo_destroy(rem_cinfo_t *ci)
+rem_client_info_destroy(RemClientInfo *ci)
 {
 	g_assert_debug(ci);
 	
-	rem_sv_destroy(ci->encodings);
+	rem_sl_destroy(ci->charsets);
 	
-	g_free(ci);
+	g_slice_free(RemClientInfo, ci);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,31 +39,31 @@ rem_cinfo_destroy(rem_cinfo_t *ci)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint rem_cinfo_t_bfv[] = {
+static const guint REM_CLIENT_INFO_BFV[] = {
 	REM_BIN_DT_INT,	3,
 	REM_BIN_DT_SV,	1,
 	REM_BIN_DT_NONE
 };
 
 GByteArray*
-rem_cinfo_serialize(	const rem_cinfo_t *ci,
-			const gchar *se,
-			const rem_sv_t *pte)
+rem_client_info_serialize(const RemClientInfo *ci,
+						  const gchar *se,
+						  const RemStringList *pte)
 {
-	return rem_bin_serialize(ci, rem_cinfo_t_bfv, se, pte);
+	return rem_bin_serialize(ci, REM_CLIENT_INFO_BFV, se, pte);
 }
 
-rem_cinfo_t*
-rem_cinfo_unserialize(const GByteArray *ba, const gchar *te)
+RemClientInfo*
+rem_client_info_unserialize(const GByteArray *ba, const gchar *te)
 {
-	rem_cinfo_t *cinfo = NULL;
+	RemClientInfo *cinfo = NULL;
 	gint ret;
 	
-	ret = rem_bin_unserialize(ba, sizeof(rem_cinfo_t),
-				rem_cinfo_t_bfv, (gpointer) &cinfo, te);
+	ret = rem_bin_unserialize(ba, sizeof(RemClientInfo),
+				REM_CLIENT_INFO_BFV, (gpointer) &cinfo, te);
 		
 	if (ret < 0 && cinfo) {
-		rem_cinfo_destroy(cinfo);
+		rem_client_info_destroy(cinfo);
 		cinfo = NULL;
 	}
 	
@@ -83,17 +77,17 @@ rem_cinfo_unserialize(const GByteArray *ba, const gchar *te)
 ///////////////////////////////////////////////////////////////////////////////
 
 void
-rem_cinfo_dump(const rem_cinfo_t *ci)
+rem_client_info_dump(const RemClientInfo *ci)
 {
-	DUMP_HDR("rem_cinfo_t", ci);
+	REM_DATA_DUMP_HDR("rem_cinfo_t", ci);
 	
 	LOG("client info at %p:\n", ci);
 	
 	LOG("memlimit, img_width, img_height = %i, %i, %i\n",
 		ci->mem_limit, ci->img_width, ci->img_height);
 		
-	rem_sv_dump(ci->encodings);
+	rem_sl_dump(ci->charsets);
 	
-	DUMP_FTR;
+	REM_DATA_DUMP_FTR;
 }
 
