@@ -42,17 +42,20 @@ public final class Net {
 	 */
 	protected void down() {
 
-		// Assert.assert(sc != null && dis != null && dos != null);
-
 		try {
 
 			if (dis != null)
 				dis.close();
+		} catch (IOException e) {
+		}
+		try {
 			if (dos != null)
 				dos.close();
+		} catch (IOException e) {
+		}
+		try {
 			if (sc != null)
 				sc.close();
-
 		} catch (IOException e) {
 		}
 
@@ -77,8 +80,8 @@ public final class Net {
 	 * @param m
 	 *            the message with to store the received message id and binary
 	 *            data in
-	 * @return <b>-1</b> if receiving fails (in this case net is garuanteed to
-	 *         be down on method return), <b>0</b> if receiving was successfull
+	 * @return <b>-1</b> if receiving fails (in this case net is guaranteed to
+	 *         be down on method return), <b>0</b> if receiving was successful
 	 */
 	protected int recv(Message m) {
 
@@ -139,8 +142,8 @@ public final class Net {
 	 * 
 	 * @param m
 	 *            the message with {@link Message#bd} != null
-	 * @return <b>-1</b> if sending fails (in this case net is garuanteed to be
-	 *         down on method return), <b>0</b> if sending was successfull
+	 * @return <b>-1</b> if sending fails (in this case net is guaranteed to be
+	 *         down on method return), <b>0</b> if sending was successful
 	 */
 	protected int send(Message m) {
 
@@ -220,8 +223,9 @@ public final class Net {
 
 			} catch (IOException e) {
 
-				Log.ln("[NT] waiting for hello message failed: "
-						+ e.getMessage());
+				Log
+						.ln("[NT] waiting for hello message failed: "
+								+ e.toString());
 				down();
 				return -1;
 			}

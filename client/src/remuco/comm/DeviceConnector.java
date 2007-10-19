@@ -175,9 +175,7 @@ public final class DeviceConnector extends RemoteDevice implements
 
 			} catch (Exception e) {
 
-				e.printStackTrace();
-				
-				Log.ln("[DC] failed: " + e.getMessage());
+				Log.ln("[DC] failed: " + e.toString());
 
 				continue;
 

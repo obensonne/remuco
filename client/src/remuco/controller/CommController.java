@@ -45,7 +45,7 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 	 * 
 	 * @param ccel
 	 *            the comm controller event listener to keep up to date about
-	 *            the conncection process (which starts when
+	 *            the connection process (which starts when
 	 *            {@link #connect(String)} has been called).
 	 */
 	public CommController(ICCEventListener ccel) {
@@ -59,11 +59,11 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 	}
 
 	/**
-	 * Trys to connect to the given device. This method returns immediately and
+	 * Tries to connect to the given device. This method returns immediately and
 	 * informs the {@link ICCEventListener} specified when creating this
 	 * controller about relevant events about the connection, e.g.
 	 * {@link ICCEventListener#EVENT_CONNECTING} (this event will occur
-	 * immediately while calling this method - if no error occures, in this case
+	 * immediately while calling this method - if no error occurs, in this case
 	 * {@link ICCEventListener#EVENT_ERROR} will occur).
 	 * 
 	 * @param device
@@ -121,7 +121,7 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 
 	public void receiveMessage(Message m) {
 
-		try {
+		try { // DEBUG EXCEPTION CATCHING
 			switch (m.id) {
 			case Message.ID_LOCAL_CONNECTED:
 
