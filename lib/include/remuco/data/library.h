@@ -1,5 +1,5 @@
-#ifndef LIBRARY_H_
-#define LIBRARY_H_
+#ifndef REMUCO_LIBRARY_H_
+#define REMUCO_LIBRARY_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -10,8 +10,12 @@ G_BEGIN_DECLS
 typedef struct _RemLibrary	RemLibrary;
 
 typedef enum {
-	REM_LIBRARY_FLAG_EDITABLE =	1 << 0
-} rem_library_flags;
+	REM_PLOBLIST_FLAG_STATIC	= 0,
+	REM_PLOBLIST_FLAG_EDITABLE	= 1 << 0,
+	REM_PLOBLIST_FLAG_DYNAMIC	= 1 << 1,
+	REM_PLOBLIST_FLAG_STREAM	= 1 << 2,
+	REM_PLOBLIST_FLAG_WEIRD		= 1 << 3,
+} RemPloblistFlag;
 
 RemLibrary*
 rem_library_new(void);
@@ -35,4 +39,4 @@ rem_library_append_const(RemLibrary *lib,
 
 G_END_DECLS
 
-#endif /*LIBRARY_H_*/
+#endif /*REMUCO_LIBRARY_H_*/

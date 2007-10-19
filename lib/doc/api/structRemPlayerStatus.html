@@ -45,11 +45,17 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">GString *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPlayerStatus.html#83ac990ba0811fba6564259efe308b0e">cap_pid</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PID of the currently active plob.  <a href="#83ac990ba0811fba6564259efe308b0e"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPlayerStatus.html#fed569951eadf2a092affdce82b58253">playlist</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">List of PIDs of the plobs currently in the playlist.  <a href="#fed569951eadf2a092affdce82b58253"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPlayerStatus.html#65b1eea48ed273f998916404a07efc23">queue</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">List of PIDs of the plobs currently in the queue.  <a href="#65b1eea48ed273f998916404a07efc23"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 The <a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> struct describes the status of a media player. 
 <p>
-<dl class="see" compact><dt><b>See also:</b></dt><dd><a class="el" href="group__dx__pp.html#g60b8364fab5fdf2e760a59199fe17ec9">RemPPGetPlayerStatusFunc</a> </dd></dl>
+<dl class="see" compact><dt><b>See also:</b></dt><dd><a class="el" href="group__dx__pp.html#gf4f0a2684a3ce3f4c746426d74f130d9">RemPPSynchronizeFunc</a> </dd></dl>
 
 <p>
 <hr><h2>Field Documentation</h2>
@@ -155,10 +161,46 @@ So the first position in the playlist (or queue) is <em>1</em> (or <em>-1</em>) 
 <p>
 PID of the currently active plob. 
 <p>
-Use g_string_assign() to set the PID. 
+Use g_string_assign() to set the PID of the plob. The empty string ("") is reserved for "no plob". So use g_string_assign() with the empty string or g_string_truncate() if there is no currently active plob. 
 </div>
 </div><p>
-<hr size="1"><address style="align: right;"><small>Generated on Sun Oct 14 23:34:02 2007 for Remuco by&nbsp;
+<a class="anchor" name="fed569951eadf2a092affdce82b58253"></a><!-- doxytag: member="RemPlayerStatus::playlist" ref="fed569951eadf2a092affdce82b58253" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a>* <a class="el" href="structRemPlayerStatus.html#fed569951eadf2a092affdce82b58253">RemPlayerStatus::playlist</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+List of PIDs of the plobs currently in the playlist. 
+<p>
+Use <a class="el" href="group__dx__RemSL.html#g9171231bde00ce5f2290c9e41865c9c2">rem_sl_clear()</a> and <a class="el" href="group__dx__RemSL.html#ga8872107fcc6fd116a38a4e1a2d7516e">rem_sl_append()</a> or rem_sl_append_const() to set the playlist.<p>
+<dl class="remark" compact><dt><b>Remarks:</b></dt><dd>If a media player has no <em>global</em> <em>playlist</em>, playlist means the currently active (played) ploblist. For instance Amarok, XMMS and XMMS2 have a global playlist, while Rhythmbox has not. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="65b1eea48ed273f998916404a07efc23"></a><!-- doxytag: member="RemPlayerStatus::queue" ref="65b1eea48ed273f998916404a07efc23" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a>* <a class="el" href="structRemPlayerStatus.html#65b1eea48ed273f998916404a07efc23">RemPlayerStatus::queue</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+List of PIDs of the plobs currently in the queue. 
+<p>
+Use <a class="el" href="group__dx__RemSL.html#g9171231bde00ce5f2290c9e41865c9c2">rem_sl_clear()</a> and <a class="el" href="group__dx__RemSL.html#ga8872107fcc6fd116a38a4e1a2d7516e">rem_sl_append()</a> or rem_sl_append_const() to set the playlist. 
+</div>
+</div><p>
+<hr size="1"><address style="align: right;"><small>Generated on Fri Oct 19 16:09:49 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.1 </small></address>
 </body>

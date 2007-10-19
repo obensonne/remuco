@@ -7,6 +7,7 @@ struct _RemStringList {
 	GSList			*strings_last; // to avoid list iteration on append
 	GSList			*strings_iterator;
 	GSList			*strings_to_free;
+	guint			len;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,6 +168,7 @@ rem_sl_append_const(RemStringList *sl, const gchar *str)
 	if (sl->strings_last) sl->strings_last->next = l;
 	sl->strings_last = l;
 	
+	sl->len++;
 }
 
 void
@@ -186,12 +188,15 @@ rem_sl_append(RemStringList *sl, gchar *str)
 	if (sl->strings_last) sl->strings_last->next = l;
 	sl->strings_last = l;
 	
+	sl->len++;
 }
 
 void
 rem_sl_clear(RemStringList *sl)
 {
-	g_return_if_fail(sl && sl->chunk);
+	GSList *l;
+
+	g_return_if_fail(sl);
 	
 	g_string_chunk_free(sl->chunk);
 	
@@ -200,6 +205,22 @@ rem_sl_clear(RemStringList *sl)
 	if (sl->strings) g_slist_free(sl->strings);
 	
 	sl->strings = NULL;
+	
+	if (sl->strings_to_free) {
+		
+		l = sl->strings_to_free;
+		while (l) {
+			g_free(l->data);
+			l = g_slist_next(l);
+		}
+		
+		g_slist_free(sl->strings_to_free);
+	}
+	
+	sl->strings_to_free = NULL;
+
+	sl->len = 0;
+
 }
 
 void
@@ -272,7 +293,7 @@ rem_sl_length(const RemStringList *sl)
 {
 	g_return_val_if_fail(sl, 0);
 	
-	return g_slist_length(sl->strings);
+	return sl->len;
 }
 
 guint
@@ -296,6 +317,38 @@ rem_sl_hash(const RemStringList *sl)
 	}
 	
 	return hash;
+}
+
+gboolean
+rem_sl_equal(const RemStringList *sl1, const RemStringList *sl2)
+{
+	gchar	*s1, *s2;
+	GSList	*l1, *l2;
+	
+	if (sl1 == sl2) return TRUE;
+	if (sl1 == NULL || sl2 == NULL) return FALSE;
+	if (sl1->len != sl2->len) return FALSE;
+	if (sl1->len == 0 && sl2->len == 0) return TRUE;
+	
+	l1 = sl1->strings;
+	l2 = sl2->strings;
+	
+	do {
+		
+		s1 = (gchar*) l1->data;
+		s2 = (gchar*) l2->data;
+		
+		if (s1 == s2) continue;
+		if (s1 == NULL || s2 == NULL) return FALSE;
+		if (!g_str_equal(s1, s2)) return FALSE;
+		
+		l1 = l1->next;
+		l2 = l2->next;
+		
+	} while (l1); // sl1 and sl1 are qeual in length, so l1 != 0 <=> l2 != 0
+	
+	return TRUE;
+	
 }
 
 RemStringList*

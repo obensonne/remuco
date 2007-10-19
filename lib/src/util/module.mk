@@ -1,4 +1,4 @@
-CDIR := remuco/util
+CDIR := util
 
 SRC_FILES_LOCAL := 
 

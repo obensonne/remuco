@@ -8,4 +8,4 @@ Description: Remuco server library (to be used by Remuco player proxies).
 Version: @VERSION@
 URL: http://remuco.sourceforge.net
 Libs: -L${libdir} -lremuco
-Cflags: -I$(includedir}
+Cflags: -I${includedir}

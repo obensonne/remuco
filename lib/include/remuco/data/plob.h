@@ -1,5 +1,5 @@
-#ifndef PLOB_H_
-#define PLOB_H_
+#ifndef REMUCO_PLOB_H_
+#define REMUCO_PLOB_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -111,4 +111,4 @@ rem_plob_meta_get(const RemPlob *plob, const gchar *name);
 
 G_END_DECLS
 
-#endif /*PLOB_H_*/
+#endif /*REMUCO_PLOB_H_*/

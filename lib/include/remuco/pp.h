@@ -1,5 +1,5 @@
-#ifndef PP_H_
-#define PP_H_
+#ifndef REMUCO_PP_H_
+#define REMUCO_PP_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -49,28 +49,15 @@ typedef RemLibrary*			(*RemPPGetLibraryFunc)
 	(RemPPPriv *pp_priv);
 
 /**
- * RemLib requests the PP to snychronize @a status to the current player status.
+ * RemLib requests the PP to synchronize @a status to the current player status.
  * 
  * @param[in]  pp_priv	the PP's private data
  * @param[out] status	the RemPlayerStatus to synchronize
  * 
+ * @remark Do not make any assumptions about the values in @a status.
  */
-typedef void				(*RemPPGetPlayerStatusFunc)
+typedef void				(*RemPPSynchronizeFunc)
 	(RemPPPriv *pp_priv, RemPlayerStatus *status);
-
-/**
- * RemLib requests the PIDs fo the plobs in the playlist.
- * 
- * @param[in]  pp_priv	the PP's private data
- * 
- * @return a list of the PIDs of the plobs in the playlist
- * 
- * @remark If a media player has no @em global @em playlist, playlist means
- *         the currently active (played) ploblist. For instance Amarok, XMMS
- *         and XMMS2 have a global playlist, while Rhythmbox has not.
- */
-typedef RemStringList*		(*RemPPGetPlaylistFunc)
-	(RemPPPriv *pp_priv);
 
 /**
  * RemLib requests a RemPlob with a certain PID.
@@ -93,17 +80,6 @@ typedef RemPlob*			(*RemPPGetPlobFunc)
  */
 typedef RemStringList*		(*RemPPGetPloblistFunc)
 	(RemPPPriv *pp_priv, const gchar *plid);
-
-/**
- * RemLib requests the PIDs fo the plobs in the queue.
- * 
- * @param[in]  pp_priv	the PP's private data
- * 
- * @return a list of the PIDs of the plobs in the queue
- * 
- */
-typedef RemStringList*		(*RemPPGetQueueFunc)
-	(RemPPPriv *pp_priv);
 
 /**
  * RemLib notifies that a crucial error occured. As a result the PP should call
@@ -156,12 +132,12 @@ typedef RemStringList*		(*RemPPSearchFunc)
  * commands and possible parameters mean.
  * 
  * @param[in]  pp_priv	the PP's private data
- * @param[in]  command	the command to do
+ * @param[in]  cmd		the command to do
  * @param[in]  param	a parameter for @a command
  * 
  */
 typedef void				(*RemPPSimpleControlFunc)
-	(RemPPPriv *pp_priv, RemSimpleControlCommand command, gint param);
+	(RemPPPriv *pp_priv, RemSimpleControlCommand cmd, gint param);
 
 /**
  * @ingroup dx_pp
@@ -231,10 +207,14 @@ typedef struct {
 	guint			max_rating_value;
 	/** The player/PP supports seeking to a certain position in a plob. */
 	gboolean		supports_seek;
+	/** The player has a playlist and the PP can pass the content to RemLib. */
+	gboolean		supports_playlist;
 	/** The player/PP supports jumping to a certain position in the playlist. */
-	gboolean		supports_jump_playlist;
+	gboolean		supports_playlist_jump;
+	/** The player has a queue and the PP can pass the content to RemLib. */
+	gboolean		supports_queue;
 	/** The player/PP supports jumping to a certain position in the queue. */
-	gboolean		supports_jump_queue;
+	gboolean		supports_queue_jump;
 	/**
 	 * The player/PP supports tags (for instance like in XMMS2 where songs can
 	 * be tagged with free choosen words). This only makes sense if the
@@ -242,31 +222,41 @@ typedef struct {
 	 * RemPPCallbacks::update_plob is set.
 	 */
 	gboolean		supports_tags;
+	/** The bitwise or'ed supported repeat modes. */
 	RemRepeatMode	supported_repeat_modes;
+	/** The bitwise or'ed supported shuffle modes. */
 	RemShuffleMode	supported_shuffle_modes;
 } RemPPDescriptor;
 
 /**
  * @ingroup dx_pp
  * The RemPPCallbacks struct specifies callback functions to use by RemLib
- * to get information about the media player. At the same time, by setting
- * certain functions to <code>NULL</code>, it describes features of the
- * player/PP.
+ * to get information about the media player. Some functions are mandatory and
+ * some optional - see the documentation of the individual fields. The meaning
+ * of each functions is described in the corresponding function type definiton.
  * 
  */
 typedef struct {
-
+	
+	/** Mandatory */
+	RemPPSynchronizeFunc		synchronize;
+	/** Optional */
 	RemPPGetLibraryFunc			get_library;
-	RemPPGetPlayerStatusFunc	get_player_status;
-	RemPPGetPlaylistFunc		get_playlist;
+	/** Mandatory */
 	RemPPGetPlobFunc			get_plob;
+	/** Optional */
 	RemPPGetPloblistFunc		get_ploblist;
-	RemPPGetQueueFunc			get_queue;
+	/** Mandatory */
 	RemPPNotifyErrorFunc		notify_error;
+	/** Optional */
 	RemPPPlayPloblistFunc		play_ploblist;
+	/** Optional */
 	RemPPSearchFunc				search;
+	/** Mandatory */
 	RemPPSimpleControlFunc		simple_ctrl;
+	/** Optional */
 	RemPPUpdatePlobFunc			update_plob;
+	/** Optional */
 	RemPPUpdatePloblistFunc		update_ploblist;
 	
 } RemPPCallbacks;
@@ -288,4 +278,4 @@ typedef struct {
 
 G_END_DECLS
 
-#endif /*PP_H_*/
+#endif /*REMUCO_PP_H_*/

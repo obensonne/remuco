@@ -45,19 +45,27 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#a07a3d8d641ea67c48726921f76d538c">supports_seek</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports seeking to a certain position in a plob.  <a href="#a07a3d8d641ea67c48726921f76d538c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#df498791c8100a94a70e468ea756ce92">supports_jump_playlist</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#9979c338f3ec97087393d74be47ba721">supports_playlist</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports jumping to a certain position in the playlist.  <a href="#df498791c8100a94a70e468ea756ce92"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#397ba23daed77061e96ba6407fa8b2be">supports_jump_queue</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player has a playlist and the PP can pass the content to RemLib.  <a href="#9979c338f3ec97087393d74be47ba721"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#6d88db09bf6314c8bda57e9b07327df8">supports_playlist_jump</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports jumping to a certain position in the queue.  <a href="#397ba23daed77061e96ba6407fa8b2be"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports jumping to a certain position in the playlist.  <a href="#6d88db09bf6314c8bda57e9b07327df8"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#73e2b30b6571f71ddd1a3148db71aaf0">supports_queue</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player has a queue and the PP can pass the content to RemLib.  <a href="#73e2b30b6571f71ddd1a3148db71aaf0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#555d8c1e140eb9fe0a1f7a3b3a2eedd8">supports_queue_jump</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports jumping to a certain position in the queue.  <a href="#555d8c1e140eb9fe0a1f7a3b3a2eedd8"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#d7526109e4cf706dda5c658828384497">supports_tags</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The player/PP supports tags (for instance like in XMMS2 where songs can be tagged with free choosen words).  <a href="#d7526109e4cf706dda5c658828384497"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__ps.html#g07e5c968d52cb6f69bf48dc2bef4da17">RemRepeatMode</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#e38380a8b91b3eacd2c126b20373ca40">supported_repeat_modes</a></td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The bitwise or'ed supported repeat modes.  <a href="#e38380a8b91b3eacd2c126b20373ca40"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__ps.html#g92a5e8a21a4f205ea5ac341b9ce7a513">RemShuffleMode</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPPDescriptor.html#587dc2cf2dd25ce17223e69cd7f5d825">supported_shuffle_modes</a></td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The bitwise or'ed supported shuffle modes.  <a href="#587dc2cf2dd25ce17223e69cd7f5d825"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 The <a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> struct describes miscellaneous characteristics of a player proxy (PP) respectively the media player it connects. 
@@ -111,7 +119,7 @@ The character set that is used for textual data passed from the PP to RemLib (se
 <p>
 The player/PP notifies when there are changes in player status, playlist or queue (if set to <code>FALSE</code>, RemLib will periodically check for changes autonously). 
 <p>
-<dl class="see" compact><dt><b>See also:</b></dt><dd><a class="el" href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">RemNotifyFlags</a> </dd></dl>
+<dl class="see" compact><dt><b>See also:</b></dt><dd>RemNotifyFlags </dd></dl>
 
 </div>
 </div><p>
@@ -129,7 +137,7 @@ The player/PP notifies when there are changes in player status, playlist or queu
 <p>
 Specifies who is responsible for running a GMainLoop. 
 <p>
-If <code>TRUE</code>, RemLib starts a GMainLoop when <a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up()</a> gets called. As a result, <a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up()</a> blocks and returns when <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a> has been called. If <code>FALSE</code>, <a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up()</a> returns immediately - but in this case the PP developer must ensure that there already is a GMainLoop running for the default GMainContext and that it <em>will</em> <em>run</em> at least until <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a> gets called. 
+If <code>TRUE</code>, RemLib starts a GMainLoop when <a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up()</a> gets called. As a result, <a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up()</a> blocks and returns when <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a> has been called. If <code>FALSE</code>, <a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up()</a> returns immediately - but in this case the PP developer must ensure that there already is a GMainLoop running for the default GMainContext and that it <em>will</em> <em>run</em> at least until <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a> gets called. 
 </div>
 </div><p>
 <a class="anchor" name="5281ed4131e1ab9acb30005ae7557b0a"></a><!-- doxytag: member="RemPPDescriptor::max_rating_value" ref="5281ed4131e1ab9acb30005ae7557b0a" args="" -->
@@ -166,12 +174,29 @@ The player/PP supports seeking to a certain position in a plob.
 
 </div>
 </div><p>
-<a class="anchor" name="df498791c8100a94a70e468ea756ce92"></a><!-- doxytag: member="RemPPDescriptor::supports_jump_playlist" ref="df498791c8100a94a70e468ea756ce92" args="" -->
+<a class="anchor" name="9979c338f3ec97087393d74be47ba721"></a><!-- doxytag: member="RemPPDescriptor::supports_playlist" ref="9979c338f3ec97087393d74be47ba721" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#df498791c8100a94a70e468ea756ce92">RemPPDescriptor::supports_jump_playlist</a>          </td>
+          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#9979c338f3ec97087393d74be47ba721">RemPPDescriptor::supports_playlist</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The player has a playlist and the PP can pass the content to RemLib. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6d88db09bf6314c8bda57e9b07327df8"></a><!-- doxytag: member="RemPPDescriptor::supports_playlist_jump" ref="6d88db09bf6314c8bda57e9b07327df8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#6d88db09bf6314c8bda57e9b07327df8">RemPPDescriptor::supports_playlist_jump</a>          </td>
         </tr>
       </table>
 </div>
@@ -183,12 +208,29 @@ The player/PP supports jumping to a certain position in the playlist.
 
 </div>
 </div><p>
-<a class="anchor" name="397ba23daed77061e96ba6407fa8b2be"></a><!-- doxytag: member="RemPPDescriptor::supports_jump_queue" ref="397ba23daed77061e96ba6407fa8b2be" args="" -->
+<a class="anchor" name="73e2b30b6571f71ddd1a3148db71aaf0"></a><!-- doxytag: member="RemPPDescriptor::supports_queue" ref="73e2b30b6571f71ddd1a3148db71aaf0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#397ba23daed77061e96ba6407fa8b2be">RemPPDescriptor::supports_jump_queue</a>          </td>
+          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#73e2b30b6571f71ddd1a3148db71aaf0">RemPPDescriptor::supports_queue</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The player has a queue and the PP can pass the content to RemLib. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="555d8c1e140eb9fe0a1f7a3b3a2eedd8"></a><!-- doxytag: member="RemPPDescriptor::supports_queue_jump" ref="555d8c1e140eb9fe0a1f7a3b3a2eedd8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">gboolean <a class="el" href="structRemPPDescriptor.html#555d8c1e140eb9fe0a1f7a3b3a2eedd8">RemPPDescriptor::supports_queue_jump</a>          </td>
         </tr>
       </table>
 </div>
@@ -229,6 +271,8 @@ This only makes sense if the player/PP also supports edidting of plobs, i.e. the
 <div class="memdoc">
 
 <p>
+The bitwise or'ed supported repeat modes. 
+<p>
 
 </div>
 </div><p>
@@ -244,10 +288,12 @@ This only makes sense if the player/PP also supports edidting of plobs, i.e. the
 <div class="memdoc">
 
 <p>
+The bitwise or'ed supported shuffle modes. 
+<p>
 
 </div>
 </div><p>
-<hr size="1"><address style="align: right;"><small>Generated on Sun Oct 14 23:34:02 2007 for Remuco by&nbsp;
+<hr size="1"><address style="align: right;"><small>Generated on Fri Oct 19 16:09:49 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.1 </small></address>
 </body>

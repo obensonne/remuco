@@ -6,7 +6,6 @@
 #include "complex/rem-cinfo.h"
 #include "complex/rem-pinfo.h"
 #include "complex/rem-pstatus.h"
-#include "complex/rem-pstatus-priv.h"
 #include "complex/rem-plob.h"
 #include "complex/rem-ploblist.h"
 #include "complex/rem-library.h"

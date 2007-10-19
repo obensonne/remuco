@@ -104,7 +104,8 @@ install: all install-dev
 install-dev:
 	# Install header files
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/include
-	find -type f -name "*.h" | grep -vF ".svn" | \
+	#cp -r ../include/remuco.h ../include/remuco $(DESTDIR)$(PREFIX)/include
+	find ../include -type f -name "*.h" | grep -vF ".svn" | \
 		xargs cp --parents -t $(DESTDIR)$(PREFIX)/include
 	# Generate and install pkg-config file	
 	cp remuco.pc.in remuco.pc

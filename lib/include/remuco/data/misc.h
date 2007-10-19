@@ -1,5 +1,5 @@
-#ifndef MISC_H_
-#define MISC_H_
+#ifndef REMUCO_MISC_H_
+#define REMUCO_MISC_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -43,7 +43,8 @@ typedef enum {
 	REM_SCTRL_CMD_COUNT
 } RemSimpleControlCommand;
 
+
 G_END_DECLS
 
 
-#endif /*MISC_H_*/
+#endif /*REMUCO_MISC_H_*/

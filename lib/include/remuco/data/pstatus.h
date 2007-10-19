@@ -1,5 +1,5 @@
-#ifndef PS_H_
-#define PS_H_
+#ifndef REMUCO_PSTATUS_H_
+#define REMUCO_PSTATUS_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -19,14 +19,14 @@ G_BEGIN_DECLS
  */
 typedef enum {
 	/** Stop */
-	REM_PS_STATE_STOP,
+	REM_PBS_STOP,
 	/** Play */
-	REM_PS_STATE_PLAY,
+	REM_PBS_PLAY,
 	/** Paused */
-	REM_PS_STATE_PAUSE,
+	REM_PBS_PAUSE,
 	/** The player is OFF */
-	REM_PS_STATE_OFF,
-	REM_PS_STATE_COUNT
+	REM_PBS_OFF,
+	REM_PBS_COUNT
 } RemPlaybackState;
 
 /**
@@ -34,9 +34,9 @@ typedef enum {
  */
 typedef enum {
 	/** Sequential play order. */
-	REM_PS_SHUFFLE_MODE_OFF = 0,
+	REM_SHUFFLE_MODE_OFF = 0,
 	/** Random play order. */
-	REM_PS_SHUFFLE_MODE_ON = 1
+	REM_SHUFFLE_MODE_ON = 1
 } RemShuffleMode;
 
 /**
@@ -44,45 +44,29 @@ typedef enum {
  */
 typedef enum {
 	/** No repeat. */
-	REM_PS_REPEAT_MODE_NONE = 0,
+	REM_REPEAT_MODE_NONE = 0,
 	/** Repeat the current plob. */
-	REM_PS_REPEAT_MODE_PLOB = 1 << 0,
+	REM_REPEAT_MODE_PLOB = 1 << 0,
 	/** Repeat the current album. */
-	REM_PS_REPEAT_MODE_ALBUM = 1 << 1,
+	REM_REPEAT_MODE_ALBUM = 1 << 1,
 	/** Repeat the playlist. */
-	REM_PS_REPEAT_MODE_PL = 1 << 2
+	REM_REPEAT_MODE_PL = 1 << 2
 } RemRepeatMode;
-
-/**
- * Flags describing differences between two RemPlayerStatus.
- * 
- * @see rem_player_status_compare()
- */
-typedef enum {
-	/** No difference. */
-	REM_PS_DIFF_NONE = 0,
-	/** @a state, @a volume, @a repeat, @a shuffle and/or @a cap_pos differs. */
-	REM_PS_DIFF_SVRSP = 1 << 0,
-	/** @a cap_pid differs. */
-	REM_PS_DIFF_PID = 1 << 2,
-	/** All differ. */
-	REM_PS_DIFF_ALL = 0xFFFF
-} RemPlayerStatusCompareResult;
 
 /**
  * The RemPPDescriptor struct describes the status of a media player.
  * 
- * @see RemPPGetPlayerStatusFunc
+ * @see RemPPSynchronizeFunc
  */
 typedef struct {
 	/** Playback state. */
 	RemPlaybackState		state;
 	/** Volume. */
-	gint				volume;
+	gint					volume;
 	/** Playback state. */
-	RemRepeatMode	repeat;
+	RemRepeatMode			repeat;
 	/** Playback state. */
-	RemShuffleMode	shuffle;
+	RemShuffleMode			shuffle;
 	/**
 	 * Position of the currently active plob in playlist (or queue).
 	 * - > 0 : position within playlist
@@ -91,11 +75,28 @@ typedef struct {
 	 * 
 	 * So the first position in the playlist (or queue) is @em 1 (or @em -1) !
 	 */
-	gint				cap_pos;
+	gint					cap_pos;
 	/**
-	 * PID of the currently active plob. Use g_string_assign() to set the PID.
+	 * PID of the currently active plob. Use
+	 * g_string_assign() to set the PID of the plob. The empty string ("") is
+	 * reserved for "no plob". So use g_string_assign() with the empty string
+	 * or g_string_truncate() if there is no currently active plob.
 	 */
-	GString				*cap_pid;
+	GString					*cap_pid;
+	/**
+	 * List of PIDs of the plobs currently in the playlist. Use rem_sl_clear()
+	 * and rem_sl_append() or rem_sl_append_const() to set the playlist.
+	 * 
+	 * @remark If a media player has no @em global @em playlist, playlist means
+	 *         the currently active (played) ploblist. For instance Amarok, XMMS
+	 *         and XMMS2 have a global playlist, while Rhythmbox has not.
+ 	 */
+	RemStringList			*playlist;
+	/**
+	 * List of PIDs of the plobs currently in the queue. Use rem_sl_clear()
+	 * and rem_sl_append() or rem_sl_append_const() to set the playlist.
+	 */
+	RemStringList			*queue;
 } RemPlayerStatus;
 
 RemPlayerStatus*
@@ -104,14 +105,8 @@ rem_player_status_new(void);
 void
 rem_player_status_destroy(RemPlayerStatus*);
 
-void
-rem_player_status_copy(RemPlayerStatus *src, RemPlayerStatus *dst);
-
-RemPlayerStatusCompareResult
-rem_player_status_compare(RemPlayerStatus *one, RemPlayerStatus *two);
-
 /*@}*/
 
 G_END_DECLS
 
-#endif /*PS_H_*/
+#endif /*REMUCO_PSTATUS_H_*/

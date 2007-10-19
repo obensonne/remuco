@@ -30,37 +30,36 @@ struct _RemServer {
 	
 	////////// main loop and context and sources //////////
 	
-	GMainLoop			*ml;
-	GMainContext		*mc;
-	GSource				*src_notify;
-	GSource				*src_down;
+	GMainLoop				*ml;
+	GMainContext			*mc;
+	GSource					*src_notify;
+	GSource					*src_down;
 	
 	////////// communication related fields //////////
 	
-	RemNetServer		*net_server;
-	GHashTable			*clients;
-	RemNetMsg			*net_msg_rx;	// reuse to avoid avoidable reallocations
-	RemNetMsg			net_msg_tx;		// note: this is no pointer
-	gchar				*charset;
+	RemNetServer			*net_server;
+	GHashTable				*clients;
+	RemNetMsg				*net_msg_rx;	// reuse to avoid reallocations
+	RemNetMsg				net_msg_tx;		// note: this is no pointer
+	gchar					*charset;
 	
 	////////// the player proxy //////////
 	
-	RemPPCallbacks		*pp_cb;
-	RemPPPriv			*pp_priv;
-	gboolean			pp_notifies_changes;
+	const RemPPCallbacks	*pp_cb;
+	const RemPPPriv			*pp_priv;
+	gboolean				pp_notifies_changes;
 	
 	////////// player related fields //////////
 	
-	RemPlayerInfo		*pinfo;
-	RemPlayerStatus		*pstatus;
-	RemPlayerStatusPriv	pstatus_priv;
-	RemPlob				*cap;
-	RemPloblist			*playlist;
-	guint				playlist_hash;
-	RemPloblist			*queue;
-	guint				queue_hash;
-	RemLibrary			*lib;
-	RemNotifyFlags	changes;
+	RemPlayerInfo			*pinfo;
+	RemPlayerStatus			*pstatus;
+	RemPlayerStatusFP		*pstatus_fp;
+	RemPlob					*cap;
+	RemPloblist				*playlist;
+	guint					playlist_hash;
+	RemPloblist				*queue;
+	guint					queue_hash;
+	RemLibrary				*lib;
 };
 
 typedef struct {
@@ -90,7 +89,7 @@ priv_serialize(const RemServer *rem,
 	const RemLibrary		*lib;
 	const RemPlob		*plob;
 	const RemPlayerInfo		*pinfo;
-	const RemPlayerStatusPriv			*psi;
+	const RemPlayerStatusBasic			*psi;
 	
 	if (!data) return NULL;
 	
@@ -131,9 +130,9 @@ priv_serialize(const RemServer *rem,
 		
 	case REM_MSG_ID_IFS_STATUS:
 				
-		psi = (RemPlayerStatusPriv*) data;
+		psi = (RemPlayerStatusBasic*) data;
 		
-		ba = rem_player_status_priv_serialize(psi, rem->charset, client->info->charsets);
+		ba = rem_player_status_basic_serialize(psi, rem->charset, client->info->charsets);
 				
 		break;
 		
@@ -180,7 +179,7 @@ priv_htcb_tx(gpointer key, gpointer val, gpointer data)
 	
 	switch (server->net_msg_tx.id) {
 		case REM_MSG_ID_IFS_STATUS:
-			tx_data = &server->pstatus_priv;
+			tx_data = &server->pstatus_fp->priv;
 		break;
 		case REM_MSG_ID_IFS_CAP:
 			tx_data = server->cap;
@@ -243,7 +242,7 @@ priv_build_ploblist(RemServer *s,
 	
 	while((pid = rem_sl_iterator_next(pids))) {
 		
-		plob = s->pp_cb->get_plob(s->pp_priv, pid);
+		plob = s->pp_cb->get_plob((RemPPPriv*) s->pp_priv, pid);
 		if (!plob) plob = rem_plob_new_unknown(pid);
 			
 		s1 = rem_plob_meta_get(plob, REM_PLOB_META_TITLE);
@@ -274,9 +273,12 @@ priv_handle_pimsg(RemServer* server,
 	RemStringList		*sl;
 	RemPloblist			*pl;
 	const gchar			*pl_name;
+	RemPPPriv			*ppp;
 	
 	msg_response.id = 0;
 	msg_response.ba = NULL;
+	
+	ppp = (RemPPPriv*) server->pp_priv;
 	
 	switch (msg->id) {
 		
@@ -287,7 +289,7 @@ priv_handle_pimsg(RemServer* server,
 		
 		string = rem_string_unserialize(msg->ba, server->charset);
 		
-		plob = server->pp_cb->get_plob(server->pp_priv, string->value);
+		plob = server->pp_cb->get_plob(ppp, string->value);
 		
 		msg_response.id = msg->id;
 		msg_response.ba = priv_serialize(server, client, msg->id, plob, NULL);
@@ -301,7 +303,7 @@ priv_handle_pimsg(RemServer* server,
 		
 		string = rem_string_unserialize(msg->ba, server->charset);
 		
-		sl = server->pp_cb->get_ploblist(server->pp_priv, string->value);
+		sl = server->pp_cb->get_ploblist(ppp, string->value);
 		
 		pl_name = rem_library_get_name(server->lib, string->value);
 		pl = rem_ploblist_new(string->value, pl_name);
@@ -320,7 +322,7 @@ priv_handle_pimsg(RemServer* server,
 	
 		rem_library_destroy(server->lib);
 		
-		server->lib = server->pp_cb->get_library(server->pp_priv);
+		server->lib = server->pp_cb->get_library(ppp);
 		if (!server->lib) {
 			LOG_WARN("library request from pp returned NULL\n");
 			server->lib = rem_library_new();
@@ -336,7 +338,7 @@ priv_handle_pimsg(RemServer* server,
 			
 		string = rem_string_unserialize(msg->ba, server->charset);
 		
-		server->pp_cb->play_ploblist(server->pp_priv, string->value);
+		server->pp_cb->play_ploblist(ppp, string->value);
 		
 		rem_string_destroy(string);
 
@@ -346,8 +348,8 @@ priv_handle_pimsg(RemServer* server,
 			
 		sctrl = rem_simple_control_unserialize(msg->ba, server->charset);
 		
-		server->pp_cb->simple_ctrl(server->pp_priv,
-							(RemSimpleControlCommand) sctrl->cmd, sctrl->param);
+		server->pp_cb->simple_ctrl(
+					ppp, (RemSimpleControlCommand) sctrl->cmd, sctrl->param);
 		
 		rem_simple_control_destroy(sctrl);
 		
@@ -397,102 +399,57 @@ priv_handle_pimsg(RemServer* server,
 static void
 priv_handle_playerchanges(RemServer* server)
 {
-	gchar			*cap_pid;
-	RemStringList	*pids;
-	guint			hash;
-	gboolean		change_status = FALSE,
-					change_cap = FALSE,
-					change_playlist = FALSE,
-					change_queue = FALSE;
+	RemPlayerStatusDiff	diff;
+	RemPPPriv			*ppp;
+	
+	ppp = (RemPPPriv*) server->pp_priv;
 	
 	////////// status change ? //////////
 	
-	if (server->changes & REM_NF_STATUS_CHANGED) {
-		
-		server->pp_cb->get_player_status(server->pp_priv, server->pstatus);
+	server->pp_cb->synchronize(ppp, server->pstatus);
 	
-		////////// check if status (w/o plob) really changed //////////
-		
-		change_status = rem_player_status_priv_assign(
-							&server->pstatus_priv, server->pstatus);
-		
-		////////// check if cap really changed //////////
-
-		cap_pid = server->pstatus->cap_pid->str;
-		
-		// check if cap _really_ changed (we don't trust PPs ;)
-		if ((cap_pid == NULL && server->cap != NULL) ||
-			(cap_pid != NULL && server->cap == NULL) ||
-			!g_str_equal(cap_pid, server->cap->pid)) {
-			
-			change_cap = TRUE;
-			
-			rem_plob_destroy(server->cap);
-
-			if (cap_pid) {
-				server->cap = server->pp_cb->get_plob(server->pp_priv, cap_pid);
-			} else {
-				server->cap = NULL;
-			}
-		}
-	}
+	g_return_if_fail(server->pstatus->cap_pid);
+	g_return_if_fail(server->pstatus->playlist);
+	g_return_if_fail(server->pstatus->queue);
 	
-	////////// playlist change? //////////
-
-	if (server->changes & REM_NF_PLAYLIST_CHANGED) {
-		
-		pids = server->pp_cb->get_playlist(server->pp_priv);
-		if (!pids) {
-			LOG_ERROR("got null playlist\n");
-		} else {
-			// check if playlist _really_ changed (we don't trust PPs ;)
-			hash = rem_sl_hash(pids);
-			if (hash != server->playlist_hash) {
-				server->playlist_hash = hash;
-				priv_build_ploblist(server, server->playlist, pids);
-				change_playlist = TRUE;
-			}
-			rem_sl_destroy(pids);
-		}
-	}
-		
-	////////// what says PP about queue change? //////////
-
-	if (server->changes & REM_NF_QUEUE_CHANGED) {
-		
-		pids = server->pp_cb->get_queue(server->pp_priv);
-		if (!pids) {
-			LOG_ERROR("got null queue\n");
-		} else {
-			// check if queue _really_ changed (we don't trust PPs ;)
-			hash = rem_sl_hash(pids);
-			if (hash != server->queue_hash) {
-				server->queue_hash = hash;
-				priv_build_ploblist(server, server->queue, pids);
-				change_queue = TRUE;
-			}
-			rem_sl_destroy(pids);
-		}
-	}
+	diff = rem_player_status_fp_update(server->pstatus, server->pstatus_fp);
 	
-	////////// transmit changes to clients //////////
+	////////// player status basic //////////
 
-	if (change_status) {
+	if (diff & REM_PS_DIFF_SVRSP) {
 		LOG_DEBUG("send new player status");
 		server->net_msg_tx.id = REM_MSG_ID_IFS_STATUS;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
-	if (change_cap) {
+	
+	////////// currently active plob //////////
+
+	if (diff & REM_PS_DIFF_PID) {
+		rem_plob_destroy(server->cap);
+		if (server->pstatus_fp->cap_pid->len) {
+			server->cap = server->pp_cb->get_plob(
+										ppp, server->pstatus_fp->cap_pid->str);
+		} else {
+			server->cap = NULL;
+		}
 		LOG_DEBUG("send new cap");
 		server->net_msg_tx.id = REM_MSG_ID_IFS_CAP;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
-	if (change_playlist) {
+	
+	////////// playlist //////////
+
+	if (diff & REM_PS_DIFF_PLAYLIST) {
+		priv_build_ploblist(server, server->playlist, server->pstatus->playlist);
 		LOG_DEBUG("send new playlist");
 		server->net_msg_tx.id = REM_MSG_ID_IFS_PLAYLIST;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
-	if (change_queue) {
+	
+	////////// queue //////////
+
+	if (diff & REM_PS_DIFF_QUEUE) {
+		priv_build_ploblist(server, server->queue, server->pstatus->queue);
 		LOG_DEBUG("send new queue");
 		server->net_msg_tx.id = REM_MSG_ID_IFS_QUEUE;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
@@ -506,128 +463,131 @@ priv_handle_playerchanges(RemServer* server)
 //////////////////////////////////////////////////////////////////////////////
 
 static RemPlayerInfo*
-priv_get_player_info(const RemPlayerProxy *pp)
+priv_get_player_info( const RemPPDescriptor *desc, const RemPPCallbacks *callbacks)
 {
 	RemPlayerInfo			*pinfo;
 	RemPlayerInfoFeature	features = 0;
 
 	////////// check for player name //////////
 	
-	if (!pp->desc->player_name) {
+	if (!desc->player_name) {
 		LOG_ERROR("no player name given\n");
 		return NULL;
 	}
 
 	////////// mandatory callback functions //////////
 	
-	if (!pp->callbacks->get_player_status) {
+	if (!callbacks->synchronize) {
 		LOG_ERROR("mandatory callback function 'get_player_status' not set\n");
 		return NULL;
 	}
-	if (!pp->callbacks->get_plob) {
+	if (!callbacks->get_plob) {
 		LOG_ERROR("mandatory callback function 'get_plob' not set\n");
 		return NULL;
 	}
-	if (!pp->callbacks->notify_error) {
+	if (!callbacks->notify_error) {
 		LOG_ERROR("mandatory callback function 'notify_error' not set\n");
 		return NULL;
 	}
-	if (!pp->callbacks->simple_ctrl) {
+	if (!callbacks->simple_ctrl) {
 		LOG_ERROR("mandatory callback function 'simple_ctrl' not set\n");
 		return NULL;
 	}
 	
 	////////// optional callback functions //////////
 	
-	if (pp->callbacks->get_library) {
+	if (callbacks->get_library) {
+		if (!desc->supports_playlist) {
+			LOG_ERROR("Library support requires playlist support!\n");
+			return NULL;
+		}
 		features |= REM_FEATURE_LIBRARY;
 		LOG_DEBUG("Player/PP supports library\n");
 	}
-	if (pp->callbacks->get_playlist) {
-		features |= REM_FEATURE_PLAYLIST;
-		LOG_DEBUG("Player/PP supports playlist\n");
-	}
-	if (pp->callbacks->get_ploblist) {
+	if (callbacks->get_ploblist) {
 		features |= REM_FEATURE_LIBRARY_PL_CONTENT;
 		LOG_DEBUG("Player/PP can give us content of any ploblists\n");
 	}
-	if (pp->callbacks->get_queue) {
-		features |= REM_FEATURE_QUEUE;
-		LOG_DEBUG("Player/PP supports queue\n");
-	}
-	if (pp->callbacks->play_ploblist) {
+	if (callbacks->play_ploblist) {
 		features |= REM_FEATURE_LIBRARY_PL_PLAY;
 		LOG_DEBUG("Player/PP supports playing a certain ploblist\n");
-		if (!pp->callbacks->get_library) {
+		if (!callbacks->get_library) {
 			LOG_ERROR("You should set callback function 'get_library' too!\n");
 			return NULL;
 		}
 	}
-	if (pp->callbacks->search) {
+	if (callbacks->search) {
 		features |= REM_FEATURE_SEARCH;
 		LOG_DEBUG("Player/PP supports plob search\n");
 	}
-	if (pp->callbacks->update_plob) {
+	if (callbacks->update_plob) {
 		features |= REM_FEATURE_PLOB_EDIT;
 		LOG_DEBUG("Player/PP supports editing plobs\n");
 	}
-	if (pp->callbacks->update_ploblist) {
+	if (callbacks->update_ploblist) {
 		//features |= REM_FEATURE_PL ???;
 		LOG_DEBUG("Player/PP supports editing plobs\n");
 	}
 	
 	////////// rating //////////
 	
-	if (pp->desc->max_rating_value) {
+	if (desc->max_rating_value) {
 		features |= REM_FEATURE_RATE;
 	}
 	
 	////////// repeat modes //////////
 	
-	if (pp->desc->supported_repeat_modes & REM_PS_REPEAT_MODE_ALBUM) {
+	if (desc->supported_repeat_modes & REM_REPEAT_MODE_ALBUM) {
 		features |= REM_FEATURE_REPEAT_MODE_ALBUM;
 	}
-	if (pp->desc->supported_repeat_modes & REM_PS_REPEAT_MODE_PL) {
+	if (desc->supported_repeat_modes & REM_REPEAT_MODE_PL) {
 		features |= REM_FEATURE_REPEAT_MODE_PL;
 	}
-	if (pp->desc->supported_repeat_modes & REM_PS_REPEAT_MODE_PLOB) {
+	if (desc->supported_repeat_modes & REM_REPEAT_MODE_PLOB) {
 		features |= REM_FEATURE_REPEAT_MODE_PLOB;
 	}
 	
 	////////// misc //////////
 
-	if (pp->desc->supported_shuffle_modes & REM_PS_SHUFFLE_MODE_ON) {
+	if (desc->supports_playlist) {
+		features |= REM_FEATURE_PLAYLIST;
+		LOG_DEBUG("Player/PP supports playlist\n");
+	}
+	if (desc->supports_queue) {
+		features |= REM_FEATURE_QUEUE;
+		LOG_DEBUG("Player/PP supports queue\n");
+	}
+
+	if (desc->supported_shuffle_modes & REM_SHUFFLE_MODE_ON) {
 		features |= REM_FEATURE_SHUFFLE_MODE;
 	}
 	
-	if (pp->desc->supports_jump_playlist) {
+	if (desc->supports_playlist_jump) {
 		features |= REM_FEATURE_PLAYLIST_JUMP;
-		if (!pp->callbacks->get_playlist) {
-			LOG_ERROR("Playlist jump enabled -> you should enable callback "
-					"function 'get_playlist' too!\n");
+		if (!desc->supports_playlist) {
+			LOG_ERROR("Playlist jump only makes sense with playlist support!\n");
 			return NULL;
 		}
 	}
-	if (pp->desc->supports_jump_queue) {
+	if (desc->supports_queue_jump) {
 		features |= REM_FEATURE_QUEUE_JUMP;
-		if (!pp->callbacks->get_queue) {
-			LOG_ERROR("Queue jump enabled -> you should enable callback "
-					"function 'get_playlist' too!\n");
+		if (!desc->supports_queue) {
+			LOG_ERROR("Queue jump only makes sense with queue support!\n");
 			return NULL;
 		}
 	}
 	
-	if (pp->desc->supports_seek) {
+	if (desc->supports_seek) {
 		features |= REM_FEATURE_SEEK;
 	}
 	
-	if (pp->desc->supports_tags) {
+	if (desc->supports_tags) {
 		features |= REM_FEATURE_PLOB_TAGS;
 	}
 
-	pinfo = rem_player_info_new(pp->desc->player_name);
+	pinfo = rem_player_info_new(desc->player_name);
 	pinfo->features = features;
-	pinfo->rating_max = pp->desc->max_rating_value;
+	pinfo->rating_max = desc->max_rating_value;
 
 	return pinfo;
 }
@@ -681,16 +641,9 @@ priv_cb_notify(gpointer data)
 	
 	if (rem->pp_notifies_changes) {
 		
-		rem->changes = 0;
-		
-		g_source_unref(rem->src_notify);
-		rem->src_notify = NULL;
-		
 		return FALSE;
 		
 	} else { // we check player changes periodically with a timer 
-		
-		rem->changes = REM_NF_ALL_CHANGED;
 		
 		return TRUE;
 	}
@@ -716,28 +669,26 @@ priv_cb_down(gpointer data)
 	if (server->src_notify)
 		g_source_unref(server->src_notify);
 	if (server->src_down)
-	g_source_unref(server->src_down);
+		g_source_unref(server->src_down);
 	
 	// free all player state info data:
 	rem_player_info_destroy(server->pinfo);
 	rem_player_status_destroy(server->pstatus);
+	rem_player_status_fp_destroy(server->pstatus_fp);
 	rem_plob_destroy(server->cap);
 	rem_ploblist_destroy(server->playlist);
 	rem_ploblist_destroy(server->queue);
 	rem_library_destroy(server->lib);
 	
-	g_source_unref(server->src_down);
-	server->src_down = NULL;
-
+	// free other data:
+	rem_net_msg_destroy(server->net_msg_rx);
+	g_free(server->charset);
+	
 	// if needed, stop the main loop:
 	if (server->ml) {
 		g_main_loop_quit(server->ml);
 		g_main_loop_unref(server->ml);
 	}
-	
-	rem_net_msg_destroy(server->net_msg_rx);
-	
-	g_free(server->charset);
 	
 	g_slice_free(RemServer, server);
 	
@@ -960,42 +911,48 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 //////////////////////////////////////////////////////////////////////////////
 
 RemServer*
-rem_server_up(const RemPlayerProxy *pp, GError **err)
+rem_server_up(const RemPPDescriptor *pp_desc,
+			  const RemPPCallbacks *pp_callbacks,
+			  const RemPPPriv *pp_priv,
+			  GError **err)
 {
 	RemServer				*server;
 	G_CONST_RETURN gchar	*charset_locale;
 
-	g_return_val_if_fail(pp && pp->callbacks && pp->desc && pp->priv, NULL);
+	g_return_val_if_fail(pp_callbacks && pp_desc && pp_priv, NULL);
 	g_return_val_if_fail(concl(err, !(*err)), NULL);
 	
-	////////// set up server struct //////////
+	////////// init server struct //////////
 
 	server = g_slice_new0(RemServer);
 	
-	server->pinfo = priv_get_player_info(pp);
+	server->pp_cb = pp_callbacks;
+	server->pp_priv = pp_priv;
+	
+	////////// have allok at the PP //////////
+
+	server->pinfo = priv_get_player_info(pp_desc, pp_callbacks);
 	g_return_val_if_fail(server->pinfo, NULL);
 
-	server->pp_cb = pp->callbacks;
-	server->pp_priv = pp->priv;
-		
-	if (!pp->desc->charset) {
+	server->pp_notifies_changes = pp_desc->notifies_changes;
+
+	////////// charset //////////
+	
+	if (!pp_desc->charset) {
 		g_get_charset(&charset_locale);
 		server->charset = g_strdup(charset_locale);
 	} else {
-		server->charset = g_strdup(pp->desc->charset);		
+		server->charset = g_strdup(pp_desc->charset);		
 	}
-	LOG_DEBUG("used charset: %s\n", server->charset);
-	
-	server->pp_notifies_changes = pp->desc->notifies_changes;
-
-	server->pstatus = rem_player_status_new();
+	LOG_DEBUG("using charset: %s\n", server->charset);
 	
 	////////// set up a server (channel) //////////
 	
 	server->net_server = rem_net_server_new();
 	if (!server->net_server) {
 		g_set_error(err, 0, 0, "setting up the server failed");
-		g_free(server);
+		rem_player_info_destroy(server->pinfo);
+		g_slice_free(RemServer, server);
 		return NULL;
 	}
 
@@ -1015,7 +972,7 @@ rem_server_up(const RemPlayerProxy *pp, GError **err)
 	
 	////////// if needed, periodically check for player changes //////////
 
-	if (!server->pp_notifies_changes)
+	if (!pp_desc->notifies_changes)
 		g_timeout_add_full(G_PRIORITY_HIGH_IDLE,
 						   2000,
 						   &priv_cb_notify,
@@ -1024,9 +981,19 @@ rem_server_up(const RemPlayerProxy *pp, GError **err)
 	
 	LOG_INFO("server started\n");
 	
+	////////// other //////////
+	
+	server->pstatus = rem_player_status_new();
+	
+	server->pstatus_fp = rem_player_status_fp_new();
+	
+	server->net_msg_rx = rem_net_msg_new();
+	
 	////////// main loop and context management //////////
 	
-	if (pp->desc->run_main_loop) {
+	server->mc = g_main_context_default();
+
+	if (pp_desc->run_main_loop) {
 		
 		LOG_DEBUG("running main loop (blocking)\n");
 		
@@ -1034,28 +1001,16 @@ rem_server_up(const RemPlayerProxy *pp, GError **err)
 		g_main_loop_run(server->ml);
 	}
 	
-	server->mc = g_main_context_default();
-	
-	////////// other //////////
-	
-	server->net_msg_rx = rem_net_msg_new();
 	
 	return server;
 
 }
 
 void
-rem_server_notify(RemServer* server, RemNotifyFlags flags)
+rem_server_notify(RemServer* server)
 {
 	
 	g_return_if_fail(server);
-	g_return_if_fail(concl(
-			flags & REM_NF_PLAYLIST_CHANGED, server->pp_cb->get_playlist));
-	g_return_if_fail(concl(
-			flags & REM_NF_QUEUE_CHANGED, server->pp_cb->get_queue));
-
-	server->changes |= flags;	// remember all changes - this func may get called
-							// multiple times before the changes get processed
 
 	if (server->src_notify)	// already called
 		return;

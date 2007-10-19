@@ -1,5 +1,5 @@
-#ifndef SL_H_
-#define SL_H_
+#ifndef REMUCO_SL_H_
+#define REMUCO_SL_H_
 
 #ifndef REMUCO_H_
 #error "Include <remuco.h> !"
@@ -124,6 +124,17 @@ guint
 rem_sl_hash(const RemStringList *sl);
 
 /**
+ * Compares 2 string lists and returns @p TRUE if they equal.
+ * 
+ * @param sl1 a RemStringList (may be <code>NULL</code>)
+ * @param sl2 another RemStringList (may be <code>NULL</code>)
+ * 
+ * @return @p TRUE if @a sl1 and @a sl2 equal, @p FALSE otherwise
+ */
+gboolean
+rem_sl_equal(const RemStringList *sl1, const RemStringList *sl2);
+
+/**
  * Creates a copy of a RemStringList.
  * 
  * The copy is a @em real copy, i.e. the contained strings get copied too.
@@ -147,4 +158,4 @@ rem_sl_dump(const RemStringList *sl);
 
 G_END_DECLS
 
-#endif /*SL_H_*/
+#endif /*REMUCO_SL_H_*/

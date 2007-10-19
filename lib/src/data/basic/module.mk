@@ -1,4 +1,4 @@
-CDIR := remuco/data/basic
+CDIR := data/basic
 
 SRC_FILES_LOCAL := rem-il.c rem-bin.c rem-sl.c
 

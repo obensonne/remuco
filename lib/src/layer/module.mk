@@ -1,4 +1,4 @@
-CDIR := remuco/layer
+CDIR := layer
 
 SRC_FILES_LOCAL := rem-net-bt.c rem-net-io.c rem-server.c
 

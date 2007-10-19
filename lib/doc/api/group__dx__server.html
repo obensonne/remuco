@@ -26,26 +26,13 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef _RemServer&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The RemServer struct is an opaque data structure to represent a Remuco server.  <a href="#gfb5fc7c4947e92836caecf04b9f4eff2"></a><br></td></tr>
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">RemNotifyFlags</a> { <br>
-&nbsp;&nbsp;<a class="el" href="group__dx__server.html#gg0b2af3cf4d21bc4e0a984d24d85260fab610c4c2f539bdcbbd1eda9ac32ba1af">REM_NF_STATUS_CHANGED</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="group__dx__server.html#gg0b2af3cf4d21bc4e0a984d24d85260fa5dfc18337a1639f93e4726c585d3ad8d">REM_NF_PLAYLIST_CHANGED</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="group__dx__server.html#gg0b2af3cf4d21bc4e0a984d24d85260fa6e1bf0cf61722319b7148a9c8340fa79">REM_NF_QUEUE_CHANGED</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="group__dx__server.html#gg0b2af3cf4d21bc4e0a984d24d85260fa12590dacbde816aecbef6b2f2b26515d">REM_NF_ALL_CHANGED</a>
-<br>
- }</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A bitwise combination representing changes in a player.  <a href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">More...</a><br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up</a> (const <a class="el" href="structRemPlayerProxy.html">RemPlayerProxy</a> *pp, GError **err)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up</a> (const <a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> *pp_desc, const <a class="el" href="structRemPPCallbacks.html">RemPPCallbacks</a> *pp_callbacks, const <a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, GError **err)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Starts a Remuco server.  <a href="#g5d22dd4b431e9e4e0e3bcb761e535a0d"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#g108d76baf9aaa63b6775861db6a30c41">rem_server_notify</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *server, <a class="el" href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">RemNotifyFlags</a> flags)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Starts a Remuco server.  <a href="#gb6eaf56962627da75e7de7bbeaa20d58"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c">rem_server_notify</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *server)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Notifies a RemServer about changes in a player.  <a href="#g108d76baf9aaa63b6775861db6a30c41"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Notifies a RemServer about changes in a player.  <a href="#g883a194f875e02648bc9b7ea6f7a0d1c"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *rem)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Shuts down a RemServer.  <a href="#ga1ea2703916381b40dc5809a4af86973"></a><br></td></tr>
@@ -68,37 +55,6 @@ The RemLib server interface provides functions to be used by player proxies to c
 <p>
 The RemServer struct is an opaque data structure to represent a Remuco server. 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="g0b2af3cf4d21bc4e0a984d24d85260fa"></a><!-- doxytag: member="server.h::RemNotifyFlags" ref="g0b2af3cf4d21bc4e0a984d24d85260fa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">RemNotifyFlags</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-A bitwise combination representing changes in a player. 
-<p>
-<dl class="see" compact><dt><b>See also:</b></dt><dd><a class="el" href="group__dx__server.html#g108d76baf9aaa63b6775861db6a30c41">rem_server_notify()</a> </dd></dl>
-<dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="gg0b2af3cf4d21bc4e0a984d24d85260fab610c4c2f539bdcbbd1eda9ac32ba1af"></a><!-- doxytag: member="REM_NF_STATUS_CHANGED" ref="gg0b2af3cf4d21bc4e0a984d24d85260fab610c4c2f539bdcbbd1eda9ac32ba1af" args="" -->REM_NF_STATUS_CHANGED</em>&nbsp;</td><td>
-The status changed, that is one of the attributes in <a class="el" href="structRemPlayerStatus.html">RemPlayerStatus</a>. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="gg0b2af3cf4d21bc4e0a984d24d85260fa5dfc18337a1639f93e4726c585d3ad8d"></a><!-- doxytag: member="REM_NF_PLAYLIST_CHANGED" ref="gg0b2af3cf4d21bc4e0a984d24d85260fa5dfc18337a1639f93e4726c585d3ad8d" args="" -->REM_NF_PLAYLIST_CHANGED</em>&nbsp;</td><td>
-The playlist content changed. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="gg0b2af3cf4d21bc4e0a984d24d85260fa6e1bf0cf61722319b7148a9c8340fa79"></a><!-- doxytag: member="REM_NF_QUEUE_CHANGED" ref="gg0b2af3cf4d21bc4e0a984d24d85260fa6e1bf0cf61722319b7148a9c8340fa79" args="" -->REM_NF_QUEUE_CHANGED</em>&nbsp;</td><td>
-The queue content changed. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="gg0b2af3cf4d21bc4e0a984d24d85260fa12590dacbde816aecbef6b2f2b26515d"></a><!-- doxytag: member="REM_NF_ALL_CHANGED" ref="gg0b2af3cf4d21bc4e0a984d24d85260fa12590dacbde816aecbef6b2f2b26515d" args="" -->REM_NF_ALL_CHANGED</em>&nbsp;</td><td>
-Anything that can change has changed. </td></tr>
-</table>
-</dl>
 
 </div>
 </div><p>
@@ -130,11 +86,11 @@ Disconnects all clients and frees all of the memory used by a RemServer.<p>
 </dl>
 <dl class="remark" compact><dt><b>Remarks:</b></dt><dd>The function returns immediately but the shutdown process may take some more milli seconds. So please wait a bit before completely shutting down your process/app.</dd></dl>
 <dl compact><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>may be a callback <code>shutdown_finished()</code> is a good idea</dd></dl>
-<dl class="remark" compact><dt><b>Remarks:</b></dt><dd>If <a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up()</a> has been called with <em>run_main_loop</em> <code>==</code> TRUE, then <a class="el" href="group__dx__server.html#g5d22dd4b431e9e4e0e3bcb761e535a0d">rem_server_up()</a> will return as a result of calling this function. </dd></dl>
+<dl class="remark" compact><dt><b>Remarks:</b></dt><dd>If <a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up()</a> has been called with <em>run_main_loop</em> <code>==</code> TRUE, then <a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up()</a> will return as a result of calling this function. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="g108d76baf9aaa63b6775861db6a30c41"></a><!-- doxytag: member="server.h::rem_server_notify" ref="g108d76baf9aaa63b6775861db6a30c41" args="(RemServer *server, RemNotifyFlags flags)" -->
+<a class="anchor" name="g883a194f875e02648bc9b7ea6f7a0d1c"></a><!-- doxytag: member="server.h::rem_server_notify" ref="g883a194f875e02648bc9b7ea6f7a0d1c" args="(RemServer *server)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -142,18 +98,9 @@ Disconnects all clients and frees all of the memory used by a RemServer.<p>
           <td class="memname">void rem_server_notify           </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *&nbsp;</td>
-          <td class="paramname"> <em>server</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__dx__server.html#g0b2af3cf4d21bc4e0a984d24d85260fa">RemNotifyFlags</a>&nbsp;</td>
-          <td class="paramname"> <em>flags</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td width="100%"></td>
+          <td class="paramname"> <em>server</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td width="100%"></td>
         </tr>
       </table>
 </div>
@@ -162,24 +109,37 @@ Disconnects all clients and frees all of the memory used by a RemServer.<p>
 <p>
 Notifies a RemServer about changes in a player. 
 <p>
+The RemServer will later call <a class="el" href="structRemPPCallbacks.html#a366ba7d407f038534129d0ebafe666e">RemPPCallbacks::synchronize</a> to be up to date.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>server</em>&nbsp;</td><td>a RemServer </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>flags</em>&nbsp;</td><td>flags describing what changed </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>server</em>&nbsp;</td><td>a RemServer</td></tr>
   </table>
 </dl>
+<dl class="remark" compact><dt><b>Remarks:</b></dt><dd>Multiple calls to this functions in a very short time don't necessarily result in multiple calls to <a class="el" href="structRemPPCallbacks.html#a366ba7d407f038534129d0ebafe666e">RemPPCallbacks::synchronize</a>. RemLib processes the changes when the GMainLoop is some kind of idle. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="g5d22dd4b431e9e4e0e3bcb761e535a0d"></a><!-- doxytag: member="server.h::rem_server_up" ref="g5d22dd4b431e9e4e0e3bcb761e535a0d" args="(const RemPlayerProxy *pp, GError **err)" -->
+<a class="anchor" name="gb6eaf56962627da75e7de7bbeaa20d58"></a><!-- doxytag: member="server.h::rem_server_up" ref="gb6eaf56962627da75e7de7bbeaa20d58" args="(const RemPPDescriptor *pp_desc, const RemPPCallbacks *pp_callbacks, const RemPPPriv *pp_priv, GError **err)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a>* rem_server_up           </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structRemPlayerProxy.html">RemPlayerProxy</a> *&nbsp;</td>
-          <td class="paramname"> <em>pp</em>, </td>
+          <td class="paramtype">const <a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> *&nbsp;</td>
+          <td class="paramname"> <em>pp_desc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structRemPPCallbacks.html">RemPPCallbacks</a> *&nbsp;</td>
+          <td class="paramname"> <em>pp_callbacks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *&nbsp;</td>
+          <td class="paramname"> <em>pp_priv</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -201,15 +161,17 @@ Starts a Remuco server.
 <p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp</em>&nbsp;</td><td>a <a class="el" href="structRemPlayerProxy.html">RemPlayerProxy</a> </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>err</em>&nbsp;</td><td>location to return error in case something fails starting the server fails</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_desc</em>&nbsp;</td><td>Descriptor of the player proxy that starts the server. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_callbacks</em>&nbsp;</td><td>Callback functions to use by the server to interact with the player proxy. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_priv</em>&nbsp;</td><td>Player proxy private data. This will be used as first parameter for the functions in <em>pp_callbacks</em>. </td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>err</em>&nbsp;</td><td>Location to return error in case something fails starting the server fails.</td></tr>
   </table>
 </dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A RemServer which must be used as first parameter for <a class="el" href="group__dx__server.html#g108d76baf9aaa63b6775861db6a30c41">rem_server_notify()</a> and <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a>. If an error occurs <code>NULL</code> will be returned and <em>err</em> will be set. </dd></dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A RemServer which must be used as first parameter for <a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c">rem_server_notify()</a> and <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down()</a>. If an error occurs <code>NULL</code> will be returned and <em>err</em> will be set. </dd></dl>
 
 </div>
 </div><p>
-<hr size="1"><address style="align: right;"><small>Generated on Sun Oct 14 23:34:02 2007 for Remuco by&nbsp;
+<hr size="1"><address style="align: right;"><small>Generated on Fri Oct 19 16:09:49 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.1 </small></address>
 </body>

@@ -54,6 +54,9 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">guint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__RemSL.html#g21e285441ee6c6e7b15e577fa61a7d3c">rem_sl_hash</a> (const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *sl)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns a hash value of a RemStringList.  <a href="#g21e285441ee6c6e7b15e577fa61a7d3c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__RemSL.html#g03c5a3ac80a97391a6bc415f98409c7b">rem_sl_equal</a> (const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *sl1, const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *sl2)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Compares 2 string lists and returns <code>TRUE</code> if they equal.  <a href="#g03c5a3ac80a97391a6bc415f98409c7b"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__RemSL.html#g536e01e48d963c6acc7791666853a296">rem_sl_copy</a> (const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *sl)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Creates a copy of a RemStringList.  <a href="#g536e01e48d963c6acc7791666853a296"></a><br></td></tr>
@@ -263,6 +266,44 @@ Prints the content of a RemStringList to standard out.
 
 </div>
 </div><p>
+<a class="anchor" name="g03c5a3ac80a97391a6bc415f98409c7b"></a><!-- doxytag: member="stringlist.h::rem_sl_equal" ref="g03c5a3ac80a97391a6bc415f98409c7b" args="(const RemStringList *sl1, const RemStringList *sl2)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">gboolean rem_sl_equal           </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *&nbsp;</td>
+          <td class="paramname"> <em>sl1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *&nbsp;</td>
+          <td class="paramname"> <em>sl2</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td width="100%"></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Compares 2 string lists and returns <code>TRUE</code> if they equal. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>sl1</em>&nbsp;</td><td>a RemStringList (may be <code>NULL</code>) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>sl2</em>&nbsp;</td><td>another RemStringList (may be <code>NULL</code>)</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd><code>TRUE</code> if <em>sl1</em> and <em>sl2</em> equal, <code>FALSE</code> otherwise </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="g7e2b9c656caa679562dec8e5b33ec6b3"></a><!-- doxytag: member="stringlist.h::rem_sl_get" ref="g7e2b9c656caa679562dec8e5b33ec6b3" args="(const RemStringList *sl, guint index)" -->
 <div class="memitem">
 <div class="memproto">
@@ -436,7 +477,7 @@ Creates a new RemStringList.
 Use <a class="el" href="group__dx__RemSL.html#gf82809193a4f7eb82738757fa2db6247">rem_sl_destroy()</a> to free. 
 </div>
 </div><p>
-<hr size="1"><address style="align: right;"><small>Generated on Sun Oct 14 23:34:02 2007 for Remuco by&nbsp;
+<hr size="1"><address style="align: right;"><small>Generated on Fri Oct 19 16:09:49 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.1 </small></address>
 </body>
