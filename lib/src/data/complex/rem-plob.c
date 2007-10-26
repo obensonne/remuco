@@ -108,6 +108,26 @@ rem_plob_meta_get_value(const RemPlob *plob, guint index)
 	return rem_sl_get(plob->meta, index * 2 + 1);
 }
 
+void
+rem_plob_meta_iter_reset(const RemPlob *plob)
+{
+	g_return_if_fail(plob);
+	
+	rem_sl_iterator_reset(plob->meta);
+}
+
+void
+rem_plob_meta_iter_next(const RemPlob *plob,
+						const gchar **name,
+						const gchar **value)
+{
+	g_return_if_fail(plob);
+	
+	*name = rem_sl_iterator_next(plob->meta);
+	*value = rem_sl_iterator_next(plob->meta);
+}
+
+
 const gchar*
 rem_plob_meta_get(const RemPlob *plob, const gchar *name)
 {

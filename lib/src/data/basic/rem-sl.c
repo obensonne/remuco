@@ -250,17 +250,17 @@ rem_sl_destroy(RemStringList *sl)
 }
 
 void
-rem_sl_iterator_reset(RemStringList *sl)
+rem_sl_iterator_reset(const RemStringList *sl)
 {
 	g_return_if_fail(sl);
 	
-	sl->strings_iterator = sl->strings;
+	((RemStringList *) sl)->strings_iterator = sl->strings;
 }
 
 const gchar*
-rem_sl_iterator_next(RemStringList *sl)
+rem_sl_iterator_next(const RemStringList *sl)
 {
-	gchar	*s;
+	const gchar	*s;
 	
 	g_return_val_if_fail(sl, NULL);
 	
@@ -268,7 +268,9 @@ rem_sl_iterator_next(RemStringList *sl)
 	
 	s = (gchar*) sl->strings_iterator->data;
 	
-	sl->strings_iterator = sl->strings_iterator->next;
+	if G_UNLIKELY(!s) LOG_WARN("iterator fails on NULL elements\n");
+	
+	((RemStringList *) sl)->strings_iterator = sl->strings_iterator->next;
 	
 	return s;
 	

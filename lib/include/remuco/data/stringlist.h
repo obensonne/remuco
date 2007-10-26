@@ -69,12 +69,16 @@ rem_sl_clear(RemStringList *sl);
 /**
  * Resets a RemStringList its iterator.
  * 
- * Allways call this before iterating the list with rem_sl_iterator_next().
+ * <em>Allways call this before iterating the list with rem_sl_iterator_next() !
+ * </em>
  * 
  * @param sl a RemStringList
+ * 
+ * @remark The @p const decalration of @a sl means the content of the string
+ *         list, not the iterator state! 
  */ 
 void
-rem_sl_iterator_reset(RemStringList *sl);
+rem_sl_iterator_reset(const RemStringList *sl);
 
 /**
  * Iterates to the next string in a RemStringList.
@@ -84,9 +88,17 @@ rem_sl_iterator_reset(RemStringList *sl);
  * @param sl a RemStringList
  * 
  * @return the next string or <code>NULL</code> if there is no more string
+ * 
+ * @remark This iterator does not work on string lists which contain
+ *         <code>NULL</code> elements. This is because it is not clear
+ *         whether a <code>NULL</code> return indicates a <code>NULL</code>
+ *         string or the end of the list.
+ * 
+ * @remark The @p const decalration of @a sl means the content of the string
+ *         list, not the iterator state! 
  */ 
 const gchar*
-rem_sl_iterator_next(RemStringList *sl);
+rem_sl_iterator_next(const RemStringList *sl);
 
 /**
  * Returns the string of a RemStringList at the given index.

@@ -83,7 +83,7 @@ LFLAGS += $(shell pkg-config --libs $(PKG_CONFIG_REQ))
 # all object files
 OBJ_FILES := $(subst .c,.o,$(SRC_FILES))
 # all libtool object files
-OBJ_FILES_LT := $(subst .o,.lo,$($OBJ_FILES))
+OBJ_FILES_LT := $(subst .o,.lo,$(OBJ_FILES))
 
 ###############################################################################
 #

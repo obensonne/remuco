@@ -74,6 +74,16 @@ typedef struct _rem_plob RemPlob;
 RemPlob*
 rem_plob_new(const gchar *pid);
 
+/**
+ * Creates a new plob with artist and title set to 'unknown'.
+ * 
+ * @param pid the PDI of the reqeuested plob
+ * 
+ * @return the requested plob
+ * 
+ * @remark Use this function to create a plob to return if you cannot deliver a
+ *         plob requested by RemPPGetPlobFunc().
+ */
 RemPlob*
 rem_plob_new_unknown(const gchar *pid);
 
@@ -98,12 +108,30 @@ rem_plob_meta_add_const(RemPlob *p, const gchar *name, const gchar *value);
 guint
 rem_plob_meta_num(const RemPlob *plob);
 
-const gchar*
-rem_plob_meta_get_name(const RemPlob *plob, guint index);
+//const gchar*
+//rem_plob_meta_get_name(const RemPlob *plob, guint index);
+//
+//const gchar*
+//rem_plob_meta_get_value(const RemPlob *plob, guint index);
 
-const gchar*
-rem_plob_meta_get_value(const RemPlob *plob, guint index);
+void
+rem_plob_meta_iter_reset(const RemPlob *plob);
 
+/**
+ * 
+ * @remark The @p const decalration of @a plob means the content of the plob
+ *         list, not the meta information iterator state! 
+ */
+void
+rem_plob_meta_iter_next(const RemPlob *plob,
+						const gchar **name,
+						const gchar **value);
+
+/**
+ * 
+ * @remark The @p const decalration of @a plob means the content of the plob
+ *         list, not the meta information iterator state! 
+ */
 const gchar*
 rem_plob_meta_get(const RemPlob *plob, const gchar *name);
 

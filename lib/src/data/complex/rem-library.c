@@ -38,7 +38,10 @@ rem_library_clear(RemLibrary *lib)
 }
 
 void
-rem_library_append(RemLibrary *lib, gchar *plid, gchar *name, gint flags)
+rem_library_append(RemLibrary *lib,
+				   gchar *plid,
+				   gchar *name,
+				   RemPloblistFlag flags)
 {
 	g_return_if_fail(lib && plid && name);
 	
@@ -51,7 +54,7 @@ void
 rem_library_append_const(RemLibrary *lib,
 						 const gchar *plid,
 						 const gchar *name,
-						 gint flags)
+						 RemPloblistFlag flags)
 {
 	g_return_if_fail(lib && plid && name);
 	

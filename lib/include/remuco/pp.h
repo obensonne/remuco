@@ -65,7 +65,9 @@ typedef void				(*RemPPSynchronizeFunc)
  * @param[in]  pp_priv	the PP's private data
  * @param[in]  pid		the PID of the requested RemPlob
  * 
- * @return the requested RemPlob
+ * @return the requested RemPlob (must not be <code>NULL</code> -if there is no
+ *         information about the requested plob, return a dummy plob or
+ *         something like that - see rem_plob_new_unknown())
  */
 typedef RemPlob*			(*RemPPGetPlobFunc)
 	(RemPPPriv *pp_priv, const gchar *pid);
@@ -86,7 +88,8 @@ typedef RemStringList*		(*RemPPGetPloblistFunc)
  * rem_server_down().
  * 
  * @param[in]  pp_priv	the PP's private data
- * @param[in]  err		a @p GError describing the occured error
+ * @param[in]  err		a @p GError describing the occured error (you are
+ *                      responsible for freeing this error!)
  * 
  */
 typedef void				(*RemPPNotifyErrorFunc)
