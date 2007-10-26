@@ -10,20 +10,11 @@ else:
     macros = [ ('G_DISABLE_ASSERT',''), ('LOGLEVEL', 'LL_INFO') ]
     macros_off = []
 
-# use this when to compile against an installed Remuco server library
 inc_dirs = commands.getoutput("pkg-config glib-2.0 remuco --cflags").replace('-I','').split()
-#inc_dirs.append("../../lib/src")
 libs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-l").replace('-l','').split()
 lib_dirs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-L").replace('-L','').split()
-#lib_dirs.append("../../lib/src/remuco") # to build within source tree withoud installed server library
+src_files = ['module.c', 'functions.c', 'constants.c', 'types/ppdesc.c', 'types/ppcb.c', 'types/pstatus.c']
 
-# use this when to compile against the server lib within the source tree
-#inc_dirs = commands.getoutput("pkg-config glib-2.0 --cflags").replace('-I','').split()
-#inc_dirs.append("../../lib/src")
-#libs = commands.getoutput("pkg-config glib-2.0 --libs-only-l").replace('-l','').split()
-#libs.append("remuco")
-#lib_dirs = commands.getoutput("pkg-config glib-2.0 --libs-only-L").replace('-L','').split()
-#lib_dirs.append("../../lib/src/remuco")
 
 #print "libs: " + str(libs)
 
@@ -33,7 +24,7 @@ module1 = Extension('remuco',
                     include_dirs = inc_dirs,
                     libraries = libs,
                     library_dirs = lib_dirs,
-                    sources = ['binding.c'])
+                    sources = src_files)
 
 
 setup (name = 'Remuco',

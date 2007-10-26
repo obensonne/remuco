@@ -88,11 +88,11 @@ A.2. Source Code Access
    To browse the SVN repository visit:
    http://remuco.svn.sourceforge.net/viewvc/remuco
 
-   The most current code is located in 'trunk'. Note that this
+   The most current code is located in "trunk" . Note that this
    code is not always stable or in a working state. The sources
    of specific releases of the several parts of the Remuco system
-   (server library, client, ...) are located in 'tags' -- getting
-   code from 'tags' ensures to have working code.
+   (server library, client, ...) are located in "tags" -- getting
+   code from "tags" ensures to have working code.
 
    Example A-1. Check out the current development version of the
    server library into the directory remuco-lib-trunk: 
@@ -102,5 +102,5 @@ A.2. Source Code Access
    Example A-2. Check out the client source from release 0.6.0
    into the directory remuco-client-0.6.0: 
 
-   $ svn co <SVN-ROOT>/tags/remuco-client-0.6.0 \
+   $ svn co <SVN-ROOT>/tags/remuco-client-0.6.0
    remuco-client-0.6.0

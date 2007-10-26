@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# Configuraion
+# Configuration
 #
 ###############################################################################
 
@@ -16,7 +16,7 @@ PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 #
 ##############################################################################
 
-all: check-build-requirements
+all: clean .build-req
 	cd src && python setup.py build
 
 install:
@@ -34,8 +34,10 @@ dist: clean
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
 
 clean:
-	rm -rf build dist
+	#cd src && python setup.py clean
+	rm -rf build dist src/build
 	rm -f *.deb
+	rm -f .build-req
 
 ###############################################################################
 #
@@ -43,13 +45,14 @@ clean:
 #
 ##############################################################################
 
-check-build-requirements:
+.build-req:
 	@echo -n "Checking for libremuco .. "
 	@pkg-config --exists remuco > /dev/null \
 		&& echo "ok" || { echo "missing" ; false; }
 	@echo -n "Checking for python-dev .. "
 	@python-config --prefix > /dev/null \
 		&& echo "ok" || { echo "missing" ; false; }
+	touch .build-req
 
 ###############################################################################
 #
