@@ -26,7 +26,7 @@ LFLAGS += $(shell pkg-config --libs $(PKG_CONFIG_REQ))
 # debug dependent compile flags and commands
 ifneq "$(DEBUG)" ""
 CFLAGS += -O0 -g
-CFLAGS += -DLOGLEVEL=LL_DEBUG
+CFLAGS += -DLOGLEVEL=LL_NOISE
 else
 CFLAGS += -O2
 CFLAGS += -DLOGLEVEL=LL_INFO
@@ -97,6 +97,12 @@ clean:
 	fi
 	@echo
 	touch .build-req
+
+valgrind: all
+	G_SLICE=always-malloc \
+		valgrind --leak-check=yes \
+		--suppressions=valgrind-errors.suppress \
+		./remuco-xmms2
 
 ###############################################################################
 #
