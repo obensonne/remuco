@@ -7,6 +7,8 @@
 DEBUG ?= yes
 PREFIX ?= /usr
 
+X2_CONFIG_DIR := $(HOME)/.config
+
 PKG_VERSION := 0.6.0
 PKG_BASENAME := remuco-xmms2
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
@@ -47,7 +49,8 @@ remuco-xmms2: remuco-xmms2.o
 	chmod +x remuco-xmms2
 
 install:
-	install remuco-xmms2 $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
+	install remuco-xmms2 $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-xmms2
