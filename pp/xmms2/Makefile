@@ -28,7 +28,8 @@ LFLAGS += $(shell pkg-config --libs $(PKG_CONFIG_REQ))
 # debug dependent compile flags and commands
 ifneq "$(DEBUG)" ""
 CFLAGS += -O0 -g
-CFLAGS += -DLOGLEVEL=LL_NOISE
+#CFLAGS += -DLOGLEVEL=LL_NOISE
+CFLAGS += -DLOGLEVEL=LL_DEBUG
 else
 CFLAGS += -O2
 CFLAGS += -DLOGLEVEL=LL_INFO
@@ -104,6 +105,7 @@ clean:
 valgrind: all
 	G_SLICE=always-malloc \
 		valgrind --leak-check=yes \
+		--gen-suppressions=no \
 		--suppressions=valgrind-errors.suppress \
 		./remuco-xmms2
 
