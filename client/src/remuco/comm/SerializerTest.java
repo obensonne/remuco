@@ -78,7 +78,7 @@ public class SerializerTest extends TestCase {
 		p.setMeta("ich", null);
 		p.setRating(3);
 		
-		m.id = Message.ID_IFS_CURPLOB;
+		m.id = Message.ID_IFS_CAP;
 		m.sd = p.sdGet();
 		
 		srz.sd2bd(m);

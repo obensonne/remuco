@@ -11,7 +11,15 @@ import remuco.util.Log;
  */
 public final class Library implements IStructuredData {
 
-	public static final int FLAG_EDITABLE = 0x0001;
+	public static final int FLAG_STATIC = 0;
+	
+	public static final int FLAG_EDITABLE = 1 << 0;
+	
+	public static final int FLAG_DYNAMIC = 1 << 1;
+	
+	public static final int FLAG_STREAM = 1 << 2;
+	
+	public static final int FLAG_WEIRD = 1 << 3;
 
 	public static final int[] sdFormatVector = new int[] { DT_SV, 2, DT_IV, 1 };
 
@@ -50,7 +58,7 @@ public final class Library implements IStructuredData {
 
 	public Object[] sdGet() {
 
-		Log.asssertNotReached();
+		Log.asssertNotReached(this);
 
 		return null;
 
@@ -62,19 +70,19 @@ public final class Library implements IStructuredData {
 
 		flags = (int[][]) bdv[1];
 
-//		if (plidsAndNames[0] == null || plidsAndNames[1] == null
-//				|| flags[0] == null) {
-//			throw new BinaryDataExecption("some library attributes are null");
-//		}
-//		if (plidsAndNames[0].length != plidsAndNames[1].length
-//				|| plidsAndNames[0].length != flags[0].length) {
-//			throw new BinaryDataExecption(
-//					"some library attributes format error");
-//		}
+		// if (plidsAndNames[0] == null || plidsAndNames[1] == null
+		// || flags[0] == null) {
+		// throw new BinaryDataExecption("some library attributes are null");
+		// }
+		// if (plidsAndNames[0].length != plidsAndNames[1].length
+		// || plidsAndNames[0].length != flags[0].length) {
+		// throw new BinaryDataExecption(
+		// "some library attributes format error");
+		// }
 
 	}
 
-	 public String toString() {
+	public String toString() {
 
 		StringBuffer sb = new StringBuffer("Library: ");
 

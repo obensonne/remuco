@@ -41,7 +41,7 @@ public final class Serializer {
 	 */
 	protected synchronized void bd2sd(Message m) throws BinaryDataExecption {
 
-		Log.asssert(m != null && m.sd == null);
+		Log.asssert(this, m != null && m.sd == null);
 
 		if (m.bd == null)
 			return;
@@ -70,7 +70,7 @@ public final class Serializer {
 	 */
 	protected synchronized void sd2bd(Message m) {
 
-		Log.asssert(m != null && m.bd == null);
+		Log.asssert(this, m != null && m.bd == null);
 
 		if (m.sd == null)
 
@@ -95,7 +95,7 @@ public final class Serializer {
 	 * @return the size of the following subdata
 	 * @throws BinaryDataExecption
 	 *             if type, count or size could not be read because the are not
-	 *             enoug bytes availbale in <code>bis</code> or if there are
+	 *             enough bytes availbale in <code>bis</code> or if there are
 	 *             less bytes in <code>bis</code> available than the read size
 	 * 
 	 */
@@ -112,7 +112,7 @@ public final class Serializer {
 
 		size = bis.readInt();
 
-		Log.ln("[SR] " + size + " bytes (" + bis.available() + " remaining)");
+		Log.debug("[SR] " + size + "B (" + bis.available() + "B remaining)");
 
 		if (size > bis.available())
 			throw new BinaryDataExecption("not enough data");
@@ -129,9 +129,11 @@ public final class Serializer {
 		String[][] svv;
 		byte[][] bav;
 
+		Log.debug("--- SERIALIZE START ---");
+
 		bos.reset();
 
-		Log.asssert(dataStruct.length == dsfv.length / 2);
+		Log.asssert(this, dataStruct.length == dsfv.length / 2);
 
 		n = dsfv.length / 2;
 		for (i = 0; i < n; i++) {
@@ -139,7 +141,7 @@ public final class Serializer {
 			dt = dsfv[2 * i];
 			dc = dsfv[2 * i + 1];
 
-			Log.ln("[SR] serialize dt " + dt + " (" + dc + " times)");
+			Log.debug("[SR] serialize dt " + dt + " (" + dc + " times)");
 
 			serializePrepare(dt, dc);
 
@@ -147,7 +149,7 @@ public final class Serializer {
 			case IStructuredData.DT_BA:
 
 				bav = (byte[][]) dataStruct[i];
-				Log.asssert(bav.length == dc);
+				Log.asssert(this, bav.length == dc);
 
 				for (j = 0; j < bav.length; j++) {
 					bos.writeBa(bav[j]);
@@ -157,7 +159,7 @@ public final class Serializer {
 			case IStructuredData.DT_INT:
 
 				iv = (int[]) dataStruct[i];
-				Log.asssert(iv.length == dc);
+				Log.asssert(this, iv.length == dc);
 
 				for (j = 0; j < iv.length; j++) {
 					bos.writeInt(iv[j]);
@@ -166,14 +168,14 @@ public final class Serializer {
 				break;
 			case IStructuredData.DT_IV:
 
-				Log.ln("BUG: need IV serialization");
+				Log.ln("[SR] BUG: need IV serialization");
 				// TODO: implement IV serialization
 
 				break;
 			case IStructuredData.DT_STR:
 
 				sv = (String[]) dataStruct[i];
-				Log.asssert(sv.length == dc);
+				Log.asssert(this, sv.length == dc);
 
 				bos.write(sv, false);
 
@@ -181,7 +183,7 @@ public final class Serializer {
 			case IStructuredData.DT_SV:
 
 				svv = (String[][]) dataStruct[i];
-				Log.asssert(svv.length == dc);
+				Log.asssert(this, svv.length == dc);
 
 				for (j = 0; j < svv.length; j++) {
 
@@ -193,7 +195,7 @@ public final class Serializer {
 
 			default:
 
-				Log.asssertNotReached();
+				Log.asssertNotReached(this);
 				break;
 			}
 
@@ -202,6 +204,8 @@ public final class Serializer {
 			// serialize(bos)
 
 		}
+
+		Log.debug("--- SERIALIZE END ---");
 
 		return bos.toByteArray();
 	}
@@ -216,7 +220,9 @@ public final class Serializer {
 
 		int size = bos.size() - markerDataStart;
 
-		Log.ln("  [SR] finish -  write " + size + " at " + markerDataSizePos);
+		Log
+				.debug("  [SR] finish -  write " + size + " at "
+						+ markerDataSizePos);
 
 		bos.writeIntAt(size, markerDataSizePos);
 
@@ -235,7 +241,7 @@ public final class Serializer {
 	 */
 	private void serializePrepare(int dt, int dc) {
 
-		Log.ln("  [SR] prepate - write at " + bos.size());
+		Log.debug("  [SR] prepare - write at " + bos.size());
 
 		bos.write(dt);
 		bos.write(dc);
@@ -249,7 +255,7 @@ public final class Serializer {
 	private Object[] unserialize(int[] dsfv, byte[] dataBin)
 			throws BinaryDataExecption {
 
-		Log.ln("--- UNSERIALIZE ---");
+		Log.debug("--- UNSERIALIZE START ---");
 
 		int i, j, n, dt, dc, ds;
 		Object[] bdv;
@@ -257,7 +263,7 @@ public final class Serializer {
 
 		bis = new BaIn(dataBin);
 
-		Log.asssert(dsfv.length % 2 == 0);
+		Log.asssert(this, dsfv.length % 2 == 0);
 
 		n = dsfv.length / 2;
 
@@ -303,7 +309,7 @@ public final class Serializer {
 			case IStructuredData.DT_IV:
 
 				int[][] ivv = new int[dc][];
-				
+
 				for (j = 0; j < ivv.length; j++) {
 					ivv[j] = bis.readIntV();
 				}
@@ -334,13 +340,15 @@ public final class Serializer {
 
 			default:
 
-				Log.asssertNotReached();
+				Log.asssertNotReached(this);
 				break;
 			}
 
 			// serialize(bos)
 
 		}
+
+		Log.debug("--- UNSERIALIZE END ---");
 
 		return bdv;
 

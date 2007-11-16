@@ -136,18 +136,17 @@ public final class BaOut extends ByteArrayOutputStream {
 			m = count;
 		}
 
-		Log.asssert(sv);
+		Log.asssert(this, sv);
 
 		write(Tools.defaultEncoding);
 
 		for (i = 0; i < sv.length; i++) {
 
 			write(sv[i]);
-
 		}
 
 		if (withNullPointerFlag) {
-			Log.ln("[BO] write sv size (" + (count - m) + ") at " + (m - 4));
+			
 			writeIntAt(count - m, m - 4);
 		}
 
@@ -182,7 +181,7 @@ public final class BaOut extends ByteArrayOutputStream {
 	 */
 	public void writeIntAt(int i, int at) {
 
-		Log.asssert(at + 4 <= count);
+		Log.asssert(this, at + 4 <= count);
 
 		int m = count;
 

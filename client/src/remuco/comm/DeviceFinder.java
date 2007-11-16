@@ -101,13 +101,13 @@ public final class DeviceFinder implements DiscoveryListener {
 
 	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
 
-		Log.asssertNotReached();
+		Log.asssertNotReached(this);
 
 	}
 
 	public void serviceSearchCompleted(int arg0, int arg1) {
 
-		Log.asssertNotReached();
+		Log.asssertNotReached(this);
 
 	}
 
@@ -141,7 +141,7 @@ public final class DeviceFinder implements DiscoveryListener {
 			agent = localDevice.getDiscoveryAgent();
 		}
 
-		Log.asssert(agent);
+		Log.asssert(this, agent);
 
 		try {
 			agent.startInquiry(DiscoveryAgent.GIAC, this);

@@ -3,7 +3,7 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.ui.Theme;
 
 public final class StateScreeny extends Screeny {
@@ -26,7 +26,7 @@ public final class StateScreeny extends Screeny {
 
 	protected void dataUpdated() {
 
-		State s = (State) data;
+		Status s = (Status) data;
 
 		screenyState.updateData(s);
 		screenyRepeat.updateData(s);
@@ -41,8 +41,8 @@ public final class StateScreeny extends Screeny {
 
 		Image borderLeft, borderRight;
 
-		borderLeft = theme.getImg(Theme.IMGID_STATE_BORDER_LEFT);
-		borderRight = theme.getImg(Theme.IMGID_STATE_BORDER_RIGHT);
+		borderLeft = theme.getImg(Theme.IMGID_STATUS_BORDER_LEFT);
+		borderRight = theme.getImg(Theme.IMGID_STATUS_BORDER_RIGHT);
 
 		setImage(Image.createImage(width, borderLeft.getHeight()));
 

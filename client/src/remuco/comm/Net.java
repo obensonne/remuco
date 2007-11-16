@@ -67,7 +67,7 @@ public final class Net {
 
 	protected boolean isUp() {
 
-		Log.asssert((sc == null && dis == null && dos == null)
+		Log.asssert(this, (sc == null && dis == null && dos == null)
 				|| (sc != null && dis != null && dos != null));
 
 		return sc != null && dis != null && dos != null;
@@ -85,8 +85,8 @@ public final class Net {
 	 */
 	protected int recv(Message m) {
 
-		Log.asssert(sc != null && dis != null && dos != null);
-		Log.asssert(m.bd == null && m.sd == null);
+		Log.asssert(this, sc != null && dis != null && dos != null);
+		Log.asssert(this, m.bd == null && m.sd == null);
 
 		int size, skipped;
 
@@ -100,16 +100,16 @@ public final class Net {
 			m.id = dis.readInt();
 			size = dis.readInt();
 
-			Log.debug("[NT] rxed message (ID " + m.id + ", SIZE " + size + ")");
+			Log.debug("[NT] rxed msg " + m.id + "(" + size + "B)");
 
 			if (size > 0) {
 
 				try {
-					m.bd = new byte[size];
+					m.bd = new byte[size]; // this may throw OutOfMemoryError
 					dis.readFully(m.bd);
 				} catch (OutOfMemoryError e) {
-					Log.ln("[NT] out of memory, must discard incoming data ("
-							+ size + " bytes)");
+					Log.ln("[NT] out of memory, discard incoming data (" + size
+							+ "B)");
 					while (size > 0) {
 						Tools.sleep(100);
 						skipped = (int) dis.skip(size);
@@ -147,7 +147,7 @@ public final class Net {
 	 */
 	protected int send(Message m) {
 
-		Log.asssert(sc != null && dis != null && dos != null);
+		Log.asssert(this, sc != null && dis != null && dos != null);
 
 		Log.ln("[NT] will now send data (" + m.bd.length + " bytes)");
 
@@ -157,6 +157,7 @@ public final class Net {
 			dos.writeInt(m.bd.length);
 			dos.write(m.bd);
 			dos.write(IO_SUFFIX);
+			dos.flush();
 			m.bd = null;
 		} catch (IOException e) {
 			m.bd = null;
@@ -172,6 +173,8 @@ public final class Net {
 	/**
 	 * Set up the net. The net must be down (see {@link #down()}) to call this
 	 * method.
+	 * <p>
+	 * This method receives the <i>HELLO</i> message from the server.
 	 * 
 	 * @param sc
 	 *            the {@link StreamConnection} to use for communication
@@ -187,8 +190,8 @@ public final class Net {
 	 */
 	protected int up(StreamConnection sc) throws UserException {
 
-		Log.asssert(sc);
-		Log.asssert(this.sc == null && dis == null && dos == null);
+		Log.asssert(this, sc);
+		Log.asssert(this, this.sc == null && dis == null && dos == null);
 
 		final byte[] ba = new byte[IO_PREFIX.length + PROTO_VER_BA.length
 				+ IO_SUFFIX.length];
@@ -223,9 +226,7 @@ public final class Net {
 
 			} catch (IOException e) {
 
-				Log
-						.ln("[NT] waiting for hello message failed: "
-								+ e.toString());
+				Log.ln("[NT] waiting for hello msg failed: " + e.toString());
 				down();
 				return -1;
 			}
@@ -238,7 +239,7 @@ public final class Net {
 
 		if (n < ba.length) {
 
-			Log.ln("[NT] not enough data for hello message (need " + ba.length
+			Log.ln("[NT] not enough data for hello msg (need " + ba.length
 					+ " bytes, only " + n + " available)");
 			down();
 			return -1;
@@ -255,7 +256,7 @@ public final class Net {
 			if (readAndCompare(PROTO_VER_BA) < 0) {
 				down();
 				throw new UserException("Connecting failed",
-						"The server has a different Remuco protocol version.");
+						"The server has a different protocol version.");
 			}
 			if (readAndCompare(IO_SUFFIX) < 0) {
 				Log.ln("[NT] IO suffix differs");
@@ -264,7 +265,7 @@ public final class Net {
 			}
 
 		} catch (IOException e) {
-			Log.ln("[NT] receiving hello message failed: " + e.getMessage());
+			Log.ln("[NT] rxing hello msg failed: " + e.getMessage());
 			down();
 			return -1;
 		}

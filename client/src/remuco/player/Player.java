@@ -27,7 +27,7 @@ public final class Player implements IMessageReceiver {
 
 	public final PlobList queue = new PlobList(PlobList.PLID_QUEUE, null);
 
-	public final State state = new State();
+	public final Status state = new Status();
 
 	private ICurrentPlobListener currentPlobListener;
 
@@ -169,7 +169,7 @@ public final class Player implements IMessageReceiver {
 
 		switch (m.id) {
 
-		case Message.ID_IFS_CURPLOB:
+		case Message.ID_IFS_CAP:
 
 			if (m.sd != null) {
 				thePlob.sdSet(m.sd);
@@ -305,7 +305,7 @@ public final class Player implements IMessageReceiver {
 
 	/**
 	 * Registers <code>sl</code> to get notified when the state (see
-	 * {@link State}) has changed.
+	 * {@link Status}) has changed.
 	 */
 	public void registerStateListener(IStateListener sl) {
 

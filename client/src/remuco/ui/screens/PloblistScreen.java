@@ -3,6 +3,8 @@ package remuco.ui.screens;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -33,6 +35,8 @@ public final class PloblistScreen extends List implements CommandListener,
 
 	private final PlobInfoScreen screenPlobInfo;
 
+	private final Alert alertUpdate;
+	
 	private Command selectCommand;
 
 	/**
@@ -61,6 +65,10 @@ public final class PloblistScreen extends List implements CommandListener,
 		screenPlobInfo = new PlobInfoScreen();
 		screenPlobInfo.addCommand(UI.CMD_BACK);
 		screenPlobInfo.setCommandListener(this);
+		
+		alertUpdate = new Alert("Info");
+		alertUpdate.setString("Updating list..");
+		alertUpdate.setType(AlertType.INFO);
 
 	}
 
@@ -177,6 +185,10 @@ public final class PloblistScreen extends List implements CommandListener,
 
 		this.pl = pl;
 
+		if (isShown()) {
+			display.setCurrent(alertUpdate, this);
+		}
+		
 		deleteAll();
 
 		setTitle(pl.getName());

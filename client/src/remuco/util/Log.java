@@ -8,36 +8,36 @@ public final class Log {
 
 	private static final int PACKSEP = ".".charAt(0);
 
-	public static void asssert(boolean b) {
+	public static void asssert(Object o, boolean b) {
 
 		if (!b) {
-			ln("[ASSERTION FAILED]");
+			ln(o, "[ASSERTION FAILED]");
 		}
 
 	}
 
-	public static void asssert(long l) {
+	public static void asssert(Object o, long l) {
 
 		if (l == 0)
-			ln("[ASSERTION FAILED]");
+			ln(o, "[ASSERTION FAILED]");
 
 	}
 
-	public static void asssert(Object o) {
+	public static void asssert(Object o, Object ob) {
 
-		if (o == null)
-			ln("[ASSERTION FAILED]");
+		if (ob == null)
+			ln(o, "[ASSERTION FAILED]");
 
 	}
 
-	public static void asssertNotReached() {
+	public static void asssertNotReached(Object o) {
 
-		asssert(false);
+		asssert(o, false);
 
 	}
 
 	public static void debug(String msg) {
-		out.println(msg);
+		//out.println(msg);
 	}
 
 	/**

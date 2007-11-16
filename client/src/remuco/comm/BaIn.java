@@ -140,7 +140,7 @@ public final class BaIn extends ByteArrayInputStream {
 		try {
 			return readString(null);
 		} catch (UnsupportedEncodingException e) {
-			Log.asssertNotReached();
+			Log.asssertNotReached(this);
 			return null;
 		}
 

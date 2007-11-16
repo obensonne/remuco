@@ -282,7 +282,7 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 
 		} else if (c == WaitingScreen.CMD_CANCEL) {
 
-			// user canceled connectiion setup
+			// user canceled connection setup
 
 			cc.disconnect();
 
@@ -402,7 +402,8 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 
 		case EVENT_CONNECTING:
 
-			screenConnecting.setMessage(msg);
+			//screenConnecting.setMessage(msg); TODO change this
+			screenConnecting.setMessage("Lost connection. Reconnect..");
 			screenConnecting.setCancable(true);
 
 			display.setCurrent(screenConnecting);
@@ -419,7 +420,7 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 
 		default:
 
-			Log.asssertNotReached();
+			Log.asssertNotReached(this);
 
 			break;
 		}
@@ -449,13 +450,13 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 		int action = Keys.getActionForKey(key);
 		int rating;
 
-		Log.debug("[PLSC] pressed key "
-				+ screenMain.getKeyName(key)
-				+ " (id "
-				+ key
-				+ ") -> "
-				+ (action != Keys.ACTION_NOOP ? Keys.actionNames[action]
-						: "no action") + " (id " + action + ")");
+//		Log.debug("[UI] pressed key "
+//				+ screenMain.getKeyName(key)
+//				+ " (id "
+//				+ key
+//				+ ") -> "
+//				+ (action != Keys.ACTION_NOOP ? Keys.actionNames[action]
+//						: "no action") + " (id " + action + ")");
 
 		switch (action) {
 		case Keys.ACTION_VOLUP:

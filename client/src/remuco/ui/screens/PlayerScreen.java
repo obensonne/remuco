@@ -6,7 +6,7 @@ import javax.microedition.lcdui.Graphics;
 import remuco.Remuco;
 import remuco.player.Info;
 import remuco.player.Plob;
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.ui.IKeyListener;
 import remuco.ui.Theme;
 import remuco.ui.screenies.PlobScreeny;
@@ -73,7 +73,7 @@ public final class PlayerScreen extends Canvas {
 	 * @param state
 	 *            then new state to show
 	 */
-	public void updateState(State state) {
+	public void updateState(Status state) {
 
 		screenyState.updateData(state);
 		repaint(screenyState.getX(), screenyState.getY(), screenyState

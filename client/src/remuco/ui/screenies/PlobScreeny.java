@@ -6,7 +6,6 @@ import javax.microedition.lcdui.Image;
 import remuco.player.Info;
 import remuco.player.Plob;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 public final class PlobScreeny extends Screeny {
 

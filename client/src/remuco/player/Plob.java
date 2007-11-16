@@ -26,35 +26,54 @@ import remuco.util.Tools;
 
 public final class Plob implements IStructuredData {
 
-	public static final String META_ALBUM = "Album";
+	public static final String META_ALBUM = "album";
 
-	public static final String META_ARTIST = "Artist";
+	public static final String META_ARTIST = "artist";
 
-	public static final String META_BITRATE = "Bitrate";
+	public static final String META_BITRATE = "bitrate";
 
-	public static final String META_COMMENT = "Comment";
+	public static final String META_COMMENT = "comment";
 
-	public static final String META_GENRE = "Genre";
+	public static final String META_GENRE = "genre";
 
-	public static final String META_LENGTH = "Length";
+	public static final String META_LENGTH = "length";
 
-	public static final String META_TAGS = "Tags";
+	public static final String META_TAGS = "tags";
 
-	public static final String META_TITLE = "Title";
+	public static final String META_TITLE = "title";
 
-	public static final String META_TRACK = "Track";
+	public static final String META_TRACK = "track";
 
-	public static final String META_YEAR = "Year";
+	public static final String META_YEAR = "year";
+
+	private static final String META_RATING = "rating";
+
+	/** Type of the plob, e.g. 'song', 'video', 'photo', ... */
+	private static final String META_TYPE = "__type__";
+
+	/** Meta information value for REM_PLOB_META_TYPE */
+	private static final String META_TYPE_AUDIO = "audio";
+
+	/** Meta information value for REM_PLOB_META_TYPE */
+	private static final String META_TYPE_VIDEO = "video";
+
+	/** Meta information value for REM_PLOB_META_TYPE */
+	private static final String META_TYPE_OTHER = "other";
+
+	public static final int TYPE_AUDIO = 1;
+
+	public static final int TYPE_VIDEO = 2;
+
+	public static final int TYPE_OTHER = 3;
+
+	// META_ART = "__art__" is not needed by the client;
+
+	public static final String META_ANY = "__any__";
 
 	public static final String PID_ANY = "__XXX__";
 
 	public static final int[] sdFormatVector = new int[] { DT_STR, 1, DT_SV, 1,
 			DT_BA, 1 };
-
-	private static final String META_RATING = "Rating";
-
-	/** Type of the plob, e.g. 'song', 'video', 'photo', ... */
-	private static final String META_TYPE = "Type";
 
 	private Image img;
 
@@ -210,16 +229,25 @@ public final class Plob implements IStructuredData {
 	}
 
 	/**
-	 * Get the plob's type. Returns the value of the meta information '{@value #META_TYPE}'
-	 * or 'song' if no type is given (because this is correct in most cases).
+	 * Get the plob's type. The type is given by the meta information '{@value #META_TYPE}'.
+	 * If this meta information is not present, it is assumed that the plob is
+	 * an audio track.
 	 * 
-	 * @return the type string
+	 * @return the type (one of {@value #META_TYPE_AUDIO},
+	 *         {@value #META_TYPE_VIDEO} or {@value #TYPE_OTHER}).
 	 */
-	public String getType() {
+	public int getType() {
 
 		String s = getMeta(META_TYPE);
 
-		return s.length() > 0 ? s : "song";
+		if (s.equals(META_TYPE_AUDIO))
+			return TYPE_AUDIO;
+		if (s.equals(META_TYPE_VIDEO))
+			return TYPE_VIDEO;
+		if (s.equals(META_TYPE_OTHER))
+			return TYPE_OTHER;
+		
+		return TYPE_AUDIO;
 
 	}
 
@@ -283,7 +311,7 @@ public final class Plob implements IStructuredData {
 
 		if (Remuco.EMULATION) {
 			try {
-				img = Image.createImage("/Korama/cover.png");
+				img = Image.createImage("/cover.test.png");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

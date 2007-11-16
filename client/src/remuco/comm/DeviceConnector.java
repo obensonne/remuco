@@ -87,8 +87,8 @@ public final class DeviceConnector extends RemoteDevice implements
 	 */
 	protected void createNetConnection() throws UserException {
 
-		Log.asssert(!connecting && !searchingServices);
-		Log.asssert(net == null || !net.isUp());
+		Log.asssert(this, !connecting && !searchingServices);
+		Log.asssert(this, net == null || !net.isUp());
 
 		connecting = true;
 
@@ -122,7 +122,7 @@ public final class DeviceConnector extends RemoteDevice implements
 	 */
 	protected Net getNetConnection() throws UserException {
 
-		Log.asssert(connecting);
+		Log.asssert(this, connecting);
 
 		int n;
 		ServiceRecord sr;
@@ -206,19 +206,19 @@ public final class DeviceConnector extends RemoteDevice implements
 
 	public void deviceDiscovered(RemoteDevice arg0, DeviceClass arg1) {
 
-		Log.asssertNotReached();
+		Log.asssertNotReached(this);
 
 	}
 
 	public void inquiryCompleted(int arg0) {
 
-		Log.asssertNotReached();
+		Log.asssertNotReached(this);
 
 	}
 
 	public void serviceSearchCompleted(int transID, int respCode) {
 
-		Log.asssert(searchingServices);
+		Log.asssert(this, searchingServices);
 
 		Log.ln("[DC] Service search finished. Return code: " + respCode);
 
@@ -232,7 +232,7 @@ public final class DeviceConnector extends RemoteDevice implements
 
 	public void servicesDiscovered(int transId, ServiceRecord[] srs) {
 
-		Log.asssert(searchingServices);
+		Log.asssert(this, searchingServices);
 
 		int n = srs.length;
 		synchronized (serviceRecords) {

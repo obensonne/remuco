@@ -3,7 +3,7 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.ui.Theme;
 
 public final class VolumeScreeny extends Screeny {
@@ -22,7 +22,7 @@ public final class VolumeScreeny extends Screeny {
 
 	protected void dataUpdated() {
 
-		volume = ((State) data).getVolume();
+		volume = ((Status) data).getVolume();
 
 		if (volume < 0)
 			volume = 0;
@@ -35,10 +35,10 @@ public final class VolumeScreeny extends Screeny {
 
 		int w, h;
 
-		imgLeft = theme.getImg(Theme.IMGID_STATE_VOLUME_LEFT);
-		imgOn = theme.getImg(Theme.IMGID_STATE_VOLUME_ON);
-		imgOff = theme.getImg(Theme.IMGID_STATE_VOLUME_OFF);
-		imgRight = theme.getImg(Theme.IMGID_STATE_VOLUME_RIGHT);
+		imgLeft = theme.getImg(Theme.IMGID_STATUS_VOLUME_LEFT);
+		imgOn = theme.getImg(Theme.IMGID_STATUS_VOLUME_ON);
+		imgOff = theme.getImg(Theme.IMGID_STATUS_VOLUME_OFF);
+		imgRight = theme.getImg(Theme.IMGID_STATUS_VOLUME_RIGHT);
 
 		resolution = width - imgLeft.getWidth() - imgRight.getWidth();
 

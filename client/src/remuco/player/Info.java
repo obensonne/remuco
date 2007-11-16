@@ -15,115 +15,71 @@ public final class Info implements IStructuredData {
 	 */
 	public static final Info EMULATOR = newEmulatorInfo();
 
-	/**
-	 * Means the player proxy can give us a playlist of the player.
-	 */
-	public static final int FEATURE_PLAYLIST = 0x0001;
+	/** Inspect the current playlist */
+	public static final int FEATURE_PLAYLIST = 1 << 0;
+
+	/** Edit the current playlist. <b>FUTURE FEATURE !</b> */
+	public static final int FEATURE_PLAYLIST_EDIT = 1 << 1;
+
+	/** Jump to a specific song in the current playlist */
+	public static final int FEATURE_PLAYLIST_JUMP = 1 << 2;
+
+	/** Show repeat and shuffle status */
+	public static final int FEATURE_REPEAT_MODE_PLOB = 1 << 3;
+
+	public static final int FEATURE_REPEAT_MODE_ALBUM = 1 << 4;
+
+	public static final int FEATURE_REPEAT_MODE_PL = 1 << 5;
+
+	public static final int FEATURE_SHUFFLE_MODE = 1 << 6;
+
+	/** Inspect the play queue */
+	public static final int FEATURE_QUEUE = 1 << 7;
+
+	/** Edit the play queue. <i>FUTURE FEATURE</i> */
+	public static final int FEATURE_QUEUE_EDIT = 1 << 8;
+
+	/** Jump to a specific song in the play queue */
+	public static final int FEATURE_QUEUE_JUMP = 1 << 9;
+
+	/** Edit the meta information of plobs */
+	public static final int FEATURE_PLOB_EDIT = 1 << 10;
+
+	public static final int FEATURE_PLOB_TAGS = 1 << 11;
+
+	/** Seek to position within the current plob. <b>FUTURE FEATURE !</b> */
+	public static final int FEATURE_SEEK = 1 << 12;
+
+	/** Rate plobs */
+	public static final int FEATURE_RATE = 1 << 13;
+
+	/** <b>FUTURE FEATURE !</b> */
+	public static final int FEATURE_PLAY_NEXT = 1 << 14;
+
+	/** Search plobs. <b>FUTURE FEATURE !</b> */
+	public static final int FEATURE_SEARCH = 1 << 15;
+
+	/** Show predefined ploblists and make them the new playlist */
+	public static final int FEATURE_LIBRARY = 1 << 16;
+
+	/** Show content of a predefined ploblist */
+	public static final int FEATURE_LIBRARY_PL_CONTENT = 1 << 17;
 
 	/**
-	 * The PP is able to replace the content of the playlist by a new list of
-	 * plobs.
-	 * <p>
-	 * <b>FUTURE FEATURE !</b> (not yet implemented)
+	 * Play a certain ploblists.
+	 * 
+	 * @deprecated Redundant since this is required if {@link #FEATURE_LIBRARY}
+	 *             is set.
 	 */
-	public static final int FEATURE_PLAYLIST_EDIT = 0x0002;
+	public static final int FEATURE_LIBRARY_PL_PLAY = 1 << 18;
 
-	/**
-	 * The PP can jump to a specific position within the playlist.
-	 */
-	public static final int FEATURE_PLAYLIST_JUMP = 0x0004;
-
-	/**
-	 * The player has a repeat mode which repeats the current plob and the PP
-	 * supports this.
-	 */
-	public static final int FEATURE_PLAYLIST_MODE_REPEAT_ONE_PLOB = 0x0008;
-
-	/**
-	 * The player has a repeat mode which repeats the current album and the PP
-	 * supports this.
-	 */
-	public static final int FEATURE_PLAYLIST_MODE_REPEAT_ALBUM = 0x0010;
-
-	/**
-	 * The player has a repeat mode which repeats the whole playlist and the PP
-	 * supports this.
-	 */
-	public static final int FEATURE_PLAYLIST_MODE_REPEAT_PLAYLIST = 0x0020;
-
-	/**
-	 * The player has a shuffle mode and the PP supports this.
-	 */
-	public static final int FEATURE_PLAYLIST_MODE_SHUFFLE = 0x0040;
-
-	/**
-	 * The player has a queue and the PP can read the queue contents.
-	 */
-	public static final int FEATURE_QUEUE = 0x0080;
-
-	/**
-	 * The PP is able to replace the content of the queue by a new list of
-	 * plobs.
-	 * <p>
-	 * <b>FUTURE FEATURE !</b> (not yet implemented)
-	 */
-	public static final int FEATURE_QUEUE_EDIT = 0x0100;
-
-	/**
-	 * The PP can jump to a specific position within the queue.
-	 */
-	public static final int FEATURE_QUEUE_JUMP = 0x0200;
-
-	/**
-	 * The PP can alter the meta information of a plob.
-	 */
-	public static final int FEATURE_PLOB_EDIT = 0x0400;
-
-	/**
-	 * The player supports tags (e.g. as in XMMS2) and the PP supports this.
-	 */
-	public static final int FEATURE_PLOB_TAGS = 0x0800;
-
-	/**
-	 * The PP can seek to a specific postion within the current song.
-	 * <p>
-	 * <b>FUTURE FEATURE !</b> (not yet implemented)
-	 */
-	public static final int FEATURE_SEEK = 0x1000;
-
-	/**
-	 * The player supports rating and the PP supports this.
-	 */
-	public static final int FEATURE_RATE = 0x2000;
-
-	/**
-	 * The PP is able to use a specifc plob as the 'play next candidate'. This
-	 * is used for votings to play a specific plob after the current without
-	 * rumbeling the playlist too much. The plob may change often before it
-	 * acutally should get played (i.e. when the current song finishes).
-	 * <p>
-	 * <b>FUTURE FEATURE !</b> (not yet implemented)
-	 */
-	public static final int FEATURE_PLAY_NEXT_CANDIDATE = 0x4000;
-
-	/**
-	 * The player supports searching for certain plobs and the PP supports this.
-	 * <p>
-	 * <b>FUTURE FEATURE !</b> (not yet implemented)
-	 */
-	public static final int FEATURE_SEARCH = 0x8000;
-
-	/**
-	 * The player and player proxy can provide a library, i.e. a list of preset
-	 * ploblists and these ploblists can be loaded to be the new playlist.
-	 */
-	public static final int FEATURE_LIBRARY = 0x10000;
-	public static final int FEATURE_LIBRARY_PLOBLIST_CONTENT = 0x20000;
+	/** Edit any ploblist (not only playlist or queue). */
+	public static final int FEATURE_PLOBLIST_EDIT = 1 << 19;
 
 	public static final Info UNKNOWN = new Info();
 
 	public static final int[] sdFormatVector = new int[] { DT_STR, 1, DT_INT,
-			3, DT_BA, 1 };
+			2, DT_BA, 1 };
 
 	/**
 	 * @emulator Only used for testing!
@@ -205,10 +161,6 @@ public final class Info implements IStructuredData {
 		return iv[1];
 	}
 
-	public int getRatingNone() {
-		return iv[2];
-	}
-
 	public boolean hasFeature(int feature) {
 
 		return (iv[0] & feature) != 0;
@@ -219,6 +171,9 @@ public final class Info implements IStructuredData {
 		changeListener.removeElement(il);
 	}
 
+	/**
+	 * @deprecated Only used for testing!
+	 */
 	public Object[] sdGet() {
 
 		Object[] bdv = new Object[3];

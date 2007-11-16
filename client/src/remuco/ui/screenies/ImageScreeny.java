@@ -4,7 +4,6 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 public final class ImageScreeny extends Screeny {
 

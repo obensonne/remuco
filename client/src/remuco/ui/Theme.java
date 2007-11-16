@@ -50,17 +50,17 @@ public final class Theme {
 			IMGID_PLOB_BORDER_BOTTOM = 1, IMGID_PLOB_BORDER_LEFT = 2,
 			IMGID_PLOB_BORDER_RIGHT = 3, IMGID_PLOB_CORNER_TOP_LEFT = 4,
 			IMGID_PLOB_CORNER_TOP_RIGHT = 5, IMGID_PLOB_CORNER_BOTTOM_LEFT = 6,
-			IMGID_PLOB_CORNER_BOTTOM_RIGHT = 7, IMGID_STATE_REPEAT_OFF = 8,
-			IMGID_STATE_REPEAT_PLOB = 9, IMGID_STATE_REPEAT_ALBUM = 10,
-			IMGID_STATE_REPEAT_PL = 11, IMGID_STATE_SHUFFLE_OFF = 12,
-			IMGID_STATE_SHUFFLE_ON = 13, IMGID_STATE_VOLUME_LEFT = 14,
-			IMGID_STATE_VOLUME_RIGHT = 15, IMGID_STATE_VOLUME_OFF = 16,
-			IMGID_STATE_VOLUME_ON = 17, IMGID_STATE_GPS_PLAY = 18,
-			IMGID_STATE_GPS_PAUSE = 19, IMGID_STATE_GPS_STOP = 20,
-			IMGID_STATE_GPS_OFF = 21, IMGID_STATE_GPS_SRVOFF = 22,
-			IMGID_STATE_GPS_PROBLEM = 23, IMGID_STATE_GPS_ERROR = 24,
+			IMGID_PLOB_CORNER_BOTTOM_RIGHT = 7, IMGID_STATUS_REPEAT_OFF = 8,
+			IMGID_STATUS_REPEAT_PLOB = 9, IMGID_STATUS_REPEAT_ALBUM = 10,
+			IMGID_STATUS_REPEAT_PL = 11, IMGID_STATUS_SHUFFLE_OFF = 12,
+			IMGID_STATUS_SHUFFLE_ON = 13, IMGID_STATUS_VOLUME_LEFT = 14,
+			IMGID_STATUS_VOLUME_RIGHT = 15, IMGID_STATUS_VOLUME_OFF = 16,
+			IMGID_STATUS_VOLUME_ON = 17, IMGID_STATUS_PBS_PLAY = 18,
+			IMGID_STATUS_PBS_PAUSE = 19, IMGID_STATUS_PBS_STOP = 20,
+			IMGID_STATUS_PBS_OFF = 21, IMGID_STATUS_PBS_SRVOFF = 22,
+			IMGID_STATUS_PBS_UNKNOWN = 23, IMGID_STATUS_PBS_ERROR = 24,
 			IMGID_PLOB_RATE_OFF = 25, IMGID_PLOB_RATE_ON = 26,
-			IMGID_STATE_BORDER_LEFT = 27, IMGID_STATE_BORDER_RIGHT = 28,
+			IMGID_STATUS_BORDER_LEFT = 27, IMGID_STATUS_BORDER_RIGHT = 28,
 			IMGID_COLORS = 29;
 
 	private static final String DEFAULT = "Korama";
@@ -71,16 +71,17 @@ public final class Theme {
 			"plob.border-bottom.png", "plob.border-left.png",
 			"plob.border-right.png", "plob.corner-top-left.png",
 			"plob.corner-top-right.png", "plob.corner-bottom-left.png",
-			"plob.corner-bottom-right.png", "state.repeat-off.png",
-			"state.repeat-plob.png", "state.repeat-album.png",
-			"state.repeat-pl.png", "state.shuffle-off.png",
-			"state.schuffle-on.png", "state.volume-left.png",
-			"state.volume-right.png", "state.volume-off.png",
-			"state.volume-on.png", "state.gps-play.png", "state.gps-pause.png",
-			"state.gps-stop.png", "state.gps-off.png", "state.gps-srvoff.png",
-			"state.gps-problem.png", "state.gps-error.png",
-			"plob.rate-off.png", "plob.rate-on.png", "state.border-left.png",
-			"state.border-right.png", "colors.png", };
+			"plob.corner-bottom-right.png", "status.repeat-off.png",
+			"status.repeat-plob.png", "status.repeat-album.png",
+			"status.repeat-pl.png", "status.shuffle-off.png",
+			"status.shuffle-on.png", "status.volume-left.png",
+			"status.volume-right.png", "status.volume-off.png",
+			"status.volume-on.png", "status.pbs-play.png",
+			"status.pbs-pause.png", "status.pbs-stop.png",
+			"status.pbs-off.png", "status.pbs-srvoff.png",
+			"status.pbs-unknown.png", "status.pbs-error.png",
+			"plob.rate-off.png", "plob.rate-on.png", "status.border-left.png",
+			"status.border-right.png", "colors.png", };
 
 	private static String[] list = null;
 
@@ -134,8 +135,6 @@ public final class Theme {
 		int[] rgb, rgbSchrink;
 		int w, h, wOrig, yScaled, yOrig;
 
-		Log.debug("[TH] scale by " + numerator + "/" + denominator);
-
 		if (numerator == denominator)
 			return img;
 
@@ -169,16 +168,16 @@ public final class Theme {
 	}
 
 	/**
-	 * Schrinks an image if its width or height exceeds the boundaries given by
+	 * Shrinks an image if its width or height exceeds the boundaries given by
 	 * <code>maxWidth</code> and <code>maxHeight</code>.
 	 * 
 	 * @param img
-	 *            the image to schrink
+	 *            the image to shrink
 	 * @param maxWidth
 	 *            the maximum allowed width of the image
 	 * @param maxHeight
-	 *            the maximum allowd height of the image
-	 * @return a shrinked copy of the image (<i>immutable!</i>) or
+	 *            the maximum allowed height of the image
+	 * @return a shrunk copy of the image (<i>immutable!</i>) or
 	 *         <code>img</code> if shrinking is not needed
 	 */
 	public static final Image shrinkImageIfNeeded(Image img, int maxWidth,
@@ -194,7 +193,7 @@ public final class Theme {
 	}
 
 	/**
-	 * Split a one-line string to multi-line string, depending on availbale
+	 * Split a one-line string to multi-line string, depending on available
 	 * width and font size.
 	 * 
 	 * @param s
@@ -422,25 +421,25 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state area images for same height");
 
-		v.addElement(img[IMGID_STATE_BORDER_LEFT]);
-		v.addElement(img[IMGID_STATE_BORDER_RIGHT]);
-		v.addElement(img[IMGID_STATE_GPS_ERROR]);
-		v.addElement(img[IMGID_STATE_GPS_OFF]);
-		v.addElement(img[IMGID_STATE_GPS_PAUSE]);
-		v.addElement(img[IMGID_STATE_GPS_PLAY]);
-		v.addElement(img[IMGID_STATE_GPS_PROBLEM]);
-		v.addElement(img[IMGID_STATE_GPS_SRVOFF]);
-		v.addElement(img[IMGID_STATE_GPS_STOP]);
-		v.addElement(img[IMGID_STATE_REPEAT_ALBUM]);
-		v.addElement(img[IMGID_STATE_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATE_REPEAT_PL]);
-		v.addElement(img[IMGID_STATE_REPEAT_PLOB]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_OFF]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_ON]);
-		v.addElement(img[IMGID_STATE_VOLUME_LEFT]);
-		v.addElement(img[IMGID_STATE_VOLUME_OFF]);
-		v.addElement(img[IMGID_STATE_VOLUME_ON]);
-		v.addElement(img[IMGID_STATE_VOLUME_RIGHT]);
+		v.addElement(img[IMGID_STATUS_BORDER_LEFT]);
+		v.addElement(img[IMGID_STATUS_BORDER_RIGHT]);
+		v.addElement(img[IMGID_STATUS_PBS_ERROR]);
+		v.addElement(img[IMGID_STATUS_PBS_OFF]);
+		v.addElement(img[IMGID_STATUS_PBS_PAUSE]);
+		v.addElement(img[IMGID_STATUS_PBS_PLAY]);
+		v.addElement(img[IMGID_STATUS_PBS_UNKNOWN]);
+		v.addElement(img[IMGID_STATUS_PBS_SRVOFF]);
+		v.addElement(img[IMGID_STATUS_PBS_STOP]);
+		v.addElement(img[IMGID_STATUS_REPEAT_ALBUM]);
+		v.addElement(img[IMGID_STATUS_REPEAT_OFF]);
+		v.addElement(img[IMGID_STATUS_REPEAT_PL]);
+		v.addElement(img[IMGID_STATUS_REPEAT_PLOB]);
+		v.addElement(img[IMGID_STATUS_SHUFFLE_OFF]);
+		v.addElement(img[IMGID_STATUS_SHUFFLE_ON]);
+		v.addElement(img[IMGID_STATUS_VOLUME_LEFT]);
+		v.addElement(img[IMGID_STATUS_VOLUME_OFF]);
+		v.addElement(img[IMGID_STATUS_VOLUME_ON]);
+		v.addElement(img[IMGID_STATUS_VOLUME_RIGHT]);
 
 		ok &= checkSizesEqual(v, false, true);
 
@@ -448,13 +447,13 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state-gps images for same width");
 
-		v.addElement(img[IMGID_STATE_GPS_ERROR]);
-		v.addElement(img[IMGID_STATE_GPS_OFF]);
-		v.addElement(img[IMGID_STATE_GPS_PAUSE]);
-		v.addElement(img[IMGID_STATE_GPS_PLAY]);
-		v.addElement(img[IMGID_STATE_GPS_PROBLEM]);
-		v.addElement(img[IMGID_STATE_GPS_SRVOFF]);
-		v.addElement(img[IMGID_STATE_GPS_STOP]);
+		v.addElement(img[IMGID_STATUS_PBS_ERROR]);
+		v.addElement(img[IMGID_STATUS_PBS_OFF]);
+		v.addElement(img[IMGID_STATUS_PBS_PAUSE]);
+		v.addElement(img[IMGID_STATUS_PBS_PLAY]);
+		v.addElement(img[IMGID_STATUS_PBS_UNKNOWN]);
+		v.addElement(img[IMGID_STATUS_PBS_SRVOFF]);
+		v.addElement(img[IMGID_STATUS_PBS_STOP]);
 
 		ok &= checkSizesEqual(v, false, true);
 
@@ -462,10 +461,10 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state-repeat images for same width");
 
-		v.addElement(img[IMGID_STATE_REPEAT_ALBUM]);
-		v.addElement(img[IMGID_STATE_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATE_REPEAT_PL]);
-		v.addElement(img[IMGID_STATE_REPEAT_PLOB]);
+		v.addElement(img[IMGID_STATUS_REPEAT_ALBUM]);
+		v.addElement(img[IMGID_STATUS_REPEAT_OFF]);
+		v.addElement(img[IMGID_STATUS_REPEAT_PL]);
+		v.addElement(img[IMGID_STATUS_REPEAT_PLOB]);
 
 		ok &= checkSizesEqual(v, false, true);
 
@@ -473,8 +472,8 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state-shuffle images for same width");
 
-		v.addElement(img[IMGID_STATE_SHUFFLE_OFF]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_ON]);
+		v.addElement(img[IMGID_STATUS_SHUFFLE_OFF]);
+		v.addElement(img[IMGID_STATUS_SHUFFLE_ON]);
 
 		ok &= checkSizesEqual(v, false, true);
 
@@ -482,13 +481,13 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state-volume-bar images");
 
-		if (img[IMGID_STATE_VOLUME_OFF].getWidth() != 1) {
+		if (img[IMGID_STATUS_VOLUME_OFF].getWidth() != 1) {
 			Log.ln("[TH] VALIDATION:     "
 					+ "volume bar image (on/off) must have 1px width!");
 			ok = false;
 		}
-		v.addElement(img[IMGID_STATE_VOLUME_OFF]);
-		v.addElement(img[IMGID_STATE_VOLUME_ON]);
+		v.addElement(img[IMGID_STATUS_VOLUME_OFF]);
+		v.addElement(img[IMGID_STATUS_VOLUME_ON]);
 
 		ok &= checkSizesEqual(v, false, true);
 
@@ -534,7 +533,7 @@ public final class Theme {
 
 		for (i = 0; i < img.length; i++) {
 			try {
-				img[i] = Image.createImage("/" + current + "/" + imgName[i]);
+				img[i] = Image.createImage("/themes/" + current + "/" + imgName[i]);
 			} catch (IOException e) {
 				Log.ln("[TH] VALIDATION: missing image " + imgName[i]);
 				img[i] = imgFallBack;

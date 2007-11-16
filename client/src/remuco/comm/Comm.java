@@ -151,7 +151,7 @@ public final class Comm extends Thread implements IMessageSender {
 
 	public void sendMessage(Message m) {
 
-		Log.asssert(m.bd == null);
+		Log.asssert(this, m.bd == null);
 
 		if (Remuco.EMULATION) {
 
@@ -167,7 +167,7 @@ public final class Comm extends Thread implements IMessageSender {
 
 		srz.sd2bd(m);
 
-		Log.asssert(m.bd);
+		Log.asssert(this, m.bd);
 
 		if (net != null && net.isUp() && net.send(m) < 0) {
 
@@ -247,7 +247,7 @@ public final class Comm extends Thread implements IMessageSender {
 	 */
 	private void receiveMessages() {
 
-		Log.asssert(net != null);
+		Log.asssert(this, net != null);
 
 		if (!net.isUp()) { // yes, this may happen
 			net.down();

@@ -9,24 +9,29 @@ import remuco.util.Tools;
  * @author Christian Buennig
  * 
  */
-public final class State implements IStructuredData {
+public final class Status implements IStructuredData {
 
+	/** Player state */
 	public static final byte ST_STOP = 0;
 
+	/** Player state */
 	public static final byte ST_PLAY = 1;
 
+	/** Player state */
 	public static final byte ST_PAUSE = 2;
 
-	public static final byte ST_PROBLEM = 3;
+	/** Player state */
+	public static final byte ST_OFF = 3;
 
-	public static final byte ST_OFF = 4;
+	public static final byte ST_COUNT = 4;
 
-	public static final byte ST_ERROR = 5;
+	/** Remuco server state (no player state) */
+	public static final byte ST_ERROR = ST_COUNT + 0;
 
-	public static final byte ST_SRVOFF = 6;
+	/** Remuco server state (no player state) */
+	public static final byte ST_SRVOFF = ST_COUNT + 1;
 
-	public static final byte ST_COUNT = 7;
-
+	/** Remuco client state (no server or player state) */
 	public static final byte ST_UNKNOWN = 50;
 
 	public static final byte SHUFFLE_MODE_OFF = 0;
@@ -35,11 +40,11 @@ public final class State implements IStructuredData {
 
 	public static final byte REPEAT_MODE_NONE = 0;
 
-	public static final byte REPEAT_MODE_PLOB = 1;
+	public static final byte REPEAT_MODE_PLOB = 1 << 0;
 
-	public static final byte REPEAT_MODE_ALBUM = 2;
+	public static final byte REPEAT_MODE_ALBUM = 1 << 1;
 
-	public static final byte REPEAT_MODE_PL = 3;
+	public static final byte REPEAT_MODE_PL = 1 << 2;
 
 	// ////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +68,7 @@ public final class State implements IStructuredData {
 
 	// ////////////////////////////////////////////////////////////////////////
 
-	public State() {
+	public Status() {
 		reset();
 	}
 
@@ -77,7 +82,7 @@ public final class State implements IStructuredData {
 	 *         have been equal, <code>false</code> otherwise.
 	 * 
 	 */
-	public boolean copyInto(State dest) {
+	public boolean copyInto(Status dest) {
 
 		boolean equal = true;
 
@@ -102,10 +107,10 @@ public final class State implements IStructuredData {
 			return false;
 		if (this == o)
 			return true;
-		if (!(o instanceof State))
+		if (!(o instanceof Status))
 			return false;
 
-		State ps = (State) o;
+		Status ps = (Status) o;
 
 		return Tools.compare(serialIv, ps.serialIv);
 	}

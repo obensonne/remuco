@@ -20,7 +20,8 @@ public final class SimpleControl implements IStructuredData {
 
 	public static final int CMD_RATE = 7;
 
-	//public static final int CMD_VOTE = 8;
+	/** <b>FUTUTRE FEATURE</b> */
+	public static final int CMD_VOTE = 8;
 
 	public static final int CMD_SEEK = 9;
 

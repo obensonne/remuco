@@ -2,7 +2,7 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.ui.Theme;
 
 public final class StateSubScreeny extends Screeny {
@@ -14,28 +14,28 @@ public final class StateSubScreeny extends Screeny {
 	public static final int TYPE_STATE = 0;
 
 	private static final int[] IMGIDS_REPEAT = new int[] {
-			Theme.IMGID_STATE_REPEAT_ALBUM, Theme.IMGID_STATE_REPEAT_OFF,
-			Theme.IMGID_STATE_REPEAT_PL, Theme.IMGID_STATE_REPEAT_PLOB };
+			Theme.IMGID_STATUS_REPEAT_ALBUM, Theme.IMGID_STATUS_REPEAT_OFF,
+			Theme.IMGID_STATUS_REPEAT_PL, Theme.IMGID_STATUS_REPEAT_PLOB };
 
 	private static final int[] IMGIDS_SHUFFLE = new int[] {
-			Theme.IMGID_STATE_SHUFFLE_OFF, Theme.IMGID_STATE_SHUFFLE_ON };
+			Theme.IMGID_STATUS_SHUFFLE_OFF, Theme.IMGID_STATUS_SHUFFLE_ON };
 
 	private static final int[] IMGIDS_STATE = new int[] {
-			Theme.IMGID_STATE_GPS_ERROR, Theme.IMGID_STATE_GPS_OFF,
-			Theme.IMGID_STATE_GPS_PAUSE, Theme.IMGID_STATE_GPS_PLAY,
-			Theme.IMGID_STATE_GPS_PROBLEM, Theme.IMGID_STATE_GPS_SRVOFF,
-			Theme.IMGID_STATE_GPS_STOP, Theme.IMGID_STATE_GPS_PROBLEM };
+			Theme.IMGID_STATUS_PBS_ERROR, Theme.IMGID_STATUS_PBS_OFF,
+			Theme.IMGID_STATUS_PBS_PAUSE, Theme.IMGID_STATUS_PBS_PLAY,
+			Theme.IMGID_STATUS_PBS_SRVOFF, Theme.IMGID_STATUS_PBS_STOP,
+			Theme.IMGID_STATUS_PBS_UNKNOWN };
 
 	private static final int[] VALUES_REPEAT = new int[] {
-			State.REPEAT_MODE_ALBUM, State.REPEAT_MODE_NONE,
-			State.REPEAT_MODE_PL, State.REPEAT_MODE_PLOB };
+			Status.REPEAT_MODE_ALBUM, Status.REPEAT_MODE_NONE,
+			Status.REPEAT_MODE_PL, Status.REPEAT_MODE_PLOB };
 
 	private static final int[] VALUES_SHUFFLE = new int[] {
-			State.SHUFFLE_MODE_OFF, State.SHUFFLE_MODE_ON };
+			Status.SHUFFLE_MODE_OFF, Status.SHUFFLE_MODE_ON };
 
-	private static final int[] VALUES_STATE = new int[] { State.ST_ERROR,
-			State.ST_OFF, State.ST_PAUSE, State.ST_PLAY, State.ST_PROBLEM,
-			State.ST_SRVOFF, State.ST_STOP, State.ST_UNKNOWN };
+	private static final int[] VALUES_STATE = new int[] { Status.ST_ERROR,
+			Status.ST_OFF, Status.ST_PAUSE, Status.ST_PLAY, Status.ST_SRVOFF,
+			Status.ST_STOP, Status.ST_UNKNOWN };
 
 	/**
 	 * The images to use to represent a value. The image to use to represent
@@ -105,7 +105,7 @@ public final class StateSubScreeny extends Screeny {
 
 	protected void dataUpdated() {
 
-		State s = (State) data;
+		Status s = (Status) data;
 
 		if (s == null) {
 			val = 0;

@@ -6,7 +6,7 @@ import remuco.player.Plob;
 import remuco.player.PlobList;
 import remuco.player.Library;
 import remuco.player.SimpleControl;
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.player.StringParam;
 import remuco.util.Log;
 
@@ -32,7 +32,7 @@ public final class Message {
 	 */
 	public static final int[][] DSFVAin = new int[][] { null, // 0, ID_IGNORE
 			Info.sdFormatVector, // 1, ID_IFS_PINFO
-			State.sdFormatVector, // 2, ID_IFS_STATE
+			Status.sdFormatVector, // 2, ID_IFS_STATE
 			Plob.sdFormatVector, // 3, ID_IFS_CURPLOB
 			PlobList.sdFormatVector, // 4, ID_IFS_PLAYLIST
 			PlobList.sdFormatVector, // 5, ID_IFS_QUEUE
@@ -86,7 +86,7 @@ public final class Message {
 	/**
 	 * Current player state.
 	 * <p>
-	 * Param: {@link State}
+	 * Param: {@link Status}
 	 */
 	public static final int ID_IFS_STATE = 2;
 
@@ -95,7 +95,7 @@ public final class Message {
 	 * <p>
 	 * Param: {@link Plob}
 	 */
-	public static final int ID_IFS_CURPLOB = 3;
+	public static final int ID_IFS_CAP = 3;
 
 	/**
 	 * Current playlist.

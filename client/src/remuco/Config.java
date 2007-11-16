@@ -260,7 +260,7 @@ public final class Config {
 			try {
 				key = dis.readUTF();
 				val = dis.readUTF();
-				Log.debug("[CONF] load: option " + key + " = '" + val + "'");
+				Log.ln("[CONF] load: " + key + " = '" + val + "'");
 			} catch (IOException e) {
 				Log.ln("[CONF] load: error, bad strings in record " + i + "("
 						+ e.getMessage() + ")");
@@ -525,11 +525,13 @@ public final class Config {
 	private static RecordStore openRecord(String name) {
 
 		RecordStore rs = null;
+		int rsUsed, rsTotal;
 
 		try {
 			rs = RecordStore.openRecordStore(RECORD, true);
-			Log.debug("[CONF] open: ok (~" + ((rs.getSize() / 1024) + 1)
-					+ "K used, " + rs.getSizeAvailable() / 1024 + "K free)");
+			rsUsed = (rs.getSize() / 1024) + 1;
+			rsTotal = (rs.getSizeAvailable() / 1024) + 1;
+			Log.ln("[CONF] open: ok, using " + rsUsed + "/" + rsTotal + "KB");
 			return rs;
 		} catch (RecordStoreFullException e) {
 			Log.ln("[CONF] open: error, full");

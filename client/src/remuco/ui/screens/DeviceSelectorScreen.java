@@ -15,7 +15,6 @@ import remuco.UserException;
 import remuco.comm.DeviceFinder;
 import remuco.comm.IDeviceSearcher;
 import remuco.ui.UI;
-import remuco.util.Log;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IDeviceSearcher {
@@ -27,7 +26,7 @@ public final class DeviceSelectorScreen extends List implements
 			1);
 
 	private static final Command CMD_SHOW_KNOWN_DEVICES = new Command(
-			"Show known devices", Command.SCREEN, 2);
+			"Known devices", Command.SCREEN, 2);
 
 	private final Alert alertScanProblem, alertForgetDevice;
 
@@ -81,7 +80,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		int index;
 
-		if (c == List.SELECT_COMMAND) { // DEVICE SELECTE //
+		if (c == List.SELECT_COMMAND) { // DEVICE SELECTED //
 
 			index = getSelectedIndex();
 
@@ -192,7 +191,7 @@ public final class DeviceSelectorScreen extends List implements
 		if (devices.length == 0) {
 			alertScanProblem.setTitle("No Devices");
 			alertScanProblem.setString("Please check if your computer is in "
-					+ "range and its Bluetooth is enabled.");
+					+ "range, its Bluetooth is enabled and visible.");
 			display.setCurrent(alertScanProblem);
 		} else {
 			display.setCurrent(this);

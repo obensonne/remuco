@@ -43,6 +43,7 @@ public final class LibraryScreen extends List implements CommandListener,
 		setCommandListener(this);
 
 		screenPloblist = new PloblistScreen(this, display, player);
+		screenPloblist.addCommand(UI.CMD_BACK);
 
 	}
 
@@ -64,6 +65,10 @@ public final class LibraryScreen extends List implements CommandListener,
 
 			player.reqPloblist(lib.getPloblistPlid(i), this);
 
+		} else if (c == UI.CMD_BACK && d == screenPloblist) {
+			
+			display.setCurrent(this);
+
 		} else {
 
 			parent.commandAction(c, d);
@@ -76,7 +81,7 @@ public final class LibraryScreen extends List implements CommandListener,
 
 		/*
 		 * Ensure we are shown (may not be the case if the user pressed "back"
-		 * right after he requested some info about a plob).
+		 * right after he requested the content of a ploblist).
 		 */
 		if (isShown()) {
 
@@ -110,7 +115,7 @@ public final class LibraryScreen extends List implements CommandListener,
 
 			setSelectCommand(CMD_PLAY);
 
-			if (player.info.hasFeature(Info.FEATURE_LIBRARY_PLOBLIST_CONTENT)) {
+			if (player.info.hasFeature(Info.FEATURE_LIBRARY_PL_CONTENT)) {
 				addCommand(CMD_SHOW_CONTENT);
 			} else {
 				removeCommand(CMD_SHOW_CONTENT);

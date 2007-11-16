@@ -175,9 +175,7 @@
         <copy file="build/MF" tofile="build/jar/MANIFEST.MF" />
         <jar jarfile="build/jar/${midlet.jar}" manifest="build/jar/MANIFEST.MF">
             <fileset dir="build/preverified" />
-            <fileset dir="res/themes" />
-            <fileset file="res/monkey.png" />
-            <fileset file="res/logo.png" />
+            <fileset dir="res/" />
         </jar>
     </target>
 	

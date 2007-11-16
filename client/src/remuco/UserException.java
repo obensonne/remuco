@@ -9,8 +9,8 @@ public final class UserException extends Exception {
 	
 	public UserException(String error, String details) {
 		
-		Log.asssert(error);
-		Log.asssert(error.length());
+		Log.asssert(this, error);
+		Log.asssert(this, error.length());
 		
 		this.error = error;
 		

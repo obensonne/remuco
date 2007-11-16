@@ -6,7 +6,7 @@ import remuco.player.Info;
 import remuco.player.Plob;
 import remuco.player.PlobList;
 import remuco.player.SimpleControl;
-import remuco.player.State;
+import remuco.player.Status;
 import remuco.player.StringParam;
 import remuco.util.Log;
 import remuco.util.Tools;
@@ -20,7 +20,7 @@ public final class EmulatedServer implements IMessageSender {
 
 		private Plob currentPlob;
 
-		private State ps = new State();
+		private Status ps = new Status();
 
 		private int state, volume, plpos, repeat, shuffle;
 
@@ -32,7 +32,7 @@ public final class EmulatedServer implements IMessageSender {
 
 					if (Tools.random(2) == 0) {
 
-						state = (int) Tools.random(State.ST_COUNT);
+						state = (int) Tools.random(Status.ST_COUNT);
 						volume = (int) Tools.random(100);
 						repeat = (int) Tools.random(4);
 						shuffle = (int) Tools.random(2);
@@ -60,7 +60,7 @@ public final class EmulatedServer implements IMessageSender {
 
 		}
 
-		protected State getState() {
+		protected Status getState() {
 
 			ps.set(state, volume, plpos, repeat, shuffle);
 
@@ -101,12 +101,12 @@ public final class EmulatedServer implements IMessageSender {
 			case SimpleControl.CMD_PLAYPAUSE:
 
 				switch (state) {
-				case State.ST_PLAY:
-					state = State.ST_PAUSE;
+				case Status.ST_PLAY:
+					state = Status.ST_PAUSE;
 					break;
-				case State.ST_PAUSE:
-				case State.ST_STOP:
-					state = State.ST_PLAY;
+				case Status.ST_PAUSE:
+				case Status.ST_STOP:
+					state = Status.ST_PLAY;
 					break;
 				default:
 					break;
@@ -124,7 +124,7 @@ public final class EmulatedServer implements IMessageSender {
 
 				currentPlob = (Plob) playlist.firstElement();
 				plpos = 1;
-				state = State.ST_PLAY;
+				state = Status.ST_PLAY;
 				break;
 
 			case SimpleControl.CMD_SEEK:
@@ -134,7 +134,7 @@ public final class EmulatedServer implements IMessageSender {
 
 			case SimpleControl.CMD_STOP:
 
-				state = State.ST_STOP;
+				state = Status.ST_STOP;
 				break;
 
 			default:
@@ -165,7 +165,7 @@ public final class EmulatedServer implements IMessageSender {
 
 	private final Object select = new Object();
 
-	private final State state = new State();
+	private final Status state = new Status();
 
 	public EmulatedServer(IMessageReceiver mr) {
 
@@ -285,9 +285,9 @@ public final class EmulatedServer implements IMessageSender {
 
 					case Message.ID_CTL_SCTRL:
 
-						if (state.getState() != State.ST_PLAY
-								&& state.getState() != State.ST_PAUSE
-								&& state.getState() != State.ST_STOP)
+						if (state.getState() != Status.ST_PLAY
+								&& state.getState() != Status.ST_PAUSE
+								&& state.getState() != Status.ST_STOP)
 							break;
 
 						SimpleControl sctrl = new SimpleControl();
@@ -334,7 +334,7 @@ public final class EmulatedServer implements IMessageSender {
 
 					currentPlob = ep.getCurrentPlob();
 
-					msgToClient.id = Message.ID_IFS_CURPLOB;
+					msgToClient.id = Message.ID_IFS_CAP;
 					msgToClient.sd = currentPlob == null ? null : currentPlob
 							.sdGet();
 

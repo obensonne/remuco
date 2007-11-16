@@ -48,6 +48,14 @@ public final class Remuco extends MIDlet implements CommandListener {
 	 */
 	public static final boolean EMULATION = false;
 
+	/** Command for the log form to show memory status */
+	private static final Command CMD_MEMINFO = new Command("Memory",
+			Command.SCREEN, 1);
+
+	/** Command for the log form to run the garbage collector */
+	private static final Command CMD_RUNGC = new Command("Run GC",
+			Command.SCREEN, 2);
+
 	private final Alert alertLoadConfig;
 
 	private final Alert alertSaveConfig;
@@ -58,8 +66,18 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	private Displayable displayableAfterLog;
 
+	/** Alert displaying current memory status */
+	private final Alert logAlertMemInfo;
+
+	/** Text for the memory status alert */
+	private final StringBuffer logAlertText;
+
 	private final Form logForm;
 
+	/**
+	 * We need to know this since {@link #startApp()} might get called more than
+	 * once (e.g. after we have been paused).
+	 */
 	private boolean startAppFirstTime = true;
 
 	private final UI ui;
@@ -68,8 +86,16 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 		// set up logging
 
+		logAlertText = new StringBuffer();
+
+		logAlertMemInfo = new Alert("Memory Info");
+		logAlertMemInfo.setType(AlertType.INFO);
+		logAlertMemInfo.setTimeout(Alert.FOREVER);
+
 		logForm = new Form("Log");
 		logForm.addCommand(UI.CMD_BACK);
+		logForm.addCommand(CMD_MEMINFO);
+		logForm.addCommand(CMD_RUNGC);
 		logForm.setCommandListener(this);
 		if (EMULATION) {
 			Log.ln("RUNING IN EMULATION MODE ..");
@@ -112,11 +138,37 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	public void commandAction(Command c, Displayable d) {
 
+		long memUsed, memFree, memTotal;
+
 		if (c == UI.CMD_SHOW_LOG) {
 
 			displayableAfterLog = d;
 
 			display.setCurrent(logForm);
+
+		} else if (c == CMD_RUNGC) {
+
+			// run garbage collector
+
+			System.gc();
+
+		} else if (c == CMD_MEMINFO) {
+
+			// show memory usage
+
+			logAlertText.delete(0, logAlertText.length());
+
+			memTotal = Runtime.getRuntime().totalMemory() / 1024;
+			memFree = Runtime.getRuntime().freeMemory() / 1024;
+			memUsed = memTotal - memFree;
+
+			logAlertText.append("Total: ").append(memTotal).append(" KB\n");
+			logAlertText.append("Used : ").append(memUsed).append(" KB\n");
+			logAlertText.append("Free : ").append(memFree).append(" KB\n");
+
+			logAlertMemInfo.setString(logAlertText.toString());
+
+			display.setCurrent(logAlertMemInfo, logForm);
 
 		} else if (c == UI.CMD_BACK && d == logForm) {
 
@@ -163,7 +215,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	protected void pauseApp() {
 
-		Log.debug("pauseApp");
+		Log.ln("[RM] paused");
 
 	}
 
@@ -180,11 +232,11 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 			ui.go();
 
-			Log.debug("startApp (first time)");
+			Log.ln("[RM] started");
 
 		} else {
 
-			Log.debug("startApp (again)");
+			Log.ln("[RM] unpaused");
 
 		}
 

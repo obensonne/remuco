@@ -19,10 +19,10 @@ import remuco.util.Tools;
  */
 public final class PlobList implements IStructuredData {
 
-	/** PLID of the playlist */
+	/** PLID of the playlist (name not needed) */
 	public static final String PLID_PLAYLIST = "__PLAYLIST__";
 
-	/** PLID of the queue */
+	/** PLID of the queue (name not needed)  */
 	public static final String PLID_QUEUE = "__QUEUE__";
 
 	public static final int[] sdFormatVector = new int[] { DT_STR, 2, DT_SV, 1 };
@@ -39,7 +39,7 @@ public final class PlobList implements IStructuredData {
 
 	public PlobList(String plid, String name) {
 
-		Log.asssert(plid);
+		Log.asssert(this, plid);
 		// Assert.assert(name);
 
 		this.plid = plid;
@@ -143,7 +143,7 @@ public final class PlobList implements IStructuredData {
 			pos = plobs.indexOf(pid);
 		} while (pos != -1 && pos % 2 != 0);
 
-		Log.asssert(pos >= 0);
+		Log.asssert(this, pos >= 0);
 
 		plobs.removeElementAt(pos);
 		plobs.removeElementAt(pos);
