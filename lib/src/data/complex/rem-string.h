@@ -25,12 +25,12 @@ typedef struct {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define rem_strpar_new()	g_slice_new0(RemString);
+#define rem_string_new()	g_slice_new0(RemString);
 
-#define rem_string_destroy(_sp) if (_sp) {	\
-	 if ((_sp)->value)						\
-	 	g_free((_sp)->value);				\
-	 g_slice_free(RemString, _sp);			\
+#define rem_string_destroy(_str) if (_str) {	\
+	 if ((_str)->value)							\
+	 	g_free((_str)->value);					\
+	 g_slice_free(RemString, _str);				\
 }
 
 ///////////////////////////////////////////////////////////////////////////////

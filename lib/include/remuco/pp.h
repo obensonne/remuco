@@ -13,23 +13,38 @@ G_BEGIN_DECLS
  *  
  * Documentation of player proxy related types.
  * 
- * When a player proxy (PP) interacts with RemLib it does this (amongst others)
- * with callback functions and PP specific data types. They are decribed on this
- * page. You probably don't want to read this page from top to bottom but come
- * here when these callback functions and data type get mentioned in the
- * @ref dx_server documentation.
+ * When a player proxy (PP) interacts with the server it does (next to the
+ * @ref dx_server) with callback functions and PP specific data types. These
+ * are decribed on this page. You probably don't want to read this page from
+ * top to bottom but come here when these callback functions and data types
+ * get mentioned in the @ref dx_server documentation or in PP examples.
  */
 
 /*@{*/
 
 /**
- * The RemPPPriv struct is (for RemLib) an opaque data structure to store player
- * proxy private data. Player proxies may define <code>struct _RemPPPriv</code>
- * according to their needs.
+ * The RemPPPriv struct is (from the server's perspective) an opaque data
+ * structure to store player proxy private data. Player proxies may define
+ * <code>struct _RemPPPriv</code> according to their needs.
  * 
  * @see rem_server_up()
  */
 typedef struct _RemPPPriv RemPPPriv;
+
+/**
+ * Events the server may signal to the PP via RemPPCallbacks::notify.
+ */
+typedef enum {
+	/**
+	 * The server has experienced a serious error. It cannot proceed its work.
+	 * A PP should call rem_server_down() when it receives such an event.
+	 */
+	REM_SERVER_EVENT_ERROR,
+	/**
+	 * The server has finished its shut down process.
+	 */
+	REM_SERVER_EVENT_DOWN
+} RemServerEvent;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -84,16 +99,14 @@ typedef RemStringList*		(*RemPPGetPloblistFunc)
 	(RemPPPriv *pp_priv, const gchar *plid);
 
 /**
- * RemLib notifies that a crucial error occured. As a result the PP should call
- * rem_server_down().
+ * RemLib notifies a PP about an event.
  * 
  * @param[in]  pp_priv	the PP's private data
- * @param[in]  err		a @p GError describing the occured error (you are
- *                      responsible for freeing this error!)
- * 
+ * @param[in]  event	an event, see RemServerEvent for possible events and
+ *                      their meaning
  */
-typedef void				(*RemPPNotifyErrorFunc)
-	(RemPPPriv *pp_priv, GError *err);
+typedef void				(*RemPPNotifyFunc)
+	(RemPPPriv *pp_priv, RemServerEvent event);
 
 /**
  * RemLib requests the PP to use (the contents of) the ploblist as the new
@@ -129,7 +142,6 @@ typedef RemStringList*		(*RemPPSearchFunc)
 	(RemPPPriv *pp_priv, const RemPlob *mask);
 
 /**
- * @ingroup dx_pp
  * RemLib requests the PP to do the simple control command @a command with
  * the parameter @a param. See RemSimpleControlCommand for what the individual
  * commands and possible parameters mean.
@@ -137,13 +149,11 @@ typedef RemStringList*		(*RemPPSearchFunc)
  * @param[in]  pp_priv	the PP's private data
  * @param[in]  cmd		the command to do
  * @param[in]  param	a parameter for @a command
- * 
  */
 typedef void				(*RemPPSimpleControlFunc)
 	(RemPPPriv *pp_priv, RemSimpleControlCommand cmd, gint param);
 
 /**
- * @ingroup dx_pp
  * RemLib requests the PP to update (on player side) the meta information of a
  * plob.
  * 
@@ -156,7 +166,6 @@ typedef void				(*RemPPUpdatePlobFunc)
 	(RemPPPriv *pp_priv, const RemPlob *plob);
 
 /**
- * @ingroup dx_pp
  * RemLib requests the PP to update (on player side) the contents of a ploblist.
  * 
  * @param[in]  pp_priv	the PP's private data
@@ -180,29 +189,10 @@ typedef struct {
 	/** Name of the media player. */
 	gchar			*player_name;
 	/**
-	 * The character set that is used for textual data passed from the PP
-	 * to RemLib (set this to <code>NULL</code> if the current locale's
-	 * character set is valid).
+	 * The character set that is used for text data passed from the PP
+	 * to RemLib. If unset, RemLib assumes it is UTF-8.
 	 */
 	gchar			*charset;
-	/**
-	 * The player/PP notifies when there are changes in player status,
-	 * playlist or queue (if set to @p FALSE, RemLib will periodically check
-	 * for changes autonously). 
-	 *
-	 * @see RemNotifyFlags
-	 */
-	gboolean		notifies_changes;
-	/**
-	 * Specifies who is responsible for running a GMainLoop.
-	 * If @p TRUE, RemLib starts a GMainLoop when rem_server_up() gets called.
-	 * As a result, rem_server_up() blocks and returns when rem_server_down()
-	 * has been called. If @p FALSE, rem_server_up() returns immediately -
-	 * but in this case the PP developer must ensure that there already is
-	 * a GMainLoop running for the default GMainContext and that it @em will
-	 * @em run at least until rem_server_down() gets called.
-	 */
-	gboolean		run_main_loop;
 	/**
 	 * Maximum rating value used by the media player (0 means the player/PP
 	 * does not support rating).
@@ -232,7 +222,6 @@ typedef struct {
 } RemPPDescriptor;
 
 /**
- * @ingroup dx_pp
  * The RemPPCallbacks struct specifies callback functions to use by RemLib
  * to get information about the media player. Some functions are mandatory and
  * some optional - see the documentation of the individual fields. The meaning
@@ -250,7 +239,7 @@ typedef struct {
 	/** Optional */
 	RemPPGetPloblistFunc		get_ploblist;
 	/** Mandatory */
-	RemPPNotifyErrorFunc		notify_error;
+	RemPPNotifyFunc				notify;
 	/** Optional */
 	RemPPPlayPloblistFunc		play_ploblist;
 	/** Optional */
@@ -263,6 +252,15 @@ typedef struct {
 	RemPPUpdatePloblistFunc		update_ploblist;
 	
 } RemPPCallbacks;
+
+/**
+ * Creates a new RemPPCallbacks. All fields are initialized to 0.
+ * Free it with rem_pp_callbacks_free() !
+ * */
+#define rem_pp_callbacks_new() g_slice_new0(RemPPCallbacks)
+
+/** Frees a RemPPCallbacks previously created with rem_pp_callbacks_new(). */
+#define rem_pp_callbacks_free(_ppcb) g_slice_free(RemPPCallbacks, _ppcb)
 
 ///////////////////////////////////////////////////////////////////////////////
 

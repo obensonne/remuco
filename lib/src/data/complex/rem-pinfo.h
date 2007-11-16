@@ -49,8 +49,11 @@ typedef enum {
 	REM_FEATURE_LIBRARY				= 1 << 16,
 	/* Show content of a predefined ploblist */
 	REM_FEATURE_LIBRARY_PL_CONTENT	= 1 << 17,
-	/* Play a certain ploblists */
-	REM_FEATURE_LIBRARY_PL_PLAY		= 1 << 18
+	/* Play a certain ploblists (Decprecated since this is requires by
+	 * REM_FEATURE_LIBRARY) */
+	REM_FEATURE_LIBRARY_PL_PLAY		= 1 << 18,
+	/* Edit any ploblist (not only playlist or queue). */
+	REM_FEATURE_PLOBLIST_EDIT		= 1 << 19
 	
 } RemPlayerInfoFeature;
 

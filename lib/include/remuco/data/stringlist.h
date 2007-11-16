@@ -83,8 +83,6 @@ rem_sl_iterator_reset(const RemStringList *sl);
 /**
  * Iterates to the next string in a RemStringList.
  * 
- * Allways call this before iterating the list with rem_sl_iterator_next().
- * 
  * @param sl a RemStringList
  * 
  * @return the next string or <code>NULL</code> if there is no more string
@@ -95,7 +93,9 @@ rem_sl_iterator_reset(const RemStringList *sl);
  *         string or the end of the list.
  * 
  * @remark The @p const decalration of @a sl means the content of the string
- *         list, not the iterator state! 
+ *         list, not the iterator state!
+ * 
+ * @see rem_sl_iterator_reset()
  */ 
 const gchar*
 rem_sl_iterator_next(const RemStringList *sl);
@@ -116,7 +116,7 @@ const gchar*
 rem_sl_get(const RemStringList *sl, guint index);
 
 /**
- * Returns the number of string in a RemStringList.
+ * Returns the number of strings in a RemStringList.
  * 
  * @param sl a RemStringList
  * 

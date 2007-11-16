@@ -13,7 +13,7 @@
 
 #include <remuco.h>
 
-#define REM_PROTO_VERSION			0x05
+#define REM_PROTO_VERSION			0x06
 
 typedef struct {
 	guint		id;
@@ -22,14 +22,15 @@ typedef struct {
 
 typedef struct {
 	GIOChannel	*chan;
-	gchar		addr[18]; // 12 hex digits + 5 colons + term. null -> 18 chars   
-} rem_net_client_t;
+	gchar		addr[18]; // 12 hex digits + 5 colons + term. null -> 18 chars
+	gboolean	flush_on_close;
+} RemNetClient;
 
-typedef struct _rem_net_server_priv rem_net_server_priv_t;
+typedef struct _RemNetServerPriv RemNetServerPriv;
 
 typedef struct {
-	GIOChannel				*chan;
-	rem_net_server_priv_t	*priv;
+	GIOChannel			*chan;
+	RemNetServerPriv	*priv;
 } RemNetServer;
 
 
@@ -42,22 +43,29 @@ rem_net_msg_reset(RemNetMsg *msg);
 void
 rem_net_msg_destroy(RemNetMsg *msg);
 
+void
+rem_net_client_destroy(RemNetClient *client);
+
 RemNetServer*
 rem_net_server_new();
 
 void
 rem_net_server_destroy(RemNetServer* server);
 
-rem_net_client_t*
+RemNetClient*
 rem_net_client_accept(RemNetServer *server);
 
 void
-rem_net_client_destroy(rem_net_client_t *client);
+rem_net_client_destroy(RemNetClient *client);
 
 gint
-rem_net_client_rxmsg(rem_net_client_t *client, RemNetMsg *msg);
+rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg);
 
 gint
-rem_net_client_txmsg(rem_net_client_t *client, const RemNetMsg *msg);
+rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg);
+
+gint
+rem_net_client_hello(RemNetClient* client);
+
 
 #endif /*REMNET_H_*/

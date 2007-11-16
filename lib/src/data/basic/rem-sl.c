@@ -153,19 +153,24 @@ rem_sl_new()
 void
 rem_sl_append_const(RemStringList *sl, const gchar *str)
 {
-	gchar	*str_copy = NULL;
+	gchar	*str_chunked = NULL;
 	GSList	*l;
 
 	g_return_if_fail(sl);
 	
 	////////// 'chunk' the string //////////
 	
-	if (str) str_copy = g_string_chunk_insert(sl->chunk, str);
+	if (str) str_chunked = g_string_chunk_insert(sl->chunk, str);
 	
 	////////// append while avoiding list iteration //////////
 
-	l = g_slist_append(NULL, str_copy);
-	if (sl->strings_last) sl->strings_last->next = l;
+	l = g_slist_append(NULL, str_chunked);
+	
+	if (sl->strings_last)
+		sl->strings_last->next = l;
+	else
+		sl->strings = l;
+	
 	sl->strings_last = l;
 	
 	sl->len++;
@@ -180,12 +185,17 @@ rem_sl_append(RemStringList *sl, gchar *str)
 	
 	////////// remember the string to free it later //////////
 	
-	if (str) sl->strings_to_free = g_slist_prepend(sl->strings, str);
+	if (str) sl->strings_to_free = g_slist_prepend(sl->strings_to_free, str);
 
 	////////// append while avoiding list iteration //////////
 	
 	l = g_slist_append(NULL, str);
-	if (sl->strings_last) sl->strings_last->next = l;
+	
+	if (sl->strings_last)
+		sl->strings_last->next = l;
+	else
+		sl->strings = l;
+	
 	sl->strings_last = l;
 	
 	sl->len++;
@@ -205,6 +215,8 @@ rem_sl_clear(RemStringList *sl)
 	if (sl->strings) g_slist_free(sl->strings);
 	
 	sl->strings = NULL;
+	sl->strings_last = NULL;
+	sl->strings_iterator = NULL;
 	
 	if (sl->strings_to_free) {
 		
@@ -307,13 +319,14 @@ rem_sl_hash(const RemStringList *sl)
 	
 	if (!sl || !sl->strings) return 0;
 	
-	hash = 0;
+	hash = sl->len;
 	u = 0;
 	
 	l = sl->strings;
 	while (l) {
 		s = (gchar*) l->data;
-		hash ^= ((s ? g_str_hash(s) : 0) + (u << 5));
+		//hash ^= ((s ? g_str_hash(s) : 0) * u);
+		hash = (hash << 5) - hash + (s ? g_str_hash(s) : 0);
 		u++;
 		l = g_slist_next(l);
 	}
@@ -495,7 +508,7 @@ priv_serialize(const RemStringList *sl, const gchar *enc)
  * 
  * @param sl
  * 	the string list
- * @param se
+ * @param ef
  * 	the encoding of the strings in the string list
  * @param pte
  *	A list of possible encodings to use for the serialized string list
@@ -511,6 +524,7 @@ GByteArray*
 rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *pte)
 {
 	g_assert_debug(sl);
+	g_assert_debug(ef);
 	g_assert_debug(concl(pte, pte->strings && pte->strings->data));
 	
 	RemStringList	*sl_converted;
@@ -524,7 +538,7 @@ rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *
 
 	l = pte->strings;
 	while (l) {
-		if (g_str_equal(ef, (gchar*) l->data)) break;
+		if (l->data && g_str_equal(ef, (gchar*) l->data)) break;
 		l = g_slist_next(l);
 	}
 	
@@ -532,7 +546,7 @@ rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *
 	
 	////////// we must convert //////////
 	
-	LOG_NOISE("conversion needed (from %s)", ef);
+	LOG_NOISE("conversion needed (from %s)\n", ef);
 
 	l = pte->strings;
 	
@@ -550,6 +564,8 @@ rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *
 			
 			return ba;
 		}
+		
+		l = g_slist_next(l);
 	}
 	
 	////////// must convert with fallback characters //////////

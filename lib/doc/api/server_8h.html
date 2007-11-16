@@ -21,17 +21,20 @@
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The RemServer struct is an opaque data structure to represent a Remuco server.  <a href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2"></a><br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58">rem_server_up</a> (const <a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> *pp_desc, const <a class="el" href="structRemPPCallbacks.html">RemPPCallbacks</a> *pp_callbacks, const <a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, GError **err)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#gcd0a0c0a74c5392f3ba4bc42f6203ad0">rem_server_up</a> (<a class="el" href="structRemPPDescriptor.html">RemPPDescriptor</a> *pp_desc, <a class="el" href="structRemPPCallbacks.html">RemPPCallbacks</a> *pp_callbacks, const <a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, GError **err)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Starts a Remuco server.  <a href="group__dx__server.html#gb6eaf56962627da75e7de7bbeaa20d58"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets up a Remuco server.  <a href="group__dx__server.html#gcd0a0c0a74c5392f3ba4bc42f6203ad0"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c">rem_server_notify</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *server)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Notifies a RemServer about changes in a player.  <a href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#gb07876b38aada734c06bc6b3e4ca3af7">rem_server_poll</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *server)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Instructs a RemServer to periodically check for player changes (by calling <a class="el" href="structRemPPCallbacks.html#a366ba7d407f038534129d0ebafe666e" title="Mandatory.">RemPPCallbacks::synchronize</a>).  <a href="group__dx__server.html#gb07876b38aada734c06bc6b3e4ca3af7"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973">rem_server_down</a> (<a class="el" href="group__dx__server.html#gfb5fc7c4947e92836caecf04b9f4eff2">RemServer</a> *rem)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Shuts down a RemServer.  <a href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973"></a><br></td></tr>
 </table>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Oct 26 23:04:00 2007 for Remuco by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Nov 15 17:14:01 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>

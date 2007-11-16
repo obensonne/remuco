@@ -81,17 +81,28 @@ rem_dump_ba(GByteArray *ba)
 	
 }
 static void
-rem_dump(guint8 data, guint len)
+rem_dump(guint8 *data, guint len)
 {
 	GByteArray ba;
 	ba.data = data;
 	ba.len = len;
-	dump_gba(&ba);
+	rem_dump_ba(&ba);
 }
 #else
 #define rem_dump_ba(_ba)
 #define rem_dump(_data, _len)
 #endif
 
+#define g_return_if_fail_wmsg(_expr, _msg)	\
+	if G_UNLIKELY(!(_expr)) {				\
+		LOG_BUG("%s\n", _msg);				\
+		g_return_if_fail(_expr)				\
+	}
+
+#define g_return_val_if_fail_wmsg(_expr, _val, _msg)	\
+	if G_UNLIKELY(!(_expr)) {							\
+		LOG_BUG("%s\n", _msg);							\
+		g_return_val_if_fail(_expr, _val)				\
+	}
 
 #endif /*COMMON_H_*/

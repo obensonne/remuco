@@ -26,9 +26,9 @@ rem_client_info_new(void)
 void
 rem_client_info_destroy(RemClientInfo *ci)
 {
-	g_assert_debug(ci);
+	if (!ci) return;
 	
-	rem_sl_destroy(ci->charsets);
+	if (ci->charsets) rem_sl_destroy(ci->charsets);
 	
 	g_slice_free(RemClientInfo, ci);
 }

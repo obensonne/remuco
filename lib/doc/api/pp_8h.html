@@ -26,42 +26,58 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRemPlayerProxy.html">RemPlayerProxy</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The <a class="el" href="structRemPlayerProxy.html" title="The RemPlayerProxy packs all player proxy related data.">RemPlayerProxy</a> packs all player proxy related data.  <a href="structRemPlayerProxy.html#_details">More...</a><br></td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#gb903ca32ced81ff0b82b90c342bec0df">rem_pp_callbacks_new</a>()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Creates a new <a class="el" href="structRemPPCallbacks.html" title="The RemPPCallbacks struct specifies callback functions to use by RemLib to get information...">RemPPCallbacks</a>.  <a href="group__dx__pp.html#gb903ca32ced81ff0b82b90c342bec0df"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g7c271948e2ca78fb1f43f8db664a2593">rem_pp_callbacks_free</a>(_ppcb)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Frees a <a class="el" href="structRemPPCallbacks.html" title="The RemPPCallbacks struct specifies callback functions to use by RemLib to get information...">RemPPCallbacks</a> previously created with <a class="el" href="group__dx__pp.html#gb903ca32ced81ff0b82b90c342bec0df" title="Creates a new RemPPCallbacks.">rem_pp_callbacks_new()</a>.  <a href="group__dx__pp.html#g7c271948e2ca78fb1f43f8db664a2593"></a><br></td></tr>
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct _RemPPPriv&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The RemPPPriv struct is (for RemLib) an opaque data structure to store player proxy private data.  <a href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The RemPPPriv struct is (from the server's perspective) an opaque data structure to store player proxy private data.  <a href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="library_8h.html#a3679698cb353eafeb4b44af1e43155a">RemLibrary</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#gb4159c12bdaad76ad08d9abc1afc68ec">RemPPGetLibraryFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PLIDs and names of a media player's ploblists.  <a href="group__dx__pp.html#gb4159c12bdaad76ad08d9abc1afc68ec"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#ga6ea598214753ced74d72dd06199e964">RemPPSynchronizeFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, <a class="el" href="structRemPlayerStatus.html">RemPlayerStatus</a> *status)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PP to synchronize <em>status</em> to the current player status.  <a href="group__dx__pp.html#ga6ea598214753ced74d72dd06199e964"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="group__dx__plob.html#g73510ec4a9183ff1676a5f6841bde457">RemPlob</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#gcaaf73c9a6ca74c9a3d159c920189ac6">RemPPGetPlobFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const gchar *pid)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="group__dx__plob.html#g8137e8b63bd85eb0c4b79ae3389a23d5">RemPlob</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#gcaaf73c9a6ca74c9a3d159c920189ac6">RemPPGetPlobFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const gchar *pid)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests a RemPlob with a certain PID.  <a href="group__dx__pp.html#gcaaf73c9a6ca74c9a3d159c920189ac6"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g2565a7d7d609b5b78c98b0c479fd1a70">RemPPGetPloblistFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const gchar *plid)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PIDs of the plobs in a certain ploblist.  <a href="group__dx__pp.html#g2565a7d7d609b5b78c98b0c479fd1a70"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g623548ad578fccf65cfbee090e20b739">RemPPNotifyErrorFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, GError *err)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g804409875005caeff564eb84f91cd6cb">RemPPNotifyFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, <a class="el" href="group__dx__pp.html#g756c5dc9c8eb2d878e888a69e1c20608">RemServerEvent</a> event)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib notifies that a crucial error occured.  <a href="group__dx__pp.html#g623548ad578fccf65cfbee090e20b739"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib notifies a PP about an event.  <a href="group__dx__pp.html#g804409875005caeff564eb84f91cd6cb"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g5cf099d02a69cbc14403349a244b224d">RemPPPlayPloblistFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const gchar *plid)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PP to use (the contents of) the ploblist as the new playlist.  <a href="group__dx__pp.html#g5cf099d02a69cbc14403349a244b224d"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g967ee25f5c2cbb4756a4930b8c1aef3a">RemPPSearchFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const <a class="el" href="group__dx__plob.html#g73510ec4a9183ff1676a5f6841bde457">RemPlob</a> *mask)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g967ee25f5c2cbb4756a4930b8c1aef3a">RemPPSearchFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const <a class="el" href="group__dx__plob.html#g8137e8b63bd85eb0c4b79ae3389a23d5">RemPlob</a> *mask)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PIDs of the plobs that equal in the meta information elements set in <em>mask</em>.  <a href="group__dx__pp.html#g967ee25f5c2cbb4756a4930b8c1aef3a"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#gb2e0f2328a65c2e1afdc3511d4eb528c">RemPPSimpleControlFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, <a class="el" href="misc_8h.html#a12125d3fc57871b5a0eb2da8136a7ea">RemSimpleControlCommand</a> cmd, gint param)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PP to do the simple control command <em>command</em> with the parameter <em>param</em>.  <a href="group__dx__pp.html#gb2e0f2328a65c2e1afdc3511d4eb528c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g37c9b3a3dfca32090c56cabc334c17e4">RemPPUpdatePlobFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const <a class="el" href="group__dx__plob.html#g73510ec4a9183ff1676a5f6841bde457">RemPlob</a> *plob)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g37c9b3a3dfca32090c56cabc334c17e4">RemPPUpdatePlobFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const <a class="el" href="group__dx__plob.html#g8137e8b63bd85eb0c4b79ae3389a23d5">RemPlob</a> *plob)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PP to update (on player side) the meta information of a plob.  <a href="group__dx__pp.html#g37c9b3a3dfca32090c56cabc334c17e4"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#ga8a79112622e9f16ce1479d71d5187a7">RemPPUpdatePloblistFunc</a> )(<a class="el" href="group__dx__pp.html#g8c969437edcabdea228979e06b8f4170">RemPPPriv</a> *pp_priv, const gchar *plid, const <a class="el" href="group__dx__RemSL.html#ga8e78c7d68033218f3a6c29cda592b9a">RemStringList</a> *pids)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">RemLib requests the PP to update (on player side) the contents of a ploblist.  <a href="group__dx__pp.html#ga8a79112622e9f16ce1479d71d5187a7"></a><br></td></tr>
+<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dx__pp.html#g756c5dc9c8eb2d878e888a69e1c20608">RemServerEvent</a> { <br>
+&nbsp;&nbsp;<a class="el" href="group__dx__pp.html#gg756c5dc9c8eb2d878e888a69e1c20608f9c6a32dca6c5ebef66562acfc698d77">REM_SERVER_EVENT_ERROR</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="group__dx__pp.html#gg756c5dc9c8eb2d878e888a69e1c2060858ca57b4cfc7ebea2119f96386ee81d8">REM_SERVER_EVENT_DOWN</a>
+<br>
+ }</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Events the server may signal to the PP via <a class="el" href="structRemPPCallbacks.html#cbefa0399d248808db8bd5971d51e6d4" title="Mandatory.">RemPPCallbacks::notify</a>.  <a href="group__dx__pp.html#g756c5dc9c8eb2d878e888a69e1c20608">More...</a><br></td></tr>
 </table>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Oct 26 23:04:00 2007 for Remuco by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Nov 15 17:14:01 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>

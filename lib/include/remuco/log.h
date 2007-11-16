@@ -28,6 +28,8 @@
 
 G_BEGIN_DECLS
 
+#define LOGTS
+
 /* When compiling define LOGLEVEL with one of the following macros.
  * Then everything with an equal or lower loglevel will be logged */
 #define LL_FATAL	0
@@ -70,6 +72,7 @@ G_BEGIN_DECLS
 	#define LOGPID2
 #endif
 
+#define LABEL_BUG	"! BUG   ! "
 #define LABEL_FATAL	"[ FATAL ] "
 #define LABEL_ERROR	"[ ERROR ] "
 #define LABEL_WARN	"[ WARN  ] "
@@ -80,6 +83,7 @@ G_BEGIN_DECLS
 /* If LOGCOL gets defined at compile time, every log messages has a particular
  * color depending on its priority/level */
 #ifdef LOGCOL
+	#define COL_BUG		"\033[41;3m"
 	#define COL_FATAL	"\033[41;3m"
 	#define COL_ERROR	"\033[41;3m"
 	#define COL_WARN	"\033[31;3m"
@@ -88,6 +92,7 @@ G_BEGIN_DECLS
 	#define COL_NOISE	"\033[37;3m"
 	#define COL_END		"\033[0m"
 #else
+	#define COL_BUG
 	#define COL_FATAL
 	#define COL_ERROR
 	#define COL_WARN
@@ -98,6 +103,9 @@ G_BEGIN_DECLS
 #endif
 
 #define FUNC_FORMAT_STR "%-25s"
+
+#define LOG_BUG(x, args...) LOGTS1 printf( COL_BUG LOGTS2 LABEL_BUG \
+	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
 
 /* These are the offered logging macros, which one will be used depends on the
  * defined loglevel */

@@ -11,6 +11,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// types
+//
+///////////////////////////////////////////////////////////////////////////////
+
+struct _RemPlob {
+	gchar			*pid;
+	RemStringList	*meta;
+	GByteArray		*img;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // create and destroy a plob
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,21 +195,17 @@ rem_plob_serialize(const RemPlob *plob,
 	
 	img_file = rem_plob_meta_get(plob, REM_PLOB_META_ART);
 	
-	if (img_file) {
+	if (img_file && img_file[0]) {
 		
 		plob_tmp->img = rem_img_get(img_file, img_width_max, img_height_max);
 				
-		ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
-		
-		if (plob->img) {
-			g_byte_array_free(plob->img, TRUE);
-			plob_tmp->img = NULL;
-		}
+	}
 	
-	} else {
+	ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
 		
-		ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
-		
+	if (plob->img) {
+		g_byte_array_free(plob->img, TRUE);
+		plob_tmp->img = NULL;
 	}
 	
 	return ba;

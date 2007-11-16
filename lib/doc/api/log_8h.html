@@ -17,6 +17,8 @@
 <h1>remuco/log.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#f44e04c68243d40e909c872ed5b6d50b">LOGTS</a></td></tr>
+
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#911e8cadf678f4e2a92e117ae5511d62">LL_FATAL</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#fdd503c7602488094b1ece8885d59c8d">LL_ERROR</a></td></tr>
@@ -43,6 +45,8 @@
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#f2875b30d631bbb5653e32ed1fc3163d">LOGPID2</a></td></tr>
 
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#154731e5f8ba75ed05e0de0d79e0bfce">LABEL_BUG</a></td></tr>
+
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#79b01a4d9df02b52e21bba160a87be00">LABEL_FATAL</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a68ef1f1edb281aa89ef9e60676399e3">LABEL_ERROR</a></td></tr>
@@ -54,6 +58,8 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#4f43e56dcc6a327cc5bfe633410f2343">LABEL_DEBUG</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#144f7a4b03a6d936b11286e4a81ad89b">LABEL_NOISE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#95f59fe7403f07439b5a2fbfdec8da9b">COL_BUG</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#7a4f1beb3b754e2fc1e4cf92f11f0281">COL_FATAL</a></td></tr>
 
@@ -70,6 +76,8 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#3c69fd7e49b943b5c904b6274e6ee4df">COL_END</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#f98cfe269a5de2d907670e5b7a12e020">FUNC_FORMAT_STR</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#2bc0a382e38dc83457f8a376cd60734a">LOG_BUG</a>(x, args...)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aa8bc3216f2ff286f0ecf483789a8658">LOG_FATAL</a>(x, args...)</td></tr>
 
@@ -89,6 +97,21 @@
 
 </table>
 <hr><h2>Define Documentation</h2>
+<a class="anchor" name="95f59fe7403f07439b5a2fbfdec8da9b"></a><!-- doxytag: member="log.h::COL_BUG" ref="95f59fe7403f07439b5a2fbfdec8da9b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COL_BUG          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
 <a class="anchor" name="07b50ad6697535106ed570c6d416496e"></a><!-- doxytag: member="log.h::COL_DEBUG" ref="07b50ad6697535106ed570c6d416496e" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -200,6 +223,21 @@
       <table class="memname">
         <tr>
           <td class="memname">#define FUNC_FORMAT_STR          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="154731e5f8ba75ed05e0de0d79e0bfce"></a><!-- doxytag: member="log.h::LABEL_BUG" ref="154731e5f8ba75ed05e0de0d79e0bfce" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LABEL_BUG          </td>
         </tr>
       </table>
 </div>
@@ -395,6 +433,29 @@
       <table class="memname">
         <tr>
           <td class="memname">#define LOG          </td>
+          <td>(</td>
+          <td class="paramtype">x,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">args...&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td width="100%"></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2bc0a382e38dc83457f8a376cd60734a"></a><!-- doxytag: member="log.h::LOG_BUG" ref="2bc0a382e38dc83457f8a376cd60734a" args="(x, args...)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LOG_BUG          </td>
           <td>(</td>
           <td class="paramtype">x,         <tr>
           <td class="paramkey"></td>
@@ -618,6 +679,21 @@
 
 </div>
 </div><p>
+<a class="anchor" name="f44e04c68243d40e909c872ed5b6d50b"></a><!-- doxytag: member="log.h::LOGTS" ref="f44e04c68243d40e909c872ed5b6d50b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LOGTS          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
 <a class="anchor" name="6cf720e2f5726bd814c1673e3325c81d"></a><!-- doxytag: member="log.h::LOGTS1" ref="6cf720e2f5726bd814c1673e3325c81d" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -678,7 +754,7 @@
 
 </div>
 </div><p>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Oct 26 23:04:00 2007 for Remuco by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Nov 15 17:14:01 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>

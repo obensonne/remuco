@@ -60,12 +60,12 @@ typedef enum {
  */
 typedef struct {
 	/** Playback state. */
-	RemPlaybackState		state;
+	RemPlaybackState		pbs;
 	/** Volume. */
-	gint					volume;
-	/** Playback state. */
+	guint					volume;
+	/** Repeat mode. */
 	RemRepeatMode			repeat;
-	/** Playback state. */
+	/** Suffle state. */
 	RemShuffleMode			shuffle;
 	/**
 	 * Position of the currently active plob in playlist (or queue).
@@ -77,7 +77,7 @@ typedef struct {
 	 */
 	gint					cap_pos;
 	/**
-	 * PID of the currently active plob. Use
+	 * PID of the currently active plob. Use g_string_printf() or
 	 * g_string_assign() to set the PID of the plob. The empty string ("") is
 	 * reserved for "no plob". So use g_string_assign() with the empty string
 	 * or g_string_truncate() if there is no currently active plob.
@@ -94,14 +94,16 @@ typedef struct {
 	RemStringList			*playlist;
 	/**
 	 * List of PIDs of the plobs currently in the queue. Use rem_sl_clear()
-	 * and rem_sl_append() or rem_sl_append_const() to set the playlist.
+	 * and rem_sl_append() or rem_sl_append_const() to set the queue.
 	 */
 	RemStringList			*queue;
 } RemPlayerStatus;
 
+/** Creates a new RemPlayerStatus with all fields initialized. */
 RemPlayerStatus*
 rem_player_status_new(void);
 
+/** Frees a RemPlayerStatus incl. the resources of its fields. */
 void
 rem_player_status_destroy(RemPlayerStatus*);
 

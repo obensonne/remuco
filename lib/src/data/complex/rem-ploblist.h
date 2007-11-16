@@ -23,6 +23,11 @@ typedef struct {
 	RemStringList	*plobs; // pids and titles
 } RemPloblist;
 
+#define REM_PLOBLIST_PLID_PLAYLIST	"__PLAYLIST__"
+#define REM_PLOBLIST_NAME_PLAYLIST	"Playlist"
+#define REM_PLOBLIST_PLID_QUEUE		"__QUEUE__"
+#define REM_PLOBLIST_NAME_QUEUE		"Queue"
+
 //#define REM_PLOBLIST_PLID_VOTE		"__VOTE__"
 //#define REM_PLOBLIST_NAME_VOTE		"Vote"
 

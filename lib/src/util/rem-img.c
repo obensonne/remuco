@@ -66,7 +66,7 @@ rem_img_file_to_ba(const gchar *file)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// publicfunctions
+// public functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +83,8 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	guint			width_target, height_target;
 	gchar			*tmp_file;
  	
+	g_return_val_if_fail(file[0], NULL); 
+	
 	// init Wand and read image
 
 	MagickWandGenesis();

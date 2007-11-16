@@ -14,7 +14,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-struct _rem_net_server_priv {
+struct _RemNetServerPriv {
 	
 	sdp_session_t	*sdp_session;
 	sdp_record_t	*sdp_record;
@@ -82,7 +82,7 @@ rem_net_server_new(void)
 	
 	////////// create/register SDP service //////////
 	
-	server->priv = g_slice_new0(rem_net_server_priv_t);
+	server->priv = g_slice_new0(RemNetServerPriv);
 
 	priv_service_up(server, port);
 	
@@ -122,17 +122,22 @@ rem_net_server_destroy(RemNetServer *server)
 	g_io_channel_shutdown(server->chan, TRUE, NULL);
 	g_io_channel_unref(server->chan);
 
-	g_slice_free(rem_net_server_priv_t, server->priv);
+	g_slice_free(RemNetServerPriv, server->priv);
 	g_slice_free(RemNetServer, server);
 	
 }
 
-rem_net_client_t*
+/**
+ * Accepts a client connection request on the socket of a RemNetServer.
+ * On success returns a RemNetClient with a new socket and new IO channel.
+ * No data is yet communicated at this point!
+ */ 
+RemNetClient*
 rem_net_client_accept(RemNetServer *server)
 {
 	g_assert_debug(server);
 	
-	rem_net_client_t	*client;
+	RemNetClient	*client;
 	struct sockaddr_rc	addr_client;
 	socklen_t			len;
 	gint				sock, sock_server;
@@ -148,7 +153,7 @@ rem_net_client_accept(RemNetServer *server)
 		return NULL;
 	}
 
-	client = g_slice_new0(rem_net_client_t);
+	client = g_slice_new0(RemNetClient);
 	
 	ba2str(&addr_client.rc_bdaddr, client->addr);
 	
@@ -164,12 +169,12 @@ rem_net_client_accept(RemNetServer *server)
 }
 
 void
-rem_net_client_destroy(rem_net_client_t *client)
+rem_net_client_destroy(RemNetClient *client)
 {
 	LOG_INFO("disconnect client %s\n", client->addr);
-	g_io_channel_shutdown(client->chan, TRUE, NULL);
+	g_io_channel_shutdown(client->chan, client->flush_on_close, NULL);
 	g_io_channel_unref(client->chan);
-	g_slice_free(rem_net_client_t, client);
+	g_slice_free(RemNetClient, client);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

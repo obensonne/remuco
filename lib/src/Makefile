@@ -6,13 +6,10 @@
 
 LIB_FILE_BASE := libremuco.so
 LIB_FILE := $(LIB_FILE_BASE)
-LIB_VERSION_MAJOR := 0
-LIB_VERSION_MINOR := 6
-#LIB_VERSION_SUBMINOR := 0
-#LIB_VERSION := $(LIB_VERSION_MAJOR).$(LIB_VERSION_MINOR).$(LIB_VERSION_SUBMINOR)
-#LIB_FILE := $(LIB_FILE_BASE).$(LIB_VERSION)
-#LIB_FILE_SO := $(LIB_FILE_BASE).$(LIB_VERSION_MAJOR).$(LIB_VERSION_MINOR)
 
+LT_CURRENT := 0
+LT_REVISION := 0
+LT_AGE := 0
 PREFIX ?= /usr
 
 ###############################################################################
@@ -50,7 +47,8 @@ LFLAGS :=
 # debug dependent compile flags and commands
 ifneq "$(DEBUG)" ""
 CFLAGS += -O0 -g
-CFLAGS += -DLOGLEVEL=LL_DEBUG
+CFLAGS ?= -DLOGLEVEL=LL_DEBUG
+#CFLAGS ?= -DLOGLEVEL=LL_NOISE
 else
 CFLAGS += -O2
 CFLAGS += -DLOGLEVEL=LL_INFO
@@ -94,36 +92,24 @@ OBJ_FILES_LT := $(subst .o,.lo,$(OBJ_FILES))
 all: .build-req libremuco.la
 
 # for now we do not seperate between normal and dev packages
-install: all install-dev
+install: all install-headers
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/lib
-	libtool --mode=install $(INSTALL_LIB) libremuco.la $(DESTDIR)$(PREFIX)/lib/
-	#$(INSTALL_LIB) $(LIB_FILE) $(DESTDIR)$(PREFIX)/lib/
-	@echo "Consider running ldconfig !"
-	#ldconfig -n $(DESTDIR)$(PREFIX)/lib/
+	libtool --mode=install $(INSTALL_LIB) libremuco.la \
+		$(DESTDIR)$(PREFIX)/lib/
 
-install-dev:
+install-headers:
 	# Install header files
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/include
-	#cp -r ../include/remuco.h ../include/remuco $(DESTDIR)$(PREFIX)/include
 	find ../include -type f -name "*.h" | grep -vF ".svn" | \
 		xargs cp --parents -t $(DESTDIR)$(PREFIX)/include
-	# Generate and install pkg-config file	
-	cp remuco.pc.in remuco.pc
-	sed -i remuco.pc \
-		-e "s,@PREFIX@,$(PREFIX)," \
-		-e "s,@VERSION@,$(LIB_VERSION),"
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/lib/pkgconfig
-	$(INSTALL_LIB) -m 644 remuco.pc $(DESTDIR)$(PREFIX)/lib/pkgconfig
-#	ln -sf $(LIB_FILE_SO) $(DESTDIR)$(PREFIX)/lib/$(LIB_FILE_BASE)
-
-uninstall: uninstall-dev
-	rm  -f $(DESTDIR)$(PREFIX)/lib/$(LIB_FILE_BASE).*
+	
+uninstall: uninstall-headers
+	rm  -f $(DESTDIR)$(PREFIX)/lib/libremuco.so*
 	ldconfig -n $(DESTDIR)$(PREFIX)/lib/
 
-uninstall-dev:
+uninstall-headers:
 	rm -rf $(DESTDIR)$(PREFIX)/include/remuco
-	rm  -f $(DESTDIR)$(PREFIX)/lib/pkgconfig/remuco.pc
-	rm  -f $(DESTDIR)$(PREFIX)/lib/$(LIB_FILE_BASE)
+	rm  -f $(DESTDIR)$(PREFIX)/include/remuco.h
 	
 clean:
 	find -type f -name "*.o" | xargs rm -f
@@ -131,8 +117,7 @@ clean:
 	find -type f -name "*.loT" | xargs rm -f
 	find -type f -name "*~" | xargs rm -f
 	find -type d -name ".libs" | xargs rm -rf
-	rm -f libremuco.*
-	rm -f remuco.pc
+	rm -f libremuco*
 	rm -f .build-req
 
 ###############################################################################
@@ -145,8 +130,11 @@ clean:
 	libtool --mode=compile $(CC) $(CFLAGS) -c $< -o $@ 
 
 libremuco.la: $(OBJ_FILES)
-	libtool --mode=link $(CC) -o libremuco.la $(OBJ_FILES_LT) \
-		-rpath $(PREFIX)/lib $(LFLAGS)
+	libtool --mode=link $(CC) \
+		-version-info=$(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+		-rpath /usr/lib \
+		-o libremuco.la $(OBJ_FILES_LT) \
+		$(LFLAGS)
 #	$(CC) $(LFLAGS) -o $(LIB_FILE) $(OBJ_FILES)
 #	$(STRIP) $(LIB_FILE)
 
@@ -177,9 +165,6 @@ libremuco.la: $(OBJ_FILES)
 	@echo
 	touch .build-req
 	
-	@echo
-	@echo $(OBJ_FILES)
-	@echo
-	
-
+soname:
+	@echo $(LT_CURRENT)
 

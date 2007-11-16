@@ -7,18 +7,13 @@
 
 G_BEGIN_DECLS
 
-#define REM_PLOBLIST_PLID_PLAYLIST	"__PLAYLIST__"
-#define REM_PLOBLIST_NAME_PLAYLIST	"Playlist"
-#define REM_PLOBLIST_PLID_QUEUE		"__QUEUE__"
-#define REM_PLOBLIST_NAME_QUEUE		"Queue"
-
 /**
  * Simple control commands.
  * 
  * Some of these commands are used in combination with a numeric parameter.
  * In that case the meaning of the parameter is explained too.
  * 
- * @see pp_ctrl()
+ * @see RemPPCallbacks::simple_ctrl
  */
 typedef enum {
 	REM_SCTRL_CMD_PLAYPAUSE,
@@ -36,10 +31,31 @@ typedef enum {
 	 * -- this is similar to RemPlayerStatus::cap_pos.
 	 */
 	REM_SCTRL_CMD_JUMP,
+	/**
+	 * Adjust the volume.
+	 * Param: the volume in percent
+	 */
 	REM_SCTRL_CMD_VOLUME,
+	/**
+	 * Rate the currently active plob.
+	 * Param: the rating value with 0 <= rating <=
+	 *        RemPPDescriptor::max_rating_value
+	 */
 	REM_SCTRL_CMD_RATE,
-	REM_SCTRL_CMD_VOTE, // FUTURE FEATURE
-	REM_SCTRL_CMD_SEEK, // FUTURE FEATURE
+	/** FUTURE FEATURE */
+	REM_SCTRL_CMD_VOTE, // <FUTURE FEATURE
+	/** FUTURE FEATURE */
+	REM_SCTRL_CMD_SEEK,
+	/**
+	 * Set the repeat mode.
+	 * Param: the repeat mode (see RemRepeatMode)
+	 */
+	REM_SCTRL_CMD_REPEAT,
+	/**
+	 * Set the shuffle mode.
+	 * Param: the shuffle mode (see RemShuffleMode)
+	 */
+	REM_SCTRL_CMD_SHUFFLE,
 	REM_SCTRL_CMD_COUNT
 } RemSimpleControlCommand;
 

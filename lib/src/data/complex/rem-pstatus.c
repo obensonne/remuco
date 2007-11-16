@@ -111,13 +111,13 @@ rem_player_status_fp_update(RemPlayerStatus *ps, RemPlayerStatusFP *ps_fp)
 	
 	result = 0;
 	
-	if ((ps_fp->priv.state != ps->state) ||
+	if ((ps_fp->priv.pbs != ps->pbs) ||
 		(ps_fp->priv.volume != ps->volume) ||
 		(ps_fp->priv.repeat != ps->repeat) ||
 		(ps_fp->priv.shuffle != ps->shuffle) ||
 		(ps_fp->priv.cap_pos != ps->cap_pos)) {
 		
-		ps_fp->priv.state = ps->state;
+		ps_fp->priv.pbs = ps->pbs;
 		ps_fp->priv.volume = ps->volume;
 		ps_fp->priv.repeat = ps->repeat;
 		ps_fp->priv.shuffle = ps->shuffle;
@@ -131,6 +131,7 @@ rem_player_status_fp_update(RemPlayerStatus *ps, RemPlayerStatusFP *ps_fp)
 	}
 	
 	hash = rem_sl_hash(ps->playlist);
+	LOG_NOISE("pl hash n/o: %u/%u\n", hash, ps_fp->playlist_hash);
 	if (hash != ps_fp->playlist_hash) {
 		ps_fp->playlist_hash = hash;
 		result |= REM_PS_DIFF_PLAYLIST;

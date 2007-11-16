@@ -19,8 +19,8 @@ static const guint8 REM_IO_SUFFIX[] = { 0xFE, 0xFE, 0xFE, 0xFE};
 #define REM_IO_PREFIX_LEN	4
 #define REM_IO_SUFFIX_LEN	4
 
-#define REM_IO_RETRY_WAIT	25000	// micro seconds => 25 milli seconds
-#define REM_IO_RETRY_MAX	10		// waiting at most 250ms for data
+#define REM_IO_RETRY_WAIT	25000	// us => 25 ms
+#define REM_IO_RETRY_MAX	20		// waiting at most 500 ms for data
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +45,7 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 		read = 0;
 		ret = g_io_channel_read_chars(chan, (gchar*) data, len, &read, NULL);
 		
-		LOG_NOISE("read returned %i\n", ret);
+		LOG_NOISE("read returned %i (read %u bytes)\n", ret, read);
 
 		////////// handle: IO error //////////
 		
@@ -74,7 +74,7 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 	
 	////////// handle: missing data, though we've waited a while //////////
 	
-	LOG_WARN("could not read all data");
+	LOG_WARN("could not read all data\n");
 
 	return -1;
 }
@@ -96,7 +96,7 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 		written = 0;
 		ret = g_io_channel_write_chars(chan, (gchar*) data, len, &written, NULL);
 		
-		LOG_NOISE("write returned %i\n", ret);
+		LOG_NOISE("write returned %i (wrote %u bytes)\n", ret, written);
 
 		////////// handle: IO error //////////
 		
@@ -129,6 +129,22 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 
 	return -1;
 	
+}
+
+static gint
+priv_flush(GIOChannel *chan)
+{
+	LOG_NOISE("called\n");
+
+	GIOStatus ret;
+	
+	ret = g_io_channel_flush(chan, NULL);
+	if (ret != G_IO_STATUS_NORMAL) {
+		LOG_ERROR("flushing channel failed\n");
+		return -1;
+	}
+	
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,14 +182,14 @@ rem_net_msg_destroy(RemNetMsg *msg)
 
 
 /**
- * Receives a message and writes received bytes into @a msg.
+ * Receives a message and writes its id and received bytes into @a msg.
  * 
  * @param client The client to receive a message from.
  * @param msg A RemNetMsg created with rem_net_msg_new(), i.e. the contained
  *            GByteArray must already be initialized.
  */
 gint
-rem_net_client_rxmsg(rem_net_client_t *client, RemNetMsg *msg)
+rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 {
 	g_assert_debug(client && msg);
 
@@ -248,7 +264,7 @@ rem_net_client_rxmsg(rem_net_client_t *client, RemNetMsg *msg)
 
 	rem_dump(suffix, REM_IO_SUFFIX_LEN);
 
-	if (memcmp(prefix, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN)) {
+	if (memcmp(suffix, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN)) {
 		LOG_WARN("wrong io suffix\n");
 		rem_net_msg_reset(msg);
 		return -1;
@@ -258,7 +274,7 @@ rem_net_client_rxmsg(rem_net_client_t *client, RemNetMsg *msg)
 }
 
 gint
-rem_net_client_txmsg(rem_net_client_t *client, const RemNetMsg *msg)
+rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg)
 {
 	g_assert_debug(client && msg);
 
@@ -285,18 +301,18 @@ rem_net_client_txmsg(rem_net_client_t *client, const RemNetMsg *msg)
 	
 	////////// message len //////////
 	
-	LOG_NOISE("write msg size (%i)\n", msg->ba->len);
+	LOG_NOISE("write msg size (%i)\n", (msg->ba ? msg->ba->len : 0));
 	
-	len_nbo = g_htonl(msg->ba->len);
+	len_nbo = msg->ba ? g_htonl(msg->ba->len) : 0;
 
 	ret = priv_tx(client->chan, (guint8*) &len_nbo, 4);
 	if (ret < 0) return ret;
 	
 	////////// data //////////
 	
-	if (msg->ba->len) {
+	if (msg->ba && msg->ba->len) {
 		
-		LOG_NOISE("write msg data\n", len);
+		LOG_NOISE("write msg data (%u bytes)\n", msg->ba->len);
 		
 		ret = priv_tx(client->chan, msg->ba->data, msg->ba->len);
 		if (ret < 0) return ret;
@@ -309,5 +325,32 @@ rem_net_client_txmsg(rem_net_client_t *client, const RemNetMsg *msg)
 	ret = priv_tx(client->chan, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN);
 	if (ret < 0) return ret;
 
+	ret = priv_flush(client->chan);
+	if (ret < 0) return ret;	
+	
 	return 0;	
+}
+
+/** Sends HELLO message to a client */
+gint
+rem_net_client_hello(RemNetClient* client)
+{
+	gint			ret;
+	const guint8	pv = REM_PROTO_VERSION;
+	
+	LOG_DEBUG("send hello msg to %s\n", client->addr);
+	
+	ret = priv_tx(client->chan, REM_IO_PREFIX, REM_IO_PREFIX_LEN);
+	if (ret < 0) return ret;
+	
+	ret = priv_tx(client->chan, &pv, 1);
+	if (ret < 0) return ret;
+
+	ret = priv_tx(client->chan, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN);
+	if (ret < 0) return ret;
+
+	ret = priv_flush(client->chan);
+	if (ret < 0) return ret;	
+
+	return 0;
 }

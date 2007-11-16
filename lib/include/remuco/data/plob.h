@@ -19,8 +19,8 @@ G_BEGIN_DECLS
  * (e.g. album art). The PID is set when creating a plob with rem_plob_new().
  * Meta information is technically a list of key-value associations.
  * You can set meta information about a plob with rem_plob_meta_add() and
- * rem_plob_meta_add_const(). In most cases you the predefined meta information
- * keys @p REM_PLOB_META_... will fit your needs.
+ * rem_plob_meta_add_const(). In most cases the predefined meta information
+ * keys (e.g. @ref REM_PLOB_META_ARTIST) will fit your needs.
  *   
  */
 
@@ -32,7 +32,7 @@ G_BEGIN_DECLS
  * Use the rem_plob_new() to create and rem_plob_destroy() to free.
  * 
  */
-typedef struct _rem_plob RemPlob;
+typedef struct _RemPlob RemPlob;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -41,25 +41,29 @@ typedef struct _rem_plob RemPlob;
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Meta information name */
-#define REM_PLOB_META_ALBUM			"Album"
+#define REM_PLOB_META_ALBUM			"album"
 /** Meta information name */
-#define REM_PLOB_META_ARTIST		"Artist"
-#define REM_PLOB_META_BITRATE		"Bitrate"
-#define REM_PLOB_META_COMMENT		"Comment"
-#define REM_PLOB_META_GENRE			"Genre"
-#define REM_PLOB_META_LENGTH		"Length"
-#define REM_PLOB_META_TITLE			"Title"
+#define REM_PLOB_META_ARTIST		"artist"
+#define REM_PLOB_META_BITRATE		"bitrate"
+#define REM_PLOB_META_COMMENT		"comment"
+#define REM_PLOB_META_GENRE			"genre"
+/** Meta information name (value must be length in seconds) */
+#define REM_PLOB_META_LENGTH		"length"
+#define REM_PLOB_META_TITLE			"title"
 /** Meta information name (value means number within album) */
-#define REM_PLOB_META_TRACK			"Track"
-#define REM_PLOB_META_YEAR			"Year"
-#define REM_PLOB_META_RATING		"Rating"
-#define REM_PLOB_META_TAGS			"Tags"
+#define REM_PLOB_META_TRACK			"track"
+#define REM_PLOB_META_YEAR			"year"
+/** Meta information name (value must be a non-negative number) */
+#define REM_PLOB_META_RATING		"rating"
+#define REM_PLOB_META_TAGS			"tags"
 /** Meta information name */
-#define REM_PLOB_META_TYPE			"Type"
+#define REM_PLOB_META_TYPE			"__type__"
 /** Meta information value for REM_PLOB_META_TYPE */
-#define REM_PLOB_META_TYPE_AUDIO	"Audio"
+#define REM_PLOB_META_TYPE_AUDIO	"audio"
 /** Meta information value for REM_PLOB_META_TYPE */
-#define REM_PLOB_META_TYPE_VIDEO	"Video"
+#define REM_PLOB_META_TYPE_VIDEO	"video"
+/** Meta information value for REM_PLOB_META_TYPE */
+#define REM_PLOB_META_TYPE_OTHER	"other"
 /** Meta information name (value must be an image's filename) */
 #define REM_PLOB_META_ART			"__art__"
 #define REM_PLOB_META_ANY			"__any__"
@@ -128,7 +132,16 @@ rem_plob_meta_iter_next(const RemPlob *plob,
 						const gchar **value);
 
 /**
+ * Get the value of a meta inforation.
  * 
+ * @param plob	a RemPlob
+ * @param name	the meta information's name (use one of @p REM_PLOB_META_... -
+ *              e.g. @ref REM_PLOB_META_ARTIST)
+ * 
+ * @return the meta information value or '' (empty string) if the meta
+ *         information does not exist -> so this method @em never returns
+ *         <code>NULL</code>
+ *  
  * @remark The @p const decalration of @a plob means the content of the plob
  *         list, not the meta information iterator state! 
  */
