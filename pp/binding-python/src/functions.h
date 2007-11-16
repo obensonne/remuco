@@ -12,4 +12,7 @@ rempy_server_down(PyObject *self, PyObject *args);
 PyObject*
 rempy_server_notify(PyObject *self, PyObject *args);
 
+PyObject*
+rempy_server_poll(PyObject *self, PyObject *args);
+
 #endif /*REMPY_FUNCTIONS_H_*/

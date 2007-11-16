@@ -4,23 +4,30 @@
 #include <remuco.h>
 
 struct _RemPPPriv {
-	gint x;
-	
-	PyObject			*pp_priv_py;
-	RemPyPPCallbacks	*pp_callbacks_py;
-	RemPyPlayerStatus	*ps_py;
+	/** Player proxy private data. */
+	PyObject			*pp_priv;
+	/** Player proxy callbacks. */
+	RemPyPPCallbacks	*pp_callbacks;
+	/** Player status to use for the player proxy. */
+	RemPyPlayerStatus	*pp_ps;
+	/**
+	 * Self reference as a Python C object. Need to remember it to decref it
+	 * on server shut down.
+	 */
+	PyObject			*self_py;
 	RemServer			*server;
 };
 
+/** Will be called if the refocunt of RemPPPriv::self_py is 0 */
 static void
 priv_pp_priv_destroy(void *data)
 {
 	RemPPPriv *priv = (RemPPPriv*) priv;
 	
-	Py_CLEAR(priv->pp_priv_py);
-	Py_CLEAR(priv->pp_callbacks_py);
-	Py_CLEAR(priv->ps_py);
-	
+	Py_CLEAR(priv->pp_priv);
+	Py_CLEAR(priv->pp_callbacks);
+	Py_CLEAR(priv->pp_ps);
+	// priv->self_py should already have a ref count of 0, that's why we're here
 	g_slice_free(RemPPPriv, priv);
 }
 
@@ -31,34 +38,34 @@ priv_pp_priv_destroy(void *data)
 ///////////////////////////////////////////////////////////////////////////////
 
 static void
-cb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps);
+rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps);
 
 static RemLibrary*
-cb_get_library(RemPPPriv *priv);
+rcb_get_library(RemPPPriv *priv);
 
 static RemPlob*
-cb_get_plob(RemPPPriv *priv, const gchar *pid);
+rcb_get_plob(RemPPPriv *priv, const gchar *pid);
 
 static RemStringList*
-cb_get_ploblist(RemPPPriv *priv, const gchar *plid);
+rcb_get_ploblist(RemPPPriv *priv, const gchar *plid);
 
 static void
-cb_notify_error(RemPPPriv *priv, GError *err);
+rcb_notify(RemPPPriv *priv, RemServerEvent event);
 
 static void
-cb_play_ploblist(RemPPPriv *priv, const gchar *plid);
+rcb_play_ploblist(RemPPPriv *priv, const gchar *plid);
 
 static RemStringList*
-cb_search(RemPPPriv *priv, const RemPlob *plob);
+rcb_search(RemPPPriv *priv, const RemPlob *plob);
 
 static void
-cb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param);
+rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param);
 
 static void
-cb_update_plob(RemPPPriv *pp_priv, const RemPlob *plob);
+rcb_update_plob(RemPPPriv *pp_priv, const RemPlob *plob);
 
 static void
-cb_update_ploblist(RemPPPriv *pp_priv,
+rcb_update_ploblist(RemPPPriv *pp_priv,
 				   const gchar *plid,
 				   const RemStringList* pids);
 
@@ -158,6 +165,14 @@ priv_conv_plob_c2py(const RemPlob *plob)
 static RemPPCallbacks*
 priv_conv_ppcallbacks_py2c(PyObject *po)
 {
+	
+#define REMPY_FUNC_CHECK(_fo, _fn)								\
+	if (!PyCallable_Check(_fo)) {								\
+		PyErr_Print();											\
+		PyErr_SetString(PyExc_TypeError, "cannot call " _fn);	\
+		return NULL;											\
+	}
+
 	RemPyPPCallbacks	*ppcb_py;
 	RemPPCallbacks		*ppcb_c;
 	
@@ -171,26 +186,46 @@ priv_conv_ppcallbacks_py2c(PyObject *po)
 	
 	ppcb_c = g_slice_new0(RemPPCallbacks);
 	
-	if (ppcb_py->get_library != Py_None)
-		ppcb_c->get_library = &cb_get_library;
-	if (ppcb_py->get_plob != Py_None)
-		ppcb_c->get_plob = &cb_get_plob;
-	if (ppcb_py->get_ploblist != Py_None)
-		ppcb_c->get_ploblist = &cb_get_ploblist;
-	if (ppcb_py->notify_error != Py_None)
-		ppcb_c->notify_error = &cb_notify_error;
-	if (ppcb_py->play_ploblist != Py_None)
-		ppcb_c->play_ploblist = &cb_play_ploblist;
-	if (ppcb_py->search != Py_None)
-		ppcb_c->search = &cb_search;
-	if (ppcb_py->simple_control != Py_None)
-		ppcb_c->simple_ctrl = &cb_simple_control;
-	if (ppcb_py->synchronize != Py_None)
-		ppcb_c->synchronize = &cb_synchronize;
-	if (ppcb_py->update_plob != Py_None)
-		ppcb_c->update_plob = &cb_update_plob;
-	if (ppcb_py->update_ploblist != Py_None)
-		ppcb_c->update_ploblist = &cb_update_ploblist;
+	if (ppcb_py->get_library != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->get_library, "get_library");
+		ppcb_c->get_library = &rcb_get_library;
+	}
+	if (ppcb_py->get_plob != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->get_plob, "get_plob");
+		ppcb_c->get_plob = &rcb_get_plob;
+	}
+	if (ppcb_py->get_ploblist != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->get_ploblist, "get_ploblist");
+		ppcb_c->get_ploblist = &rcb_get_ploblist;
+	}
+	if (ppcb_py->notify != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->notify, "notify");
+		ppcb_c->notify = &rcb_notify;
+	}
+	if (ppcb_py->play_ploblist != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->play_ploblist, "play_ploblist");
+		ppcb_c->play_ploblist = &rcb_play_ploblist;
+	}
+	if (ppcb_py->search != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->search, "search");
+		ppcb_c->search = &rcb_search;
+	}
+	if (ppcb_py->simple_control != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->simple_control, "simple_control");
+		ppcb_c->simple_ctrl = &rcb_simple_control;
+	}
+	if (ppcb_py->synchronize != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->synchronize, "synchronize");
+		ppcb_c->synchronize = &rcb_synchronize;
+	}
+	if (ppcb_py->update_plob != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->update_plob, "update_plob");
+		ppcb_c->update_plob = &rcb_update_plob;
+	}
+	if (ppcb_py->update_ploblist != Py_None) {
+		REMPY_FUNC_CHECK(ppcb_py->update_ploblist, "update_ploblist");
+		ppcb_c->update_ploblist = &rcb_update_ploblist;
+	}
 	
 	return ppcb_c;
 	
@@ -236,8 +271,6 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	}
 	
 	ppd->max_rating_value = (guint) ppd_py->max_rating_value;
-	ppd->notifies_changes = (gboolean) ppd_py->notifies_changes;
-	ppd->run_main_loop = (gboolean) ppd_py->run_main_loop;
 	ppd->supported_repeat_modes = (RemRepeatMode) ppd_py->supported_repeat_modes;
 	ppd->supported_shuffle_modes = (RemShuffleMode) ppd_py->supported_shuffle_modes;
 	ppd->supports_playlist = (gboolean) ppd_py->supports_playlist;
@@ -264,8 +297,8 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 	}
 	
 	if (ps_py->playlist == Py_None) {
-		rem_sl_destroy(ps->playlist);
-		ps->playlist = NULL;
+		PyErr_SetString(PyExc_TypeError, "PlayerStatus.playlist is not set");
+		return;
 	} else {
 		priv_conv_sl_py2c(ps_py->playlist, ps->playlist);
 		if (PyErr_Occurred()) {
@@ -276,8 +309,8 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 	}	
 	
 	if (ps_py->queue == Py_None) {
-		rem_sl_destroy(ps->queue);
-		ps->queue = NULL;
+		PyErr_SetString(PyExc_TypeError, "PlayerStatus.queue is not set");
+		return;
 	} else {
 		priv_conv_sl_py2c(ps_py->queue, ps->queue);
 		if (PyErr_Occurred()) {
@@ -290,7 +323,7 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 	ps->cap_pos = ps_py->cap_pos;
 	ps->repeat = (RemRepeatMode) ps_py->repeat;
 	ps->shuffle = (RemShuffleMode) ps_py->shuffle;
-	ps->state = (RemPlaybackState) ps_py->state;
+	ps->pbs = (RemPlaybackState) ps_py->pbs;
 	ps->volume = ps_py->volume;
 }
 
@@ -302,25 +335,25 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 ///////////////////////////////////////////////////////////////////////////////
 
 static void
-cb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
+rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 {
 	PyObject	*args, *ret;
 	
-	args = Py_BuildValue("OO", priv->pp_priv_py, (PyObject*) priv->ps_py);
+	args = Py_BuildValue("OO", priv->pp_priv, (PyObject*) priv->pp_ps);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->synchronize, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->synchronize, args, NULL);
 
 	Py_DECREF(args);
 	rempy_assert(ret, "error calling function 'synchronize'");
 	Py_DECREF(ret);
 
-	priv_conv_pstatus_py2c(priv->ps_py, ps);
+	priv_conv_pstatus_py2c(priv->pp_ps, ps);
 	
 	rempy_assert(!PyErr_Occurred(), "bad return from 'synchronize'");
 }
 
 static RemLibrary*
-cb_get_library(RemPPPriv *priv)
+rcb_get_library(RemPPPriv *priv)
 {
 	gboolean		ok;
 	PyObject		*args, *ret, *plids, *names, *flags, *item;
@@ -331,9 +364,9 @@ cb_get_library(RemPPPriv *priv)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("O", priv->pp_priv_py);
+	args = Py_BuildValue("O", priv->pp_priv);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->get_library, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->get_library, args, NULL);
 
 	Py_DECREF(args);
 
@@ -383,7 +416,7 @@ cb_get_library(RemPPPriv *priv)
 }
 
 static RemPlob*
-cb_get_plob(RemPPPriv *priv, const gchar *pid)
+rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 {
 	RemPlob			*plob;
 	gboolean		ok;
@@ -392,9 +425,9 @@ cb_get_plob(RemPPPriv *priv, const gchar *pid)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("Os", priv->pp_priv_py, pid);
+	args = Py_BuildValue("Os", priv->pp_priv, pid);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->get_plob, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->get_plob, args, NULL);
 
 	Py_DECREF(args);
 
@@ -429,7 +462,7 @@ cb_get_plob(RemPPPriv *priv, const gchar *pid)
 }
 
 static RemStringList*
-cb_get_ploblist(RemPPPriv *priv, const gchar *plid)
+rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 {
 	gboolean		ok;
 	PyObject		*args, *ret, *list, *item;
@@ -440,9 +473,9 @@ cb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("Os", priv->pp_priv_py, plid);
+	args = Py_BuildValue("Os", priv->pp_priv, plid);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->get_ploblist, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->get_ploblist, args, NULL);
 
 	Py_DECREF(args);
 
@@ -475,30 +508,36 @@ cb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 }
 
 static void
-cb_notify_error(RemPPPriv *priv, GError *err)
+rcb_notify(RemPPPriv *priv, RemServerEvent event)
 {
 	PyObject	*args, *ret;
 	
-	args = Py_BuildValue("Os", priv->pp_priv_py, err->message);
+	args = Py_BuildValue("Oi", priv->pp_priv, event);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->notify_error, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->notify, args, NULL);
 
 	Py_DECREF(args);
 	
-	rempy_assert(ret, "error calling function 'notify_error'");
+	rempy_assert(ret, "error calling function 'notify'");
+
+	if (event == REM_SERVER_EVENT_DOWN) {
+		Py_DECREF(priv->self_py);
+		// priv_pp_priv_destroy(priv); should be called automatically by the
+		// Py_DECREF above
+	}
 	
 	Py_DECREF(ret);
 
 }
 
 static void
-cb_play_ploblist(RemPPPriv *priv, const gchar *plid)
+rcb_play_ploblist(RemPPPriv *priv, const gchar *plid)
 {
 	PyObject	*args, *ret;
 	
-	args = Py_BuildValue("Os", priv->pp_priv_py, plid);
+	args = Py_BuildValue("Os", priv->pp_priv, plid);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->play_ploblist, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->play_ploblist, args, NULL);
 
 	Py_DECREF(args);
 	
@@ -510,7 +549,7 @@ cb_play_ploblist(RemPPPriv *priv, const gchar *plid)
 }
 
 static RemStringList*
-cb_search(RemPPPriv *priv, const RemPlob *plob)
+rcb_search(RemPPPriv *priv, const RemPlob *plob)
 {
 	gboolean		ok;
 	PyObject		*args, *ret, *dict, *list, *item;
@@ -525,9 +564,9 @@ cb_search(RemPPPriv *priv, const RemPlob *plob)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("OO", priv->pp_priv_py, dict);
+	args = Py_BuildValue("OO", priv->pp_priv, dict);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->search, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->search, args, NULL);
 
 	Py_DECREF(args);
 	Py_DECREF(dict);
@@ -562,13 +601,13 @@ cb_search(RemPPPriv *priv, const RemPlob *plob)
 }
 
 static void
-cb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
+rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 {
 	PyObject	*args, *ret;
 	
-	args = Py_BuildValue("Oii", priv->pp_priv_py, cmd, param);
+	args = Py_BuildValue("Oii", priv->pp_priv, cmd, param);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->simple_control, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->simple_control, args, NULL);
 
 	Py_DECREF(args);
 	
@@ -578,7 +617,7 @@ cb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 }
 
 static void
-cb_update_plob(RemPPPriv *priv, const RemPlob *plob)
+rcb_update_plob(RemPPPriv *priv, const RemPlob *plob)
 {
 	PyObject		*args, *ret, *dict;
 	
@@ -588,9 +627,9 @@ cb_update_plob(RemPPPriv *priv, const RemPlob *plob)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("OO", priv->pp_priv_py, dict);
+	args = Py_BuildValue("OO", priv->pp_priv, dict);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->update_plob, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->update_plob, args, NULL);
 
 	Py_DECREF(args);
 	Py_DECREF(dict);
@@ -604,7 +643,7 @@ cb_update_plob(RemPPPriv *priv, const RemPlob *plob)
 }
 
 static void
-cb_update_ploblist(RemPPPriv *priv,
+rcb_update_ploblist(RemPPPriv *priv,
 				   const gchar *plid,
 				   const RemStringList* pids)
 {
@@ -616,9 +655,9 @@ cb_update_ploblist(RemPPPriv *priv,
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("OsO", priv->pp_priv_py, plid, list);
+	args = Py_BuildValue("OsO", priv->pp_priv, plid, list);
 	
-	ret = PyObject_Call(priv->pp_callbacks_py->update_ploblist, args, NULL);
+	ret = PyObject_Call(priv->pp_callbacks->update_ploblist, args, NULL);
 
 	Py_DECREF(args);
 	Py_DECREF(list);
@@ -640,59 +679,63 @@ PyObject*
 rempy_server_up(PyObject *self, PyObject *args)
 {
 	gboolean		ok;
-	PyObject		*pp_desc_py, *pp_callbacks_py, *pp_priv_py;
-	RemPPPriv		*pp_priv_c;
-	RemPPDescriptor	*pp_desc_c;
-	RemPPCallbacks	*pp_callbacks_c;
-	GError		*err;
+	PyObject		*pp_desc;		// python pp's descriptor
+	PyObject		*pp_callbacks;	// python pp's callbacks
+	PyObject		*pp_priv;		// python pp's private data
+	RemPPPriv		*priv;			// our (python binding) private data
+	RemPPDescriptor	*desc;			// our (python binding) descriptor
+	RemPPCallbacks	*callbacks;		// our (python binding) callbacks
+	GError			*err;
 	
-	ok = (gboolean) PyArg_ParseTuple(args, "OOO", &pp_desc_py, &pp_callbacks_py,
-							&pp_priv_py);
+	ok = (gboolean) PyArg_ParseTuple(args, "OOO", &pp_desc, &pp_callbacks,
+							&pp_priv);
 
 	if (!ok) return NULL;
 	
-	pp_callbacks_c = priv_conv_ppcallbacks_py2c(pp_callbacks_py);
-	if (!pp_callbacks_c) {
+	callbacks = priv_conv_ppcallbacks_py2c(pp_callbacks); 
+	if (!callbacks) {
 		PyErr_Print();
 		PyErr_SetString(PyExc_TypeError, "bad argument #2");
 		return NULL;
 	}
 	
-	pp_desc_c = priv_conv_ppdescriptor_py2c(pp_desc_py);
-	if (!pp_desc_c) {
+	desc = priv_conv_ppdescriptor_py2c(pp_desc);
+	if (!desc) {
 		PyErr_Print();
 		PyErr_SetString(PyExc_TypeError, "bad argument #1");
-		g_slice_free(RemPPCallbacks, pp_callbacks_c);
+		g_slice_free(RemPPCallbacks, callbacks);
 		return NULL;
 	}
 	
-	pp_priv_c = g_slice_new0(RemPPPriv);
+	priv = g_slice_new0(RemPPPriv);
 	
-	Py_INCREF(pp_priv_py);
-	pp_priv_c->pp_priv_py = pp_priv_py;
+	Py_INCREF(pp_priv); // http://docs.python.org/ext/ownershipRules.html
+	priv->pp_priv = pp_priv;
 	
-	Py_INCREF(pp_callbacks_py);
-	pp_priv_c->pp_callbacks_py = (RemPyPPCallbacks*) pp_callbacks_py;
+	Py_INCREF(pp_callbacks); // http://docs.python.org/ext/ownershipRules.html
+	priv->pp_callbacks = (RemPyPPCallbacks*) pp_callbacks;
 	
-	pp_priv_c->ps_py = rempy_pstatus_new();
+	priv->pp_ps = rempy_pstatus_new();
 
 	err = NULL;
-	pp_priv_c->server = rem_server_up(pp_desc_c, pp_callbacks_c, pp_priv_c, &err);
+	priv->server = rem_server_up(desc, callbacks, priv, &err);
 	
-	if (!pp_priv_c->server) {
+	if (!priv->server) {
 		PyErr_Clear();
 		PyErr_SetString(
 				PyExc_RuntimeError, err ? err->message : "server start failed");
 		if (err) g_error_free(err);
-		g_slice_free(RemPPCallbacks, pp_callbacks_c);
-		if (pp_desc_c->charset) g_free(pp_desc_c->charset);
-		if (pp_desc_c->player_name) g_free(pp_desc_c->charset);
-		g_slice_free(RemPPDescriptor, pp_desc_c);
-		priv_pp_priv_destroy(pp_priv_c);
+		g_slice_free(RemPPCallbacks, callbacks);
+		if (desc->charset) g_free(desc->charset);
+		if (desc->player_name) g_free(desc->charset);
+		g_slice_free(RemPPDescriptor, desc);
+		priv_pp_priv_destroy(priv);
 		return NULL;
 	}
 	
-	return PyCObject_FromVoidPtr(pp_priv_c, &priv_pp_priv_destroy);
+	priv->self_py = PyCObject_FromVoidPtr(priv, &priv_pp_priv_destroy);
+	// ref count of pb_priv->self_py is now 1
+	return priv->self_py; // ref count of pb_priv->self_py is now 2
 	
 }
 
@@ -700,24 +743,22 @@ PyObject*
 rempy_server_down(PyObject *self, PyObject *args)
 {
 	gboolean	ok;
-	PyObject	*pp_priv_py;
-	RemPPPriv	*pp_priv_c;
+	PyObject	*priv_py;
+	RemPPPriv	*priv;
 
-	ok = (gboolean) PyArg_ParseTuple(args, "O", &pp_priv_py);
+	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
 	
 	if (!ok) return NULL;
 	
-	if (!PyCObject_Check(pp_priv_py)) {
+	if (!PyCObject_Check(priv_py)) {
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError,
 				"bad argument #1: expected server private data");
 	}
 	
-	pp_priv_c = (RemPPPriv*) PyCObject_AsVoidPtr(pp_priv_py);
+	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
 	
-	rem_server_down(pp_priv_c->server);
-	
-	Py_DECREF(pp_priv_py);
+	rem_server_down(priv->server);
 	
 	Py_INCREF(Py_None);
 	
@@ -728,22 +769,48 @@ PyObject*
 rempy_server_notify(PyObject *self, PyObject *args)
 {
 	gboolean	ok;
-	PyObject	*pp_priv_py;
-	RemPPPriv	*pp_priv_c;
+	PyObject	*priv_py;
+	RemPPPriv	*priv;
 
-	ok = (gboolean) PyArg_ParseTuple(args, "O", &pp_priv_py);
+	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
 	
 	if (!ok) return NULL;
 	
-	if (!PyCObject_Check(pp_priv_py)) {
+	if (!PyCObject_Check(priv_py)) {
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError,
 				"bad argument #1: expected server private data");
 	}
 	
-	pp_priv_c = (RemPPPriv*) PyCObject_AsVoidPtr(pp_priv_py);
+	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
 	
-	rem_server_notify(pp_priv_c->server);
+	rem_server_notify(priv->server);
+	
+	Py_INCREF(Py_None);
+	
+	return Py_None;
+}
+
+PyObject*
+rempy_server_poll(PyObject *self, PyObject *args)
+{
+	gboolean	ok;
+	PyObject	*priv_py;
+	RemPPPriv	*priv;
+
+	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
+	
+	if (!ok) return NULL;
+	
+	if (!PyCObject_Check(priv_py)) {
+		PyErr_Clear();
+		PyErr_SetString(PyExc_TypeError,
+				"bad argument #1: expected server private data");
+	}
+	
+	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
+	
+	rem_server_poll(priv->server);
 	
 	Py_INCREF(Py_None);
 	

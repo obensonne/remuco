@@ -10,7 +10,7 @@ typedef struct {
 	PyObject	*get_plob;
 	PyObject	*get_library;
 	PyObject	*get_ploblist;
-	PyObject	*notify_error;
+	PyObject	*notify;
 	PyObject	*play_ploblist;
 	PyObject	*search;
 	PyObject	*simple_control;

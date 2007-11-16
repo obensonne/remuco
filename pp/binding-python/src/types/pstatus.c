@@ -1,7 +1,7 @@
 #include "pstatus.h"
 
 static PyMemberDef PlayerStatus_members[] = {
-	{"state", T_INT, offsetof(RemPyPlayerStatus, state), 0,
+	{"state", T_INT, offsetof(RemPyPlayerStatus, pbs), 0,
 			"See also description of RemPlayerStatus in C API documentaion."},
 	{"volume", T_INT, offsetof(RemPyPlayerStatus, volume), 0,
 			"See also description of RemPlayerStatus in C API documentaion."},

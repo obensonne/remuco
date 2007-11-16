@@ -6,7 +6,7 @@
 
 typedef struct {
 	PyObject_HEAD
-	int			state;
+	int			pbs;
 	int			volume;
 	int			repeat;
 	int			shuffle;

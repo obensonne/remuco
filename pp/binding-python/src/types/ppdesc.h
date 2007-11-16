@@ -8,8 +8,6 @@ typedef struct {
 	PyObject_HEAD
 	PyObject	*player_name;
 	PyObject	*charset;
-	int			notifies_changes;
-	int			run_main_loop;
 	int			max_rating_value;
 	int			supports_seek;
 	int			supports_playlist;

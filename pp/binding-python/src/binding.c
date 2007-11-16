@@ -810,7 +810,7 @@ initremuco(void)
 	PyModule_AddIntConstant(module, "PS_STATE_PROBLEM", REM_PS_STATE_PROBLEM); 
 	PyModule_AddIntConstant(module, "PS_STATE_OFF", REM_PS_STATE_OFF); 
 	PyModule_AddIntConstant(module, "PS_STATE_ERROR", REM_PS_STATE_ERROR); 
-	PyModule_AddIntConstant(module, "PS_STATE_SRVOFF", REM_PS_STATE_SRVOFF); 
+	PyModule_AddIntConstant(module, "PS_STATE_SRVOFF", REM_PS_PBS_SRVOFF); 
 	PyModule_AddIntConstant(module, "PS_STATE_COUNT", REM_PS_STATE_COUNT); 
 	
 	PyModule_AddIntConstant(module, "PS_SHUFFLE_MODE_OFF", REM_PS_SHUFFLE_MODE_OFF); 

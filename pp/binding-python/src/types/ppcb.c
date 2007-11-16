@@ -14,9 +14,9 @@ static PyMemberDef PPCallbacks_members[] = {
 	{"get_ploblist", T_OBJECT_EX, offsetof(RemPyPPCallbacks, get_ploblist), 0,
 	 "RemLib requests a ploblist. 1st param is a string (the PLID of the "
 	 "requested plob list). Return a list of PIDs (strings)."},
-	{"notify_error", T_OBJECT_EX, offsetof(RemPyPPCallbacks, notify_error), 0,
-	 "A serious error occured. 1st param is a string (error message). "
-	 "Nothing to return. Shut down the server!"},
+	{"notify", T_OBJECT_EX, offsetof(RemPyPPCallbacks, notify), 0,
+	 "An event occured. 1st param is an int indicating the event type. "
+	 "Nothing to return."},
 	{"play_ploblist", T_OBJECT_EX, offsetof(RemPyPPCallbacks, play_ploblist), 0,
 	 "RemLib request to play a ploblist (resp. to fill the playlist with its "
 	 "content). 1st param is a string (the ploblist's PLID). Nothing to return."},
@@ -56,7 +56,7 @@ PPCallbacks_init(RemPyPPCallbacks *self, PyObject *args, PyObject *kwds)
 	REMPY_INIT_CBF(get_plob);
 	REMPY_INIT_CBF(get_library);
 	REMPY_INIT_CBF(get_ploblist);
-	REMPY_INIT_CBF(notify_error);
+	REMPY_INIT_CBF(notify);
 	REMPY_INIT_CBF(play_ploblist);
 	REMPY_INIT_CBF(search);
 	REMPY_INIT_CBF(simple_control);
@@ -77,7 +77,7 @@ PPCallbacks_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     	REMPY_INIT_CBF(get_plob);
     	REMPY_INIT_CBF(get_library);
     	REMPY_INIT_CBF(get_ploblist);
-    	REMPY_INIT_CBF(notify_error);
+    	REMPY_INIT_CBF(notify);
     	REMPY_INIT_CBF(play_ploblist);
     	REMPY_INIT_CBF(search);
     	REMPY_INIT_CBF(simple_control);
@@ -97,7 +97,7 @@ PPCallbacks_dealloc(RemPyPPCallbacks* self)
 	Py_CLEAR(self->get_plob);
 	Py_CLEAR(self->get_library);
 	Py_CLEAR(self->get_ploblist);
-	Py_CLEAR(self->notify_error);
+	Py_CLEAR(self->notify);
 	Py_CLEAR(self->play_ploblist);
 	Py_CLEAR(self->search);
 	Py_CLEAR(self->simple_control);

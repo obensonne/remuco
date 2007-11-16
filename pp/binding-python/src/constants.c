@@ -22,15 +22,10 @@ rempy_constants_add(PyObject *m)
 	PyModule_AddStringConstant(m, "PLOB_META_ANY", REM_PLOB_META_ANY);
 	PyModule_AddStringConstant(m, "REM_PLOB_META_ART", REM_PLOB_META_ART);
 
-	PyModule_AddStringConstant(m, "PLOBLIST_PLID_PLAYLIST", REM_PLOBLIST_PLID_PLAYLIST);
-	PyModule_AddStringConstant(m, "PLOBLIST_NAME_PLAYLIST", REM_PLOBLIST_NAME_PLAYLIST);
-	PyModule_AddStringConstant(m, "PLOBLIST_PLID_QUEUE", REM_PLOBLIST_PLID_QUEUE);
-	PyModule_AddStringConstant(m, "PLOBLIST_NAME_QUEUE", REM_PLOBLIST_NAME_QUEUE);
-
-	PyModule_AddIntConstant(m, "PS_STATE_STOP", REM_PBS_STOP); 
-	PyModule_AddIntConstant(m, "PS_STATE_PLAY", REM_PBS_PLAY); 
-	PyModule_AddIntConstant(m, "PS_STATE_PAUSE", REM_PBS_PAUSE); 
-	PyModule_AddIntConstant(m, "PS_STATE_OFF", REM_PBS_OFF); 
+	PyModule_AddIntConstant(m, "PS_PBS_STOP", REM_PBS_STOP); 
+	PyModule_AddIntConstant(m, "PS_PBS_PLAY", REM_PBS_PLAY); 
+	PyModule_AddIntConstant(m, "PS_PBS_PAUSE", REM_PBS_PAUSE); 
+	PyModule_AddIntConstant(m, "PS_PBS_OFF", REM_PBS_OFF); 
 	
 	PyModule_AddIntConstant(m, "PS_SHUFFLE_MODE_OFF", REM_SHUFFLE_MODE_OFF); 
 	PyModule_AddIntConstant(m, "PS_SHUFFLE_MODE_ON", REM_SHUFFLE_MODE_ON); 
@@ -49,6 +44,8 @@ rempy_constants_add(PyObject *m)
 	PyModule_AddIntConstant(m, "SCTRL_CMD_RATE", REM_SCTRL_CMD_RATE); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_VOTE", REM_SCTRL_CMD_VOTE); // FUTURE FEATURE 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_SEEK", REM_SCTRL_CMD_SEEK); // FUTURE FEATURE 
+	PyModule_AddIntConstant(m, "SCTRL_CMD_REPEAT", REM_SCTRL_CMD_REPEAT); 
+	PyModule_AddIntConstant(m, "SCTRL_CMD_SHUFFLE", REM_SCTRL_CMD_SHUFFLE); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_COUNT", REM_SCTRL_CMD_COUNT); 
 			
 }
