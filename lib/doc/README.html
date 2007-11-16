@@ -53,7 +53,7 @@ HREF="#AEN21"
 ></DT
 ><DT
 >A. <A
-HREF="#AEN24"
+HREF="#AEN31"
 >General Information</A
 ></DT
 ><DD
@@ -65,7 +65,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN38"
+HREF="#AEN45"
 >Source Code Access</A
 ></DT
 ></DL
@@ -155,8 +155,40 @@ NAME="AEN21"
 >4. Usage</A
 ></H2
 ><P
->&#13;            Using the library is only relevant when you write a player proxy.
-            Please refer to the player proxy writing guide on remuco.sf.net.
+>&#13;            This is a library, it's used by player proxies. However, you can
+            configure it a bit ..
+        </P
+><P
+>&#13;            In case you want to use a Remuco client to remotely shutdown your
+            system, place a shell script in <TT
+CLASS="filename"
+>$XDG_CONFIG_HOME/remuco
+            </TT
+> called  <TT
+CLASS="filename"
+>system-shutdown.sh </TT
+>
+            (usally <TT
+CLASS="filename"
+>XDG_CONFIG_HOME</TT
+> extends to
+            <TT
+CLASS="filename"
+>~/.config</TT
+>).
+            The Remuco server will run this when it receives the shutdown command
+            from a client. Make sure an ordinary user (especially the one
+            running the player proxy you use) is able to shut down the system
+            with this script. More info on this can be found at <A
+HREF="http://www.ma.utexas.edu/users/stirling/computergeek/shutdown.html"
+TARGET="_top"
+>http://www.ma.utexas.edu/users/stirling/computergeek/shutdown.html</A
+>
+            or at <A
+HREF="https://help.ubuntu.com/community/Sudoers"
+TARGET="_top"
+>https://help.ubuntu.com/community/Sudoers</A
+>.
         </P
 ></DIV
 ><DIV
@@ -164,7 +196,7 @@ CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN24"
+NAME="AEN31"
 >A. General Information</A
 ></H1
 ><P
@@ -224,7 +256,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN38"
+NAME="AEN45"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -267,7 +299,7 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN48"
+NAME="AEN55"
 ></A
 ><P
 ><B
@@ -290,7 +322,7 @@ CLASS="computeroutput"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN53"
+NAME="AEN60"
 ></A
 ><P
 ><B
