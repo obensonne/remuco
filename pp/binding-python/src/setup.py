@@ -1,13 +1,13 @@
 from distutils.core import setup, Extension
 import commands
 
-debug = True
+debug = False
 
 if debug:
     macros = [ ('DEBUG',''), ('LOGLEVEL', 'LL_DEBUG') ]
     macros_off = [ 'NDEBUG' ]
 else:
-    macros = [ ('G_DISABLE_ASSERT',''), ('LOGLEVEL', 'LL_INFO') ]
+    macros = [ ('LOGLEVEL', 'LL_INFO') ]
     macros_off = []
 
 inc_dirs = commands.getoutput("pkg-config glib-2.0 remuco --cflags").replace('-I','').split()
@@ -36,6 +36,6 @@ setup (name = 'Remuco',
        description = 'Python interface to the Remuco server library',
        long_description = '''
    Python interface to the Remuco server library for Remuco player proxies
-   writtten in Python.
+   written in Python.
    ''',
        ext_modules = [module1])
