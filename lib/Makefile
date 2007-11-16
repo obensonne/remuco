@@ -47,7 +47,7 @@ dist: clean doc
 clean:
 	make -C src clean
 	rm -rf build dist
-	rm  -f remuco.pc
+	rm  -f remuco.pc svn.diff
 
 ##############################################################################
 #
