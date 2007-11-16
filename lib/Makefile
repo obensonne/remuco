@@ -76,7 +76,8 @@ deb: clean doc
 		-type d -name ".svn" | xargs rm -rf
 	# create tgz packages
 	cd build/deb && \
-		tar zcf $(DEB_PKG_BIN).tar.gz .$(PREFIX)/lib/libremuco.so.* && \
+		tar zcf $(DEB_PKG_BIN).tar.gz \
+			.$(PREFIX)/lib/libremuco.so.* && \
 		tar zcf $(DEB_PKG_DEV).tar.gz \
 			.$(PREFIX)/lib/libremuco.so \
 			.$(PREFIX)/lib/libremuco.a \
@@ -89,10 +90,10 @@ deb: clean doc
 		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG_BIN).tar.gz && \
 		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG_DEV).tar.gz
 	# copy some prepared debian files
-	cp deb.alien/control build/deb/$(DEB_PKG_BIN)/debian
-	cp deb.alien/copyright build/deb/$(DEB_PKG_BIN)/debian
-	cp deb.alien/control-dev build/deb/$(DEB_PKG_DEV)/debian/control
-	cp deb.alien/copyright build/deb/$(DEB_PKG_DEV)/debian
+	cp alien/control build/deb/$(DEB_PKG_BIN)/debian
+	cp alien/copyright build/deb/$(DEB_PKG_BIN)/debian
+	cp alien/control-dev build/deb/$(DEB_PKG_DEV)/debian/control
+	cp alien/copyright build/deb/$(DEB_PKG_DEV)/debian
 	# create packages
 	cd  build/deb/$(DEB_PKG_BIN) && debian/rules binary
 	cd  build/deb/$(DEB_PKG_DEV) && debian/rules binary
@@ -127,4 +128,4 @@ pkg-fullname:
 	@echo $(PKG_FULLNAME)
 	
 lib-soname:
-	make -C src soname
+	@make -C src soname

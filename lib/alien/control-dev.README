@@ -1,0 +1,5 @@
+How to get the needed dev package (needs manual verification)..
+
+Relpace <LIB_DEB_PKG> with the binary debian package of the libaray.
+
+dpkg-deb -f <LIB_DEB_PKG> Depends | sed -e "s/([^)]*),//g" | sed -e "s/\([^ ]\+\)/\1-dev,/g"

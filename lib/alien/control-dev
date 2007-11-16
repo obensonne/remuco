@@ -1,0 +1,16 @@
+Source: libremuco-dev
+Section: alien
+Priority: extra
+Maintainer: Christian Buennig <mondai@users.sourceforge.net>
+
+Package: libremuco-dev
+Architecture: i386
+Depends: libremuco0 (= 0.6.0-1), libbluetooth2-dev, libc6-dev, libglib2.0-dev, libmagick9-dev
+Provides: libremuco0-dev
+Conflicts: libremuco0-dev
+Description: Remuco Server Library.
+ Library to be used by Remuco player proxies.
+ .
+ This package contains the files needed to develop player proxies.
+ .
+ (Converted from a tgz package by alien version 8.68.)

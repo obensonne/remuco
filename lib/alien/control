@@ -1,0 +1,12 @@
+Source: libremuco0
+Section: alien
+Priority: extra
+Maintainer: Christian Buennig <mondai@users.sourceforge.net>
+
+Package: libremuco0
+Architecture: i386
+Depends: ${shlibs:Depends}
+Description: Remuco Server Library
+ Library to be used by Remuco player proxies.
+ .
+ (Converted from a tgz package by alien version 8.68.)
