@@ -61,44 +61,45 @@ DEB_PKG_BASENAME := libremuco
 DEB_PKG_BIN := $(DEB_PKG_BASENAME)$(DEB_SONAME)-$(PKG_VERSION)
 DEB_PKG_DEV := $(DEB_PKG_BASENAME)-dev-$(PKG_VERSION)
 
-DEB_DESTDIR := $$PWD/build/deb
+DEB_BUILDDIR := $(CURDIR)/build/deb
+DEB_DESTDIR := $(DEB_BUILDDIR)/fsroot
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
 deb: clean doc
 	# install in a temp location
-	mkdir -p build/deb
-	DESTDIR=$(DEB_DESTDIR) make install
+	mkdir -p $(DEB_DESTDIR)
+	DESTDIR=$(DEB_DESTDIR) DEBUG=no make install
 	# install doc files for dev package
 	mkdir -p $(DEB_DESTDIR)$(PREFIX)/share/doc
 	cp -r doc $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)-dev
 	find $(DEB_DESTDIR)$(PREFIX)/share/doc/libremuco-dev \
 		-type d -name ".svn" | xargs rm -rf
 	# create tgz packages
-	cd build/deb && \
-		tar zcf $(DEB_PKG_BIN).tar.gz \
-			.$(PREFIX)/lib/libremuco.so.* && \
-		tar zcf $(DEB_PKG_DEV).tar.gz \
+	cd $(DEB_DESTDIR) && tar zcf $(DEB_BUILDDIR)/$(DEB_PKG_BIN).tar.gz \
+			.$(PREFIX)/lib/libremuco.so.*
+	tar zcf $(DEB_BUILDDIR)/$(DEB_PKG_DEV).tar.gz -C $(DEB_DESTDIR) \
 			.$(PREFIX)/lib/libremuco.so \
 			.$(PREFIX)/lib/libremuco.a \
 			.$(PREFIX)/lib/libremuco.la \
-			.$(PREFIX)/include/remuco* \
+			.$(PREFIX)/include/remuco.h \
+			.$(PREFIX)/include/remuco \
 			.$(PREFIX)/lib/pkgconfig/remuco.pc \
-			.$(PREFIX)/share/doc/$(PKG_BASENAME)-dev
+			.$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)-dev
 	# convert to debian package (with -g option)
-	cd build/deb && \
+	cd $(DEB_BUILDDIR) && \
 		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG_BIN).tar.gz && \
 		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG_DEV).tar.gz
 	# copy some prepared debian files
-	cp alien/control build/deb/$(DEB_PKG_BIN)/debian
-	cp alien/copyright build/deb/$(DEB_PKG_BIN)/debian
-	cp alien/control-dev build/deb/$(DEB_PKG_DEV)/debian/control
-	cp alien/copyright build/deb/$(DEB_PKG_DEV)/debian
+	cp alien/control $(DEB_BUILDDIR)/$(DEB_PKG_BIN)/debian
+	cp alien/copyright $(DEB_BUILDDIR)/$(DEB_PKG_BIN)/debian
+	cp alien/control-dev $(DEB_BUILDDIR)/$(DEB_PKG_DEV)/debian/control
+	cp alien/copyright $(DEB_BUILDDIR)/$(DEB_PKG_DEV)/debian
 	# create packages
-	cd  build/deb/$(DEB_PKG_BIN) && debian/rules binary
-	cd  build/deb/$(DEB_PKG_DEV) && debian/rules binary
+	cd  $(DEB_BUILDDIR)/$(DEB_PKG_BIN) && debian/rules binary
+	cd  $(DEB_BUILDDIR)/$(DEB_PKG_DEV) && debian/rules binary
 	mkdir -p dist
-	cp build/deb/*.deb dist/
+	cp $(DEB_BUILDDIR)/*.deb dist/
 
 ##############################################################################
 #

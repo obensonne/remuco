@@ -45,7 +45,7 @@ LFLAGS :=
 #LFLAGS += -Wl,-soname,$(LIB_FILE_SO)
 
 # debug dependent compile flags and commands
-ifneq "$(DEBUG)" ""
+ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
 CFLAGS ?= -DLOGLEVEL=LL_DEBUG
 #CFLAGS ?= -DLOGLEVEL=LL_NOISE
