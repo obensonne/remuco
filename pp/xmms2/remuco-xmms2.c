@@ -22,8 +22,6 @@ static RemPPPriv	*priv_global;	// we need a global ref to our private data
 
 /* Defined here because used more than once. */
 #define XMETA_NAME_RATING	"rating"
-/* Defined here because used more than once. */
-#define XMETA_NAME_ART		"album_front_small"
 
 /** X2 names of the meta informatioin we request from X2 */
 static const gchar	*XMETA_NAMES[] = {
@@ -31,7 +29,7 @@ static const gchar	*XMETA_NAMES[] = {
 		"title", "genre",
 		"comment", "tracknr",
 		"duration", "bitrate",
-		XMETA_NAME_RATING, XMETA_NAME_ART };
+		XMETA_NAME_RATING };
 
 /** Remuco names of the meta informatioin we request from X2 */
 static const gchar	*RMETA_NAMES[] = {
@@ -39,7 +37,7 @@ static const gchar	*RMETA_NAMES[] = {
 		REM_PLOB_META_TITLE, REM_PLOB_META_GENRE,
 		REM_PLOB_META_COMMENT, REM_PLOB_META_TRACK,
 		REM_PLOB_META_LENGTH, REM_PLOB_META_BITRATE,
-		REM_PLOB_META_RATING, REM_PLOB_META_ART };
+		REM_PLOB_META_RATING };
 
 /** X2 value types the meta informatioin we request from X2 */
 static const gint	XMETA_TYPES[] = { 
@@ -47,13 +45,19 @@ static const gint	XMETA_TYPES[] = {
 		XMMSC_RESULT_VALUE_TYPE_STRING, XMMSC_RESULT_VALUE_TYPE_STRING,
 		XMMSC_RESULT_VALUE_TYPE_STRING, XMMSC_RESULT_VALUE_TYPE_INT32,
 		XMMSC_RESULT_VALUE_TYPE_INT32, XMMSC_RESULT_VALUE_TYPE_INT32,
-		XMMSC_RESULT_VALUE_TYPE_INT32, XMMSC_RESULT_VALUE_TYPE_STRING };
+		XMMSC_RESULT_VALUE_TYPE_INT32 };
 
 /** Count of meta information elements we request from X2 */
 #define XMETA_COUNT	10
 
 /** Number of the meta information element 'length' (or duration) */
 #define XMETA_NUM_LENGTH	6
+
+static const gchar *XMETA_NAMES_ART[] = {
+		"album_front_large", "album_front_small", "album_front_thumbnail" };
+};
+
+#define XMETA_ART_COUNT 3
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -274,19 +278,24 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 	
 	result = xmmsc_playlist_current_pos(priv->xc, XMMS_ACTIVE_PLAYLIST);
 	
-	REMX2_RESULT_WAIT(result);
+	xmmsc_result_wait(result);
 	
-	ret = xmmsc_result_get_uint(result, &u);
-	g_assert(ret);
+	if (xmmsc_result_iserror(result)) {
+		
+		ps->cap_pos = 0; // song not in playlist
+		
+	} else {
+		
+		ret = xmmsc_result_get_uint(result, &u);
+		g_assert(ret);
+		
+		LOG_NOISE("new (XMMS2) cap_pos is %u\n", u);
+
+		ps->cap_pos = (gint) u + 1;
+	}
 	
-	// TODO the cap position here is allways a song in a playlist, also if
-	// the current active song is not part of the current playlist
-	LOG_NOISE("new (XMMS2) cap_pos is %u\n", u);
-
-	ps->cap_pos = (gint) u + 1;
-
 	xmmsc_result_unref(result);
-
+	
 	////////// cap id //////////
 	
 	result = xmmsc_playback_current_id(priv->xc);
@@ -339,8 +348,9 @@ rcb_get_library(RemPPPriv *priv)
 		ret = xmmsc_result_get_string(result, &plid);
 		g_assert(ret);
 		
-		rem_library_append_const(
-				lib, plid, plid, REM_PLOBLIST_FLAG_STATIC);
+		if (g_str_equal(plid, XMMS_ACTIVE_PLAYLIST)) continue;
+		
+		rem_library_append_const(lib, plid, plid, REM_PLOBLIST_FLAG_STATIC);
 	}
 	
 	xmmsc_result_unref(result);
@@ -410,6 +420,20 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	}
 	
 	g_string_free(val_gs, TRUE);
+
+	////////// get album art url (try to get the biggest one) //////////
+	
+	for (u = 0; u < XMETA_ART_COUNT; u++) {
+		
+		ret = xmmsc_result_get_dict_entry_string(
+							result, XMETA_NAMES_ART[u], &val_s);
+		
+		if (ret && val_s && val_s[0] != 0) {
+			rem_plob_meta_add_const(plob, REM_PLOB_META_ART, val_s);
+			break;
+		}
+		
+	}
 	
 	xmmsc_result_unref(result);
 	
@@ -553,6 +577,20 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 
 			break;
 			
+		case REM_SCTRL_CMD_REPEAT:
+			
+			// X2 has no repeat mode
+			
+			break;
+		case REM_SCTRL_CMD_SHUFFLE:
+			
+			if (param == REM_SHUFFLE_MODE_OFF) break;
+			
+			// X2 has no shuffle mode but tha playlist can be shuffled:
+			result = xmmsc_playlist_shuffle(priv->xc, XMMS_ACTIVE_PLAYLIST);
+			xmmsc_result_unref(result);
+			
+			break;
 		default:
 			LOG_WARN("ignore command %hu\n", cmd);
 			break;
