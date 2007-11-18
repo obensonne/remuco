@@ -10,6 +10,8 @@ PKG_VERSION := $(shell python src/setup.py --version)
 PKG_BASENAME := libremuco-python
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
+LOGLEVEL ?= LL_DEBUG
+
 ###############################################################################
 #
 # Standard Targets
@@ -20,7 +22,8 @@ all: clean .build-req
 	cd src && python setup.py build
 
 install:
-	cd src && python setup.py install --prefix=$(DESTDIR)$(PREFIX)
+	cd src && LOGLEVEL=$(LOGLEVEL) \
+		python setup.py install --prefix=$(DESTDIR)$(PREFIX)
 
 uninstall:
 	#python setup.py uninstall --prefix=$(DESTDIR)$(PREFIX)
@@ -71,7 +74,10 @@ DEB_PKG_BASENAME := python-remuco
 DEB_PKG := $(DEB_PKG_BASENAME)-$(PKG_VERSION)
 
 DEB_BUILDDIR := $(CURDIR)/build/deb
+
 DEB_DESTDIR := $(DEB_BUILDDIR)/fsroot
+DEB_PREFIX := /usr
+DEB_LOGLEVEL := LL_INFO
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
@@ -81,7 +87,8 @@ deb: clean doc
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
-	DESTDIR=$(DEB_DESTDIR) make install
+	DESTDIR=$(DEB_DESTDIR) PREFIX=$(DEB_PREFIX) LOGLEVEL=$(DEB_LOGLEVEL) \
+		make install
 	# create tgz packages
 	tar zcf $(DEB_BUILDDIR)/$(DEB_PKG).tar.gz -C $(DEB_DESTDIR) \
 		.$(PREFIX)

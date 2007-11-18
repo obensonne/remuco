@@ -42,7 +42,6 @@ PlayerStatus_init(RemPyPlayerStatus *self, PyObject *args, PyObject *kwds)
 static PyObject*
 PlayerStatus_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-	LOG_DEBUG("called\n");
 	RemPyPlayerStatus *self;
 
     self = (RemPyPlayerStatus *)type->tp_alloc(type, 0);

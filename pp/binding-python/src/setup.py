@@ -1,10 +1,14 @@
 from distutils.core import setup, Extension
 import commands
+import os
 
-debug = True
+LOGLEVEL = os.getenv("LOGLEVEL")
 
-if debug:
-    macros = [ ('DEBUG',''), ('LOGLEVEL', 'LL_DEBUG') ]
+if not LOGLEVEL:
+    LOGLEVEL = "LL_DEBUG"
+
+if LOGLEVEL == "LL_DEBUG" or LOGLEVEL == "LL_NOISE":
+    macros = [ ('LOGLEVEL', 'LL_DEBUG') ]
     macros_off = [ 'NDEBUG' ]
 else:
     macros = [ ('LOGLEVEL', 'LL_INFO') ]
