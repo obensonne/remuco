@@ -42,6 +42,7 @@ PlayerStatus_init(RemPyPlayerStatus *self, PyObject *args, PyObject *kwds)
 static PyObject*
 PlayerStatus_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+	LOG_DEBUG("called\n");
 	RemPyPlayerStatus *self;
 
     self = (RemPyPlayerStatus *)type->tp_alloc(type, 0);
@@ -70,7 +71,7 @@ static PyTypeObject PlayerStatusType = {
 	PyObject_HEAD_INIT(NULL)
 	0,									/*ob_size*/
 	"remuco.PlayerStatus",				/*tp_name*/
-	sizeof(RemPyPlayerStatus),				/*tp_basicsize*/
+	sizeof(RemPyPlayerStatus),			/*tp_basicsize*/
 	0,									/*tp_itemsize*/
 	(destructor)PlayerStatus_dealloc,	/*tp_dealloc*/
 	0,									/*tp_print*/
@@ -111,7 +112,7 @@ static PyTypeObject PlayerStatusType = {
 RemPyPlayerStatus*
 rempy_pstatus_new()
 {
-	return PyObject_New(RemPyPlayerStatus, &PlayerStatusType);
+	return PlayerStatus_new(&PlayerStatusType, NULL, NULL);
 }
 
 int

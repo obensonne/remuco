@@ -24,11 +24,12 @@ priv_pp_priv_destroy(void *data)
 {
 	RemPPPriv *priv = (RemPPPriv*) priv;
 	
+	g_return_if_fail(data);
+	
 	Py_CLEAR(priv->pp_priv);
 	Py_CLEAR(priv->pp_callbacks);
 	Py_CLEAR(priv->pp_ps);
-	// priv->self_py should already have a ref count of 0, that's why we're here
-	g_slice_free(RemPPPriv, priv);
+	g_free(priv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,6 +163,10 @@ priv_conv_plob_c2py(const RemPlob *plob)
 	return dict;
 }
 
+/**
+ * Instpects the callbacks we've got from the python PP and sets up our
+ * wrappter callbacks appropriately.
+ */
 static RemPPCallbacks*
 priv_conv_ppcallbacks_py2c(PyObject *po)
 {
@@ -170,6 +175,7 @@ priv_conv_ppcallbacks_py2c(PyObject *po)
 	if (!PyCallable_Check(_fo)) {								\
 		PyErr_Print();											\
 		PyErr_SetString(PyExc_TypeError, "cannot call " _fn);	\
+		g_free(ppcb_c);											\
 		return NULL;											\
 	}
 
@@ -184,7 +190,7 @@ priv_conv_ppcallbacks_py2c(PyObject *po)
 	
 	ppcb_py = (RemPyPPCallbacks*) po;
 	
-	ppcb_c = g_slice_new0(RemPPCallbacks);
+	ppcb_c = g_new0(RemPPCallbacks, 1);
 	
 	if (ppcb_py->get_library != Py_None) {
 		REMPY_FUNC_CHECK(ppcb_py->get_library, "get_library");
@@ -245,7 +251,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 
 	ppd_py = (RemPyPPDescriptor*) po;
 	
-	ppd = g_slice_new0(RemPPDescriptor);
+	ppd = g_new0(RemPPDescriptor, 1);
 	
 	if (ppd_py->charset == Py_None) {
 		ppd->charset = NULL;
@@ -254,7 +260,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	} else {
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError, "PPDescriptor.charset is not a string");
-		g_slice_free(RemPPDescriptor, ppd);
+		g_free(ppd);
 		return NULL;
 	}
 	
@@ -266,7 +272,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError, "PPDescriptor.player_name is not a string");
 		if (ppd->charset) g_free(ppd->charset);
-		g_slice_free(RemPPDescriptor, ppd);
+		g_free(ppd);
 		return NULL;
 	}
 	
@@ -703,11 +709,11 @@ rempy_server_up(PyObject *self, PyObject *args)
 	if (!desc) {
 		PyErr_Print();
 		PyErr_SetString(PyExc_TypeError, "bad argument #1");
-		g_slice_free(RemPPCallbacks, callbacks);
+		g_free(callbacks);
 		return NULL;
 	}
-	
-	priv = g_slice_new0(RemPPPriv);
+
+	priv = g_new0(RemPPPriv, 1);
 	
 	Py_INCREF(pp_priv); // http://docs.python.org/ext/ownershipRules.html
 	priv->pp_priv = pp_priv;
@@ -725,10 +731,10 @@ rempy_server_up(PyObject *self, PyObject *args)
 		PyErr_SetString(
 				PyExc_RuntimeError, err ? err->message : "server start failed");
 		if (err) g_error_free(err);
-		g_slice_free(RemPPCallbacks, callbacks);
+		g_free(callbacks);
 		if (desc->charset) g_free(desc->charset);
-		if (desc->player_name) g_free(desc->charset);
-		g_slice_free(RemPPDescriptor, desc);
+		if (desc->player_name) g_free(desc->player_name);
+		g_free(desc);
 		priv_pp_priv_destroy(priv);
 		return NULL;
 	}

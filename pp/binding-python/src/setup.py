@@ -1,7 +1,7 @@
 from distutils.core import setup, Extension
 import commands
 
-debug = False
+debug = True
 
 if debug:
     macros = [ ('DEBUG',''), ('LOGLEVEL', 'LL_DEBUG') ]
