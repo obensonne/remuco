@@ -44,7 +44,7 @@ struct _RemServer {
 	
 	RemPPDescriptor			*pp_desc;
 	RemPPCallbacks			*pp_cb;
-	const RemPPPriv			*pp_priv;
+	RemPPPriv				*pp_priv;
 	
 	gboolean				pending_sync;	// ensure calm handling of rem_server_notify()
 	gboolean				pending_down;	// ensure calm handling of rem_server_down()
@@ -63,36 +63,11 @@ struct _RemServer {
 };
 
 typedef struct {
-	RemNetClient	*net;
+	RemNetClient		*net;
 	RemClientInfo		*info;
 	guint				src_id;
 } RemClient;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// macros for debugging processing time
-//
-//////////////////////////////////////////////////////////////////////////////
-
-#if LOGLEVEL >= LL_NOISE
-static GTimer *dbg_timer;
-#define REM_DBG_TIMER_INIT dbg_timer = g_timer_new()
-#define REM_DBG_TIMER_FREE g_timer_destroy(dbg_timer)
-#define REM_DBG_TIMER_START	g_timer_start(dbg_timer)
-#define REM_DBG_TIMER_SNAP(_msg) G_STMT_START {	\
-	gdouble _sec; 								\
-	_sec = g_timer_elapsed(dbg_timer, NULL);	\
-	LOG(" - - - TIMER %f | %s - - -\n", _sec, _msg);	\
-} G_STMT_END
-#define REM_DBG_TIMER_STOP g_timer_stop(dbg_timer)
-#else
-#define REM_DBG_TIMER_INIT
-#define REM_DBG_TIMER_FREE
-#define REM_DBG_TIMER_START
-#define REM_DBG_TIMER_SNAP(_msg)
-#define REM_DBG_TIMER_STOP
-#endif
-	
 //////////////////////////////////////////////////////////////////////////////
 //
 // private functions: IO and serialization
@@ -274,7 +249,7 @@ priv_build_ploblist(RemServer *s,
 	
 	while((pid = rem_sl_iterator_next(pids))) {
 		
-		plob = s->pp_cb->get_plob((RemPPPriv*) s->pp_priv, pid);
+		plob = s->pp_cb->get_plob(s->pp_priv, pid);
 		if (!plob) plob = rem_plob_new_unknown(pid);
 			
 		s1 = rem_plob_meta_get(plob, REM_PLOB_META_TITLE);
@@ -307,18 +282,11 @@ priv_handle_player_changes(RemServer* server)
 	LOG_NOISE("called\n");
 	
 	RemPlayerStatusDiff	diff;
-	RemPPPriv			*ppp;
-	
-	ppp = (RemPPPriv*) server->pp_priv;
 	
 	////////// status change ? //////////
 	
-	REM_DBG_TIMER_START;
-	
-	server->pp_cb->synchronize(ppp, server->pstatus);
+	server->pp_cb->synchronize(server->pp_priv, server->pstatus);
 
-	REM_DBG_TIMER_SNAP("sync finished");
-	
 	g_return_if_fail(server->pstatus->cap_pid);
 	g_return_if_fail(server->pstatus->playlist);
 	g_return_if_fail(server->pstatus->queue);
@@ -339,7 +307,7 @@ priv_handle_player_changes(RemServer* server)
 		rem_plob_destroy(server->cap);
 		if (server->pstatus_fp->cap_pid->len) {
 			server->cap = server->pp_cb->get_plob(
-										ppp, server->pstatus_fp->cap_pid->str);
+					server->pp_priv, server->pstatus_fp->cap_pid->str);
 		} else {
 			server->cap = NULL;
 		}
@@ -369,8 +337,7 @@ priv_handle_player_changes(RemServer* server)
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
 	
-	REM_DBG_TIMER_SNAP("handle player changes finshed");
-	REM_DBG_TIMER_STOP;
+	LOG_NOISE("done\n");
 }
 
 static void
@@ -385,12 +352,9 @@ priv_handle_pimsg(RemServer* server,
 	RemStringList		*sl;
 	RemPloblist			*pl;
 	const gchar			*pl_name;
-	RemPPPriv			*ppp;
 	
 	msg_response.id = 0;
 	msg_response.ba = NULL;
-	
-	ppp = (RemPPPriv*) server->pp_priv;
 	
 	switch (msg->id) {
 		
@@ -401,7 +365,7 @@ priv_handle_pimsg(RemServer* server,
 		
 		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
 		
-		plob = server->pp_cb->get_plob(ppp, string->value);
+		plob = server->pp_cb->get_plob(server->pp_priv, string->value);
 		
 		msg_response.id = msg->id;
 		msg_response.ba = priv_serialize(server, client, msg->id, plob, NULL);
@@ -415,7 +379,7 @@ priv_handle_pimsg(RemServer* server,
 		
 		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
 		
-		sl = server->pp_cb->get_ploblist(ppp, string->value);
+		sl = server->pp_cb->get_ploblist(server->pp_priv, string->value);
 		
 		pl_name = rem_library_get_name(server->lib, string->value);
 		pl = rem_ploblist_new(string->value, pl_name);
@@ -434,7 +398,7 @@ priv_handle_pimsg(RemServer* server,
 	
 		rem_library_destroy(server->lib);
 		
-		server->lib = server->pp_cb->get_library(ppp);
+		server->lib = server->pp_cb->get_library(server->pp_priv);
 		if (!server->lib) {
 			LOG_WARN("library request from pp returned NULL\n");
 			server->lib = rem_library_new();
@@ -450,7 +414,7 @@ priv_handle_pimsg(RemServer* server,
 			
 		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
 		
-		server->pp_cb->play_ploblist(ppp, string->value);
+		server->pp_cb->play_ploblist(server->pp_priv, string->value);
 		
 		rem_string_destroy(string);
 
@@ -461,8 +425,9 @@ priv_handle_pimsg(RemServer* server,
 		sctrl = rem_simple_control_unserialize(
 					msg->ba, server->pp_desc->charset);
 		
-		server->pp_cb->simple_ctrl(
-					ppp, (RemSimpleControlCommand) sctrl->cmd, sctrl->param);
+		server->pp_cb->simple_ctrl(server->pp_priv,
+								  (RemSimpleControlCommand) sctrl->cmd,
+								  sctrl->param);
 		
 		// ensure that important changes immediately go to clients
 		if (server->poll && (sctrl->cmd == REM_SCTRL_CMD_JUMP ||
@@ -776,7 +741,7 @@ priv_cb_down(gpointer data)
 
 	// rescue this to finally emit shut down finished event:
 	pp_cb_notify = server->pp_cb->notify;
-	pp_priv = (RemPPPriv*) server->pp_priv;
+	pp_priv = server->pp_priv;
 	
 	// free all our resources:
 	priv_server_free(server);
@@ -784,8 +749,6 @@ priv_cb_down(gpointer data)
 	// let the pp know that we are down:
 	pp_cb_notify(pp_priv, REM_SERVER_EVENT_DOWN);
 	
-	REM_DBG_TIMER_FREE;
-
 	return FALSE;
 	
 }
@@ -994,6 +957,8 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 		
 		server->pp_cb->notify(server->pp_priv, REM_SERVER_EVENT_ERROR);
 
+		return FALSE;
+
 	} else { // some error
 		
 		LOG_DEBUG("G_IO_HUP|ERR|?? (%u)\n", cond);
@@ -1032,7 +997,7 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	
 	server->pp_desc = pp_desc;
 	server->pp_cb = pp_callbacks;
-	server->pp_priv = pp_priv;
+	server->pp_priv = (RemPPPriv*) pp_priv;
 	
 	server->pinfo = priv_create_player_info(pp_desc, pp_callbacks);
 	if (!server->pinfo) {
@@ -1089,8 +1054,6 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	server->net_msg_rx	= rem_net_msg_new();
 	
 	LOG_INFO("server started\n");
-	
-	REM_DBG_TIMER_INIT;
 	
 	return server;
 
@@ -1163,5 +1126,4 @@ rem_server_down(RemServer* server)
 	g_source_attach(src, server->mc);
 	g_source_unref(src);	
 }
-
 

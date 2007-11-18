@@ -49,6 +49,11 @@ typedef struct _RemServer		RemServer;
  * @return	A RemServer which must be used as first parameter for
  *			rem_server_notify() and rem_server_down(). If an error occurs
  *			<code>NULL</code> will be returned and @a err @em may be set.
+ * 
+ * @remark	Server takes only ownership and frees @a pp_desc and @a pp_callbacks
+ * 			if this function returns successfully, i.e. return value is not
+ * 			@p NULL! This means on error, the caller (the PP) must care about
+ * 			freeing @a pp_desc and @a pp_callbacks.
  */
 RemServer*
 rem_server_up(RemPPDescriptor *pp_desc,

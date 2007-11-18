@@ -43,17 +43,22 @@ HREF="#AEN10"
 ></DT
 ><DT
 >3. <A
-HREF="#AEN15"
+HREF="#AEN16"
 >Installation</A
 ></DT
 ><DT
 >4. <A
-HREF="#AEN21"
+HREF="#AEN23"
 >Usage</A
 ></DT
 ><DT
+>5. <A
+HREF="#AEN33"
+>Writing Player Proxies</A
+></DT
+><DT
 >A. <A
-HREF="#AEN31"
+HREF="#AEN36"
 >General Information</A
 ></DT
 ><DD
@@ -65,7 +70,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN45"
+HREF="#AEN50"
 >Source Code Access</A
 ></DT
 ></DL
@@ -123,7 +128,10 @@ NAME="AEN10"
 ><P
 >To build, run:</P
 ><P
->$ make</P
+><B
+CLASS="command"
+>$ make</B
+></P
 ><P
 >This automatically checks for build requirements.</P
 ></DIV
@@ -132,13 +140,16 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN15"
+NAME="AEN16"
 >3. Installation</A
 ></H2
 ><P
 >To install, run (with super user privileges):</P
 ><P
->$ make install</P
+><B
+CLASS="command"
+>$ make install</B
+></P
 ><P
 >&#13;            This installs into /usr/... If you prefer another prefix,
             e.g. /usr/local, run the following instead:
@@ -151,7 +162,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN21"
+NAME="AEN23"
 >4. Usage</A
 ></H2
 ><P
@@ -192,11 +203,22 @@ TARGET="_top"
         </P
 ></DIV
 ><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN33"
+>5. Writing Player Proxies</A
+></H2
+><P
+>TODO ref to the doxygen API</P
+></DIV
+><DIV
 CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN31"
+NAME="AEN36"
 >A. General Information</A
 ></H1
 ><P
@@ -256,7 +278,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN45"
+NAME="AEN50"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -299,30 +321,31 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN55"
+NAME="AEN60"
 ></A
 ><P
 ><B
 >Example A-1. 
                 Check out the current development version of the server
-                library into the directory <TT
+                library into the directory
+                <TT
 CLASS="filename"
->remuco-lib-trunk</TT
+>remuco-server-trunk</TT
 >:
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
->&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/lib remuco-lib-trunk
-                </SAMP
+>&#13;                <B
+CLASS="command"
+>&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/server remuco-server-trunk
+                </B
 >
             </P
 ></DIV
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN60"
+NAME="AEN65"
 ></A
 ><P
 ><B
@@ -335,11 +358,11 @@ CLASS="filename"
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
+>&#13;                <B
+CLASS="command"
 >&#13;                $ svn co &#60;SVN-ROOT&#62;/tags/remuco-client-0.6.0
                 remuco-client-0.6.0
-                </SAMP
+                </B
 >
             </P
 ></DIV

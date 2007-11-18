@@ -24,10 +24,10 @@ INSTALL_LIB := $(INSTALL) -m 644
 INSTALL_EXE := $(INSTALL) -m 755
 INSTALL_DIR := $(INSTALL) -m 755 -d
 
-ifeq "$(strip $(DEBUG))" ""
-STRIP := strip --strip-unneeded
-else
+ifeq "$(DEBUG)" "yes"
 STRIP := touch
+else
+STRIP := strip --strip-unneeded
 endif
 
 ###############################################################################
@@ -47,8 +47,8 @@ LFLAGS :=
 # debug dependent compile flags and commands
 ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
-CFLAGS ?= -DLOGLEVEL=LL_DEBUG
-#CFLAGS ?= -DLOGLEVEL=LL_NOISE
+CFLAGS += -DLOGLEVEL=LL_DEBUG
+#CFLAGS += -DLOGLEVEL=LL_NOISE
 else
 CFLAGS += -O2
 CFLAGS += -DLOGLEVEL=LL_INFO
