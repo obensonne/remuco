@@ -54,6 +54,13 @@ clean:
 		&& echo "ok" || { echo "missing" ; false; }
 	touch .build-req
 
+valgrind:
+	G_SLICE=always-malloc \
+		valgrind --leak-check=yes \
+		--gen-suppressions=yes \
+		--suppressions=valgrind-errors.suppress \
+		./test.py
+
 ##############################################################################
 #
 # Building debain packages (bin and dev) using alien
