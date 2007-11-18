@@ -77,7 +77,7 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 			disconnect();
 		}
 
-		ccel.event(ICCEventListener.EVENT_CONNECTING, "Try to connect..");
+		ccel.event(ICCEventListener.EVENT_CONNECTING, "Connecting ..");
 
 		try {
 			comm = new Comm(device, this);

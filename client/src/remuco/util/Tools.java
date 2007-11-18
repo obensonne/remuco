@@ -208,7 +208,7 @@ public final class Tools {
 	}
 
 	/**
-	 * Sleep a while. {@link InterruptedException} gets catched but sleeping
+	 * Sleep a while. {@link InterruptedException} gets caught but sleeping
 	 * won't be continued.
 	 * 
 	 * @param ms
@@ -222,7 +222,7 @@ public final class Tools {
 	}
 
 	/**
-	 * Sleep some random time. {@link InterruptedException} gets catched but
+	 * Sleep some random time. {@link InterruptedException} gets caught but
 	 * sleeping won't be continued.
 	 * 
 	 * @param ms

@@ -24,7 +24,7 @@ public final class Comm extends Thread implements IMessageSender {
 	private boolean interrupted;
 
 	/**
-	 * Used to signal local events (e.g. erros) to the used
+	 * Used to signal local events (e.g. errors) to the used
 	 * {@link IMessageReceiver}.
 	 */
 	private final Message localMsg = new Message();
@@ -50,7 +50,7 @@ public final class Comm extends Thread implements IMessageSender {
 	 * @param device
 	 *            the device to communicate with
 	 * @param client
-	 *            handler for the recieved messages
+	 *            handler for the received messages
 	 */
 	public Comm(String device, IMessageReceiver mr) throws UserException {
 
@@ -131,8 +131,7 @@ public final class Comm extends Thread implements IMessageSender {
 				receiveMessages();
 
 				if (!interrupted) {
-					localMsgSP.setParam("Lost connection to server. "
-							+ "Try to reconnect..");
+					localMsgSP.setParam("Lost connection.\nReconnect..");
 					localMsg.id = Message.ID_LOCAL_DISCONNECTED;
 					localMsg.sd = localMsgSP.sdGet();
 					mr.receiveMessage(localMsg);
@@ -178,11 +177,11 @@ public final class Comm extends Thread implements IMessageSender {
 	}
 
 	/**
-	 * Tries continuesly to set up the net connection until success or a serious
-	 * error occured.
+	 * Tries continuously to set up the net connection until success or a serious
+	 * error occurred.
 	 * 
 	 * @return the net connection or <code>null</code> if a serious error
-	 *         occured and proceeding does not make much sense
+	 *         occurred and proceeding does not make much sense
 	 * 
 	 */
 	private Net connect() {
@@ -215,10 +214,8 @@ public final class Comm extends Thread implements IMessageSender {
 
 			if (net == null) {
 
-				localMsgSP.setParam("Could not connect to server\n"
-						+ "Connecting failed " + n
-						+ " times now. Will retry in " + CONN_RETRY_IVAL
-						+ " seconds.");
+				localMsgSP.setParam("Connecting failed\n(" + n + " times)\n"
+						+ "Retry ..");
 				localMsg.id = Message.ID_LOCAL_DISCONNECTED;
 				localMsg.sd = localMsgSP.sdGet();
 				mr.receiveMessage(localMsg);

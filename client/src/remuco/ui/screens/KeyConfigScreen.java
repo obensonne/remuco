@@ -20,7 +20,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 	/** The current action to set a key for. */
 	private int actionToSet;
-
+	
 	private final Alert alertKeyConflict, alertReset;
 
 	private final Display display;
@@ -76,6 +76,8 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 	public void commandAction(Command c, Displayable d) {
 
+		int actionOld;
+		
 		if (c == CMD_RESET) {
 
 			display.setCurrent(alertReset);
@@ -103,10 +105,12 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 		} else if (c == UI.CMD_YES && d == alertKeyConflict) {
 
-			Keys.unsetKey(selectedKey);
+			actionOld = Keys.unsetKey(selectedKey);
 			Keys.setKeyForAction(actionToSet, selectedKey);
 
 			updateList(actionToSet);
+			if (actionOld >= 0)
+				updateList(actionOld);
 
 			display.setCurrent(this);
 

@@ -402,8 +402,7 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 
 		case EVENT_CONNECTING:
 
-			//screenConnecting.setMessage(msg); TODO change this
-			screenConnecting.setMessage("Lost connection. Reconnect..");
+			screenConnecting.setMessage(msg);
 			screenConnecting.setCancable(true);
 
 			display.setCurrent(screenConnecting);

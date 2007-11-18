@@ -40,9 +40,8 @@ public final class Keys {
 	 * Default key configuration.
 	 * <p>
 	 * Format:<br>
-	 * The key codes at <code>defaultConfig[2*i]</code> (primary key) and
-	 * <code>defaultConfig[2*i+1]</code> (alternative key, e.g. a joystick
-	 * move) are mapped to the action code <code>i</code>.
+	 * The key code at <code>i</code> is mapped to the action code
+	 * <code>i</code>.
 	 */
 	private static final int[] defaultConfig = new int[] { Canvas.KEY_NUM5, 0,
 			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
@@ -170,20 +169,22 @@ public final class Keys {
 	}
 
 	/**
-	 * Release a key. Deassociates <code>key</code> from the action it is
+	 * Release a key. Dissociates <code>key</code> from the action it is
 	 * currently associated with (if any).
 	 * 
 	 * @param key
+	 * @return the action the key has been associated with until now, or -1 if
+	 *         the key has been free until now
 	 */
-	public static synchronized void unsetKey(int key) {
+	public static synchronized int unsetKey(int key) {
 
 		for (int i = 0; i < config.length; i++) {
 			if (key == config[i]) {
 				config[i] = 0;
-				return;
+				return i;
 			}
 		}
-
+		return -1;
 	}
 
 	/**

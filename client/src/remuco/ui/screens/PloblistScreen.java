@@ -16,6 +16,7 @@ import remuco.player.Player;
 import remuco.player.Plob;
 import remuco.player.PlobList;
 import remuco.ui.UI;
+import remuco.util.Tools;
 
 public final class PloblistScreen extends List implements CommandListener,
 		IPlobRequestor {
@@ -36,7 +37,7 @@ public final class PloblistScreen extends List implements CommandListener,
 	private final PlobInfoScreen screenPlobInfo;
 
 	private final Alert alertUpdate;
-	
+
 	private Command selectCommand;
 
 	/**
@@ -65,7 +66,7 @@ public final class PloblistScreen extends List implements CommandListener,
 		screenPlobInfo = new PlobInfoScreen();
 		screenPlobInfo.addCommand(UI.CMD_BACK);
 		screenPlobInfo.setCommandListener(this);
-		
+
 		alertUpdate = new Alert("Info");
 		alertUpdate.setString("Updating list..");
 		alertUpdate.setType(AlertType.INFO);
@@ -186,9 +187,13 @@ public final class PloblistScreen extends List implements CommandListener,
 		this.pl = pl;
 
 		if (isShown()) {
+			alertUpdate
+					.setString(pl.getName() + " changed, updating..");
 			display.setCurrent(alertUpdate, this);
 		}
-		
+
+		Tools.sleep(100); // to ensure the alert is really up
+
 		deleteAll();
 
 		setTitle(pl.getName());
@@ -196,14 +201,14 @@ public final class PloblistScreen extends List implements CommandListener,
 		len = pl.getLength();
 
 		// show or hide item dependent commands
-		
+
 		enu = itemCommands.elements();
-		
+
 		if (len == 0) {
-			
+
 			while (enu.hasMoreElements())
 				super.removeCommand((Command) enu.nextElement());
-			
+
 		} else {
 
 			while (enu.hasMoreElements())

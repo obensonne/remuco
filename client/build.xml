@@ -10,10 +10,6 @@
      Building the client:
      ^^^^^^^^^^^^^^^^^^^^
      
-     In order to build the client you either need the obfuscater ProGuard
-     installed or you must skip obfuscating. See target 'obfuscate' for how
-     to select an obfuscation strategy.
-
      Edit file 'build.properties' as described within that file.
 
      Run target 'dist.jar'.
@@ -40,8 +36,9 @@
      If you set the variabl EMULATION in class remuco.Remuco to true, the client
      internally starts a dummy server and player to simulate real ones. This
      can be used to test the client without a Bluetooth connection to a real
-     server. However, this dummy server and player is only an 'rough image'
-     of a real server and player, so not everything can be tested with them.
+     server. However, this dummy server and player is only a 'rough idea'
+     of a real server and player, so not everything can be tested with this
+     emulation.
 
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      

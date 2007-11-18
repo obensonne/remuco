@@ -43,17 +43,22 @@ HREF="#AEN10"
 ></DT
 ><DT
 >3. <A
-HREF="#AEN13"
+HREF="#AEN17"
 >Installation</A
 ></DT
 ><DT
 >4. <A
-HREF="#AEN17"
+HREF="#AEN23"
 >Usage</A
 ></DT
 ><DT
+>5. <A
+HREF="#AEN28"
+>Creating New Themes</A
+></DT
+><DT
 >A. <A
-HREF="#AEN21"
+HREF="#AEN31"
 >General Information</A
 ></DT
 ><DD
@@ -65,7 +70,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN35"
+HREF="#AEN45"
 >Source Code Access</A
 ></DT
 ></DL
@@ -121,33 +126,26 @@ NAME="AEN10"
 >2. Building</A
 ></H2
 ><P
->&#13;            If you've got source package see documentation within the
-            file 'build.xml' for how to build a binary pacakge.
-        </P
-></DIV
-><DIV
-CLASS="section"
-><HR><H2
-CLASS="section"
-><A
-NAME="AEN13"
->3. Installation</A
-></H2
-><P
->&#13;            The two files remuco.jar and remuco.jad (on some devices you
-            only need the jar-file) of a particluar client variant needs
-            to be installed on your mobile. How this is done is device
-            dependent. Inspect the manual of your mobile for how to
-            install Java ME applications.
+>&#13;            The client uses the Ant build system (
+            <A
+HREF="http://ant.apache.org/"
+TARGET="_top"
+>&#13;                http://ant.apache.org/
+            </A
+>
+            ), so make sure Ant is installed on your system. To build
+            the client, edit the file
+            <TT
+CLASS="filename"
+>build.properties</TT
+>
+            and adjust it to your situation. Then run:
         </P
 ><P
->&#13;            E.g. on a Sony Ericcson K750i you copy the files onto the
-            memory stick. Then you browse to that file with the mobiles
-            file browser and select 'install' on the jad-file. Some
-            Nokia phones require to use special software on your
-            computer to install something on the mobile. .. as said,
-            please inspect your mobile's manual.
-        </P
+><B
+CLASS="command"
+>$ ant dist.jar</B
+></P
 ></DIV
 ><DIV
 CLASS="section"
@@ -155,6 +153,35 @@ CLASS="section"
 CLASS="section"
 ><A
 NAME="AEN17"
+>3. Installation</A
+></H2
+><P
+>&#13;            The client application is in the file
+            <TT
+CLASS="filename"
+>dist/remuco.jar</TT
+>
+            and the application's descriptor is in the file
+            <TT
+CLASS="filename"
+>dist/remuco.jad</TT
+>
+            . Install them on your phone (how to do this is device
+            dependent).
+        </P
+><P
+>&#13;            Once you installed the client on your phone, consider to set
+            permissions in that way that Remuco is allowed to use Bluetooth.
+            This releases you from allays acknowledging y connection to the
+            server (of course you need to trust Remuco :) ) 
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN23"
 >4. Usage</A
 ></H2
 ><P
@@ -168,13 +195,31 @@ NAME="AEN17"
             is up, you see the current music player state displayed on
             your device.
         </P
+><P
+>&#13;            Play around with the keys and the entries in the menus, I
+            think that's the best way to get familiar with the client.
+            Some notes anyway: If your change the key configuration, the
+            change applies immediately but it get stored only when the
+            client exits.
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN28"
+>5. Creating New Themes</A
+></H2
+><P
+>TODO</P
 ></DIV
 ><DIV
 CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN21"
+NAME="AEN31"
 >A. General Information</A
 ></H1
 ><P
@@ -234,7 +279,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN35"
+NAME="AEN45"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -277,30 +322,31 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN45"
+NAME="AEN55"
 ></A
 ><P
 ><B
 >Example A-1. 
                 Check out the current development version of the server
-                library into the directory <TT
+                library into the directory
+                <TT
 CLASS="filename"
->remuco-lib-trunk</TT
+>remuco-server-trunk</TT
 >:
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
->&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/lib remuco-lib-trunk
-                </SAMP
+>&#13;                <B
+CLASS="command"
+>&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/server remuco-server-trunk
+                </B
 >
             </P
 ></DIV
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN50"
+NAME="AEN60"
 ></A
 ><P
 ><B
@@ -313,11 +359,11 @@ CLASS="filename"
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
+>&#13;                <B
+CLASS="command"
 >&#13;                $ svn co &#60;SVN-ROOT&#62;/tags/remuco-client-0.6.0
                 remuco-client-0.6.0
-                </SAMP
+                </B
 >
             </P
 ></DIV
