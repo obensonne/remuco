@@ -1036,8 +1036,10 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	
 	server->pinfo = priv_create_player_info(pp_desc, pp_callbacks);
 	if (!server->pinfo) {
+		server->pp_cb = NULL;	// prevent rem_server_free() from freeing this
+		server->pp_desc = NULL;	// prevent rem_server_free() from freeing this
 		priv_server_free(server);		
-		g_return_val_if_fail(TRUE, NULL);
+		g_return_val_if_fail(FALSE, NULL);
 	}
 	
 	server->mc = g_main_context_default();
@@ -1053,6 +1055,8 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	server->net_server = rem_net_server_new();
 	if (!server->net_server) {
 		g_set_error(err, 0, 0, "setting up the server failed");
+		server->pp_cb = NULL;	// prevent rem_server_free() from freeing this
+		server->pp_desc = NULL;	// prevent rem_server_free() from freeing this
 		priv_server_free(server);
 		return NULL;
 	}
