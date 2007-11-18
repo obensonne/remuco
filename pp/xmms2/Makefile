@@ -7,7 +7,8 @@
 DEBUG ?= yes
 PREFIX ?= /usr
 
-X2_CONFIG_DIR := $(HOME)/.config
+XDG_CONFIG_HOME ?= $(HOME)/.config
+X2_CONFIG_DIR := $(XDG_CONFIG_HOME)/xmms2
 
 PKG_VERSION := 0.6.0
 PKG_BASENAME := remuco-xmms2
@@ -26,7 +27,7 @@ CFLAGS += $(shell pkg-config --cflags $(PKG_CONFIG_REQ))
 LFLAGS += $(shell pkg-config --libs $(PKG_CONFIG_REQ))
 
 # debug dependent compile flags and commands
-ifneq "$(DEBUG)" ""
+ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
 #CFLAGS += -DLOGLEVEL=LL_NOISE
 CFLAGS += -DLOGLEVEL=LL_DEBUG
@@ -54,7 +55,7 @@ install:
 	install remuco-xmms2 $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-xmms2
+	rm -f $(DESTDIR)$(X2_CONFIG_DIR)/startup.d/remuco-xmms2
 
 dist: clean
 	mkdir -p build/$(PKG_FULLNAME)

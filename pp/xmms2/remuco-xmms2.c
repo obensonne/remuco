@@ -48,13 +48,13 @@ static const gint	XMETA_TYPES[] = {
 		XMMSC_RESULT_VALUE_TYPE_INT32 };
 
 /** Count of meta information elements we request from X2 */
-#define XMETA_COUNT	10
+#define XMETA_COUNT	9
 
 /** Number of the meta information element 'length' (or duration) */
 #define XMETA_NUM_LENGTH	6
 
 static const gchar *XMETA_NAMES_ART[] = {
-		"album_front_large", "album_front_small", "album_front_thumbnail" };
+		"album_front_large", "album_front_small", "album_front_thumbnail"
 };
 
 #define XMETA_ART_COUNT 3
@@ -274,6 +274,11 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 
 	xmmsc_result_unref(result);
 
+	////////// repeat, shuffle //////////
+	
+	ps->repeat = REM_REPEAT_MODE_NONE;
+	ps->shuffle = REM_SHUFFLE_MODE_OFF;
+	
 	////////// cap position //////////
 	
 	result = xmmsc_playlist_current_pos(priv->xc, XMMS_ACTIVE_PLAYLIST);
@@ -661,7 +666,7 @@ int main(int argc, char **argv) {
 	ppd->max_rating_value = 5;
 	ppd->player_name = g_strdup("XMMS2");
 	ppd->supported_repeat_modes = 0;
-	ppd->supported_shuffle_modes = 0;
+	ppd->supported_shuffle_modes = REM_SHUFFLE_MODE_OFF | REM_SHUFFLE_MODE_ON;
 	ppd->supports_playlist = TRUE;
 	ppd->supports_playlist_jump = TRUE;
 	ppd->supports_queue = FALSE;
