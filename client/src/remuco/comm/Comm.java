@@ -96,55 +96,49 @@ public final class Comm extends Thread implements IMessageSender {
 
 	public void run() {
 
-		// DEBUG TRY CATCH //
-		try {
-			Log.ln("[CM] starting");
+		Log.ln("[CM] starting");
 
-			net = null;
+		net = null;
 
-			if (Remuco.EMULATION) {
+		if (Remuco.EMULATION) {
 
-				Tools.sleep(1000);
+			Tools.sleep(1000);
 
-				localMsg.id = Message.ID_LOCAL_CONNECTED;
-				localMsg.sd = null;
+			localMsg.id = Message.ID_LOCAL_CONNECTED;
+			localMsg.sd = null;
 
-				mr.receiveMessage(localMsg);
+			mr.receiveMessage(localMsg);
 
-				es.loop();
+			es.loop();
 
-			}
-
-			while (!interrupted) {
-
-				net = connect();
-
-				if (net == null || interrupted) {
-					break;
-				}
-
-				localMsg.id = Message.ID_LOCAL_CONNECTED;
-				localMsg.sd = null;
-
-				mr.receiveMessage(localMsg);
-
-				receiveMessages();
-
-				if (!interrupted) {
-					localMsgSP.setParam("Lost connection.\nReconnect..");
-					localMsg.id = Message.ID_LOCAL_DISCONNECTED;
-					localMsg.sd = localMsgSP.sdGet();
-					mr.receiveMessage(localMsg);
-
-					Tools.sleep(2000);
-				}
-			}
-
-			Log.ln("[CM] stopped");
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+
+		while (!interrupted) {
+
+			net = connect();
+
+			if (net == null || interrupted) {
+				break;
+			}
+
+			localMsg.id = Message.ID_LOCAL_CONNECTED;
+			localMsg.sd = null;
+
+			mr.receiveMessage(localMsg);
+
+			receiveMessages();
+
+			if (!interrupted) {
+				localMsgSP.setParam("Lost connection.\nReconnect..");
+				localMsg.id = Message.ID_LOCAL_DISCONNECTED;
+				localMsg.sd = localMsgSP.sdGet();
+				mr.receiveMessage(localMsg);
+
+				Tools.sleep(2000);
+			}
+		}
+
+		Log.ln("[CM] stopped");
 
 	}
 
@@ -177,8 +171,8 @@ public final class Comm extends Thread implements IMessageSender {
 	}
 
 	/**
-	 * Tries continuously to set up the net connection until success or a serious
-	 * error occurred.
+	 * Tries continuously to set up the net connection until success or a
+	 * serious error occurred.
 	 * 
 	 * @return the net connection or <code>null</code> if a serious error
 	 *         occurred and proceeding does not make much sense

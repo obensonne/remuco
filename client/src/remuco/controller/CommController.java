@@ -51,9 +51,9 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 	public CommController(ICCEventListener ccel) {
 
 		this.ccel = ccel;
-		
+
 		cinfo = new ClientInfo();
-		
+
 		player = new Player(this);
 
 	}
@@ -121,75 +121,69 @@ public final class CommController implements IMessageReceiver, IMessageSender {
 
 	public void receiveMessage(Message m) {
 
-		try { // DEBUG EXCEPTION CATCHING
-			switch (m.id) {
-			case Message.ID_LOCAL_CONNECTED:
+		switch (m.id) {
+		case Message.ID_LOCAL_CONNECTED:
 
-				Log.ln("[CC] send client info");
+			Log.ln("[CC] send client info");
 
-				msg.id = Message.ID_IFC_CINFO;
-				msg.sd = cinfo.sdGet();
+			msg.id = Message.ID_IFC_CINFO;
+			msg.sd = cinfo.sdGet();
 
-				comm.sendMessage(msg);
+			comm.sendMessage(msg);
 
-				break;
+			break;
 
-			case Message.ID_IFS_PINFO:
+		case Message.ID_IFS_PINFO:
 
-				Log.ln("[CC] handle player info");
+			Log.ln("[CC] handle player info");
 
-				player.info.sdSet(m.sd);
+			player.info.sdSet(m.sd);
 
-				completelyConnected = true;
+			completelyConnected = true;
 
-				ccel.event(ICCEventListener.EVENT_CONNECTED, "Connected :)");
+			ccel.event(ICCEventListener.EVENT_CONNECTED, "Connected :)");
 
-				break;
+			break;
 
-			case Message.ID_LOCAL_DISCONNECTED:
+		case Message.ID_LOCAL_DISCONNECTED:
 
-				completelyConnected = false;
-				ccel.event(ICCEventListener.EVENT_CONNECTING, StringParam
-						.getParam(m.sd));
+			completelyConnected = false;
+			ccel.event(ICCEventListener.EVENT_CONNECTING, StringParam
+					.getParam(m.sd));
 
-				player.reset();
+			player.reset();
 
-				break;
+			break;
 
-			case Message.ID_IFS_SRVDOWN:
+		case Message.ID_IFS_SRVDOWN:
 
-				Log.ln("[CC] handle srv down");
+			Log.ln("[CC] handle srv down");
 
-				completelyConnected = false;
-				ccel.event(ICCEventListener.EVENT_CONNECTING,
-						"The server has shutdown. Try to reconnect...");
+			completelyConnected = false;
+			ccel.event(ICCEventListener.EVENT_CONNECTING,
+					"The server has shutdown. Try to reconnect...");
 
-				player.reset();
+			player.reset();
 
-				break;
+			break;
 
-			case Message.ID_LOCAL_ERROR:
+		case Message.ID_LOCAL_ERROR:
 
-				completelyConnected = false;
-				ccel.event(ICCEventListener.EVENT_ERROR, StringParam
-						.getParam(m.sd));
+			completelyConnected = false;
+			ccel
+					.event(ICCEventListener.EVENT_ERROR, StringParam
+							.getParam(m.sd));
 
-				break;
+			break;
 
-			default:
+		default:
 
-				Log.ln("[CC] handle message for player");
+			Log.ln("[CC] handle message for player");
 
-				player.receiveMessage(m);
+			player.receiveMessage(m);
 
-				break;
-			}
-		} catch (RuntimeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
+			break;
 		}
-
 	}
 
 	public void sendMessage(Message m) {
