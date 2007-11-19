@@ -381,7 +381,7 @@ public final class EmulatedServer implements IMessageSender {
 
 		Message mCopy = new Message();
 
-		// XXX this may cause dubios behaviour since in most cases the caller
+		// XXX this may cause dubious behavior since in most cases the caller
 		// reuses the message m and its content .. so mCopy.sd may change until
 		// it get processed by loop() .. well, may
 		mCopy.id = m.id;
