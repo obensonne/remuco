@@ -85,6 +85,15 @@ deb: clean doc
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
 	DESTDIR=$(DEB_DESTDIR) PREFIX=$(DEB_PREFIX) DEBUG=no make install
+	# install doc files
+	mkdir -p $(DEB_DESTDIR)$(PREFIX)/share/doc
+	cp -r doc $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)
+	find $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME) \
+		-type d -name ".svn" | xargs rm -rf 
+	# next is for lintian
+	cd $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME) && \
+		mv ChangeLog changelog && gzip --best changelog && \
+		rm -f COPYING
 	# create tgz packages
 	tar zcf $(DEB_BUILDDIR)/$(DEB_PKG).tar.gz -C $(DEB_DESTDIR) \
 		.$(PREFIX)
