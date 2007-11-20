@@ -1,0 +1,14 @@
+Source: remuco-xmms2
+Section: sound
+Priority: extra
+Maintainer: Christian Buennig <mondai@users.sourceforge.net>
+
+Package: remuco-xmms2
+Architecture: i386
+Depends: ${shlibs:Depends}
+Description: Remuco Player Proxy for XMMS2
+ This Remuco player proxy is a client for XMMS2. It can be started
+ manually when the XMMS2 daemon is up or automatically by linking to the client
+ binary from a user's XMMS2 startup script directory.
+ .
+ (Converted from a tgz package by alien version 8.68.)

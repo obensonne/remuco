@@ -18,6 +18,21 @@ PKG_CONFIG_REQ := remuco xmms2-client xmms2-client-glib glib-2.0
 
 ###############################################################################
 #
+# Tools
+#
+###############################################################################
+
+INSTALL := install
+INSTALL_LIB := $(INSTALL) -m 644
+INSTALL_EXE := $(INSTALL) -m 755
+INSTALL_DIR := $(INSTALL) -m 755 -d
+ifneq "$(DEBUG)" "yes"
+INSTALL_LIB += -s
+INSTALL_EXE += -s
+endif
+
+###############################################################################
+#
 # CFLAGS and LFLAGS
 #
 ###############################################################################
@@ -50,11 +65,18 @@ remuco-xmms2: remuco-xmms2.o
 	$(CC) -o remuco-xmms2 remuco-xmms2.o $(LFLAGS)
 	chmod +x remuco-xmms2
 
-install:
+install: all
+	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
+	$(INSTALL_EXE) remuco-xmms2 $(DESTDIR)$(PREFIX)/bin
+
+install-user: all
 	install -d $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 	install remuco-xmms2 $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 
 uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-xmms2
+
+uninstall-user:
 	rm -f $(DESTDIR)$(X2_CONFIG_DIR)/startup.d/remuco-xmms2
 
 dist: clean
@@ -109,6 +131,55 @@ valgrind: all
 		--gen-suppressions=no \
 		--suppressions=valgrind-errors.suppress \
 		./remuco-xmms2
+
+##############################################################################
+#
+# Building debain packages (bin and dev) using alien
+#
+##############################################################################
+
+DEB_PKG_BASENAME := remuco-xmms2
+DEB_PKG := $(DEB_PKG_BASENAME)-$(PKG_VERSION)
+
+DEB_BUILDDIR := $(CURDIR)/build/deb
+
+DEB_DESTDIR := $(DEB_BUILDDIR)/fsroot
+DEB_PREFIX := /usr
+
+DEB_PKG_DOC_DIR := $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)
+DEB_PKG_MAN_DIR := $(DEB_DESTDIR)$(PREFIX)/share/man/man1
+
+DEB_EMAIL ?= mondai@users.sourceforge.net
+
+deb: clean
+	mkdir -p $(DEB_BUILDDIR)
+	mkdir -p $(DEB_DESTDIR)
+	# install in a temp location
+	DESTDIR=$(DEB_DESTDIR) PREFIX=$(DEB_PREFIX) DEBUG=no make install
+	# install doc files
+	mkdir -p $(DEB_PKG_DOC_DIR)
+	cp -r doc/* $(DEB_PKG_DOC_DIR)
+	find $(DEB_PKG_DOC_DIR) -type d -name ".svn" | xargs rm -rf 
+	mkdir -p $(DEB_PKG_MAN_DIR)
+	cp -r doc/remuco-xmms2.1 $(DEB_PKG_MAN_DIR)
+	gzip --best $(DEB_PKG_MAN_DIR)/remuco-xmms2.1
+	# next is for lintian
+	cd $(DEB_PKG_DOC_DIR) && \
+		mv ChangeLog changelog &&  \
+		rm -f COPYING remuco-xmms2.1
+	# create tgz packages
+	tar zcf $(DEB_BUILDDIR)/$(DEB_PKG).tar.gz -C $(DEB_DESTDIR) \
+		.$(PREFIX)
+	# convert to debian package (with -g option)
+	cd $(DEB_BUILDDIR) && \
+		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG).tar.gz
+	# copy some prepared debian files
+	cp alien/control $(DEB_BUILDDIR)/$(DEB_PKG)/debian
+	cp alien/copyright $(DEB_BUILDDIR)/$(DEB_PKG)/debian
+	# create package
+	cd $(DEB_BUILDDIR)/$(DEB_PKG) && debian/rules binary
+	mkdir -p dist
+	cp $(DEB_BUILDDIR)/*.deb dist
 
 ###############################################################################
 #
