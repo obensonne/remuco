@@ -4,13 +4,14 @@
 #
 ###############################################################################
 
-LIB_FILE_BASE := libremuco.so
-LIB_FILE := $(LIB_FILE_BASE)
+PREFIX ?= /usr
+DEBUG ?= yes
+
+LIB_FILE_BASE := libremuco
 
 LT_CURRENT := 0
 LT_REVISION := 0
 LT_AGE := 0
-PREFIX ?= /usr
 
 ###############################################################################
 #
@@ -18,7 +19,6 @@ PREFIX ?= /usr
 #
 ###############################################################################
 
-# install commands
 INSTALL := install
 INSTALL_LIB := $(INSTALL) -m 644
 INSTALL_EXE := $(INSTALL) -m 755
@@ -37,12 +37,6 @@ endif
 CFLAGS := -DREM_LIB_MAJOR=0 -DREM_LIB_MINOR=6
 LFLAGS := 
 
-# shared library compile and link flags
-#CFLAGS += -fPIC
-#LFLAGS += -shared
-#LFLAGS += -Wl,-soname,$(LIB_FILE_SO)
-
-# debug dependent compile flags and commands
 ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
 CFLAGS += -DLOGLEVEL=LL_DEBUG
@@ -87,12 +81,11 @@ OBJ_FILES_LT := $(subst .o,.lo,$(OBJ_FILES))
 #
 ##############################################################################
 
-all: .build-req libremuco.la
+all: stamp-build-requirements $(LIB_FILE_BASE).la
 
-# for now we do not seperate between normal and dev packages
 install: all install-headers
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/lib
-	libtool --mode=install $(INSTALL_LIB) libremuco.la \
+	libtool --mode=install $(INSTALL_LIB) $(LIB_FILE_BASE).la \
 		$(DESTDIR)$(PREFIX)/lib/
 
 install-headers:
@@ -102,7 +95,7 @@ install-headers:
 		xargs cp --parents -t $(DESTDIR)$(PREFIX)/include
 	
 uninstall: uninstall-headers
-	rm  -f $(DESTDIR)$(PREFIX)/lib/libremuco.so*
+	rm  -f $(DESTDIR)$(PREFIX)/lib/$(LIB_FILE_BASE).so*
 	ldconfig -n $(DESTDIR)$(PREFIX)/lib/
 
 uninstall-headers:
@@ -115,8 +108,8 @@ clean:
 	find -type f -name "*.loT" | xargs rm -f
 	find -type f -name "*~" | xargs rm -f
 	find -type d -name ".libs" | xargs rm -rf
-	rm -f libremuco*
-	rm -f .build-req
+	rm -f $(LIB_FILE_BASE)*
+	rm -f stamp-build-requirements
 
 ###############################################################################
 #
@@ -127,17 +120,14 @@ clean:
 %.o: %.c
 	libtool --mode=compile $(CC) $(CFLAGS) -c $< -o $@ 
 
-libremuco.la: $(OBJ_FILES)
+$(LIB_FILE_BASE).la: $(OBJ_FILES)
 	libtool --mode=link $(CC) \
 		-version-info=$(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 		-rpath /usr/lib \
-		-o libremuco.la $(OBJ_FILES_LT) \
+		-o $(LIB_FILE_BASE).la $(OBJ_FILES_LT) \
 		$(LFLAGS)
-#	$(CC) $(LFLAGS) -o $(LIB_FILE) $(OBJ_FILES)
-#	$(STRIP) $(LIB_FILE)
 
-.build-req:
-	
+stamp-build-requirements:
 	@echo
 	@echo "Build requirements:"
 	@for PKGC in $(PKG_CONFIG_REQ) ; do \
@@ -161,7 +151,7 @@ libremuco.la: $(OBJ_FILES)
 		echo "At least I could not start it." ; \
 	fi
 	@echo
-	touch .build-req
+	touch stamp-build-requirements
 	
 soname:
 	@echo $(LT_CURRENT)
