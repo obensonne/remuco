@@ -18,7 +18,7 @@ DEBUG ?= yes
 #
 ##############################################################################
 
-all: .build-req
+all: stamp-build-requirements
 	cd src && DEBUG=$(DEBUG) python setup.py build
 
 install:
@@ -29,18 +29,18 @@ uninstall:
 	#python setup.py uninstall --prefix=$(DESTDIR)$(PREFIX)
 	@echo "Sorry, uninstall not possible"
 
-dist: clean
+dist: pydoc clean
 	mkdir -p build/$(PKG_FULLNAME)
 	cp Makefile build/$(PKG_FULLNAME)/
 	cp -r src doc build/$(PKG_FULLNAME)/
+	find build/$(PKG_FULLNAME) -type d -name ".svn" | xargs rm -rf
 	mkdir dist
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
 
 clean:
 	#cd src && python setup.py clean
-	rm -rf build dist src/build
-	rm -f *.deb
-	rm -f .build-req
+	rm -rf build dist src/build src/dist
+	rm -f stamp-build-requirements
 
 ###############################################################################
 #
@@ -48,14 +48,22 @@ clean:
 #
 ##############################################################################
 
-.build-req:
+stamp-build-requirements:
 	@echo -n "Checking for remuco .. "
 	@pkg-config --exists remuco > /dev/null \
 		&& echo "ok" || { echo "missing" ; false; }
 	@echo -n "Checking for python .. "
 	@python-config --prefix > /dev/null \
 		&& echo "ok" || { echo "missing" ; false; }
-	touch .build-req
+	touch stamp-build-requirements
+
+pydoc: all
+	pydoc > /dev/null 2>&1 || false
+	mkdir -p build/pydoc
+	REMPYMOD=`find src/build -name remuco.so` && \
+		PYTHONPATH=`dirname $$REMPYMOD` pydoc -w remuco
+	mv -f remuco.html doc/api.html
+	
 
 valgrind:
 	G_SLICE=always-malloc \
@@ -80,7 +88,7 @@ DEB_PREFIX := /usr
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
-deb: clean doc
+deb: clean pydoc
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
