@@ -115,7 +115,7 @@ doc: api
 
 api:
 	rm -f doc/api/*
-	doxygen doc.src/api.doxyfile
+	doxygen api.doxyfile
 
 ##############################################################################
 #
