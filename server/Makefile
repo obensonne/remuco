@@ -73,6 +73,10 @@ deb: clean doc
 	# install doc files for dev package
 	mkdir -p $(DEB_DESTDIR)$(PREFIX)/share/doc
 	cp -r doc $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)-dev
+	# next one is for lintian
+	cd $(DEB_DESTDIR)$(PREFIX)/share/doc/$(DEB_PKG_BASENAME)-dev && \
+		mv ChangeLog changelog && gzip --best changelog && \
+		rm -f COPYING
 	find $(DEB_DESTDIR)$(PREFIX)/share/doc/libremuco-dev \
 		-type d -name ".svn" | xargs rm -rf
 	# create tgz packages

@@ -23,11 +23,9 @@ INSTALL := install
 INSTALL_LIB := $(INSTALL) -m 644
 INSTALL_EXE := $(INSTALL) -m 755
 INSTALL_DIR := $(INSTALL) -m 755 -d
-
-ifeq "$(DEBUG)" "yes"
-STRIP := touch
-else
-STRIP := strip --strip-unneeded
+ifneq "$(DEBUG)" "yes"
+INSTALL_LIB += -s
+INSTALL_EXE += -s
 endif
 
 ###############################################################################
