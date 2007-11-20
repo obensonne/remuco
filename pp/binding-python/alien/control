@@ -1,0 +1,12 @@
+Source: python-remuco
+Section: python
+Priority: extra
+Maintainer: Christian Buennig <mondai@users.sourceforge.net>
+
+Package: python-remuco
+Architecture: i386
+Depends: ${shlibs:Depends}, python (= 2.5)
+Description: Remuco Server Library
+ Python binding for the Remuco server library.
+ .
+ (Converted from a tgz package by alien version 8.68.)

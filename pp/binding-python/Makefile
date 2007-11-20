@@ -10,7 +10,7 @@ PKG_VERSION := $(shell python src/setup.py --version)
 PKG_BASENAME := libremuco-python
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
-LOGLEVEL ?= LL_DEBUG
+DEBUG ?= yes
 
 ###############################################################################
 #
@@ -18,11 +18,11 @@ LOGLEVEL ?= LL_DEBUG
 #
 ##############################################################################
 
-all: clean .build-req
-	cd src && python setup.py build
+all: .build-req
+	cd src && DEBUG=$(DEBUG) python setup.py build
 
 install:
-	cd src && LOGLEVEL=$(LOGLEVEL) \
+	cd src && DEBUG=$(DEBUG)  \
 		python setup.py install --prefix=$(DESTDIR)$(PREFIX)
 
 uninstall:
@@ -60,7 +60,7 @@ clean:
 valgrind:
 	G_SLICE=always-malloc \
 		valgrind --leak-check=yes \
-		--gen-suppressions=yes \
+		--gen-suppressions=no \
 		--suppressions=valgrind-errors.suppress \
 		./test.py
 
@@ -77,24 +77,22 @@ DEB_BUILDDIR := $(CURDIR)/build/deb
 
 DEB_DESTDIR := $(DEB_BUILDDIR)/fsroot
 DEB_PREFIX := /usr
-DEB_LOGLEVEL := LL_INFO
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
 deb: clean doc
-	grep "debug *= *False" src/setup.py > /dev/null || \
-		{ echo "WARNING: debug mode enabled" && false; }
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
-	DESTDIR=$(DEB_DESTDIR) PREFIX=$(DEB_PREFIX) LOGLEVEL=$(DEB_LOGLEVEL) \
-		make install
+	DESTDIR=$(DEB_DESTDIR) PREFIX=$(DEB_PREFIX) DEBUG=no make install
 	# create tgz packages
 	tar zcf $(DEB_BUILDDIR)/$(DEB_PKG).tar.gz -C $(DEB_DESTDIR) \
 		.$(PREFIX)
 	# convert to debian package (with -g option)
 	cd $(DEB_BUILDDIR) && \
 		EMAIL=$(DEB_EMAIL) alien -d -g -k -T $(DEB_PKG).tar.gz
+	sed -i $(DEB_BUILDDIR)/$(DEB_PKG)/debian/rules \
+		-e "s/#\(\t*dh_strip\) *$$/\1/"
 	# copy some prepared debian files
 	cp alien/control $(DEB_BUILDDIR)/$(DEB_PKG)/debian
 	cp alien/copyright $(DEB_BUILDDIR)/$(DEB_PKG)/debian
