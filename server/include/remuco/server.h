@@ -14,7 +14,8 @@ G_BEGIN_DECLS
  * player proxies to control and interact with the Remuco server.
  * Mainy this is
  * - setting up a server with rem_server_up(),
- * - notify the server about player status changes with rem_server_notify() and
+ * - notify the server about player status changes with rem_server_notify() or
+ *   let the server automatically check for changes with rem_server_poll()
  * - shutting down the server with rem_server_down().
  */
 
@@ -43,8 +44,7 @@ typedef struct _RemServer		RemServer;
  * 				Player proxy private data. This will be used as first parameter
  * 				for the functions in @a pp_callbacks.
  * @param[out] err
- * 				Location to return error in case something fails starting the
- * 				server fails.
+ * 				Location to return an error in case starting the server fails.
  * 
  * @return	A RemServer which must be used as first parameter for
  *			rem_server_notify() and rem_server_down(). If an error occurs
