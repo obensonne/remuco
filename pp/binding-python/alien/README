@@ -1,5 +1,6 @@
-Files to use when creatin a debian package using alien.
+Files to use when creating a debian package using alien.
 
-The files will be copied into the debian directory created by alien when using -g option.
+The files will be copied into the debian directory created by alien when
+using -g option.
 
 See target 'deb' in the Makefile.
