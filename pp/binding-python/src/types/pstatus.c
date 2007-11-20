@@ -1,7 +1,7 @@
 #include "pstatus.h"
 
 static PyMemberDef PlayerStatus_members[] = {
-	{"state", T_INT, offsetof(RemPyPlayerStatus, pbs), 0,
+	{"pbs", T_INT, offsetof(RemPyPlayerStatus, pbs), 0,
 			"See also description of RemPlayerStatus in C API documentaion."},
 	{"volume", T_INT, offsetof(RemPyPlayerStatus, volume), 0,
 			"See also description of RemPlayerStatus in C API documentaion."},
@@ -111,7 +111,7 @@ static PyTypeObject PlayerStatusType = {
 RemPyPlayerStatus*
 rempy_pstatus_new()
 {
-	return PlayerStatus_new(&PlayerStatusType, NULL, NULL);
+	return (RemPyPlayerStatus*) PlayerStatus_new(&PlayerStatusType, NULL, NULL);
 }
 
 int

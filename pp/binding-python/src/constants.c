@@ -47,5 +47,8 @@ rempy_constants_add(PyObject *m)
 	PyModule_AddIntConstant(m, "SCTRL_CMD_REPEAT", REM_SCTRL_CMD_REPEAT); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_SHUFFLE", REM_SCTRL_CMD_SHUFFLE); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_COUNT", REM_SCTRL_CMD_COUNT); 
-			
+
+	PyModule_AddIntConstant(m, "SERVER_EVENT_ERROR", REM_SERVER_EVENT_ERROR); 
+	PyModule_AddIntConstant(m, "SERVER_EVENT_DOWN", REM_SERVER_EVENT_DOWN); 
+
 }

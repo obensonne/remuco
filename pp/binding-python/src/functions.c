@@ -10,22 +10,14 @@ struct _RemPPPriv {
 	RemPyPPCallbacks	*pp_callbacks;
 	/** Player status to use for the player proxy. */
 	RemPyPlayerStatus	*pp_ps;
-	/**
-	 * Self reference as a Python C object. Need to remember it to decref it
-	 * on server shut down.
-	 */
-	PyObject			*self_py;
 	RemServer			*server;
 };
 
 /** Will be called if the refocunt of RemPPPriv::self_py is 0 */
 static void
-priv_pp_priv_destroy(void *data)
+priv_pp_priv_destroy(RemPPPriv *priv)
 {
-	RemPPPriv *priv = (RemPPPriv*) priv;
-	
-	g_return_if_fail(data);
-	
+	if (!priv) return;
 	Py_CLEAR(priv->pp_priv);
 	Py_CLEAR(priv->pp_callbacks);
 	Py_CLEAR(priv->pp_ps);
@@ -425,24 +417,23 @@ static RemPlob*
 rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 {
 	RemPlob			*plob;
-	gboolean		ok;
-	PyObject		*args, *ret, *dict, *key, *val;
+	PyObject		*args, *dict, *key, *val;
 	gint			pos;
 	
 	////////// call python function //////////
 	
 	args = Py_BuildValue("Os", priv->pp_priv, pid);
 	
-	ret = PyObject_Call(priv->pp_callbacks->get_plob, args, NULL);
-
+	dict = PyObject_Call(priv->pp_callbacks->get_plob, args, NULL);
+	
 	Py_DECREF(args);
 
-	dict = NULL;
-	ok = PyArg_ParseTuple(ret, "O", &dict); // borrowed refs
+//	dict = NULL;
+//	ok = PyArg_ParseTuple(ret, "(O)", &dict); // borrowed refs
 
 	////////// check returned data //////////
 	
-	rempy_assert(ok && PyDict_Check(dict),
+	rempy_assert(PyDict_Check(dict),
 			"bad return from 'get_plob': expected 1 dictionary");
 	
 	////////// build plob //////////
@@ -462,7 +453,7 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 				plob, PyString_AS_STRING(key), PyString_AS_STRING(val));
 	}
 	
-	Py_DECREF(ret);
+	Py_DECREF(dict);
 
 	return plob;
 }
@@ -470,8 +461,7 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 static RemStringList*
 rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 {
-	gboolean		ok;
-	PyObject		*args, *ret, *list, *item;
+	PyObject		*args, *list, *item;
 	guint			u, len;
 	RemStringList	*sl;
 	
@@ -481,16 +471,13 @@ rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 	
 	args = Py_BuildValue("Os", priv->pp_priv, plid);
 	
-	ret = PyObject_Call(priv->pp_callbacks->get_ploblist, args, NULL);
+	list = PyObject_Call(priv->pp_callbacks->get_ploblist, args, NULL);
 
 	Py_DECREF(args);
 
-	list = NULL;
-	ok = PyArg_ParseTuple(ret, "O", &list); // borrowed refs
-
 	////////// check returned data //////////
 	
-	rempy_assert(ok && PyList_Check(list),
+	rempy_assert(PyList_Check(list),
 			"bad return from 'get_ploblist': expected 1 list");
 	
 	////////// build plob list //////////
@@ -508,7 +495,7 @@ rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 		
 	}
 	
-	Py_DECREF(ret);
+	Py_DECREF(list);
 	
 	return sl;
 }
@@ -527,9 +514,7 @@ rcb_notify(RemPPPriv *priv, RemServerEvent event)
 	rempy_assert(ret, "error calling function 'notify'");
 
 	if (event == REM_SERVER_EVENT_DOWN) {
-		Py_DECREF(priv->self_py);
-		// priv_pp_priv_destroy(priv); should be called automatically by the
-		// Py_DECREF above
+		priv_pp_priv_destroy(priv);
 	}
 	
 	Py_DECREF(ret);
@@ -557,8 +542,7 @@ rcb_play_ploblist(RemPPPriv *priv, const gchar *plid)
 static RemStringList*
 rcb_search(RemPPPriv *priv, const RemPlob *plob)
 {
-	gboolean		ok;
-	PyObject		*args, *ret, *dict, *list, *item;
+	PyObject		*args, *dict, *list, *item;
 	guint			u, len;
 	RemStringList	*sl;
 	
@@ -572,17 +556,14 @@ rcb_search(RemPPPriv *priv, const RemPlob *plob)
 	
 	args = Py_BuildValue("OO", priv->pp_priv, dict);
 	
-	ret = PyObject_Call(priv->pp_callbacks->search, args, NULL);
+	list = PyObject_Call(priv->pp_callbacks->search, args, NULL);
 
 	Py_DECREF(args);
 	Py_DECREF(dict);
 
-	list = NULL;
-	ok = PyArg_ParseTuple(ret, "O", &list); // borrowed refs
-
 	////////// check returned data //////////
 	
-	rempy_assert(ok && PyList_Check(list),
+	rempy_assert(PyList_Check(list),
 			"bad return from 'search': expected 1 list");
 	
 	////////// build search result //////////
@@ -600,7 +581,7 @@ rcb_search(RemPPPriv *priv, const RemPlob *plob)
 		
 	}
 	
-	Py_DECREF(ret);
+	Py_DECREF(list);
 	
 	return sl;
 	
@@ -698,6 +679,11 @@ rempy_server_up(PyObject *self, PyObject *args)
 
 	if (!ok) return NULL;
 	
+	if (PyObject_HasAttrString(pp_priv, "xx"))
+		LOG_DEBUG("has ml\n");
+	else
+		LOG_DEBUG("has no ml\n");
+	
 	callbacks = priv_conv_ppcallbacks_py2c(pp_callbacks); 
 	if (!callbacks) {
 		PyErr_Print();
@@ -739,9 +725,7 @@ rempy_server_up(PyObject *self, PyObject *args)
 		return NULL;
 	}
 	
-	priv->self_py = PyCObject_FromVoidPtr(priv, &priv_pp_priv_destroy);
-	// ref count of pb_priv->self_py is now 1
-	return priv->self_py; // ref count of pb_priv->self_py is now 2
+	return PyCObject_FromVoidPtr(priv, NULL);
 	
 }
 

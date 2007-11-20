@@ -19,7 +19,7 @@ static PyMethodDef remuco_methods[] = {
 		"Notifies the Remuco server about a change in player status. "
 		"Params: (Object (server private data)). "
 		"For more information see rem_server_notify() in the C API documentaion."},
-	{"poll",  rempy_server_notify, METH_VARARGS,
+	{"poll",  rempy_server_poll, METH_VARARGS,
 		"Instructs the server to periodically poll the PP for changes. "
 		"Params: (Object (server private data)). "
 		"For more information see rem_server_poll() in the C API documentaion."},
