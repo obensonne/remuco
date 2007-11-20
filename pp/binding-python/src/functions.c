@@ -744,6 +744,7 @@ rempy_server_down(PyObject *self, PyObject *args)
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError,
 				"bad argument #1: expected server private data");
+		return NULL;
 	}
 	
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
@@ -770,6 +771,7 @@ rempy_server_notify(PyObject *self, PyObject *args)
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError,
 				"bad argument #1: expected server private data");
+		return NULL;
 	}
 	
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
@@ -796,6 +798,7 @@ rempy_server_poll(PyObject *self, PyObject *args)
 		PyErr_Clear();
 		PyErr_SetString(PyExc_TypeError,
 				"bad argument #1: expected server private data");
+		return NULL;
 	}
 	
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
@@ -805,4 +808,107 @@ rempy_server_poll(PyObject *self, PyObject *args)
 	Py_INCREF(Py_None);
 	
 	return Py_None;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// functions to integrate python pp logging into server log
+//
+///////////////////////////////////////////////////////////////////////////////
+
+/** We use this name for informative log output */
+static inline gboolean
+python_pp_log(gint level, PyObject	*args)
+{
+	gboolean	ok;
+	PyObject	*msg_py;
+	gchar		*msg;
+
+	ok = (gboolean) PyArg_ParseTuple(args, "O", &msg_py);
+	
+	if (!ok) return FALSE;
+	
+	if (!PyString_Check(msg_py)) {
+		PyErr_Clear();
+		PyErr_SetString(PyExc_TypeError,
+				"bad argument #1: expected string");
+		return FALSE;
+	}
+	
+	msg = PyString_AS_STRING(msg_py);
+	
+	switch (level) {
+		case LL_NOISE:
+			LOG_NOISE("%s\n", msg);
+		break;
+		case LL_DEBUG:
+			LOG_DEBUG("%s\n", msg);		
+		break;
+		case LL_INFO:
+			LOG_INFO("%s\n", msg);		
+		break;
+		case LL_WARN:
+			LOG_WARN("%s\n", msg);		
+		break;
+		case LL_ERROR:
+			LOG_ERROR("%s\n", msg);			
+		break;
+		default:
+			g_assert_not_reached();
+		break;
+	}
+	
+	return TRUE;
+}
+
+PyObject*
+rempy_log_noise(PyObject *self, PyObject *args)
+{
+	if (!python_pp_log(LL_NOISE, args)) {
+		return NULL;
+	} else {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}	
+}
+
+PyObject*
+rempy_log_debug(PyObject *self, PyObject *args)
+{
+	if (!python_pp_log(LL_DEBUG, args)) {
+		return NULL;
+	} else {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+}
+
+PyObject*
+rempy_log_info(PyObject *self, PyObject *args) {
+	if (!python_pp_log(LL_INFO, args)) {
+		return NULL;
+	} else {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}	
+}
+
+PyObject*
+rempy_log_warn(PyObject *self, PyObject *args) {
+	if (!python_pp_log(LL_WARN, args)) {
+		return NULL;
+	} else {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}	
+}
+
+PyObject*
+rempy_log_error(PyObject *self, PyObject *args) {
+	if (!python_pp_log(LL_ERROR, args)) {
+		return NULL;
+	} else {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}	
 }

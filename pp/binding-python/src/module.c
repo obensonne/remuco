@@ -23,6 +23,21 @@ static PyMethodDef remuco_methods[] = {
 		"Instructs the server to periodically poll the PP for changes. "
 		"Params: (Object (server private data)). "
 		"For more information see rem_server_poll() in the C API documentaion."},
+	{"log_noise", rempy_log_noise, METH_VARARGS,
+		"Log a noisy message within the Remuco server log system. "
+		"Params: (String (msg))."},
+	{"log_debug", rempy_log_debug, METH_VARARGS,
+		"Log a debug message within the Remuco server log system. "
+		"Params: (String (msg))."},
+	{"log_info", rempy_log_info, METH_VARARGS,
+		"Log an info message within the Remuco server log system. "
+		"Params: (String (msg))."},
+	{"log_warn", rempy_log_warn, METH_VARARGS,
+		"Log a warning message within the Remuco server log system. "
+		"Params: (String (msg))."},
+	{"log_error", rempy_log_error, METH_VARARGS,
+		"Log an error message within the Remuco server log system. "
+		"Params: (String (msg))."},
 	{NULL, NULL, 0, NULL}		/* Sentinel */
 };
 
