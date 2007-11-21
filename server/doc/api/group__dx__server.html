@@ -45,7 +45,7 @@
 The RemLib server interface provides functions to be used by player proxies to control and interact with the Remuco server. 
 <p>
 Mainy this is<ul>
-<li>setting up a server with <a class="el" href="group__dx__server.html#gcd0a0c0a74c5392f3ba4bc42f6203ad0" title="Sets up a Remuco server.">rem_server_up()</a>,</li><li>notify the server about player status changes with <a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c" title="Notifies a RemServer about changes in a player.">rem_server_notify()</a> and</li><li>shutting down the server with <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973" title="Shuts down a RemServer.">rem_server_down()</a>. </li></ul>
+<li>setting up a server with <a class="el" href="group__dx__server.html#gcd0a0c0a74c5392f3ba4bc42f6203ad0" title="Sets up a Remuco server.">rem_server_up()</a>,</li><li>notify the server about player status changes with <a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c" title="Notifies a RemServer about changes in a player.">rem_server_notify()</a> or let the server automatically check for changes with <a class="el" href="group__dx__server.html#gb07876b38aada734c06bc6b3e4ca3af7" title="Instructs a RemServer to periodically check for player changes (by calling RemPPCallbacks::synchroni...">rem_server_poll()</a></li><li>shutting down the server with <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973" title="Shuts down a RemServer.">rem_server_down()</a>. </li></ul>
 <hr><h2>Typedef Documentation</h2>
 <a class="anchor" name="gfb5fc7c4947e92836caecf04b9f4eff2"></a><!-- doxytag: member="server.h::RemServer" ref="gfb5fc7c4947e92836caecf04b9f4eff2" args="" -->
 <div class="memitem">
@@ -198,7 +198,7 @@ The server will start working if a GMainLoop has been started for the GMainConte
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_desc</em>&nbsp;</td><td>Descriptor of the player proxy that starts the server. The server takes ownership of <em>pp_desc</em> and frees it (incl. contained strings) when <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973" title="Shuts down a RemServer.">rem_server_down()</a> is called. </td></tr>
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_callbacks</em>&nbsp;</td><td>Callback functions to use by the server to interact with the player proxy. The server takes ownership of <em>pp_callback</em> and frees it when <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973" title="Shuts down a RemServer.">rem_server_down()</a> is called. </td></tr>
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pp_priv</em>&nbsp;</td><td>Player proxy private data. This will be used as first parameter for the functions in <em>pp_callbacks</em>. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>err</em>&nbsp;</td><td>Location to return error in case something fails starting the server fails.</td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>err</em>&nbsp;</td><td>Location to return an error in case starting the server fails.</td></tr>
   </table>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>A RemServer which must be used as first parameter for <a class="el" href="group__dx__server.html#g883a194f875e02648bc9b7ea6f7a0d1c" title="Notifies a RemServer about changes in a player.">rem_server_notify()</a> and <a class="el" href="group__dx__server.html#ga1ea2703916381b40dc5809a4af86973" title="Shuts down a RemServer.">rem_server_down()</a>. If an error occurs <code>NULL</code> will be returned and <em>err</em> <em>may</em> be set.</dd></dl>
@@ -206,7 +206,7 @@ The server will start working if a GMainLoop has been started for the GMainConte
 
 </div>
 </div><p>
-<hr size="1"><address style="text-align: right;"><small>Generated on Mon Nov 19 00:37:55 2007 for Remuco by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Nov 21 23:07:27 2007 for Remuco by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>
