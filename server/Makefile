@@ -66,7 +66,22 @@ DEB_DESTDIR := $(DEB_BUILDDIR)/fsroot
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
-deb: clean doc
+DEB_CHECK_SVN ?= yes
+
+deb-check-svn:
+	if [ -n "`svn st`" ] ; then \
+		echo "!!! WARNING !!! There are diffs to the repo !"; \
+		false; \
+	fi
+	if [ "`svnpath`" != "`svnpath tags`" ] ; then \
+		echo "!!! WARNING !!! You are not in tags!" ; false ; \
+	fi
+	if (svnversion | grep "[\:MS]") ; then \
+		echo "!!! WARNING !!! Working copy not in a clean state !"; \
+		false; \
+	fi
+
+deb: deb-check-svn clean doc
 	# install in a temp location
 	mkdir -p $(DEB_DESTDIR)
 	DESTDIR=$(DEB_DESTDIR) DEBUG=no make install
