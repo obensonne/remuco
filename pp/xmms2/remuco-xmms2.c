@@ -626,6 +626,8 @@ int main(int argc, char **argv) {
 	RemPPDescriptor	*ppd;
 	GError			*err;
 	
+	rem_log_init(REM_LL_DEBUG);
+	
     ////// signal handler //////
 
     if (signal(SIGINT, priv_sigint) == SIG_ERR) {
