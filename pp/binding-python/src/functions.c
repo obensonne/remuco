@@ -438,7 +438,7 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	
 	////////// build plob //////////
 	
-	plob = rem_plob_new(g_strdup(pid));
+	plob = rem_plob_new(pid);
 	
 	pos = 0; key = NULL; val = NULL;
 	while (PyDict_Next(dict, &pos, &key, &val)) { // borrowed refs
