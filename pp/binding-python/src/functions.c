@@ -838,19 +838,19 @@ python_pp_log(gint level, PyObject	*args)
 	msg = PyString_AS_STRING(msg_py);
 	
 	switch (level) {
-		case LL_NOISE:
+		case REM_LL_NOISE:
 			LOG_NOISE("%s\n", msg);
 		break;
-		case LL_DEBUG:
+		case REM_LL_DEBUG:
 			LOG_DEBUG("%s\n", msg);		
 		break;
-		case LL_INFO:
-			LOG_INFO("%s\n", msg);		
+		case REM_LL_INFO:
+			LOG_INFO("%s\n", msg);
 		break;
-		case LL_WARN:
+		case REM_LL_WARN:
 			LOG_WARN("%s\n", msg);		
 		break;
-		case LL_ERROR:
+		case REM_LL_ERROR:
 			LOG_ERROR("%s\n", msg);			
 		break;
 		default:
@@ -864,18 +864,23 @@ python_pp_log(gint level, PyObject	*args)
 PyObject*
 rempy_log_noise(PyObject *self, PyObject *args)
 {
-	if (!python_pp_log(LL_NOISE, args)) {
+#ifdef DO_LOG_NOISE
+	if (!python_pp_log(REM_LL_NOISE, args)) {
 		return NULL;
 	} else {
 		Py_INCREF(Py_None);
 		return Py_None;
-	}	
+	}
+#else
+	Py_INCREF(Py_None);
+	return Py_None;
+#endif
 }
 
 PyObject*
 rempy_log_debug(PyObject *self, PyObject *args)
 {
-	if (!python_pp_log(LL_DEBUG, args)) {
+	if (!python_pp_log(REM_LL_DEBUG, args)) {
 		return NULL;
 	} else {
 		Py_INCREF(Py_None);
@@ -885,7 +890,7 @@ rempy_log_debug(PyObject *self, PyObject *args)
 
 PyObject*
 rempy_log_info(PyObject *self, PyObject *args) {
-	if (!python_pp_log(LL_INFO, args)) {
+	if (!python_pp_log(REM_LL_INFO, args)) {
 		return NULL;
 	} else {
 		Py_INCREF(Py_None);
@@ -895,7 +900,7 @@ rempy_log_info(PyObject *self, PyObject *args) {
 
 PyObject*
 rempy_log_warn(PyObject *self, PyObject *args) {
-	if (!python_pp_log(LL_WARN, args)) {
+	if (!python_pp_log(REM_LL_WARN, args)) {
 		return NULL;
 	} else {
 		Py_INCREF(Py_None);
@@ -905,7 +910,7 @@ rempy_log_warn(PyObject *self, PyObject *args) {
 
 PyObject*
 rempy_log_error(PyObject *self, PyObject *args) {
-	if (!python_pp_log(LL_ERROR, args)) {
+	if (!python_pp_log(REM_LL_ERROR, args)) {
 		return NULL;
 	} else {
 		Py_INCREF(Py_None);

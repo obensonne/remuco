@@ -1,4 +1,5 @@
 #include <Python.h>
+#include <remuco/log.h>
 
 #include "types.h"
 #include "functions.h"
@@ -25,6 +26,9 @@ static PyMethodDef remuco_methods[] = {
 		"For more information see rem_server_poll() in the C API documentaion."},
 	{"log_noise", rempy_log_noise, METH_VARARGS,
 		"Log a noisy message within the Remuco server log system. "
+		"Note: This function only has an effect if the server library as well "
+		"as the python binding has been compiled with -DDO_LOG_NOISE (which ."
+		"is probably not the case if you fetched a binary versions of them)."
 		"Params: (String (msg))."},
 	{"log_debug", rempy_log_debug, METH_VARARGS,
 		"Log a debug message within the Remuco server log system. "
@@ -49,12 +53,14 @@ initremuco(void)
 {
 	PyObject* m;
 	
+	rem_log_init(REM_LL_DEBUG);
+	
 	if (rempy_ppdesc_init() < 0) return;
 	if (rempy_ppcb_init() < 0) return;
 	if (rempy_pstatus_init() < 0) return;
 
 	m = Py_InitModule3("remuco", remuco_methods,
-					   "Python binding to the Remuco library.");
+					   "Python binding to the Remuco server library.");
 
 	rempy_ppdesc_add(m);
 	rempy_ppcb_add(m);
