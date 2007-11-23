@@ -1,161 +1,135 @@
-/*
- * Copyright (C) 2006 Christian Buennig - See COPYING
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+#ifndef REMUCO_LOG_H_
+#define REMUCO_LOG_H_
+
+#include <errno.h>
+#include <string.h> // strerror()
+
+#ifndef REMUCO_H_
+#error "Include <remuco.h> !"
+#endif
+
+#ifndef G_LOG_LEVEL_NOISE
+#define G_LOG_LEVEL_NOISE (1 << G_LOG_LEVEL_USER_SHIFT)
+#endif
+
+/**
+ * @defgroup dx_log Remuco Logging System
+ *  
  */
 
-#ifndef _REMUCO_LOGGING_H_
-#define _REMUCO_LOGGING_H_
-
-#include <string.h>	// strerror()
-#include <errno.h>	// errno
-#include <stdio.h>
- 
-#include <sys/time.h>
+/*@{*/
 
 G_BEGIN_DECLS
 
-#define LOGTS
+typedef enum {
+	REM_LL_ERROR = G_LOG_FLAG_RECURSION | G_LOG_FLAG_FATAL |
+				   G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL,
+	REM_LL_WARN = REM_LL_ERROR | G_LOG_LEVEL_WARNING,
+	REM_LL_INFO = REM_LL_WARN | G_LOG_LEVEL_INFO,
+	REM_LL_DEBUG = REM_LL_INFO | G_LOG_LEVEL_DEBUG,
+	REM_LL_NOISE = REM_LL_DEBUG | G_LOG_LEVEL_NOISE,
+} RemLogLevel;
 
-/* When compiling define LOGLEVEL with one of the following macros.
- * Then everything with an equal or lower loglevel will be logged */
-#define LL_FATAL	0
-#define LL_ERROR	1
-#define LL_WARN		2
-#define LL_INFO		3
-#define LL_DEBUG	4
-#define LL_NOISE	5
-
-#ifndef LOGLEVEL
-	#define LOGLEVEL LL_INFO
-#endif
-
-/* If LOGTS gets defined at compile time, every log messages has a timestamp
- * prefix */
-#ifdef LOGTS
-	#define LOGTS1 do {			\
-		struct timeval debug_ts;	\
-		gettimeofday(&debug_ts, NULL);
-	#define LOGTS2 "[%i.%6i] "
-	#define LOGTS3 (int)debug_ts.tv_sec, (int)debug_ts.tv_usec, 
-	#define LOGTS4 ;	\
-		} while(0)
-#else
-	#define LOGTS1
-	#define LOGTS2
-	#define LOGTS3
-	#define LOGTS4
-#endif
-
-/* If LOGPID gets defined at compile time, every log messages has a pid
- * prefix */
-#ifdef LOGPID
-	#include <sys/types.h>
-	#include <unistd.h>
-	#define LOGPID1 "[ %5i ] "
-	#define LOGPID2 getpid(),
-#else
-	#define LOGPID1
-	#define LOGPID2
-#endif
-
-#define LABEL_BUG	"! BUG   ! "
-#define LABEL_FATAL	"[ FATAL ] "
-#define LABEL_ERROR	"[ ERROR ] "
-#define LABEL_WARN	"[ WARN  ] "
-#define LABEL_INFO	"[ INFO  ] "
-#define LABEL_DEBUG	"[ DEBUG ] "
-#define LABEL_NOISE	"[ NOISE ] "
-
-/* If LOGCOL gets defined at compile time, every log messages has a particular
- * color depending on its priority/level */
-#ifdef LOGCOL
-	#define COL_BUG		"\033[41;3m"
-	#define COL_FATAL	"\033[41;3m"
-	#define COL_ERROR	"\033[41;3m"
-	#define COL_WARN	"\033[31;3m"
-	#define COL_INFO	"\033[34;3m"
-	#define COL_DEBUG	"\033[35;3m"
-	#define COL_NOISE	"\033[37;3m"
-	#define COL_END		"\033[0m"
-#else
-	#define COL_BUG
-	#define COL_FATAL
-	#define COL_ERROR
-	#define COL_WARN
-	#define COL_INFO
-	#define COL_DEBUG
-	#define COL_NOISE
-	#define COL_END
-#endif
-
-#define FUNC_FORMAT_STR "%-25s"
-
-#define LOG_BUG(x, args...) LOGTS1 printf( COL_BUG LOGTS2 LABEL_BUG \
-	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-
-/* These are the offered logging macros, which one will be used depends on the
- * defined loglevel */
-#if LL_FATAL <= LOGLEVEL
-        #define LOG_FATAL(x, args...) LOGTS1 printf( COL_FATAL LOGTS2 LABEL_FATAL \
-        	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-#else
-        #define LOG_FATAL(x, args...)
-#endif
-
-#if LL_ERROR <= LOGLEVEL
-	#define LOG_ERROR(x, args...) LOGTS1 printf( COL_ERROR LOGTS2 LABEL_ERROR \
-		LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-	#define LOG_ERRNO(x, args...) LOG_ERROR(x ": %s\n", ##args, strerror(errno))
-#else
-	#define LOG_ERROR(x, args...)
-	#define LOG_ERRNO(x, args...)
-#endif
-
-#if LL_WARN <= LOGLEVEL
-        #define LOG_WARN(x, args...)  LOGTS1 printf( COL_WARN LOGTS2 LABEL_WARN \
-        	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-#else
-        #define LOG_WARN(x, args...)
-#endif
-
-#if LL_INFO <= LOGLEVEL
-        #define LOG_INFO(x, args...)  LOGTS1 printf( COL_INFO LOGTS2 LABEL_INFO \
-        	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-#else
-        #define LOG_INFO(x, args...)
-#endif
-
-#if LL_DEBUG <= LOGLEVEL
-        #define LOG_DEBUG(x, args...) LOGTS1 printf( COL_DEBUG LOGTS2 LABEL_DEBUG \
-        	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-#else
-        #define LOG_DEBUG(x, args...)
-#endif
-
-#if LL_NOISE <= LOGLEVEL
-        #define LOG_NOISE(x, args...) LOGTS1 printf( \
-        	COL_NOISE LOGTS2 LABEL_NOISE \
-        	LOGPID1 FUNC_FORMAT_STR ": " COL_END x, LOGTS3 LOGPID2 __FUNCTION__, ##args) LOGTS4
-#else
-        #define LOG_NOISE(x, args...)
-#endif
-
-#define LOG(x, args...) printf(x, ##args)
+/**
+ * Initialize the Remuco logging system. Automatically gets called by
+ * rem_server_up(), but if you want to use the Remuco logging macros before
+ * you call rem_server_up(), call this at first.
+ * 
+ * @param level specifies which messages to log
+ */
+void
+rem_log_init(RemLogLevel level);
 
 G_END_DECLS
 
-#endif //_REMUCO_LOGGING_H_
+/**
+ * The Remuco logging system uses the GLib logging system. This is the log
+ * domain used for all Remuco loggings.
+ */
+#define REM_LOG_DOMAIN	"Remuco"
+
+#ifdef DO_LOG_NOISE
+/**
+ * Log a noisy debug message.
+ * 
+ * @remark	This log macro is only enabled if the server/player proxy has been
+ * 			compiled with @p -DLOG_NOISE. For performance and log readability
+ * 			reasons it is disabled by default.
+ * 
+ * @see RemLogLevel::REM_LL_NOISE
+ */ 
+#define LOG_NOISE(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_NOISE, \
+	"[NOISE] %-25s: " x, __FUNCTION__, ##args)
+#else
+/**
+ * Log a noisy debug message.
+ * 
+ * @remark	This log macro is only enabled if the server/player proxy has been
+ * 			compiled with @p -DLOG_NOISE. For performance and log readability
+ * 			reasons it is disabled by default.
+ * 
+ * @see RemLogLevel::REM_LL_NOISE
+ */ 
+#define LOG_NOISE(x, args...)
+#endif
+
+/**
+ * Log a debug message.
+ * 
+ * @see RemLogLevel::REM_LL_DEBUG
+ */ 
+#define LOG_DEBUG(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
+	"[DEBUG] %-25s: " x, __FUNCTION__, ##args)
+
+/**
+ * Log an informative message.
+ * 
+ * @see RemLogLevel::REM_LL_INFO
+ */ 
+#define LOG_INFO(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
+	"[INFO ] %-25s: " x, __FUNCTION__, ##args)
+
+/**
+ * Log a warning message.
+ * 
+ * @see RemLogLevel::REM_LL_WARN
+ */ 
+#define LOG_WARN(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
+	"[WARN ] %-25s: " x, __FUNCTION__, ##args)
+
+/**
+ * Log an error message. Use this for expected errors. For unexpected errors
+ * use LOG_BUG().
+ * 
+ * @see RemLogLevel::REM_LL_ERROR
+ */ 
+#define LOG_ERROR(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
+	"[ERROR] %-25s: " x, __FUNCTION__, ##args)
+
+/**
+ * Log an error message. Output includes an error message derived from the
+ * current value or @p errno. Use this for expected errors. For unexpected
+ * errors use LOG_BUG().
+ * 
+ * @see RemLogLevel::REM_LL_ERROR
+ */ 
+#define LOG_ERRNO(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
+	"[ERROR] %-25s: " x " (%s)", __FUNCTION__, ##args, strerror(errno))
+
+#define LOG(x, args...)
+//g_print(x, ##args)
+
+/**
+ * Logs a bug message and aborts the program.
+ * Output includes the file name, function name and line number where this
+ * macro gets called. Use this for bugs as you would use @p g_assert() and
+ * friends.
+ * Param is a format string like in @p printf().
+ */
+#define LOG_BUG(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
+	"* BUG * in %s, func. %s, line %d: " x, \
+	__FILE__, __FUNCTION__, __LINE__, ##args);
+
+/*@}*/
+
+#endif /*REMUCO_LOG_H_*/

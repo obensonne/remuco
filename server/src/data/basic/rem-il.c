@@ -156,16 +156,18 @@ rem_il_dump(const RemIntList *iv)
 {
 	guint u;
 	
-	LOG("rem_il_t@%p: ", iv);
+	REM_DATA_DUMP_HDR("RemIntList", iv);
 	
-	if (!iv) { LOG("\n"); return; }
+	if (iv && iv->l) {
+		
+		for (u = 0; u < iv->l; u++) {
+			REM_DATA_DUMP_FS("%i, ", iv->v[u]);
+		}
 	
-	for (u = 0; u < iv->l; u++) {
-		LOG("%i, ", iv->v[u]);
+		REM_DATA_DUMP_FS("\b\b");
 	}
 	
-	LOG("\n");
-
+	REM_DATA_DUMP_FTR;	
 }
 
 gboolean

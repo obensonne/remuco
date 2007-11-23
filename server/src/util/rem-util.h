@@ -25,12 +25,6 @@
 
 #define g_msleep(_ms)		g_usleep((_ms) * 1000) 
 
-////////// extend glib logging with a noise level //////////
-
-#define G_LOG_LEVEL_NOISE	(1 << G_LOG_LEVEL_USER_SHIFT)
-
-#define g_noise(args...)	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_NOISE, ##args)
-
 ////////// an 'if-then' boolean expression //////////
 
 #define concl(_a, _b)		((!(_a)) || ((_a) && (_b)))
@@ -53,31 +47,41 @@
 
 ////////// dump macros used by remuco data types //////////
 
-#define REM_DATA_DUMP_HDR(_t, _p)	LOG("DUMP(%s@%p):\n", _t, _p)
-#define REM_DATA_DUMP_FTR			LOG("\n")
+#define REM_DATA_DUMP_HDR(_t, _p) \
+			GString *_dump = g_string_sized_new(500);	\
+			g_string_printf(_dump, "DUMP(%s@%p):\n", _t, _p);
+
+#define REM_DATA_DUMP_FS(args...) \
+			g_string_printf(_dump, ##args);
+
+#define REM_DATA_DUMP_FTR \
+			LOG_DEBUG("%s", _dump->str);	\
+			g_string_free(_dump, TRUE);
 
 ////////// dump binary data //////////
 
-#if LOGLEVEL >= LL_NOISE
+#ifdef DO_LOG_NOISE
 static void
 rem_dump_ba(GByteArray *ba)
 {
 	LOG_NOISE("called\n");
 	
-	guint u;
-	guint8 *d, *dd;
+	GString	*dump;
+	guint	u;
+	guint8	*walker, *ba_end;
+
+	dump = g_string_sized_new(ba->len * 4);
 	
-	#if LOGLEVEL >= LL_DEBUG
-	LOG("Binary Data Dump: %p (%u bytes)\n", ba->data, ba->len);
-	for (u = 0, d = ba->data, dd = ba->data + ba->len; d < dd; d++, u++) {
-		LOG("%02hhX ", *d);
-		if (u == 15) {
-			u = -1;
-			LOG("\n");
+	g_string_printf(dump, "Binary Data: %p (%u bytes)", ba->data, ba->len);
+	ba_end = ba->data + ba->len;
+	for (u = 0, walker = ba->data; walker < ba_end; u = (u+1) % 16, walker++) {
+		if (u == 0) {
+			g_string_append(bin, "\n");			
 		}
-	}   
-	printf("\n");
-	#endif
+		g_string_printf(dump, "%02hhX ", *walker);
+	}
+	
+	LOG_NOISE("%s", dump);
 	
 }
 static void
@@ -92,17 +96,5 @@ rem_dump(guint8 *data, guint len)
 #define rem_dump_ba(_ba)
 #define rem_dump(_data, _len)
 #endif
-
-#define g_return_if_fail_wmsg(_expr, _msg)	\
-	if G_UNLIKELY(!(_expr)) {				\
-		LOG_BUG("%s\n", _msg);				\
-		g_return_if_fail(_expr)				\
-	}
-
-#define g_return_val_if_fail_wmsg(_expr, _val, _msg)	\
-	if G_UNLIKELY(!(_expr)) {							\
-		LOG_BUG("%s\n", _msg);							\
-		g_return_val_if_fail(_expr, _val)				\
-	}
 
 #endif /*COMMON_H_*/

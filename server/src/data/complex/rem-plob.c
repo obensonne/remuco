@@ -172,7 +172,7 @@ rem_plob_meta_get(const RemPlob *plob, const gchar *name)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint rem_data_plob_t_bfv[] = {
+static const guint RemPlob_bfv[] = {
 	REM_BIN_DT_STR, 1,
 	REM_BIN_DT_SV, 1,
 	REM_BIN_DT_BA, 1,
@@ -201,7 +201,7 @@ rem_plob_serialize(const RemPlob *plob,
 				
 	}
 	
-	ba = rem_bin_serialize(plob_tmp, rem_data_plob_t_bfv, se, pte);
+	ba = rem_bin_serialize(plob_tmp, RemPlob_bfv, se, pte);
 		
 	if (plob->img) {
 		g_byte_array_free(plob->img, TRUE);
@@ -219,8 +219,8 @@ rem_plob_unserialize(const GByteArray *ba, const gchar *te)
 	guint ret;
 
 	plob = NULL;
-	ret = rem_bin_unserialize(ba, sizeof(RemPlob),
-				rem_data_plob_t_bfv, (gpointer) &plob, te);
+	ret = rem_bin_unserialize(
+			ba, sizeof(RemPlob), RemPlob_bfv, (gpointer) &plob, te);
 
 	if (ret < 0 && plob) {
 		rem_plob_destroy(plob);
@@ -245,13 +245,15 @@ rem_plob_unserialize(const GByteArray *ba, const gchar *te)
 void
 rem_plob_dump(const RemPlob *p)
 {
-	REM_DATA_DUMP_HDR("rem_plob_t", p);
+	REM_DATA_DUMP_HDR("RemPlob", p);
 	
-	LOG("pid = %s\n", p->pid);
-	LOG("meta information:\n");
-	rem_sl_dump(p->meta);
-	LOG_INFO("image data at %p (%u bytes)\n", p->img, p->img ? p->img->len : 0);
-	
+	if (p) {
+		REM_DATA_DUMP_FS("pid = %s\n", p->pid);
+		REM_DATA_DUMP_FS("meta information:\n");
+		rem_sl_dump(p->meta);
+		REM_DATA_DUMP_FS("\nimage data at %p (%u bytes)",
+						 p->img, p->img ? p->img->len : 0);
+	}
 	REM_DATA_DUMP_FTR;
 }
 

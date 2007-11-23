@@ -89,15 +89,17 @@ rem_player_info_dump(const RemPlayerInfo *pi)
 	
 	g_assert_debug(pi->name);
 	
-	REM_DATA_DUMP_HDR("rem_pinfo_t", pi);
+	REM_DATA_DUMP_HDR("RemPlayerInfo", pi);
 
-	LOG("name = %s\nfeautres = %X, rating_max= %i\n",
+	if (pi) {
+	REM_DATA_DUMP_FS("name = %s\nfeautres = %X, rating_max= %i\n",
 		pi->name, pi->features, pi->rating_max);
 		
 	if (pi->icon)
 		rem_dump_ba(pi->icon);
 	else
-		LOG("no icon\n");
+		REM_DATA_DUMP_FS("no icon");
+	}
 	
 	REM_DATA_DUMP_FTR;
 }

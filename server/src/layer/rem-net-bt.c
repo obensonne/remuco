@@ -3,7 +3,7 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 
-#include <unistd.h>
+#include <unistd.h> // close()
 
 #include "rem-net.h"
 #include "../util/rem-util.h"
@@ -335,7 +335,7 @@ priv_server_socket_up(guint8 *port)
 
 	sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	if (sock < 0) {
-		LOG_ERROR("socket creation failed: %s\n", strerror(errno));
+		LOG_ERRNO("socket creation failed");
 		return -1;
 	}
 	

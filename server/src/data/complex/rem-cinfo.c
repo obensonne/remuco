@@ -79,14 +79,13 @@ rem_client_info_unserialize(const GByteArray *ba, const gchar *te)
 void
 rem_client_info_dump(const RemClientInfo *ci)
 {
-	REM_DATA_DUMP_HDR("rem_cinfo_t", ci);
+	REM_DATA_DUMP_HDR("RemClientInfo", ci);
 	
-	LOG("client info at %p:\n", ci);
-	
-	LOG("memlimit, img_width, img_height = %i, %i, %i\n",
-		ci->mem_limit, ci->img_width, ci->img_height);
-		
-	rem_sl_dump(ci->charsets);
+	if (ci) {
+		REM_DATA_DUMP_FS("memlimit, img_width, img_height = %i, %i, %i\n",
+						 ci->mem_limit, ci->img_width, ci->img_height);
+		rem_sl_dump(ci->charsets);
+	}
 	
 	REM_DATA_DUMP_FTR;
 }

@@ -127,8 +127,13 @@ rem_ploblist_unserialize(const GByteArray *ba, const gchar *charset_to)
 void
 rem_ploblist_dump(const RemPloblist *pl)
 {
-	LOG("plid: %s, name: %s\n", pl->plid, pl->name);
-	LOG("plobs (pid, title):\n");
-	rem_sl_dump(pl->plobs);
+	REM_DATA_DUMP_HDR("RemPloblist", pl);
+	
+	if (pl) {
+		REM_DATA_DUMP_FS("plid: %s, name: %s\n", pl->plid, pl->name);
+		REM_DATA_DUMP_FS("plobs (pid, title):\n");
+		rem_sl_dump(pl->plobs);
+	}
+	
 	REM_DATA_DUMP_FTR;
 }

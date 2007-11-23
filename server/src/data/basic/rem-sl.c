@@ -390,19 +390,20 @@ rem_sl_dump(const RemStringList *sl)
 {
 	GSList	*l;
 	
-	REM_DATA_DUMP_HDR("rem_sl_t", sl);
+	REM_DATA_DUMP_HDR("RemStringList", sl);
 	
-	if (!sl) { REM_DATA_DUMP_FTR; return; }
+	if (sl && sl->len) {
+		
+		l = sl->strings;
+		while (l) {
+			REM_DATA_DUMP_FS("%s, ", (gchar*) l->data);
+			l = g_slist_next(l);
+		}
 	
-	l = sl->strings;
-	while (l) {
-		LOG("%s, ", (gchar*) l->data);
-		l = g_slist_next(l);
+		REM_DATA_DUMP_FS("\b\b");
 	}
-
-	LOG("\b\n");
-
-	REM_DATA_DUMP_FTR;
+	
+	REM_DATA_DUMP_FTR;	
 }
 
 ///////////////////////////////////////////////////////////////////////////////

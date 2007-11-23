@@ -12,5 +12,9 @@ endif
 SRC_FILES_LOCAL += rem-img.c
 PKG_CONFIG_REQ += Wand
 
+# log support:
+SRC_FILES_LOCAL += rem-log.c
+
+
 SRC_FILES += $(addprefix $(CDIR)/,$(SRC_FILES_LOCAL))
 
