@@ -2,7 +2,6 @@
 #include <sys/stat.h>
 
 static gboolean initialized = FALSE;
-static GIOChannel *channel_global; 
 
 static void
 gcb_log_handler(const gchar *domain,
@@ -90,8 +89,6 @@ priv_get_log_channel()
 	}
 	
 	g_free(log_file);
-	
-	channel_global = channel;
 	
 	return channel;
 }
