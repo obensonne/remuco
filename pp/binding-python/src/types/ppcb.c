@@ -4,40 +4,52 @@
 
 static PyMemberDef PPCallbacks_members[] = {
 	{"snychronize", T_OBJECT_EX, offsetof(RemPyPPCallbacks, synchronize), 0,
-	 "RemLib requests to snychronizes a player status. 1st param is a "
-	 "remuco.PlayerStatus (in/out param). Nothing to return."},
+	 "Server requests to snychronizes a player status. "
+	 "Params: (Object (PP private data), PlayerStatus (in/out param)). "
+	 "Returns: None."},
 	{"get_plob", T_OBJECT_EX, offsetof(RemPyPPCallbacks, get_plob), 0,
-     "RemLib requests a plob. 1st para is a string (the PID of the requestes "
-	 "plob). Retrun a dictionary with meta information."},
+     "Server requests a plob. "
+	 "Params: (Object (PP private data), String (PID of the requested plob)). "
+	 "Retruns: Dict (plob meta information)."},
 	{"get_library", T_OBJECT_EX, offsetof(RemPyPPCallbacks, get_library), 0,
-	 "RemLib requests the library. No params. Return a list of PLIDs (strings)."},
+	 "Server requests the library. "
+	 "Params: (Object (PP private data)). "
+	 "Returns: List (containing PLIDs as strings)."},
 	{"get_ploblist", T_OBJECT_EX, offsetof(RemPyPPCallbacks, get_ploblist), 0,
-	 "RemLib requests a ploblist. 1st param is a string (the PLID of the "
-	 "requested plob list). Return a list of PIDs (strings)."},
+	 "Server requests a ploblist."
+	 "Params: (Object (PP private data), String (PLID)). "
+	 "Returns: List (containing PIDs as strings)."},
 	{"notify", T_OBJECT_EX, offsetof(RemPyPPCallbacks, notify), 0,
-	 "An event occured. 1st param is an int indicating the event type. "
-	 "Nothing to return."},
+	 "Server notifies that an event occured. "
+	 "Params: (Object (PP private data), int (event code)). "
+	 "Returns: None."},
 	{"play_ploblist", T_OBJECT_EX, offsetof(RemPyPPCallbacks, play_ploblist), 0,
-	 "RemLib request to play a ploblist (resp. to fill the playlist with its "
-	 "content). 1st param is a string (the ploblist's PLID). Nothing to return."},
+	 "Server requests to play a ploblist (resp. to fill the playlist with its "
+	 "content). "
+	 "Params: (Object (PP private data), String (PLID)). "
+	 "Returns: None."},
 	{"search", T_OBJECT_EX, offsetof(RemPyPPCallbacks, search), 0,
-	 "RemLib requests to return a list with the PIDs (strings) of all plobs, "
-	 "that have equal meta information to the plob (dictionary) given as 1st "
-	 "param."
+	 "Server requests to return a list with the PIDs of all plobs, that have "
+	 "equal meta information to the given plob. "
+	 "Params: (Object (PP private data), Dict (plob meta information)). "
+	 "Returns: List (containing PIDs as strings)."
 	 " Note: FUTURE FEATURE!"},
 	{"simple_control", T_OBJECT_EX, offsetof(RemPyPPCallbacks, simple_control), 0,
-	 "RemLib requests the PP do control the player. 1st param is a control "
-	 "command (int). 2nd param is a param (int) to the command. Nothing to "
-	 "return."},
+	 "Server requests the PP do control the player. "
+	 "Params: (Object (PP private data), int (command), int (param)). "
+	 "Returns: None."},
 	{"update_plob", T_OBJECT_EX, offsetof(RemPyPPCallbacks, update_plob), 0,
 	 "RemLib requests the PP to update the the meta information of a plob "
 	 "(which has been changed on client side). "
-	 "1st param is the plob's PID. 2nd param is the new plob (dictionary)."
+	 "Params: (Object (PP private data), String (PID of the plob to change), "
+	 "Dict (new plob meta information)). "
+	 "Returns: None."
 	 " Note: FUTURE FEATURE!"},
 	{"update_ploblist", T_OBJECT_EX, offsetof(RemPyPPCallbacks, update_ploblist), 0,
-	 "RemLib requests the PP to update the contents of a ploblist. 1st param "
-	 "is the plob list's PLID (string). 2nd param is the plob list's new "
-	 "content (list of PIDs (string)). Nothing to return."
+	 "RemLib requests the PP to update the contents of a ploblist. "
+	 "Params: (Object (PP private data), String (PLID of the list to change), "
+	 ", List (containing PIDs as strings - the new content of the list)). "
+	 "Returns: None."
 	 " Note: FUTURE FEATURE!"},
     {NULL}  /* Sentinel */
 };
