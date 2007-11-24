@@ -14,7 +14,8 @@ else:
 inc_dirs = commands.getoutput("pkg-config glib-2.0 remuco --cflags").replace('-I','').split()
 libs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-l").replace('-l','').split()
 lib_dirs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-L").replace('-L','').split()
-src_files = ['module.c', 'functions.c', 'constants.c', 'types/ppdesc.c', 'types/ppcb.c', 'types/pstatus.c']
+src_files = ['src/module.c', 'src/functions.c', 'src/constants.c',
+             'src/types/ppdesc.c', 'src/types/ppcb.c', 'src/types/pstatus.c']
 
 
 #print "libs: " + str(libs)
