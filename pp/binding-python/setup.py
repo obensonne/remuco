@@ -5,11 +5,11 @@ import os
 DEBUG = os.getenv("DEBUG")
 
 if DEBUG == "yes":
-    macros = [ ('LOGLEVEL', 'LL_DEBUG') ]
+    macros = [ ('DEBUG', '') ]
     macros_off = [ 'NDEBUG' ]
-else:
-    macros = [ ('LOGLEVEL', 'LL_INFO') ]
-    macros_off = []
+
+if DO_LOG_NOISE == "yes":
+    macros = [ ('DO_LOG_NOISE', '') ]
 
 inc_dirs = commands.getoutput("pkg-config glib-2.0 remuco --cflags").replace('-I','').split()
 libs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-l").replace('-l','').split()

@@ -11,6 +11,7 @@ PKG_BASENAME := remuco-python
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
 DEBUG ?= yes
+DO_LOG_NOISE ?= no
 
 ###############################################################################
 #
@@ -19,10 +20,12 @@ DEBUG ?= yes
 ##############################################################################
 
 all: stamp-build-requirements
-	DEBUG=$(DEBUG) python setup.py build
+	DEBUG=$(DEBUG) DO_LOG_NOISE=$(DO_LOG_NOISE) \
+		python setup.py build
 
 install:
-	DEBUG=$(DEBUG) python setup.py install --prefix=$(DESTDIR)$(PREFIX)
+	DEBUG=$(DEBUG) DO_LOG_NOISE=$(DO_LOG_NOISE) \
+		python setup.py install --prefix=$(DESTDIR)$(PREFIX)
 
 uninstall:
 	#python setup.py uninstall --prefix=$(DESTDIR)$(PREFIX)
