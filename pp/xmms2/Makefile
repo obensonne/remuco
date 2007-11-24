@@ -58,7 +58,7 @@ CFLAGS += -Wall
 #
 ##############################################################################
 
-all: .build-req remuco-xmms2
+all: stamp-build-requirements remuco-xmms2
 
 remuco-xmms2: remuco-xmms2.o
 	$(CC) -o remuco-xmms2 remuco-xmms2.o $(LFLAGS)
@@ -89,7 +89,7 @@ clean:
 	find -type f -name "*.o" | xargs rm -f
 	rm -rf build dist
 	rm -f *.deb
-	rm -f .build-req
+	rm -f stamp-build-requirements
 	rm -f remuco-xmms2
 
 ###############################################################################
@@ -98,7 +98,7 @@ clean:
 #
 ##############################################################################
 
-.build-req:
+stamp-build-requirements:
 	@echo
 	@echo "Build requirements:"
 	@for PKGC in $(PKG_CONFIG_REQ) ; do \
@@ -122,7 +122,7 @@ clean:
 		echo "At least I could not start it." ; \
 	fi
 	@echo
-	touch .build-req
+	touch stamp-build-requirements
 
 valgrind: all
 	G_SLICE=always-malloc \
