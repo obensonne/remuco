@@ -101,7 +101,7 @@ deb-check-svn:
 		false; \
 	fi
 
-deb: pydoc clean
+deb: deb-check-svn pydoc clean
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
