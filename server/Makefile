@@ -74,7 +74,8 @@ deb-check-svn:
 		false; \
 	fi
 	if [ "`svnpath`" != "`svnpath tags`" ] ; then \
-		echo "!!! WARNING !!! You are not in tags!" ; false ; \
+		echo "!!! WARNING !!! You are not in tags!"; \
+		false ; \
 	fi
 	if (svnversion | grep "[\:MS]") ; then \
 		echo "!!! WARNING !!! Working copy not in a clean state !"; \
