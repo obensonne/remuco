@@ -68,7 +68,7 @@ static const gchar *XMETA_NAMES_ART[] = {
 #define REMX2_RESULT_WAIT(_res) G_STMT_START {			\
 	xmmsc_result_wait(_res);							\
 	if (xmmsc_result_iserror(_res)) {					\
-		LOG_WARN("X2 result error: %s\n", xmmsc_result_get_error(_res));	\
+		LOG_WARN("X2 result error: %s", xmmsc_result_get_error(_res));	\
 		xmmsc_result_unref(_res);						\
 		return;											\
 	}													\
@@ -77,7 +77,7 @@ static const gchar *XMETA_NAMES_ART[] = {
 #define REMX2_RESULT_WAIT_RET(_res, _ret) G_STMT_START {\
 	xmmsc_result_wait(_res);							\
 	if (xmmsc_result_iserror(_res)) {					\
-		LOG_WARN("X2 result error: %s\n", xmmsc_result_get_error(_res));	\
+		LOG_WARN("X2 result error: %s", xmmsc_result_get_error(_res));	\
 		xmmsc_result_unref(_res);						\
 		return _ret;									\
 	}													\
@@ -94,7 +94,7 @@ xcb_disconnect(gpointer data)
 {
 	RemPPPriv	*priv = (RemPPPriv*) data;
 
-	LOG_DEBUG("XMMS2 wants us to disconnect\n");
+	LOG_DEBUG("XMMS2 wants us to disconnect");
 	
 	rem_server_down(priv->rs);
 }
@@ -111,7 +111,7 @@ xcb_disconnect(gpointer data)
 static void
 priv_sigint(gint sig)
 {
-	LOG_DEBUG("received interrupt signal\n");
+	LOG_DEBUG("received interrupt signal");
 	
 	rem_server_down(priv_global->rs);
 }
@@ -157,8 +157,6 @@ priv_finish_plob_change(RemPPPriv *priv)
 static void
 priv_get_playlist(RemPPPriv *priv, const gchar *plid, RemStringList *pl)
 {
-	LOG_NOISE("called\n");
-	
 	guint			id;
 	gint			ret;
 	GString			*pid;
@@ -173,7 +171,7 @@ priv_get_playlist(RemPPPriv *priv, const gchar *plid, RemStringList *pl)
 
 	pid = g_string_new_len("", 255);
 	
-	LOG_NOISE("playlist (%s): ", plid);
+	LOG_NOISE("build playlist (%s)..", plid);
 	for (xmmsc_result_list_first(result);
 		 xmmsc_result_list_valid(result);
 		 xmmsc_result_list_next(result))
@@ -181,16 +179,11 @@ priv_get_playlist(RemPPPriv *priv, const gchar *plid, RemStringList *pl)
 		ret = xmmsc_result_get_uint(result, &id);
 		g_assert(ret);
 		
-		#if LOGLEVEL >= LL_NOISE
-		LOG("%u ", id);
-		#endif
 		g_string_printf(pid, "%u", id);
 		
 		rem_sl_append_const(pl, pid->str);
 	}
-	#if LOGLEVEL >= LL_NOISE
-	LOG("\n");
-	#endif
+	LOG_NOISE("build playlist done, it contains %u plobs", rem_sl_length(pl));
 	
 	g_string_free(pid, TRUE);
 	
@@ -201,17 +194,17 @@ priv_get_playlist(RemPPPriv *priv, const gchar *plid, RemStringList *pl)
 static void
 priv_connect_to_xmms2(RemPPPriv *priv)
 {
-	LOG_NOISE("called\n");
+	LOG_NOISE("called");
 	
 	priv->xc = xmmsc_init("remuco");
 	
 	g_assert(priv->xc);
 
 	if (xmmsc_connect(priv->xc, g_getenv("XMMS_PATH"))) {
-		LOG_INFO("xmms2d is running\n");
+		LOG_DEBUG("xmms2d is running");
 		xmmsc_disconnect_callback_set(priv->xc, &xcb_disconnect, priv);
 	} else {
-		LOG_ERROR("%s\n", xmmsc_get_last_error(priv->xc));
+		LOG_ERROR("%s", xmmsc_get_last_error(priv->xc));
 		xmmsc_unref(priv->xc);
 		priv->xc = NULL;
 	}
@@ -239,7 +232,7 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 	ret = xmmsc_result_get_uint(result, &u);
 	g_assert(ret);
 
-	LOG_NOISE("new (xmms2) pbs is %u\n", u);
+	LOG_NOISE("new (xmms2) playback status is %u", u);
 
 	switch (u) {
 		case XMMS_PLAYBACK_STATUS_PAUSE:
@@ -252,7 +245,7 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 			ps->pbs = REM_PBS_STOP;
 			break;
 		default:
-			LOG_BUG("unknown xmms2 playback status\n");
+			LOG_BUG("unknown xmms2 playback status");
 			break;
 	}
 
@@ -270,7 +263,7 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 	
 	ps->volume = u > v ? u : v;
 
-	LOG_NOISE("new volume is %u:%u\n", u, v);
+	LOG_NOISE("new volume is %u:%u", u, v);
 
 	xmmsc_result_unref(result);
 
@@ -294,7 +287,7 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 		ret = xmmsc_result_get_uint(result, &u);
 		g_assert(ret);
 		
-		LOG_NOISE("new (XMMS2) cap_pos is %u\n", u);
+		LOG_NOISE("new (XMMS2) cap_pos is %u", u);
 
 		ps->cap_pos = (gint) u + 1;
 	}
@@ -310,7 +303,7 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 	ret = xmmsc_result_get_uint(result, &u);
 	g_assert(ret);
 	
-	LOG_NOISE("new cap id is %u\n", u);
+	LOG_NOISE("new cap id is %u", u);
 
 	if (u == 0)
 		g_string_truncate(ps->cap_pid, 0);
@@ -376,7 +369,7 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	id = (guint) g_ascii_strtoull(pid, NULL, 10);
 	g_assert(id); // id is 0 on error, and a pid of '0' is also an error
 	
-	LOG_DEBUG("read song %u from mlib\n", id);
+	LOG_DEBUG("read song %u from mlib", id);
 	
 	result = xmmsc_medialib_get_info(priv->xc, id);
 
@@ -462,11 +455,11 @@ rcb_notify(RemPPPriv *priv, RemServerEvent event)
 {
 	switch (event) {
 		case REM_SERVER_EVENT_ERROR:
-			LOG_ERROR("server experienced serious error -> shut down server\n");
+			LOG_ERROR("server experienced serious error -> shut down server");
 			rem_server_down(priv->rs);
 			break;
 		case REM_SERVER_EVENT_DOWN:
-			LOG_DEBUG("server shut down finished\n");
+			LOG_DEBUG("server shut down finished");
 			g_main_loop_quit(priv->ml);
 			break;
 		default:
@@ -495,7 +488,7 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 	guint			u;
 	gint			ret;
 
-	LOG_DEBUG("command: %hu, param: %hu\n", cmd, param);
+	LOG_DEBUG("command: %hu, param: %hu", cmd, param);
 
 	switch (cmd) {
 		case REM_SCTRL_CMD_JUMP:
@@ -597,7 +590,7 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 			
 			break;
 		default:
-			LOG_WARN("ignore command %hu\n", cmd);
+			LOG_WARN("ignore command %hu", cmd);
 			break;
 	}
 	
@@ -682,7 +675,7 @@ int main(int argc, char **argv) {
 	priv->rs = rem_server_up(ppd, rcb, priv, &err);
 	
 	if (err) {
-		LOG_ERROR("starting server failed: %s\n", err->message);
+		LOG_ERROR("starting server failed: %s", err->message);
 		g_error_free(err);
 	}
 	
@@ -697,9 +690,9 @@ int main(int argc, char **argv) {
 
 	rem_server_poll(priv->rs);
 	
-	LOG_DEBUG("now running main loop\n");
+	LOG_DEBUG("now running main loop");
 	g_main_loop_run(priv->ml);
-	LOG_DEBUG("back from main loop\n");
+	LOG_DEBUG("back from main loop");
 
 	////////// shut down //////////
 
@@ -713,7 +706,7 @@ int main(int argc, char **argv) {
 	
 	g_free(priv);
 	
-	LOG_INFO("bye..\n");
+	LOG_INFO("bye..");
 	
 	return 0;
 }
