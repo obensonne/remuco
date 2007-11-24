@@ -269,15 +269,11 @@ priv_build_ploblist(RemServer *s,
 }
 
 /**
- * Checks server->changes if some player data changed and broadcasts the changes
- * to the clients. However, if there is a change according to server->changes,
- * we check for changes again anyway. This is needed when the server does not
- * get notified by the PP and must therefore check for changes itself. Further,
- * these change checks are not very expensive and therefore protect against
- * bad PP implementations which announce changes too often.
+ * Synchronizes our internal player status with the current one via the player
+ * proxy. Then checks for changes and broadcasts it to all connected clients.
  */
 static void
-priv_handle_player_changes(RemServer* server)
+priv_synchronize(RemServer* server)
 {
 	LOG_NOISE("called\n");
 	
@@ -437,7 +433,7 @@ priv_handle_pimsg(RemServer* server,
 							 sctrl->cmd == REM_SCTRL_CMD_STOP ||
 							 sctrl->cmd == REM_SCTRL_CMD_VOLUME)) {
 			
-			priv_handle_player_changes(server);
+			priv_synchronize(server);
 		}
 		
 		rem_simple_control_destroy(sctrl);
@@ -695,7 +691,7 @@ priv_cb_notify(gpointer data)
 	
 	server = (RemServer*) data;
 	
-	priv_handle_player_changes(server);
+	priv_synchronize(server);
 	
 	server->pending_sync = FALSE;
 	
@@ -713,7 +709,7 @@ priv_cb_poll(gpointer data)
 	
 	server = (RemServer*) data;
 	
-	priv_handle_player_changes(server);
+	priv_synchronize(server);
 	
 	LOG_NOISE("done");
 
