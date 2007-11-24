@@ -6,8 +6,8 @@
 
 PREFIX ?= /usr
 
-PKG_VERSION := $(shell python src/setup.py --version)
-PKG_BASENAME := libremuco-python
+PKG_VERSION := $(shell python setup.py --version)
+PKG_BASENAME := remuco-python
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
 DEBUG ?= yes
@@ -19,11 +19,10 @@ DEBUG ?= yes
 ##############################################################################
 
 all: stamp-build-requirements
-	cd src && DEBUG=$(DEBUG) python setup.py build
+	DEBUG=$(DEBUG) python setup.py build
 
 install:
-	cd src && DEBUG=$(DEBUG)  \
-		python setup.py install --prefix=$(DESTDIR)$(PREFIX)
+	DEBUG=$(DEBUG) python setup.py install --prefix=$(DESTDIR)$(PREFIX)
 
 uninstall:
 	#python setup.py uninstall --prefix=$(DESTDIR)$(PREFIX)
@@ -31,15 +30,15 @@ uninstall:
 
 dist: pydoc clean
 	mkdir -p build/$(PKG_FULLNAME)
-	cp Makefile build/$(PKG_FULLNAME)/
+	cp Makefile setup.py build/$(PKG_FULLNAME)/
 	cp -r src doc build/$(PKG_FULLNAME)/
 	find build/$(PKG_FULLNAME) -type d -name ".svn" | xargs rm -rf
 	mkdir dist
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
 
 clean:
-	#cd src && python setup.py clean
-	rm -rf build dist src/build src/dist
+	python setup.py clean
+	rm -rf build dist
 	rm -f stamp-build-requirements
 
 ###############################################################################
@@ -60,7 +59,7 @@ stamp-build-requirements:
 pydoc: all
 	pydoc > /dev/null 2>&1 || false
 	mkdir -p build/pydoc
-	REMPYMOD=`find src/build -name remuco.so` && \
+	REMPYMOD=`find build -name remuco.so` && \
 		PYTHONPATH=`dirname $$REMPYMOD` pydoc -w remuco
 	mv -f remuco.html doc/api.html
 	
@@ -88,7 +87,7 @@ DEB_PREFIX := /usr
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
-deb: clean pydoc
+deb: pydoc clean
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
 	# install in a temp location
