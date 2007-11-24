@@ -1,12 +1,9 @@
 #ifndef REMUCO_LOG_H_
 #define REMUCO_LOG_H_
 
+#include <glib.h>
 #include <errno.h>
 #include <string.h> // strerror()
-
-#ifndef REMUCO_H_
-#error "Include <remuco.h> !"
-#endif
 
 #ifndef G_LOG_LEVEL_NOISE
 #define G_LOG_LEVEL_NOISE (1 << G_LOG_LEVEL_USER_SHIFT)
