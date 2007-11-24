@@ -52,7 +52,7 @@
 			g_string_printf(_dump, "DUMP(%s@%p):\n", _t, _p);
 
 #define REM_DATA_DUMP_FS(args...) \
-			g_string_printf(_dump, ##args);
+			g_string_append_printf(_dump, ##args);
 
 #define REM_DATA_DUMP_FTR \
 			LOG_DEBUG("%s", _dump->str);	\
@@ -64,8 +64,6 @@
 static void
 rem_dump_ba(GByteArray *ba)
 {
-	LOG_NOISE("called\n");
-	
 	GString	*dump;
 	guint	u;
 	guint8	*walker, *ba_end;
@@ -80,9 +78,6 @@ rem_dump_ba(GByteArray *ba)
 		}
 		g_string_printf(dump, "%02hhX ", *walker);
 	}
-	
-	LOG_NOISE("%s", dump);
-	
 }
 static void
 rem_dump(guint8 *data, guint len)

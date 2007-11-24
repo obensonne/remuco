@@ -59,7 +59,7 @@ rem_bac_next_sba(rem_bac_t *bac)
 		return NULL;
 
 	if (bac->pos_ptr + 6 > bac->ba->data + bac->ba->len) {
-		LOG_WARN("uncomplete sba in bac\n");
+		LOG_WARN("uncomplete sba in bac");
 		return NULL;
 	}
 	
@@ -74,7 +74,7 @@ rem_bac_next_sba(rem_bac_t *bac)
 	bac->pos_ptr += 4;
 	
 	if (bac->pos_ptr + size > bac->ba->data + bac->ba->len) {
-		LOG_WARN("uncomplete sba in bac\n");
+		LOG_WARN("uncomplete sba in bac");
 		return NULL;
 	}		
 	

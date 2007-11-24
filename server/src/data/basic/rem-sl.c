@@ -48,7 +48,7 @@ priv_convert(const RemStringList *sl,
 	
 	g_assert_debug(ef && et);
 
-	LOG_NOISE("convert strings from %s to %s\n", ef, et);
+	LOG_NOISE("convert strings from %s to %s", ef, et);
 	
 	if (!sl) return NULL;
 
@@ -71,7 +71,7 @@ priv_convert(const RemStringList *sl,
 			if (err) {
 				
 				g_assert_debug(!st);
-				LOG_WARN("'%s' failed (%s) -> simply copy\n", sf, err->message);
+				LOG_WARN("'%s' failed (%s) -> simply copy", sf, err->message);
 				g_error_free(err);
 				err = NULL;
 				rem_sl_append_const(sl_converted, sf);
@@ -280,7 +280,7 @@ rem_sl_iterator_next(const RemStringList *sl)
 	
 	s = (gchar*) sl->strings_iterator->data;
 	
-	if G_UNLIKELY(!s) LOG_WARN("iterator fails on NULL elements\n");
+	if G_UNLIKELY(!s) LOG_WARN("iterator fails on NULL elements");
 	
 	((RemStringList *) sl)->strings_iterator = sl->strings_iterator->next;
 	
@@ -547,7 +547,7 @@ rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *
 	
 	////////// we must convert //////////
 	
-	LOG_NOISE("conversion needed (from %s)\n", ef);
+	LOG_NOISE("conversion needed (from %s)", ef);
 
 	l = pte->strings;
 	
@@ -578,7 +578,7 @@ rem_sl_serialize(const RemStringList *sl, const gchar *ef, const RemStringList *
 	et = (gchar*) pte->strings->data;
 	
 	LOG_DEBUG("must convert from enc %s to fallback enc %s (with character "
-		"replacement)\n", ef, et);
+		"replacement)", ef, et);
 	
 	sl_converted = priv_convert(sl, ef, et, TRUE);
 	
@@ -616,14 +616,14 @@ rem_sl_unserialize(const GByteArray *ba, const gchar *et)
 	// data present ?
 	if (ba->len == 0) {
 		
-		LOG_WARN("data malformed (no data)\n");
+		LOG_WARN("data malformed (no data)");
 		return NULL;
 	}
 	
 	// data null-terminated ?
 	if (*(ba_end-1) != 0) {
 				
-		LOG_WARN("data malformed (last byte not zero)\n");
+		LOG_WARN("data malformed (last byte not zero)");
 		return NULL;
 	}
 	
@@ -631,7 +631,7 @@ rem_sl_unserialize(const GByteArray *ba, const gchar *et)
 	ef = (gchar*) (ba->data + 1);
 	if (!ba->data[0] || !priv_str_is_ascii(ef)) {
 				
-		LOG_WARN("data malformed (no valid encoding specifier)\n");
+		LOG_WARN("data malformed (no valid encoding specifier)");
 		return NULL;
 	}
 	

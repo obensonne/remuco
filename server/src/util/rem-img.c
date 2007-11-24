@@ -22,7 +22,7 @@ rem_img_handle_wand_error(MagickWand *mw)
 	
 	msg = MagickGetException(mw, &severity);
 	
-	LOG_ERROR("%s %s %ld %s\n", GetMagickModule(), msg);
+	LOG_ERROR("%s %s %ld %s", GetMagickModule(), msg);
 	
 	msg = (gchar *) MagickRelinquishMemory(msg);
  
@@ -45,7 +45,7 @@ rem_img_file_to_ba(const gchar *file)
 	g_file_get_contents(file, &data, &length, &err);
 	
 	if (err) {
-		LOG_WARN("could not read file '%s' (%s)\n", file, err->message);
+		LOG_WARN("could not read file '%s' (%s)", file, err->message);
 		if (data) g_free(data);
 		return NULL;
 	}
@@ -53,7 +53,7 @@ rem_img_file_to_ba(const gchar *file)
 	g_assert_debug(data);
 
 	if (!length) {
-		LOG_WARN("file '%s' is empty\n", file);
+		LOG_WARN("file '%s' is empty", file);
 		return NULL;
 	}
 	
@@ -90,12 +90,12 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	MagickWandGenesis();
 	magick_wand = NewMagickWand();
 	  
-	LOG_DEBUG("load image '%s'\n", file);
+	LOG_DEBUG("load image '%s'", file);
 	
 	magick_ret = MagickReadImage(magick_wand, file);
 	if (magick_ret == MagickFalse) {
 				
-		LOG_WARN("loading image '%s' failed\n", file);
+		LOG_WARN("load image '%s' failed", file);
 		rem_img_handle_wand_error(magick_wand);
 		return NULL;
 		
@@ -103,7 +103,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 
 	// resize the image
 
-	LOG_DEBUG("get size..\n");
+	LOG_DEBUG("get dimensions..");
 
 	MagickSetFirstIterator(magick_wand);
 
@@ -111,12 +111,12 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	height_orig = MagickGetImageHeight(magick_wand);
 
 	if (width_orig == 0 || height_orig == 0) {
-		LOG_WARN("image '%s' has 0 size\n", file);
+		LOG_WARN("image '%s' has 0 size", file);
 		rem_img_handle_wand_error(magick_wand);
 		return NULL;
 	}
 
-	LOG_DEBUG("size: %lu x %lu\n", width_orig, height_orig);
+	LOG_DEBUG("dimensions: %lu x %lu", width_orig, height_orig);
 
 	scale = MAX(	(gfloat) width_orig / width_max,
 			(gfloat) height_orig / height_max);
@@ -124,9 +124,14 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	width_target = width_orig / scale;
 	height_target = height_orig / scale;
 	
-	LOG_DEBUG("scale, width_orig, width_target, width_max, height_orig, height_target, height_max == "
-		"%f, %u, %u, %u, %u ,%u, %u\n",
-		scale, (guint) width_orig, width_target, width_max, (guint) height_orig, height_target, height_max);
+	LOG_DEBUG("scale, "
+			  "width_orig, width_target, width_max, "
+			  "height_orig, height_target, height_max == "
+			  "%f, %u, %u, %u, %u ,%u, %u",
+			  scale,
+			  (guint) width_orig, width_target, width_max,
+			  (guint) height_orig, height_target, height_max);
+	
 	g_assert_debug(width_target <= width_max && height_target <= height_max);
 
 	MagickResizeImage(
@@ -140,7 +145,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	magick_ret = MagickWriteImages(magick_wand, tmp_file, MagickTrue);
 	if (magick_ret == MagickFalse) {
 		
-		LOG_WARN("could not write tmp image '%s'\n", tmp_file);
+		LOG_WARN("could not write tmp image '%s'", tmp_file);
 		
 		g_free(tmp_file);
 		

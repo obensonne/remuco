@@ -131,13 +131,14 @@ rem_player_status_fp_update(RemPlayerStatus *ps, RemPlayerStatusFP *ps_fp)
 	}
 	
 	hash = rem_sl_hash(ps->playlist);
-	LOG_NOISE("pl hash n/o: %u/%u\n", hash, ps_fp->playlist_hash);
+	LOG_NOISE("playlist hash new/old: %u/%u", hash, ps_fp->playlist_hash);
 	if (hash != ps_fp->playlist_hash) {
 		ps_fp->playlist_hash = hash;
 		result |= REM_PS_DIFF_PLAYLIST;
 	}
 	
 	hash = rem_sl_hash(ps->queue);
+	LOG_NOISE("queue hash new/old: %u/%u", hash, ps_fp->queue_hash);
 	if (hash != ps_fp->queue_hash) {
 		ps_fp->queue_hash = hash;
 		result |= REM_PS_DIFF_QUEUE;

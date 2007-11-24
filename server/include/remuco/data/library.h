@@ -38,7 +38,7 @@ rem_library_append_const(RemLibrary *lib,
 						 const gchar *name,
 						 RemPloblistFlag flags);
 
-#define rem_library_dump(_pls)	LOG_WARN("library dump not implemented\n")
+#define rem_library_dump(_pls)	LOG_WARN("library dump not implemented")
 
 G_END_DECLS
 

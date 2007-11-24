@@ -62,8 +62,6 @@ priv_server_socket_up(guint8 *port);
 RemNetServer*
 rem_net_server_new(void)
 {
-	LOG_NOISE("called\n");
-
 	gint				sock;
 	RemNetServer	*server;
 	guint8				port = 0;
@@ -102,8 +100,8 @@ rem_net_server_new(void)
 	
 	g_io_channel_set_flags(server->chan, G_IO_FLAG_NONBLOCK, NULL);
 	
-	LOG_NOISE("done\n");
-
+	LOG_DEBUG("server channel is up");
+	
 	return server;
 }
 
@@ -115,7 +113,7 @@ rem_net_server_destroy(RemNetServer *server)
 {
 	g_assert_debug(server);
 
-	LOG_INFO("shutting down server channel\n");
+	LOG_DEBUG("shutting down server channel");
 
 	priv_service_down(server);
 	
@@ -171,7 +169,7 @@ rem_net_client_accept(RemNetServer *server)
 void
 rem_net_client_destroy(RemNetClient *client)
 {
-	LOG_INFO("disconnect client %s\n", client->addr);
+	LOG_INFO("disconnect client %s", client->addr);
 	g_io_channel_shutdown(client->chan, client->flush_on_close, NULL);
 	g_io_channel_unref(client->chan);
 	g_slice_free(RemNetClient, client);
@@ -341,10 +339,10 @@ priv_server_socket_up(guint8 *port)
 	
 	////////// bind socket (using first free port) //////////
 
-	LOG_DEBUG("bind rfcomm socket\n");
+	LOG_DEBUG("bind rfcomm socket");
 	for (*port = 1; *port <= 30; (*port)++) {
 		
-		LOG_NOISE("try port %hhu\n", *port);
+		LOG_NOISE("try port %hhu", *port);
 		addr_server.rc_channel = *port;
 		ret = bind(sock, (struct sockaddr *) &addr_server, REM_NET_BT_SOCK_RC_SIZE);
 		if (ret == 0) break;
@@ -353,7 +351,7 @@ priv_server_socket_up(guint8 *port)
 		
 	if (*port > 30) {
 		
-		LOG_ERROR("no free port to bind to\n");
+		LOG_ERROR("no free port to bind to");
 		close(sock);
 		return -1;
 		
@@ -365,7 +363,7 @@ priv_server_socket_up(guint8 *port)
 		
 	}
 	
-	LOG_DEBUG("using port %hhu\n", *port);
+	LOG_DEBUG("using port %hhu", *port);
 	
 	////////// set socket into listen mode //////////
 

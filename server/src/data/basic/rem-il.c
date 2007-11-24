@@ -119,10 +119,10 @@ rem_il_unserialize(const GByteArray *ba)
 	
 	if (ba->len % 4 != 0) {
 		
-		//LOG_WARN("data malformed - ignore last (broken) integer\n");
+		//LOG_WARN("data malformed - ignore last (broken) integer");
 		//ba_end = (gint32*) (ba->data + ba->len - ba->len % 4);
 
-		LOG_WARN("data malformed\n");
+		LOG_WARN("data malformed");
 		return NULL;
 		
 	} else {

@@ -282,7 +282,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	RemStringList	*sl;
 	
 	LOG_NOISE("unserialize %u data elements of type %u stored at %p as %u "
-		"bytes\n", sba->dc, sba->dt, sba->ba->data,  sba->ba->len);
+		"bytes", sba->dc, sba->dt, sba->ba->data,  sba->ba->len);
 
 	sba_walker = sba->ba->data;
 	sba_end = sba->ba->data + sba->ba->len;
@@ -291,7 +291,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	case REM_BIN_DT_INT:
 		
 		if (*tds + sba->dc * sizeof(gint32) > tds_end) {
-			LOG_WARN("to much data elements for ds\n");
+			LOG_WARN("to much data elements for ds");
 			return -1;
 		}
 		
@@ -311,7 +311,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 		// memory .. not dramatic, but not smart too
 		
 		if (*tds + sba->dc * sizeof(gpointer) > tds_end) {
-			LOG_WARN("to much data elements for ds\n");
+			LOG_WARN("to much data elements for ds");
 			return -1;
 		}
 		
@@ -320,7 +320,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 		sba_walker = sba_end;
 		
 		if (sba->dc != rem_sl_length(sl)) {
-			LOG_WARN("string count differs\n");
+			LOG_WARN("string count differs");
 			rem_sl_destroy(sl);
 			return -1;
 		}
@@ -341,7 +341,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	case REM_BIN_DT_IV:
 		
 		if (*tds + sba->dc * sizeof(gpointer) > tds_end) {
-			LOG_WARN("to much data elements for ds\n");
+			LOG_WARN("to much data elements for ds");
 			return -1;
 		}
 		
@@ -369,7 +369,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	case REM_BIN_DT_SV:
 		
 		if (*tds + sba->dc * sizeof(gpointer) > tds_end) {
-			LOG_WARN("to much data elements for ds\n");
+			LOG_WARN("to much data elements for ds");
 			return -1;
 		}
 		
@@ -398,7 +398,7 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	case REM_BIN_DT_BA:
 		
 		if (*tds + sba->dc * sizeof(gpointer) > tds_end) {
-			LOG_WARN("to much data elements for ds\n");
+			LOG_WARN("to much data elements for ds");
 			return -1;
 		}
 		
@@ -437,9 +437,9 @@ rem_bin_unserialize_sba(rem_bac_sba_t *sba,
 	}
 	
 	if (sba_walker != sba_end) {
-		LOG_DEBUG("sba_walker, sba_end = %p, %p, %i\n",
+		LOG_DEBUG("sba_walker, sba_end = %p, %p, %i",
 				sba_walker, sba_end, sba_end - sba_walker);
-		LOG_WARN("binary data malformed - to much or less bytes\n");
+		LOG_WARN("binary data malformed - to much or less bytes");
 		return -1; 
 	}
 	
@@ -481,13 +481,13 @@ rem_bin_unserialize(const GByteArray *ba,
 		sba = rem_bac_next_sba(bac);
 		
 		if (!sba) {
-			LOG_WARN("binary data too small\n");
+			LOG_WARN("binary data too small");
 			rem_bac_destroy(bac);
 			return -1;
 		}
 		
 		if (sba->dt != dt || sba->dc != dc) {
-			LOG_WARN("binary data malformed - dt or dc differs\n");
+			LOG_WARN("binary data malformed - dt or dc differs");
 			rem_bac_destroy(bac);
 			return -1;
 		}

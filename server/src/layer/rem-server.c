@@ -296,7 +296,7 @@ priv_handle_player_changes(RemServer* server)
 	////////// player status basic //////////
 
 	if (diff & REM_PS_DIFF_SVRSP) {
-		LOG_DEBUG("send new player status\n");
+		LOG_DEBUG("broadcast new player status");
 		server->net_msg_bc.id = REM_MSG_ID_IFS_STATUS;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
@@ -311,7 +311,7 @@ priv_handle_player_changes(RemServer* server)
 		} else {
 			server->cap = NULL;
 		}
-		LOG_DEBUG("send new cap\n");
+		LOG_DEBUG("broadcast new cap");
 		#if LOGLEVEL >= LL_NOISE
 		rem_plob_dump(server->cap);
 		#endif
@@ -323,7 +323,7 @@ priv_handle_player_changes(RemServer* server)
 
 	if (diff & REM_PS_DIFF_PLAYLIST) {
 		priv_build_ploblist(server, server->playlist, server->pstatus->playlist);
-		LOG_DEBUG("send new playlist\n");
+		LOG_DEBUG("broadcast new playlist");
 		server->net_msg_bc.id = REM_MSG_ID_IFS_PLAYLIST;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
@@ -332,7 +332,7 @@ priv_handle_player_changes(RemServer* server)
 
 	if (diff & REM_PS_DIFF_QUEUE) {
 		priv_build_ploblist(server, server->queue, server->pstatus->queue);
-		LOG_DEBUG("send new queue");
+		LOG_DEBUG("broadcast new queue");
 		server->net_msg_bc.id = REM_MSG_ID_IFS_QUEUE;
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
@@ -400,7 +400,7 @@ priv_handle_pimsg(RemServer* server,
 		
 		server->lib = server->pp_cb->get_library(server->pp_priv);
 		if (!server->lib) {
-			LOG_WARN("library request from pp returned NULL\n");
+			LOG_WARN("library request from pp returned NULL");
 			server->lib = rem_library_new();
 		}
 		
@@ -446,25 +446,25 @@ priv_handle_pimsg(RemServer* server,
 			
 	case REM_MSG_ID_REQ_SEARCH:
 		
-		LOG_WARN("search not yet implemented\n");
+		LOG_WARN("search not yet implemented");
 		//plob = rem_plob_unserialize(msg->ba, server->charset);			
 		break;
 		
 	case REM_MSG_ID_CTL_UPD_PLOB:
 			
-		LOG_WARN("update plob not yet implemented\n");
+		LOG_WARN("update plob not yet implemented");
 		//plob = rem_plob_unserialize(msg->ba, server->charset);			
 		break;
 			
 	case REM_MSG_ID_CTL_UPD_PLOBLIST:
 
-		LOG_WARN("update ploblist not yet implemented\n");
+		LOG_WARN("update ploblist not yet implemented");
 		//pl = rem_ploblist_unserialize(msg->ba, server->charset);
 		break;
 			
 	default:
 		
-		LOG_WARN("unsupported message id\n");
+		LOG_WARN("unsupported message id");
 		break;
 	}
 
@@ -522,26 +522,26 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 	////////// check for player name //////////
 	
 	if (!desc->player_name) {
-		LOG_ERROR("no player name given\n");
+		LOG_ERROR("no player name given");
 		return NULL;
 	}
 
 	////////// mandatory callback functions //////////
 	
 	if (!cbs->synchronize) {
-		LOG_ERROR("mandatory callback function 'get_player_status' not set\n");
+		LOG_ERROR("mandatory callback function 'get_player_status' not set");
 		return NULL;
 	}
 	if (!cbs->get_plob) {
-		LOG_ERROR("mandatory callback function 'get_plob' not set\n");
+		LOG_ERROR("mandatory callback function 'get_plob' not set");
 		return NULL;
 	}
 	if (!cbs->notify) {
-		LOG_ERROR("mandatory callback function 'notify' not set\n");
+		LOG_ERROR("mandatory callback function 'notify' not set");
 		return NULL;
 	}
 	if (!cbs->simple_ctrl) {
-		LOG_ERROR("mandatory callback function 'simple_ctrl' not set\n");
+		LOG_ERROR("mandatory callback function 'simple_ctrl' not set");
 		return NULL;
 	}
 	
@@ -549,17 +549,17 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 	
 	if (cbs->get_library) {
 		if (!desc->supports_playlist) {
-			LOG_ERROR("Library support requires playlist support!\n");
+			LOG_ERROR("Library support requires playlist support!");
 			return NULL;
 		}
 		features |= REM_FEATURE_LIBRARY;
-		LOG_DEBUG("Player/PP supports library\n");
+		LOG_DEBUG("Player/PP supports library");
 	}
 	if (cbs->get_ploblist) {
 		features |= REM_FEATURE_LIBRARY_PL_CONTENT;
 		LOG_DEBUG("Player/PP can give us content of any ploblists\n");
 		if (!cbs->get_library) {
-			LOG_ERROR("You should set callback function 'get_library' too!\n");
+			LOG_ERROR("You should set callback function 'get_library' too!");
 			return NULL;
 		}
 	}
@@ -567,22 +567,22 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 		features |= REM_FEATURE_LIBRARY_PL_PLAY;
 		LOG_DEBUG("Player/PP supports playing a certain ploblist\n");
 		if (!cbs->get_library) {
-			LOG_ERROR("You should set callback function 'get_library' too!\n");
+			LOG_ERROR("You should set callback function 'get_library' too!");
 			return NULL;
 		}
 	}
 	if (cbs->search) {
 		features |= REM_FEATURE_SEARCH;
-		LOG_DEBUG("Player/PP supports plob search\n");
+		LOG_DEBUG("Player/PP supports plob search");
 	}
 	if (cbs->update_plob) {
 		features |= REM_FEATURE_PLOB_EDIT;
-		LOG_DEBUG("Player/PP supports editing plobs\n");
+		LOG_DEBUG("Player/PP supports editing plobs");
 	}
 	if (cbs->update_ploblist) {
 		features |= REM_FEATURE_PLOBLIST_EDIT;
 		// TODO features |= REM_FEATURE_PL ???;
-		LOG_DEBUG("Player/PP supports editing ploblists\n");
+		LOG_DEBUG("Player/PP supports editing ploblists");
 	}
 	
 	////////// rating //////////
@@ -607,11 +607,11 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 
 	if (desc->supports_playlist) {
 		features |= REM_FEATURE_PLAYLIST;
-		LOG_DEBUG("Player/PP supports playlist\n");
+		LOG_DEBUG("Player/PP supports playlist");
 	}
 	if (desc->supports_queue) {
 		features |= REM_FEATURE_QUEUE;
-		LOG_DEBUG("Player/PP supports queue\n");
+		LOG_DEBUG("Player/PP supports queue");
 	}
 
 	if (desc->supported_shuffle_modes & REM_SHUFFLE_MODE_ON) {
@@ -621,14 +621,14 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 	if (desc->supports_playlist_jump) {
 		features |= REM_FEATURE_PLAYLIST_JUMP;
 		if (!desc->supports_playlist) {
-			LOG_ERROR("Playlist jump only makes sense with playlist support!\n");
+			LOG_ERROR("Playlist jump only makes sense with playlist support!");
 			return NULL;
 		}
 	}
 	if (desc->supports_queue_jump) {
 		features |= REM_FEATURE_QUEUE_JUMP;
 		if (!desc->supports_queue) {
-			LOG_ERROR("Queue jump only makes sense with queue support!\n");
+			LOG_ERROR("Queue jump only makes sense with queue support!");
 			return NULL;
 		}
 	}
@@ -665,20 +665,18 @@ priv_disconnect_client(gpointer data)
 {
 	g_assert(data);
 	
+	LOG_NOISE("called");
+
 	RemClient *client = (RemClient*) data;
 
-	LOG_NOISE("remove client io source..\n");
-	
 	g_source_remove(client->src_id);
 
-	LOG_NOISE("client io source removed\n");
-	
 	rem_net_client_destroy(client->net);
 	rem_client_info_destroy(client->info);
 	
 	g_slice_free(RemClient, client);
 	
-	LOG_NOISE("done\n");
+	LOG_NOISE("done");
 }
 
 /**
@@ -691,7 +689,7 @@ priv_disconnect_client(gpointer data)
 static gboolean
 priv_cb_notify(gpointer data)
 {
-	LOG_NOISE("called\n");
+	LOG_NOISE("called");
 	
 	RemServer	*server;
 	
@@ -701,13 +699,15 @@ priv_cb_notify(gpointer data)
 	
 	server->pending_sync = FALSE;
 	
+	LOG_NOISE("done");
+
 	return FALSE;
 }
 
 static gboolean
 priv_cb_poll(gpointer data)
 {
-	LOG_NOISE("called\n");
+	LOG_NOISE("called");
 	
 	RemServer	*server;
 	
@@ -715,6 +715,8 @@ priv_cb_poll(gpointer data)
 	
 	priv_handle_player_changes(server);
 	
+	LOG_NOISE("done");
+
 	return TRUE;
 }
 
@@ -722,7 +724,7 @@ priv_cb_poll(gpointer data)
 static gboolean
 priv_cb_down(gpointer data)
 {
-	LOG_NOISE("called\n");
+	LOG_NOISE("called");
 
 	RemServer		*server;
 	RemPPNotifyFunc	pp_cb_notify;
@@ -749,6 +751,8 @@ priv_cb_down(gpointer data)
 	// let the pp know that we are down:
 	pp_cb_notify(pp_priv, REM_SERVER_EVENT_DOWN);
 	
+	LOG_NOISE("done");
+
 	return FALSE;
 	
 }
@@ -780,7 +784,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 	
 	if (cond & G_IO_IN) {
 	
-		LOG_DEBUG("G_IO_IN\n");
+		LOG_DEBUG("G_IO_IN");
 		
 		ret = rem_net_client_rxmsg(client->net, mrx);
 		if (ret < 0) {
@@ -802,7 +806,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 											mrx->ba, server->pp_desc->charset);
 			
 			// send player info
-			LOG_DEBUG("send player info to client %s\n", client->net->addr);
+			LOG_DEBUG("send player info to client %s", client->net->addr);
 			mtx.id = REM_MSG_ID_IFS_PINFO;
 			mtx.ba = priv_serialize(
 						server, client, mtx.id, server->pinfo, NULL);
@@ -810,14 +814,14 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 			g_byte_array_free(mtx.ba, TRUE);
 			
 			// send player status
-			LOG_DEBUG("send player status to client %s\n", client->net->addr);
+			LOG_DEBUG("send player status to client %s", client->net->addr);
 			mtx.id = REM_MSG_ID_IFS_STATUS;
 			mtx.ba = priv_serialize(server, client, mtx.id, server->pstatus, NULL);
 			rem_net_client_txmsg(client->net, &mtx);
 			g_byte_array_free(mtx.ba, TRUE);
 			
 			// send current plob
-			LOG_DEBUG("send current plob to client %s\n", client->net->addr);
+			LOG_DEBUG("send current plob to client %s", client->net->addr);
 			mtx.id = REM_MSG_ID_IFS_CAP;
 			mtx.ba = priv_serialize(
 						server, client, mtx.id, server->cap, NULL);
@@ -826,7 +830,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 			
 			// send playlist
 			if (server->pinfo->features & REM_FEATURE_PLAYLIST) {
-				LOG_DEBUG("send playlist to client %s\n", client->net->addr);
+				LOG_DEBUG("send playlist to client %s", client->net->addr);
 				mtx.id = REM_MSG_ID_IFS_PLAYLIST;
 				mtx.ba = priv_serialize(
 							server, client, mtx.id, server->playlist, NULL);
@@ -836,7 +840,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 			
 			// send queue
 			if (server->pinfo->features & REM_FEATURE_QUEUE) {
-				LOG_DEBUG("send queueu to client %s\n", client->net->addr);
+				LOG_DEBUG("send queueu to client %s", client->net->addr);
 				mtx.id = REM_MSG_ID_IFS_QUEUE;
 				mtx.ba = priv_serialize(
 							server, client, mtx.id, server->queue, NULL);
@@ -862,7 +866,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 		 * possible? TODO
 		 */
 
-		LOG_DEBUG("G_IO_NVAL (socket closed)\n");
+		LOG_DEBUG("G_IO_NVAL (socket closed)");
 
 		g_return_val_if_reached(FALSE);
 		
@@ -870,7 +874,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 		
 	} else if (cond & G_IO_HUP) { // prob. client disconnected
 
-		LOG_DEBUG("G_IO_HUP\n");
+		LOG_DEBUG("G_IO_HUP (client disconnected)");
 		
 		g_hash_table_remove(server->clients, chan);
 		
@@ -878,9 +882,9 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 		
 	} else if (cond & G_IO_ERR) { // error
 		
-		LOG_DEBUG("G_IO_ERR\n");
+		LOG_DEBUG("G_IO_ERR");
 		
-		LOG_WARN("connection with client %s has errors\n", client->net->addr);
+		LOG_WARN("connection with client %s has errors", client->net->addr);
 
 		g_hash_table_remove(server->clients, chan);
 		
@@ -917,7 +921,7 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 	
 	if (cond == G_IO_IN) { // client requests connection
 	
-		LOG_DEBUG("G_IO_IN\n");
+		LOG_DEBUG("G_IO_IN");
 
 		client = g_slice_new0(RemClient);
 		
@@ -931,7 +935,7 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 		// send hello message
 		ret = rem_net_client_hello(client->net);
 		if (ret < 0) {
-			LOG_WARN("sending hello msg failed\n");
+			LOG_WARN("sending hello code failed");
 			rem_net_client_destroy(client->net);
 			g_slice_free(RemClient, client);
 		}
@@ -947,23 +951,11 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 		
 		return TRUE;
 		
-	} else if (cond == G_IO_NVAL) { // channel has been shut down
-	
-		// if we shut down the channel we should not get here, this must be
-		// some other error
-		
-		LOG_DEBUG("G_IO_NVAL\n");
-		LOG_ERROR("server socket broken\n");
-		
-		server->pp_cb->notify(server->pp_priv, REM_SERVER_EVENT_ERROR);
-
-		return FALSE;
-
 	} else { // some error
 		
-		LOG_DEBUG("G_IO_HUP|ERR|?? (%u)\n", cond);
+		LOG_DEBUG("G_IO_HUP|ERR|NVAL|?? (%u)", cond);
 		
-		LOG_ERROR("error on server socket\n");
+		LOG_ERROR("error on server socket");
 
 		server->pp_cb->notify(server->pp_priv, REM_SERVER_EVENT_ERROR);
 		
@@ -1013,7 +1005,7 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	
 	if (!pp_desc->charset) pp_desc->charset = g_strdup("UTF-8");
 	
-	LOG_DEBUG("using charset: %s\n", pp_desc->charset);
+	LOG_DEBUG("using charset: %s", pp_desc->charset);
 	
 	////////// set up a server (io channel) //////////
 	
@@ -1053,7 +1045,7 @@ rem_server_up(RemPPDescriptor *pp_desc,
 	
 	server->net_msg_rx	= rem_net_msg_new();
 	
-	LOG_INFO("server started\n");
+	LOG_INFO("server started");
 	
 	return server;
 
@@ -1067,7 +1059,7 @@ rem_server_notify(RemServer *server)
 	g_return_if_fail(server);
 
 	if (server->pending_sync) {	// already called
-		LOG_NOISE("already got notification\n");
+		LOG_NOISE("already got notification");
 		return;
 	}
 	
@@ -1081,7 +1073,7 @@ rem_server_notify(RemServer *server)
 	g_source_attach(src, server->mc);
 	g_source_unref(src);
 	
-	LOG_DEBUG("got notification, will process it on idle\n");
+	LOG_DEBUG("got notification, will process it on idle");
 }
 
 void
@@ -1093,7 +1085,7 @@ rem_server_poll(RemServer *server)
 	
 	if (server->poll) return;
 
-	LOG_DEBUG("start polling\n");
+	LOG_DEBUG("start polling");
 	
 	server->poll = TRUE;
 	

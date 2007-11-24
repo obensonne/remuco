@@ -33,8 +33,6 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 {
 	g_assert_debug(chan && data && len); 
 	
-	LOG_NOISE("called\n");
-
 	GIOStatus	ret;
 	guint		read, retry;
 	
@@ -58,7 +56,7 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 		
 		if (read < len) {
 			
-			LOG_NOISE("could not read all data, retry\n");
+			LOG_NOISE("could not read all data, retry");
 			g_usleep(REM_IO_RETRY_WAIT);
 			retry++;
 			data += read;
@@ -74,7 +72,7 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 	
 	////////// handle: missing data, though we've waited a while //////////
 	
-	LOG_WARN("could not read all data\n");
+	LOG_WARN("could not read all data");
 
 	return -1;
 }
@@ -84,8 +82,6 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 {
 	g_assert_debug(chan && data && len); 
 	
-	LOG_NOISE("called\n");
-
 	GIOStatus	ret;
 	guint		written, retry;
 
@@ -96,12 +92,12 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 		written = 0;
 		ret = g_io_channel_write_chars(chan, (gchar*) data, len, &written, NULL);
 		
-		LOG_NOISE("write returned %i (wrote %u bytes)\n", ret, written);
+		LOG_NOISE("write returned %i (wrote %u bytes)", ret, written);
 
 		////////// handle: IO error //////////
 		
 		if (ret == G_IO_STATUS_EOF || ret == G_IO_STATUS_ERROR) {
-			LOG_WARN("IO error on client channel\n");
+			LOG_WARN("IO error on client channel");
 			return -1;
 		}
 		
@@ -109,7 +105,7 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 		
 		if (written < len) {
 			
-			LOG_NOISE("could not write all data, retry\n");
+			LOG_NOISE("could not write all data, retry");
 			g_usleep(REM_IO_RETRY_WAIT);
 			retry++;
 			data += written;
@@ -134,13 +130,11 @@ priv_tx(GIOChannel *chan, const guint8 *data, guint len)
 static gint
 priv_flush(GIOChannel *chan)
 {
-	LOG_NOISE("called\n");
-
 	GIOStatus ret;
 	
 	ret = g_io_channel_flush(chan, NULL);
 	if (ret != G_IO_STATUS_NORMAL) {
-		LOG_ERROR("flushing channel failed\n");
+		LOG_ERROR("flushing channel failed");
 		return -1;
 	}
 	
@@ -202,7 +196,7 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 	
 	////////// IO prefix //////////
 	
-	LOG_NOISE("read io prefix\n");
+	LOG_NOISE("read io prefix");
 	
 	ret = priv_rx(client->chan, prefix, REM_IO_PREFIX_LEN);
 	if (ret < 0) return ret;
@@ -210,13 +204,13 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 	rem_dump(prefix, REM_IO_PREFIX_LEN);
 	
 	if (memcmp(prefix, REM_IO_PREFIX, REM_IO_PREFIX_LEN)) {
-		LOG_WARN("wrong io prefix\n");
+		LOG_WARN("wrong io prefix");
 		return -1;
 	}
 	
 	////////// message id //////////
 	
-	LOG_NOISE("read msg type\n");
+	LOG_NOISE("read msg type");
 	
 	ret = priv_rx(client->chan, (guint8*) &msg_id_nbo, 4);
 	if (ret < 0) return ret;
@@ -227,7 +221,7 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 	
 	////////// message len //////////
 	
-	LOG_NOISE("read msg len\n");
+	LOG_NOISE("read msg len");
 	
 	ret = priv_rx(client->chan, (guint8*) &len_nbo, 4);
 	if (ret < 0) return ret;
@@ -242,7 +236,7 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 		
 		g_byte_array_set_size(msg->ba, len);
 		
-		LOG_NOISE("read msg data (%i bytes)\n", len);
+		LOG_NOISE("read msg data (%i bytes)", len);
 		
 		ret = priv_rx(client->chan, msg->ba->data, len);
 		if (ret < 0) {
@@ -254,7 +248,7 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 	
 	////////// IO suffix //////////
 	
-	LOG_NOISE("read io suffix\n");
+	LOG_NOISE("read io suffix");
 	
 	ret = priv_rx(client->chan, suffix, REM_IO_SUFFIX_LEN);
 	if (ret < 0) {
@@ -265,7 +259,7 @@ rem_net_client_rxmsg(RemNetClient *client, RemNetMsg *msg)
 	rem_dump(suffix, REM_IO_SUFFIX_LEN);
 
 	if (memcmp(suffix, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN)) {
-		LOG_WARN("wrong io suffix\n");
+		LOG_WARN("wrong io suffix");
 		rem_net_msg_reset(msg);
 		return -1;
 	}
@@ -278,21 +272,19 @@ rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg)
 {
 	g_assert_debug(client && msg);
 
-	LOG_NOISE("called\n");
-
 	gint ret;
 	gint32 len_nbo, msg_id_nbo;
 
 	////////// IO prefix //////////
 	
-	LOG_NOISE("write io prefix\n");
+	LOG_NOISE("write io prefix");
 	
 	ret = priv_tx(client->chan, REM_IO_PREFIX, REM_IO_PREFIX_LEN);
 	if (ret < 0) return ret;
 
 	////////// message id //////////
 	
-	LOG_NOISE("write msg type(%i)\n", msg->id);
+	LOG_NOISE("write msg type(%i)", msg->id);
 	
 	msg_id_nbo = g_htonl(msg->id);
 
@@ -301,7 +293,7 @@ rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg)
 	
 	////////// message len //////////
 	
-	LOG_NOISE("write msg size (%i)\n", (msg->ba ? msg->ba->len : 0));
+	LOG_NOISE("write msg size (%i)", (msg->ba ? msg->ba->len : 0));
 	
 	len_nbo = msg->ba ? g_htonl(msg->ba->len) : 0;
 
@@ -312,7 +304,7 @@ rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg)
 	
 	if (msg->ba && msg->ba->len) {
 		
-		LOG_NOISE("write msg data (%u bytes)\n", msg->ba->len);
+		LOG_NOISE("write msg data (%u bytes)", msg->ba->len);
 		
 		ret = priv_tx(client->chan, msg->ba->data, msg->ba->len);
 		if (ret < 0) return ret;
@@ -320,7 +312,7 @@ rem_net_client_txmsg(RemNetClient *client, const RemNetMsg *msg)
 	
 	////////// IO suffix //////////
 	
-	LOG_NOISE("write io suffix\n");
+	LOG_NOISE("write io suffix");
 	
 	ret = priv_tx(client->chan, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN);
 	if (ret < 0) return ret;
@@ -338,7 +330,7 @@ rem_net_client_hello(RemNetClient* client)
 	gint			ret;
 	const guint8	pv = REM_PROTO_VERSION;
 	
-	LOG_DEBUG("send hello msg to %s\n", client->addr);
+	LOG_DEBUG("send hello code to %s", client->addr);
 	
 	ret = priv_tx(client->chan, REM_IO_PREFIX, REM_IO_PREFIX_LEN);
 	if (ret < 0) return ret;

@@ -229,7 +229,7 @@ rem_plob_unserialize(const GByteArray *ba, const gchar *te)
 
 	if (plob->img) {
 		g_byte_array_free(plob->img, TRUE);
-		LOG_WARN("client send art image within plob\n");
+		LOG_WARN("client send art image within plob");
 		plob->img = NULL;
 	}
 	
