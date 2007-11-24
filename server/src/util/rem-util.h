@@ -31,7 +31,7 @@
 
 ////////// assertions //////////
 
-#if LOGLEVEL >= LL_DEBUG
+#ifdef DEBUG
 #define g_assert_debug(_expr)	g_assert(_expr)
 #define g_assert_not_reached_debug() g_assert_not_reached()
 #else

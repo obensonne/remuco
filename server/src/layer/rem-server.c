@@ -308,7 +308,7 @@ priv_synchronize(RemServer* server)
 			server->cap = NULL;
 		}
 		LOG_DEBUG("broadcast new cap");
-		#if LOGLEVEL >= LL_NOISE
+		#ifdef DO_LOG_NOISE
 		rem_plob_dump(server->cap);
 		#endif
 		server->net_msg_bc.id = REM_MSG_ID_IFS_CAP;
