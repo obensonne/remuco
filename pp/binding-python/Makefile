@@ -87,6 +87,20 @@ DEB_PREFIX := /usr
 
 DEB_EMAIL ?= mondai@users.sourceforge.net
 
+deb-check-svn:
+	if [ -n "`svn st`" ] ; then \
+		echo "!!! WARNING !!! There are diffs to the repo !"; \
+		false; \
+	fi
+	if [ "`svnpath`" != "`svnpath tags`" ] ; then \
+		echo "!!! WARNING !!! You are not in tags!"; \
+		false ; \
+	fi
+	if (svnversion | grep "[\:MS]") ; then \
+		echo "!!! WARNING !!! Working copy not in a clean state !"; \
+		false; \
+	fi
+
 deb: pydoc clean
 	mkdir -p $(DEB_BUILDDIR)
 	mkdir -p $(DEB_DESTDIR)
