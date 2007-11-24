@@ -89,7 +89,7 @@ priv_conv_sl_py2c(PyObject *pylist, RemStringList *sl)
 	}
 	
 	len = PyList_GET_SIZE(pylist);
-	LOG_NOISE("pylist has %i elements\n", len);
+	LOG_NOISE("pylist has %i elements", len);
 
 	for (u = 0; u < len; u++) {
 		
@@ -679,10 +679,10 @@ rempy_server_up(PyObject *self, PyObject *args)
 
 	if (!ok) return NULL;
 	
-	if (PyObject_HasAttrString(pp_priv, "xx"))
-		LOG_DEBUG("has ml\n");
-	else
-		LOG_DEBUG("has no ml\n");
+//	if (PyObject_HasAttrString(pp_priv, "xx"))
+//		LOG_DEBUG("has ml");
+//	else
+//		LOG_DEBUG("has no ml");
 	
 	callbacks = priv_conv_ppcallbacks_py2c(pp_callbacks); 
 	if (!callbacks) {
@@ -839,19 +839,19 @@ python_pp_log(gint level, PyObject	*args)
 	
 	switch (level) {
 		case REM_LL_NOISE:
-			LOG_NOISE("%s\n", msg);
+			LOG_NOISE("%s", msg);
 		break;
 		case REM_LL_DEBUG:
-			LOG_DEBUG("%s\n", msg);		
+			LOG_DEBUG("%s", msg);		
 		break;
 		case REM_LL_INFO:
-			LOG_INFO("%s\n", msg);
+			LOG_INFO("%s", msg);
 		break;
 		case REM_LL_WARN:
-			LOG_WARN("%s\n", msg);		
+			LOG_WARN("%s", msg);		
 		break;
 		case REM_LL_ERROR:
-			LOG_ERROR("%s\n", msg);			
+			LOG_ERROR("%s", msg);			
 		break;
 		default:
 			g_assert_not_reached();
