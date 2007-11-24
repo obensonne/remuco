@@ -44,11 +44,10 @@ LFLAGS += $(shell pkg-config --libs $(PKG_CONFIG_REQ))
 # debug dependent compile flags and commands
 ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
-#CFLAGS += -DLOGLEVEL=LL_NOISE
-CFLAGS += -DLOGLEVEL=LL_DEBUG
+CFLAGS += -DDEBUG
+#CFLAGS += -DDO_LOG_NOISE
 else
 CFLAGS += -O2
-CFLAGS += -DLOGLEVEL=LL_INFO
 endif
 
 CFLAGS += -Wall
