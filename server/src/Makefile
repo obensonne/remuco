@@ -127,6 +127,8 @@ $(LIB_FILE_BASE).la: $(OBJ_FILES)
 		-o $(LIB_FILE_BASE).la $(OBJ_FILES_LT) \
 		$(LFLAGS)
 
+# We do not check for the development files of libc because they should be
+# present if the other requirements are fulfilled.
 stamp-build-requirements:
 	@echo
 	@echo "Build requirements:"
@@ -138,7 +140,6 @@ stamp-build-requirements:
 			echo "missing!" ; \
 			echo "It seems the dev- or header-package of $$PKGC is not installed." ; \
 			echo "At least I could not find the pkg-config file of $$PKGC."; \
-			echo; \
 			exit 1; \
 		fi; \
 	done
