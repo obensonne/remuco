@@ -41,17 +41,18 @@
 
 #define LOG_API_BUG(x, args...)												\
 	g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_ERROR,								\
-	"************************************************************"			\
+	"\n"																	\
+	"************************************************************\n"		\
 	"** BAD API USAGE ** \n"												\
-	"** detected in %s (func. %s): " x "\n"									\
-	"** This is probably because calling functions of the Remuco library "	\
-	"** with invalid parameter values or at an invalid state.\n"			\
+	"** Detected in %s (%s): " x "\n"										\
+	"** This is probably a bug in a player proxy that used the Remuco API "	\
+	"with invalid parameter values or in an invalid state.\n"				\
 	"** Aborting now ...\n"													\
 	"************************************************************",			\
 	G_STRLOC, G_STRFUNC, ##args);
 
 #define rem_bapiu_if_fail(expr, _msg) \
-	if G_UNLIKELY(!expr) LOG_API_BUG(_msg)
+	if G_UNLIKELY(!(expr)) LOG_API_BUG(_msg)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
