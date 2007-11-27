@@ -18,12 +18,12 @@ gcb_log_handler(const gchar *domain,
 	
 	// errors go also to std error:
 	if (level & (G_LOG_FATAL_MASK | G_LOG_LEVEL_CRITICAL)) {
-		g_printerr("%s %s", (domain ? domain : ""), message);
+		g_printerr("%s %s\n", (domain ? domain : ""), message);
 	}
 }
 
 static void
-priv_glog_handler_devnull(const gchar *domain,
+gcb_log_handler_devnull(const gchar *domain,
 						  GLogLevelFlags level,
 						  const gchar *message,
 						  gpointer data)
@@ -86,7 +86,11 @@ priv_get_log_channel()
 		g_error_free(err);
 	} else {
 		g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_INFO,
-				"logging goes to %s\n", log_file);
+				"----------------------------------------------");
+		g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_INFO,
+				"logging goes to %s", log_file);
+		g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_INFO,
+				"----------------------------------------------");
 	}
 	
 	g_free(log_file);
@@ -130,7 +134,7 @@ rem_log_init(RemLogLevel level)
 					  G_LOG_LEVEL_CRITICAL | G_LOG_LEVEL_DEBUG |
 					  G_LOG_LEVEL_INFO | G_LOG_LEVEL_MESSAGE |
 					  G_LOG_LEVEL_WARNING | G_LOG_LEVEL_NOISE,
-					  priv_glog_handler_devnull, NULL);
+					  gcb_log_handler_devnull, NULL);
 	
 	// now enable log output as set by 'level'
 	g_log_set_handler(REM_LOG_DOMAIN,
