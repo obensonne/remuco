@@ -3,13 +3,17 @@ import commands
 import os
 
 DEBUG = os.getenv("DEBUG")
+DO_LOG_NOISE = os.getenv("DO_LOG_NOISE")
+
+macros = []
+macros_off = []
 
 if DEBUG == "yes":
-    macros = [ ('DEBUG', '') ]
-    macros_off = [ 'NDEBUG' ]
+    macros += [ ('DEBUG', '') ]
+    macros_off += [ 'NDEBUG' ]
 
 if DO_LOG_NOISE == "yes":
-    macros = [ ('DO_LOG_NOISE', '') ]
+    macros += [ ('DO_LOG_NOISE', '') ]
 
 inc_dirs = commands.getoutput("pkg-config glib-2.0 remuco --cflags").replace('-I','').split()
 libs = commands.getoutput("pkg-config glib-2.0 remuco --libs-only-l").replace('-l','').split()
