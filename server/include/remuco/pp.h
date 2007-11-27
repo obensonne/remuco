@@ -67,7 +67,9 @@ typedef RemLibrary*			(*RemPPGetLibraryFunc)
  * RemLib requests the PP to synchronize @a status to the current player status.
  * 
  * @param[in]  pp_priv	the PP's private data
- * @param[out] status	the RemPlayerStatus to synchronize
+ * @param[out] status	the RemPlayerStatus to synchronize (the fields
+ * 						RemPlayerStatus::cap_pid, RemPlayerStatus::playlist and
+ * 						RemPlayerStatus::queue @em must @em not get set @p NULL)
  * 
  * @remark Do not make any assumptions about the values in @a status.
  */
