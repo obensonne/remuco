@@ -615,8 +615,8 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 int main(int argc, char **argv) {
 	
 	RemPPPriv		*priv;
-	RemPPCallbacks	*rcb;
-	RemPPDescriptor	*ppd;
+	RemPPCallbacks	rcb;
+	RemPPDescriptor	ppd;
 	GError			*err;
 	
 	rem_log_init(REM_LL_DEBUG);
@@ -640,46 +640,41 @@ int main(int argc, char **argv) {
 	
 	////////// set callbacks for remuco server //////////
 
-	rcb = g_new(RemPPCallbacks, 1);
-	
-	rcb->get_library = &rcb_get_library;
-	rcb->get_plob = &rcb_get_plob;
-	rcb->get_ploblist = &rcb_get_ploblist;
-	rcb->notify = &rcb_notify;
-	rcb->play_ploblist = &rcb_play_ploblist;
-	rcb->search = NULL; // FUTURE FEATURE &rcb_search;
-	rcb->simple_ctrl = &rcb_simple_control;
-	rcb->synchronize = &rcb_synchronize;
-	rcb->update_plob = NULL; // FUTURE FEATURE &rcb_update_plob;
-	rcb->update_ploblist = NULL; // FUTURE FEATURE &rcb_update_ploblist;
+	rcb.get_library = &rcb_get_library;
+	rcb.get_plob = &rcb_get_plob;
+	rcb.get_ploblist = &rcb_get_ploblist;
+	rcb.notify = &rcb_notify;
+	rcb.play_ploblist = &rcb_play_ploblist;
+	rcb.search = NULL; // FUTURE FEATURE &rcb_search;
+	rcb.simple_ctrl = &rcb_simple_control;
+	rcb.synchronize = &rcb_synchronize;
+	rcb.update_plob = NULL; // FUTURE FEATURE &rcb_update_plob;
+	rcb.update_ploblist = NULL; // FUTURE FEATURE &rcb_update_ploblist;
 
 	////////// set up pp descriptor //////////
-
-	ppd = g_new(RemPPDescriptor, 1);
-
-	ppd->charset = NULL;
-	ppd->max_rating_value = 5;
-	ppd->player_name = g_strdup("XMMS2");
-	ppd->supported_repeat_modes = 0;
-	ppd->supported_shuffle_modes = REM_SHUFFLE_MODE_OFF | REM_SHUFFLE_MODE_ON;
-	ppd->supports_playlist = TRUE;
-	ppd->supports_playlist_jump = TRUE;
-	ppd->supports_queue = FALSE;
-	ppd->supports_queue_jump = FALSE;
-	ppd->supports_seek = FALSE; // TODO TRUE;
-	ppd->supports_tags = FALSE; // TODO TRUE;
+	
+	ppd.charset = NULL;
+	ppd.max_rating_value = 5;
+	ppd.player_name = g_strdup("XMMS2");
+	ppd.supported_repeat_modes = 0;
+	ppd.supported_shuffle_modes = REM_SHUFFLE_MODE_OFF | REM_SHUFFLE_MODE_ON;
+	ppd.supports_playlist = TRUE;
+	ppd.supports_playlist_jump = TRUE;
+	ppd.supports_queue = FALSE;
+	ppd.supports_queue_jump = FALSE;
+	ppd.supports_seek = FALSE; // TODO TRUE;
+	ppd.supports_tags = FALSE; // TODO TRUE;
 	
 	////////// start remuco server //////////
 
 	err = NULL;
-	priv->rs = rem_server_up(ppd, rcb, priv, &err);
-	
-	if (err) {
-		LOG_ERROR("starting server failed: %s", err->message);
-		g_error_free(err);
-	}
+	priv->rs = rem_server_up(&ppd, &rcb, priv, &err);
 	
 	if (!priv->rs) {
+		if (err) {
+			LOG_ERROR("starting server failed: %s", err->message);
+			g_error_free(err);
+		}
 		g_free(priv);
 		return 1;
 	}
