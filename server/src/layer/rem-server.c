@@ -36,13 +36,13 @@ struct _RemServer {
 	GHashTable				*clients;
 	RemNetMsg				*net_msg_rx;	// reuse to avoid reallocations
 	RemNetMsg				net_msg_bc;		// note: this is no pointer
+	gchar					*charset;
 	
 	GMainContext			*mc;
 	gboolean				poll;			// whether we poll or get notified
 	
 	////////// the player proxy //////////
 	
-	RemPPDescriptor			*pp_desc;
 	RemPPCallbacks			*pp_cb;
 	RemPPPriv				*pp_priv;
 	
@@ -103,7 +103,7 @@ priv_serialize(const RemServer *server,
 		plob = (RemPlob*) data;
 		
 		ba = rem_plob_serialize(plob,
-								server->pp_desc->charset,
+								server->charset,
 								client->info->charsets,
 								client->info->img_width,
 								client->info->img_height);
@@ -118,7 +118,7 @@ priv_serialize(const RemServer *server,
 		pl = (RemPloblist*) data;
 		
 		ba = rem_ploblist_serialize(
-				pl, server->pp_desc->charset, client->info->charsets);
+				pl, server->charset, client->info->charsets);
 		
 		if (client_independent) *client_independent = FALSE;
 
@@ -129,7 +129,7 @@ priv_serialize(const RemServer *server,
 		pinfo = (RemPlayerInfo*) data;
 		
 		ba = rem_player_info_serialize(
-				pinfo, server->pp_desc->charset, client->info->charsets);
+				pinfo, server->charset, client->info->charsets);
 		
 		break;
 		
@@ -138,7 +138,7 @@ priv_serialize(const RemServer *server,
 		psi = (RemPlayerStatusBasic*) data;
 		
 		ba = rem_player_status_basic_serialize(
-				psi, server->pp_desc->charset, client->info->charsets);
+				psi, server->charset, client->info->charsets);
 				
 		break;
 		
@@ -151,7 +151,7 @@ priv_serialize(const RemServer *server,
 		lib = (RemLibrary*) data;
 		
 		ba = rem_library_serialize(
-				lib, server->pp_desc->charset, client->info->charsets);
+				lib, server->charset, client->info->charsets);
 		
 		if (client_independent) *client_independent = FALSE;
 
@@ -283,9 +283,12 @@ priv_synchronize(RemServer* server)
 	
 	server->pp_cb->synchronize(server->pp_priv, server->pstatus);
 
-	g_return_if_fail(server->pstatus->cap_pid);
-	g_return_if_fail(server->pstatus->playlist);
-	g_return_if_fail(server->pstatus->queue);
+	rem_bapiu_if_fail(server->pstatus->cap_pid,
+			"bad return from callback function 'synchronize': cap_pid is NULL");
+	rem_bapiu_if_fail(server->pstatus->playlist,
+			"bad return from callback function 'synchronize': playlist is NULL");
+	rem_bapiu_if_fail(server->pstatus->queue,
+			"bad return from callback function 'synchronize': queue is NULL");
 	
 	diff = rem_player_status_fp_update(server->pstatus, server->pstatus_fp);
 	
@@ -359,7 +362,7 @@ priv_handle_pimsg(RemServer* server,
 			
 	case REM_MSG_ID_REQ_PLOB:
 		
-		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
+		string = rem_string_unserialize(msg->ba, server->charset);
 		
 		plob = server->pp_cb->get_plob(server->pp_priv, string->value);
 		
@@ -373,7 +376,7 @@ priv_handle_pimsg(RemServer* server,
 		
 	case REM_MSG_ID_REQ_PLOBLIST:
 		
-		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
+		string = rem_string_unserialize(msg->ba, server->charset);
 		
 		sl = server->pp_cb->get_ploblist(server->pp_priv, string->value);
 		
@@ -408,7 +411,7 @@ priv_handle_pimsg(RemServer* server,
 
 	case REM_MSG_ID_CTL_PLAY_PLOBLIST:
 			
-		string = rem_string_unserialize(msg->ba, server->pp_desc->charset);
+		string = rem_string_unserialize(msg->ba, server->charset);
 		
 		server->pp_cb->play_ploblist(server->pp_priv, string->value);
 		
@@ -418,8 +421,7 @@ priv_handle_pimsg(RemServer* server,
 			
 	case REM_MSG_ID_CTL_SCTRL:
 			
-		sctrl = rem_simple_control_unserialize(
-					msg->ba, server->pp_desc->charset);
+		sctrl = rem_simple_control_unserialize(msg->ba, server->charset);
 		
 		server->pp_cb->simple_ctrl(server->pp_priv,
 								  (RemSimpleControlCommand) sctrl->cmd,
@@ -490,6 +492,7 @@ priv_server_free(RemServer *server)
 {
 	if (server->net_msg_bc.ba)	g_byte_array_free(server->net_msg_bc.ba, TRUE);
 	if (server->net_msg_rx)		rem_net_msg_destroy(server->net_msg_rx);
+	if (server->charset)		g_free(server->charset);
 
 	if (server->cap)			rem_plob_destroy(server->cap);
 	if (server->lib)			rem_library_destroy(server->lib);
@@ -500,11 +503,6 @@ priv_server_free(RemServer *server)
 	if (server->pinfo)			rem_player_info_destroy(server->pinfo);
 	
 	if (server->pp_cb)			g_free(server->pp_cb);
-	if (server->pp_desc) {
-		if (server->pp_desc->charset) g_free(server->pp_desc->charset);
-		if (server->pp_desc->player_name) g_free(server->pp_desc->player_name);
-		g_free(server->pp_desc);
-	}
 
 	g_slice_free(RemServer, server);
 }
@@ -798,8 +796,7 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 			}
 			
 			// unserialize the client info
-			client->info = rem_client_info_unserialize(
-											mrx->ba, server->pp_desc->charset);
+			client->info = rem_client_info_unserialize(mrx->ba, server->charset);
 			
 			// send player info
 			LOG_DEBUG("send player info to client %s", client->net->addr);
@@ -862,10 +859,8 @@ priv_iocb_client(GIOChannel *chan, GIOCondition cond, gpointer data)
 		 * possible? TODO
 		 */
 
-		LOG_DEBUG("G_IO_NVAL (socket closed)");
+		LOG_BUG("G_IO_NVAL (socket closed)");
 
-		g_return_val_if_reached(FALSE);
-		
 		return FALSE;
 		
 	} else if (cond & G_IO_HUP) { // prob. client disconnected
@@ -968,48 +963,46 @@ priv_iocb_server(GIOChannel *chan, GIOCondition cond, gpointer data)
 //////////////////////////////////////////////////////////////////////////////
 
 RemServer*
-rem_server_up(RemPPDescriptor *pp_desc,
-			  RemPPCallbacks *pp_callbacks,
+rem_server_up(const RemPPDescriptor *pp_desc,
+			  const RemPPCallbacks *pp_callbacks,
 			  const RemPPPriv *pp_priv,
 			  GError **err)
 {
 	RemServer	*server;
 	GSource		*src;
 
-	g_return_val_if_fail(pp_callbacks && pp_desc && pp_priv, NULL);
-	g_return_val_if_fail(concl(err, !(*err)), NULL);
+	rem_log_init(REM_LL_DEBUG);
+	
+	rem_bapiu_if_fail(pp_callbacks && pp_desc && pp_priv,
+			"arguments must not be NULL");
+	rem_bapiu_if_fail(concl(err, !(*err)), "*err is not NULL");
 	
 	////////// init server struct //////////
 
 	server = g_slice_new0(RemServer);
 	
-	server->pp_desc = pp_desc;
-	server->pp_cb = pp_callbacks;
-	server->pp_priv = (RemPPPriv*) pp_priv;
-	
 	server->pinfo = priv_create_player_info(pp_desc, pp_callbacks);
 	if (!server->pinfo) {
-		server->pp_cb = NULL;	// prevent rem_server_free() from freeing this
-		server->pp_desc = NULL;	// prevent rem_server_free() from freeing this
-		priv_server_free(server);		
-		g_return_val_if_fail(FALSE, NULL);
+		rem_bapiu_if_fail(server->pinfo,
+				"invalid PP descriptor and/or callbacks configuration");
 	}
 	
+	server->pp_cb = g_memdup(pp_callbacks, sizeof(RemPPDescriptor));
+	server->pp_priv = (RemPPPriv*) pp_priv;
+
 	server->mc = g_main_context_default();
 
 	////////// charset //////////
 	
-	if (!pp_desc->charset) pp_desc->charset = g_strdup("UTF-8");
+	server->charset = g_strdup(pp_desc->charset ? pp_desc->charset : "UTF-8"); 
 	
-	LOG_DEBUG("using charset: %s", pp_desc->charset);
+	LOG_DEBUG("using charset: %s", server->charset);
 	
 	////////// set up a server (io channel) //////////
 	
 	server->net_server = rem_net_server_new();
 	if (!server->net_server) {
 		g_set_error(err, 0, 0, "setting up the server failed");
-		server->pp_cb = NULL;	// prevent rem_server_free() from freeing this
-		server->pp_desc = NULL;	// prevent rem_server_free() from freeing this
 		priv_server_free(server);
 		return NULL;
 	}
@@ -1052,7 +1045,7 @@ rem_server_notify(RemServer *server)
 {
 	GSource	*src;
 	
-	g_return_if_fail(server);
+	rem_bapiu_if_fail(server, "server is NULL");
 
 	if (server->pending_sync) {	// already called
 		LOG_NOISE("already got notification");
@@ -1077,7 +1070,7 @@ rem_server_poll(RemServer *server)
 {
 	GSource *src;
 	
-	g_return_if_fail(server);
+	rem_bapiu_if_fail(server, "server is NULL");
 	
 	if (server->poll) return;
 
@@ -1098,10 +1091,10 @@ rem_server_down(RemServer* server)
 {
 	GSource	*src;
 	
-	g_return_if_fail(server);
+	rem_bapiu_if_fail(server, "server is NULL");
 	// if this func gets called more than one, 'server' might already be freed,
-	// so in here is a segfault possible (also during the following check)
-	g_return_if_fail(!server->pending_down);
+	// so here is a segfault possible (also during the following check :/)
+	rem_bapiu_if_fail(!server->pending_down, "already called");
 	
 	server->pending_down = TRUE;
 	

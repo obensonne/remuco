@@ -30,7 +30,7 @@ rem_library_destroy(RemLibrary *lib)
 void
 rem_library_clear(RemLibrary *lib)
 {
-	g_return_if_fail(lib);
+	rem_bapiu_if_fail(lib, "RemLibrary is NULL");
 	
 	rem_sl_clear(lib->plids);
 	rem_sl_clear(lib->names);
@@ -43,7 +43,7 @@ rem_library_append(RemLibrary *lib,
 				   gchar *name,
 				   RemPloblistFlag flags)
 {
-	g_return_if_fail(lib && plid && name);
+	rem_bapiu_if_fail(lib && plid && name, "at least one argument is NULL");
 	
 	rem_sl_append(lib->plids, plid);
 	rem_sl_append(lib->names, name);
@@ -56,7 +56,7 @@ rem_library_append_const(RemLibrary *lib,
 						 const gchar *name,
 						 RemPloblistFlag flags)
 {
-	g_return_if_fail(lib && plid && name);
+	rem_bapiu_if_fail(lib && plid && name, "at least one argument is NULL");
 	
 	rem_sl_append_const(lib->plids, plid);
 	rem_sl_append_const(lib->names, name);
@@ -69,6 +69,9 @@ rem_library_append_const(RemLibrary *lib,
 const gchar*
 rem_library_get_name(const RemLibrary *pls, const gchar *plid)
 {
+	g_assert_debug(pls);
+	g_assert_debug(plid);
+	
 	const gchar	*n, *p;
 	
 	rem_sl_iterator_reset(pls->plids);

@@ -33,13 +33,10 @@ typedef struct _RemServer		RemServer;
  * function.
  * 
  * @param[in]  pp_desc
- * 				Descriptor of the player proxy that starts the server. The
- * 				server takes ownership of @a pp_desc and frees it (incl.
- * 				contained strings) when rem_server_down() is called.
+ * 				Descriptor of the player proxy that starts the server.
  * @param[in]  pp_callbacks
  * 				Callback functions to use by the server to interact with the
- * 				player proxy. The server takes ownership of @a pp_callback and
- * 				frees it when rem_server_down() is called.
+ * 				player proxy.
  * @param[in]  pp_priv
  * 				Player proxy private data. This will be used as first parameter
  * 				for the functions in @a pp_callbacks.
@@ -48,16 +45,12 @@ typedef struct _RemServer		RemServer;
  * 
  * @return	A RemServer which must be used as first parameter for
  *			rem_server_notify() and rem_server_down(). If an error occurs
- *			<code>NULL</code> will be returned and @a err @em may be set.
+ *			<code>NULL</code> will be returned and @a err will be set.
  * 
- * @remark	Server takes only ownership and frees @a pp_desc and @a pp_callbacks
- * 			if this function returns successfully, i.e. return value is not
- * 			@p NULL! This means on error, the caller (the PP) must care about
- * 			freeing @a pp_desc and @a pp_callbacks.
  */
 RemServer*
-rem_server_up(RemPPDescriptor *pp_desc,
-			  RemPPCallbacks *pp_callbacks,
+rem_server_up(const RemPPDescriptor *pp_desc,
+			  const RemPPCallbacks *pp_callbacks,
 			  const RemPPPriv *pp_priv,
 			  GError **err);
 

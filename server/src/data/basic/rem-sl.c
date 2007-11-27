@@ -156,7 +156,7 @@ rem_sl_append_const(RemStringList *sl, const gchar *str)
 	gchar	*str_chunked = NULL;
 	GSList	*l;
 
-	g_return_if_fail(sl);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	////////// 'chunk' the string //////////
 	
@@ -181,7 +181,7 @@ rem_sl_append(RemStringList *sl, gchar *str)
 {
 	GSList	*l;
 
-	g_return_if_fail(sl);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	////////// remember the string to free it later //////////
 	
@@ -206,7 +206,7 @@ rem_sl_clear(RemStringList *sl)
 {
 	GSList *l;
 
-	g_return_if_fail(sl);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	g_string_chunk_free(sl->chunk);
 	
@@ -240,7 +240,7 @@ rem_sl_destroy(RemStringList *sl)
 {
 	GSList *l;
 	
-	g_return_if_fail(sl && sl->chunk);
+	if (!sl) return;
 	
 	g_string_chunk_free(sl->chunk);
 	
@@ -264,7 +264,7 @@ rem_sl_destroy(RemStringList *sl)
 void
 rem_sl_iterator_reset(const RemStringList *sl)
 {
-	g_return_if_fail(sl);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	((RemStringList *) sl)->strings_iterator = sl->strings;
 }
@@ -274,7 +274,7 @@ rem_sl_iterator_next(const RemStringList *sl)
 {
 	const gchar	*s;
 	
-	g_return_val_if_fail(sl, NULL);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	if (!sl->strings_iterator) return NULL;
 	
@@ -293,11 +293,11 @@ rem_sl_get(const RemStringList *sl, guint index)
 {
 	GSList	*l;
 	
-	g_return_val_if_fail(sl, NULL);
+	rem_bapiu_if_fail(sl, "sl is NULL");
 	
 	l = g_slist_nth(sl->strings, index);
 	
-	g_return_val_if_fail(l, NULL);
+	rem_bapiu_if_fail(l, "index out of bounds");
 	
 	return (gchar*) l->data;
 }
@@ -305,7 +305,7 @@ rem_sl_get(const RemStringList *sl, guint index)
 guint
 rem_sl_length(const RemStringList *sl)
 {
-	g_return_val_if_fail(sl, 0);
+	rem_bapiu_if_fail(sl, "RemStringList is NULL");
 	
 	return sl->len;
 }
@@ -420,7 +420,7 @@ rem_sl_dump(const RemStringList *sl)
 void
 rem_sl_destroy_keep_strings(RemStringList *sl)
 {
-	g_return_if_fail(sl && sl->chunk);
+	if (!sl) return;
 	
 	g_string_chunk_free(sl->chunk);
 	

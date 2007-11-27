@@ -56,7 +56,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_NOISE
  */ 
 #define LOG_NOISE(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_NOISE, \
-	"[NOISE] %-25s: " x, __FUNCTION__, ##args)
+	"[NOISE] %-25s: " x, G_STRFUNC, ##args)
 #else
 /**
  * Log a noisy debug message.
@@ -76,7 +76,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_DEBUG
  */ 
 #define LOG_DEBUG(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
-	"[DEBUG] %-25s: " x, __FUNCTION__, ##args)
+	"[DEBUG] %-25s: " x, G_STRFUNC, ##args)
 
 /**
  * Log an informative message.
@@ -84,7 +84,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_INFO
  */ 
 #define LOG_INFO(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
-	"[INFO ] %-25s: " x, __FUNCTION__, ##args)
+	"[INFO ] %-25s: " x, G_STRFUNC, ##args)
 
 /**
  * Log a warning message.
@@ -92,7 +92,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_WARN
  */ 
 #define LOG_WARN(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
-	"[WARN ] %-25s: " x, __FUNCTION__, ##args)
+	"[WARN ] %-25s: " x, G_STRFUNC, ##args)
 
 /**
  * Log an error message. Use this for expected errors. For unexpected errors
@@ -101,7 +101,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_ERROR
  */ 
 #define LOG_ERROR(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
-	"[ERROR] %-25s: " x, __FUNCTION__, ##args)
+	"[ERROR] %-25s: " x, G_STRFUNC, ##args)
 
 /**
  * Log an error message. Output includes an error message derived from the
@@ -111,7 +111,7 @@ G_END_DECLS
  * @see RemLogLevel::REM_LL_ERROR
  */ 
 #define LOG_ERRNO(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
-	"[ERROR] %-25s: " x " (%s)", __FUNCTION__, ##args, strerror(errno))
+	"[ERROR] %-25s: " x " (%s)", G_STRFUNC, ##args, strerror(errno))
 
 #define LOG(x, args...)
 //g_print(x, ##args)
@@ -124,8 +124,7 @@ G_END_DECLS
  * Param is a format string like in @p printf().
  */
 #define LOG_BUG(x, args...) g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
-	"* BUG * in %s, func. %s, line %d: " x, \
-	__FILE__, __FUNCTION__, __LINE__, ##args);
+	"* BUG * in %s (func. %s): " x, G_STRLOC, G_STRFUNC, ##args);
 
 /*@}*/
 
