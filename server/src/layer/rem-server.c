@@ -283,11 +283,11 @@ priv_synchronize(RemServer* server)
 	
 	server->pp_cb->synchronize(server->pp_priv, server->pstatus);
 
-	rem_bapiu_if_fail(server->pstatus->cap_pid,
+	rem_api_check(server->pstatus->cap_pid,
 			"bad return from callback function 'synchronize': cap_pid is NULL");
-	rem_bapiu_if_fail(server->pstatus->playlist,
+	rem_api_check(server->pstatus->playlist,
 			"bad return from callback function 'synchronize': playlist is NULL");
-	rem_bapiu_if_fail(server->pstatus->queue,
+	rem_api_check(server->pstatus->queue,
 			"bad return from callback function 'synchronize': queue is NULL");
 	
 	diff = rem_player_status_fp_update(server->pstatus, server->pstatus_fp);
@@ -973,9 +973,9 @@ rem_server_up(const RemPPDescriptor *pp_desc,
 
 	rem_log_init(REM_LL_DEBUG);
 	
-	rem_bapiu_if_fail(pp_callbacks && pp_desc && pp_priv,
+	rem_api_check(pp_callbacks && pp_desc && pp_priv,
 			"arguments must not be NULL");
-	rem_bapiu_if_fail(concl(err, !(*err)), "*err is not NULL");
+	rem_api_check(concl(err, !(*err)), "*err is not NULL");
 	
 	////////// init server struct //////////
 
@@ -983,7 +983,7 @@ rem_server_up(const RemPPDescriptor *pp_desc,
 	
 	server->pinfo = priv_create_player_info(pp_desc, pp_callbacks);
 	if (!server->pinfo) {
-		rem_bapiu_if_fail(server->pinfo,
+		rem_api_check(server->pinfo,
 				"invalid PP descriptor and/or callbacks configuration");
 	}
 	
@@ -1045,7 +1045,7 @@ rem_server_notify(RemServer *server)
 {
 	GSource	*src;
 	
-	rem_bapiu_if_fail(server, "server is NULL");
+	rem_api_check(server, "server is NULL");
 
 	if (server->pending_sync) {	// already called
 		LOG_NOISE("already got notification");
@@ -1070,7 +1070,7 @@ rem_server_poll(RemServer *server)
 {
 	GSource *src;
 	
-	rem_bapiu_if_fail(server, "server is NULL");
+	rem_api_check(server, "server is NULL");
 	
 	if (server->poll) return;
 
@@ -1091,10 +1091,10 @@ rem_server_down(RemServer* server)
 {
 	GSource	*src;
 	
-	rem_bapiu_if_fail(server, "server is NULL");
+	rem_api_check(server, "server is NULL");
 	// if this func gets called more than one, 'server' might already be freed,
 	// so here is a segfault possible (also during the following check :/)
-	rem_bapiu_if_fail(!server->pending_down, "already called");
+	rem_api_check(!server->pending_down, "already called");
 	
 	server->pending_down = TRUE;
 	

@@ -77,7 +77,7 @@ rem_plob_destroy(RemPlob *plob)
 void
 rem_plob_meta_add(RemPlob *plob, gchar *name, gchar *value)
 {
-	rem_bapiu_if_fail(plob && name, "plob or name is NULL");
+	rem_api_check(plob && name, "plob or name is NULL");
 	
 	rem_sl_append(plob->meta, name);
 	
@@ -90,7 +90,7 @@ rem_plob_meta_add(RemPlob *plob, gchar *name, gchar *value)
 void
 rem_plob_meta_add_const(RemPlob *plob, const gchar *name, const gchar *value)
 {
-	rem_bapiu_if_fail(plob && name, "plob or name is NULL");
+	rem_api_check(plob && name, "plob or name is NULL");
 	
 	rem_sl_append_const(plob->meta, name);
 	rem_sl_append_const(plob->meta, value ? value : "");
@@ -99,7 +99,7 @@ rem_plob_meta_add_const(RemPlob *plob, const gchar *name, const gchar *value)
 guint
 rem_plob_meta_num(const RemPlob *plob)
 {
-	rem_bapiu_if_fail(plob, "plob is null");
+	rem_api_check(plob, "plob is null");
 	
 	return rem_sl_length(plob->meta) / 2;
 }
@@ -107,7 +107,7 @@ rem_plob_meta_num(const RemPlob *plob)
 const gchar*
 rem_plob_meta_get_name(const RemPlob *plob, guint index)
 {
-	rem_bapiu_if_fail(plob, "plob is null");
+	rem_api_check(plob, "plob is null");
 	
 	return rem_sl_get(plob->meta, index * 2);
 }
@@ -115,7 +115,7 @@ rem_plob_meta_get_name(const RemPlob *plob, guint index)
 const gchar*
 rem_plob_meta_get_value(const RemPlob *plob, guint index)
 {
-	rem_bapiu_if_fail(plob, "plob is null");
+	rem_api_check(plob, "plob is null");
 	
 	return rem_sl_get(plob->meta, index * 2 + 1);
 }
@@ -123,7 +123,7 @@ rem_plob_meta_get_value(const RemPlob *plob, guint index)
 void
 rem_plob_meta_iter_reset(const RemPlob *plob)
 {
-	rem_bapiu_if_fail(plob, "plob is NULL");
+	rem_api_check(plob, "plob is NULL");
 	
 	rem_sl_iterator_reset(plob->meta);
 }
@@ -133,7 +133,7 @@ rem_plob_meta_iter_next(const RemPlob *plob,
 						const gchar **name,
 						const gchar **value)
 {
-	rem_bapiu_if_fail(plob, "plob is NULL");
+	rem_api_check(plob, "plob is NULL");
 	
 	*name = rem_sl_iterator_next(plob->meta);
 	*value = rem_sl_iterator_next(plob->meta);
@@ -145,7 +145,7 @@ rem_plob_meta_get(const RemPlob *plob, const gchar *name)
 {
 	const gchar	*n, *v;
 	
-	rem_bapiu_if_fail(plob && name, "plob or name is NULL");
+	rem_api_check(plob && name, "plob or name is NULL");
 
 	rem_sl_iterator_reset(plob->meta);
 	

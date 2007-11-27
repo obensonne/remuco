@@ -50,7 +50,7 @@
 	"*************************************************************",		\
 	G_STRLOC, G_STRFUNC, ##args);
 
-#define rem_bapiu_if_fail(expr, _msg) \
+#define rem_api_check(expr, _msg) \
 	if G_UNLIKELY(!(expr)) LOG_API_BUG(_msg)
 
 ///////////////////////////////////////////////////////////////////////////////

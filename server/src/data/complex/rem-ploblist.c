@@ -35,7 +35,7 @@ rem_ploblist_destroy(RemPloblist *pl)
 void
 rem_ploblist_clear(RemPloblist *pl)
 {
-	rem_bapiu_if_fail(pl, "pl is NULL");
+	rem_api_check(pl, "pl is NULL");
 	
 	rem_sl_clear(pl->plobs);
 }
@@ -43,7 +43,7 @@ rem_ploblist_clear(RemPloblist *pl)
 void
 rem_ploblist_append(RemPloblist *pl, gchar* pid, gchar* title)
 {
-	rem_bapiu_if_fail(pl && pid && title, "pl, pid or title is NULL");
+	rem_api_check(pl && pid && title, "pl, pid or title is NULL");
 	
 	rem_sl_append(pl->plobs, pid);
 	rem_sl_append(pl->plobs, title);
@@ -54,7 +54,7 @@ rem_ploblist_append_const(RemPloblist *pl,
 						  const gchar* pid,
 						  const gchar* title)
 {
-	rem_bapiu_if_fail(pl && pid && title, "pl, pid or title is NULL");
+	rem_api_check(pl && pid && title, "pl, pid or title is NULL");
 	
 	rem_sl_append_const(pl->plobs, pid);
 	rem_sl_append_const(pl->plobs, title);
@@ -67,7 +67,7 @@ rem_ploblist_get_pids(const RemPloblist *pl)
 	RemStringList	*pids;
 	const gchar	*s;
 	
-	rem_bapiu_if_fail(pl, "pl is NULL");
+	rem_api_check(pl, "pl is NULL");
 	
 	pids = rem_sl_new();
 	
