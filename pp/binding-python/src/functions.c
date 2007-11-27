@@ -83,8 +83,7 @@ priv_conv_sl_py2c(PyObject *pylist, RemStringList *sl)
 	rem_sl_clear(sl);
 	
 	if (!PyList_Check(pylist)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "invalide type (expected a list)");
+		rempy_bapiu("invalide type (expected a list)", FALSE);
 		return;
 	}
 	
@@ -101,8 +100,7 @@ priv_conv_sl_py2c(PyObject *pylist, RemStringList *sl)
 			rem_sl_append_const(sl, PyString_AS_STRING(item));
 		} else {
 			PyErr_Clear();
-			PyErr_SetString(PyExc_TypeError,
-					"invalide type (list element is not a string)");
+			rempy_bapiu("invalide type (list element is not a string)", FALSE);
 			return;			
 		}
 	}
@@ -163,20 +161,18 @@ static RemPPCallbacks*
 priv_conv_ppcallbacks_py2c(PyObject *po)
 {
 	
-#define REMPY_FUNC_CHECK(_fo, _fn)								\
-	if (!PyCallable_Check(_fo)) {								\
-		PyErr_Print();											\
-		PyErr_SetString(PyExc_TypeError, "cannot call " _fn);	\
-		g_free(ppcb_c);											\
-		return NULL;											\
+#define REMPY_FUNC_CHECK(_fo, _fn)				\
+	if (!PyCallable_Check(_fo)) {				\
+		rempy_bapiu("cannot call " _fn, FALSE);	\
+		g_free(ppcb_c);							\
+		return NULL;							\
 	}
 
 	RemPyPPCallbacks	*ppcb_py;
 	RemPPCallbacks		*ppcb_c;
 	
 	if (!rempy_ppcb_check_type(po)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "invalide type (expected PPCallbacks)");
+		rempy_bapiu("invalide type (expected PPCallbacks)", FALSE);
 		return NULL;
 	}
 	
@@ -236,8 +232,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	RemPPDescriptor		*ppd;
 	
 	if (!rempy_ppdesc_check_type(po)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "invalide type (expected PPDescriptor)");
+		rempy_bapiu("invalide type (expected PPDescriptor)", FALSE);
 		return NULL;
 	}
 
@@ -250,8 +245,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	} else if (PyString_Check(ppd_py->charset)) {
 		ppd->charset = g_strdup(PyString_AsString(ppd_py->charset));
 	} else {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "PPDescriptor.charset is not a string");
+		rempy_bapiu("PPDescriptor.charset is not a string", FALSE);
 		g_free(ppd);
 		return NULL;
 	}
@@ -261,9 +255,7 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	} else if (PyString_Check(ppd_py->player_name)) {
 		ppd->player_name = g_strdup(PyString_AsString(ppd_py->player_name));
 	} else {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "PPDescriptor.player_name is not a string");
-		if (ppd->charset) g_free(ppd->charset);
+		rempy_bapiu("PPDescriptor.player_name is not a string", FALSE);
 		g_free(ppd);
 		return NULL;
 	}
@@ -289,31 +281,28 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 	} else if (PyString_Check(ps_py->cap_pid)) {
 		g_string_assign(ps->cap_pid, PyString_AsString(ps_py->cap_pid));
 	} else {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError, "PlayerStatus.cap_pid is not a string");
+		rempy_bapiu("PlayerStatus.cap_pid is not a string", FALSE);
 		return;
 	}
 	
 	if (ps_py->playlist == Py_None) {
-		PyErr_SetString(PyExc_TypeError, "PlayerStatus.playlist is not set");
+		rempy_bapiu("PlayerStatus.playlist is not set", FALSE);
 		return;
 	} else {
 		priv_conv_sl_py2c(ps_py->playlist, ps->playlist);
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-			PyErr_SetString(PyExc_TypeError, "PlayerStatus.playlist malformed");
+		if G_UNLIKELY(PyErr_Occurred()) {
+			rempy_bapiu("PlayerStatus.playlist malformed", FALSE);
 			return;
 		}
 	}	
 	
 	if (ps_py->queue == Py_None) {
-		PyErr_SetString(PyExc_TypeError, "PlayerStatus.queue is not set");
+		rempy_bapiu("PlayerStatus.queue is not set", FALSE);
 		return;
 	} else {
 		priv_conv_sl_py2c(ps_py->queue, ps->queue);
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-			PyErr_SetString(PyExc_TypeError, "PlayerStatus.queue malformed");
+		if G_UNLIKELY(PyErr_Occurred()) {
+			rempy_bapiu("PlayerStatus.queue malformed", FALSE);
 			return;
 		}
 	}
@@ -341,13 +330,14 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 	
 	ret = PyObject_Call(priv->pp_callbacks->synchronize, args, NULL);
 
+	rempy_bapiu_assert(ret, "error calling function 'synchronize'");
+	
 	Py_DECREF(args);
-	rempy_assert(ret, "error calling function 'synchronize'");
 	Py_DECREF(ret);
 
 	priv_conv_pstatus_py2c(priv->pp_ps, ps);
 	
-	rempy_assert(!PyErr_Occurred(), "bad return from 'synchronize'");
+	rempy_bapiu_assert(!PyErr_Occurred(), "bad return from 'synchronize'");
 }
 
 static RemLibrary*
@@ -366,6 +356,8 @@ rcb_get_library(RemPPPriv *priv)
 	
 	ret = PyObject_Call(priv->pp_callbacks->get_library, args, NULL);
 
+	rempy_bapiu_assert(ret, "error calling function 'get_library'");
+
 	Py_DECREF(args);
 
 	plids = NULL; names = NULL; flags = NULL;
@@ -373,12 +365,12 @@ rcb_get_library(RemPPPriv *priv)
 
 	////////// check returned data //////////
 	
-	rempy_assert(ok &&
+	rempy_bapiu_assert(ok &&
 			PyList_Check(plids) && PyList_Check(names) && PyList_Check(flags),
 			"bad return from 'get_library': expected 3 lists");
-	rempy_assert(PyList_GET_SIZE(plids) == PyList_GET_SIZE(names),
+	rempy_bapiu_assert(PyList_GET_SIZE(plids) == PyList_GET_SIZE(names),
 			"bad return from 'get_library': lists differ in length");
-	rempy_assert(PyList_GET_SIZE(names) == PyList_GET_SIZE(flags),
+	rempy_bapiu_assert(PyList_GET_SIZE(names) == PyList_GET_SIZE(flags),
 			"bad return from 'get_library': lists differ in length");
 	
 	////////// build library //////////
@@ -390,17 +382,17 @@ rcb_get_library(RemPPPriv *priv)
 	for (u = 0; u < len; u++) {
 		
 		item = PyList_GET_ITEM(plids, u); // item is a borrowed ref
-		rempy_assert(PyString_CheckExact(item),
+		rempy_bapiu_assert(PyString_CheckExact(item),
 				"bad return from 'get_library': PLIDs must be strings");
 		plid = PyString_AS_STRING(item); // borrowed ref
 		
 		item = PyList_GET_ITEM(names, u); // item is a borrowed ref
-		rempy_assert(PyString_CheckExact(item),
+		rempy_bapiu_assert(PyString_CheckExact(item),
 				"bad return from 'get_library': names must be strings");
 		name = PyString_AS_STRING(item); // borrowed ref
 
 		item = PyList_GET_ITEM(flags, u); // item is a borrowed ref
-		rempy_assert(PyInt_Check(item),
+		rempy_bapiu_assert(PyInt_Check(item),
 				"bad return from 'get_library': flags must be integers");
 		flag = (RemPloblistFlag) PyInt_AS_LONG(item);
 
@@ -426,14 +418,13 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	
 	dict = PyObject_Call(priv->pp_callbacks->get_plob, args, NULL);
 	
-	Py_DECREF(args);
+	rempy_bapiu_assert(dict, "error calling function 'get_plob'");
 
-//	dict = NULL;
-//	ok = PyArg_ParseTuple(ret, "(O)", &dict); // borrowed refs
+	Py_DECREF(args);
 
 	////////// check returned data //////////
 	
-	rempy_assert(PyDict_Check(dict),
+	rempy_bapiu_assert(PyDict_Check(dict),
 			"bad return from 'get_plob': expected 1 dictionary");
 	
 	////////// build plob //////////
@@ -443,10 +434,10 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	pos = 0; key = NULL; val = NULL;
 	while (PyDict_Next(dict, &pos, &key, &val)) { // borrowed refs
 		
-		rempy_assert(PyString_CheckExact(key),
+		rempy_bapiu_assert(PyString_CheckExact(key),
 				"bad return from 'get_plob': dict must contain strings");
 		if (val == Py_None) continue;
-		rempy_assert(PyString_CheckExact(val),
+		rempy_bapiu_assert(PyString_CheckExact(val),
 				"bad return from 'get_plob': dict must contain strings");
 
 		rem_plob_meta_add_const(
@@ -473,11 +464,13 @@ rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 	
 	list = PyObject_Call(priv->pp_callbacks->get_ploblist, args, NULL);
 
+	rempy_bapiu_assert(list, "error calling function 'get_ploblist'");
+
 	Py_DECREF(args);
 
 	////////// check returned data //////////
 	
-	rempy_assert(PyList_Check(list),
+	rempy_bapiu_assert(PyList_Check(list),
 			"bad return from 'get_ploblist': expected 1 list");
 	
 	////////// build plob list //////////
@@ -489,7 +482,7 @@ rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 	for (u = 0; u < len; u++) {
 		
 		item = PyList_GET_ITEM(list, u); // item is a borrowed ref
-		rempy_assert(PyString_CheckExact(item),
+		rempy_bapiu_assert(PyString_CheckExact(item),
 				"bad return from 'get_ploblist': PIDs must be strings");
 		rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
 		
@@ -509,10 +502,10 @@ rcb_notify(RemPPPriv *priv, RemServerEvent event)
 	
 	ret = PyObject_Call(priv->pp_callbacks->notify, args, NULL);
 
+	rempy_bapiu_assert(ret, "error calling function 'rcb_notify'");
+
 	Py_DECREF(args);
 	
-	rempy_assert(ret, "error calling function 'notify'");
-
 	if (event == REM_SERVER_EVENT_DOWN) {
 		priv_pp_priv_destroy(priv);
 	}
@@ -530,10 +523,9 @@ rcb_play_ploblist(RemPPPriv *priv, const gchar *plid)
 	
 	ret = PyObject_Call(priv->pp_callbacks->play_ploblist, args, NULL);
 
-	Py_DECREF(args);
+	rempy_bapiu_assert(ret, "error calling function 'play_ploblist'");
 	
-	rempy_assert(ret, "error calling function 'play_ploblist'");
-	
+	Py_DECREF(args);	
 	Py_DECREF(ret);
 
 	
@@ -558,12 +550,14 @@ rcb_search(RemPPPriv *priv, const RemPlob *plob)
 	
 	list = PyObject_Call(priv->pp_callbacks->search, args, NULL);
 
+	rempy_bapiu_assert(list, "error calling function 'rcb_search'");
+
 	Py_DECREF(args);
 	Py_DECREF(dict);
 
 	////////// check returned data //////////
 	
-	rempy_assert(PyList_Check(list),
+	rempy_bapiu_assert(PyList_Check(list),
 			"bad return from 'search': expected 1 list");
 	
 	////////// build search result //////////
@@ -575,7 +569,7 @@ rcb_search(RemPPPriv *priv, const RemPlob *plob)
 	for (u = 0; u < len; u++) {
 		
 		item = PyList_GET_ITEM(list, u); // item is a borrowed ref
-		rempy_assert(PyString_CheckExact(item),
+		rempy_bapiu_assert(PyString_CheckExact(item),
 				"bad return from 'search': PIDs must be strings");
 		rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
 		
@@ -596,10 +590,9 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 	
 	ret = PyObject_Call(priv->pp_callbacks->simple_control, args, NULL);
 
-	Py_DECREF(args);
+	rempy_bapiu_assert(ret, "error calling function 'simple_control'");
 	
-	rempy_assert(ret, "error calling function 'simple_control'");
-	
+	Py_DECREF(args);	
 	Py_DECREF(ret);	
 }
 
@@ -618,11 +611,10 @@ rcb_update_plob(RemPPPriv *priv, const RemPlob *plob)
 	
 	ret = PyObject_Call(priv->pp_callbacks->update_plob, args, NULL);
 
+	rempy_bapiu_assert(ret, "error calling function 'update_plob'");
+	
 	Py_DECREF(args);
 	Py_DECREF(dict);
-
-	rempy_assert(ret, "error calling function 'update_plob'");
-	
 	Py_DECREF(ret);
 	
 	return;
@@ -646,11 +638,10 @@ rcb_update_ploblist(RemPPPriv *priv,
 	
 	ret = PyObject_Call(priv->pp_callbacks->update_ploblist, args, NULL);
 
+	rempy_bapiu_assert(ret, "error calling function 'update_ploblist'");
+	
 	Py_DECREF(args);
 	Py_DECREF(list);
-
-	rempy_assert(ret, "error calling function 'update_ploblist'");
-	
 	Py_DECREF(ret);
 	
 	return;	
@@ -677,7 +668,7 @@ rempy_server_up(PyObject *self, PyObject *args)
 	ok = (gboolean) PyArg_ParseTuple(args, "OOO", &pp_desc, &pp_callbacks,
 							&pp_priv);
 
-	if (!ok) return NULL;
+	rempy_bapiu_assert(ok, "bad arguments");
 	
 //	if (PyObject_HasAttrString(pp_priv, "xx"))
 //		LOG_DEBUG("has ml");
@@ -685,19 +676,10 @@ rempy_server_up(PyObject *self, PyObject *args)
 //		LOG_DEBUG("has no ml");
 	
 	callbacks = priv_conv_ppcallbacks_py2c(pp_callbacks); 
-	if (!callbacks) {
-		PyErr_Print();
-		PyErr_SetString(PyExc_TypeError, "bad argument #2");
-		return NULL;
-	}
+	rempy_bapiu_assert(callbacks, "bad argument #2");
 	
 	desc = priv_conv_ppdescriptor_py2c(pp_desc);
-	if (!desc) {
-		PyErr_Print();
-		PyErr_SetString(PyExc_TypeError, "bad argument #1");
-		g_free(callbacks);
-		return NULL;
-	}
+	rempy_bapiu_assert(desc, "bad argument #1");
 
 	priv = g_new0(RemPPPriv, 1);
 	
@@ -712,15 +694,16 @@ rempy_server_up(PyObject *self, PyObject *args)
 	err = NULL;
 	priv->server = rem_server_up(desc, callbacks, priv, &err);
 	
+	g_free(callbacks);
+	if (desc->charset) g_free(desc->charset);
+	if (desc->player_name) g_free(desc->player_name);
+	g_free(desc);
+
 	if (!priv->server) {
 		PyErr_Clear();
 		PyErr_SetString(
 				PyExc_RuntimeError, err ? err->message : "server start failed");
 		if (err) g_error_free(err);
-		g_free(callbacks);
-		if (desc->charset) g_free(desc->charset);
-		if (desc->player_name) g_free(desc->player_name);
-		g_free(desc);
 		priv_pp_priv_destroy(priv);
 		return NULL;
 	}
@@ -738,14 +721,10 @@ rempy_server_down(PyObject *self, PyObject *args)
 
 	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
 	
-	if (!ok) return NULL;
+	rempy_bapiu_assert(ok, "bad arguments");
 	
-	if (!PyCObject_Check(priv_py)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError,
-				"bad argument #1: expected server private data");
-		return NULL;
-	}
+	rempy_bapiu_assert(PyCObject_Check(priv_py),
+			"bad argument #1: expected server private data");
 	
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
 	
@@ -765,14 +744,10 @@ rempy_server_notify(PyObject *self, PyObject *args)
 
 	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
 	
-	if (!ok) return NULL;
+	rempy_bapiu_assert(ok, "bad arguments");
 	
-	if (!PyCObject_Check(priv_py)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError,
-				"bad argument #1: expected server private data");
-		return NULL;
-	}
+	rempy_bapiu_assert(PyCObject_Check(priv_py),
+			"bad argument #1: expected server private data");
 	
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
 	
@@ -792,15 +767,11 @@ rempy_server_poll(PyObject *self, PyObject *args)
 
 	ok = (gboolean) PyArg_ParseTuple(args, "O", &priv_py);
 	
-	if (!ok) return NULL;
+	rempy_bapiu_assert(ok, "bad arguments");
 	
-	if (!PyCObject_Check(priv_py)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError,
-				"bad argument #1: expected server private data");
-		return NULL;
-	}
-	
+	rempy_bapiu_assert(PyCObject_Check(priv_py),
+			"bad argument #1: expected server private data");
+		
 	priv = (RemPPPriv*) PyCObject_AsVoidPtr(priv_py);
 	
 	rem_server_poll(priv->server);
@@ -826,14 +797,10 @@ python_pp_log(gint level, PyObject	*args)
 
 	ok = (gboolean) PyArg_ParseTuple(args, "O", &msg_py);
 	
-	if (!ok) return FALSE;
+	rempy_bapiu_assert(ok, "bad arguments in remuco.log_...");
 	
-	if (!PyString_Check(msg_py)) {
-		PyErr_Clear();
-		PyErr_SetString(PyExc_TypeError,
-				"bad argument #1: expected string");
-		return FALSE;
-	}
+	rempy_bapiu_assert(PyString_Check(msg_py),
+			"bad argument #1 in remuco.log_... : expected string");
 	
 	msg = PyString_AS_STRING(msg_py);
 	
