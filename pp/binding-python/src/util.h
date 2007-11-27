@@ -17,7 +17,7 @@
 } G_STMT_END
 */
 
-#define REMPY_API_BUG(x, args...)											\
+#define REMPY_LOG_API_BUG(x, args...)											\
 	g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,								\
 	"\n"																	\
 	"*************************************************************\n"		\
@@ -28,19 +28,18 @@
 	"*************************************************************",		\
 	G_STRLOC, G_STRFUNC, ##args);
 
-#define rempy_bapiu(_msg, _abort) G_STMT_START {		\
+#define rempy_api_warn(_msg) G_STMT_START {				\
 		if (PyErr_Occurred()) PyErr_Print();			\
-		if (_abort) {									\
-			REMPY_API_BUG(_msg);						\
-			g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_ERROR,	\
-				"** Aborting now ...\n");				\
-		} else {										\
-			REMPY_API_BUG(_msg);						\
-			PyErr_SetString(PyExc_TypeError, _msg);		\
-		}												\
+		REMPY_LOG_API_BUG(_msg);						\
+		PyErr_SetString(PyExc_TypeError, _msg);			\
 } G_STMT_END
 
-#define rempy_bapiu_assert(_expr, _msg)	\
-		if G_UNLIKELY(!(_expr)) rempy_bapiu(_msg, TRUE)
+#define rempy_api_check(_expr, _msg) G_STMT_START {		\
+		if G_UNLIKELY(!(_expr)) {						\
+			rempy_api_warn(_msg);						\
+			g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_ERROR,	\
+				"** Aborting now ...\n");				\
+		}												\
+} G_STMT_END
 
 #endif /*REMPY_UTIL_H_*/
