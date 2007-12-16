@@ -1,6 +1,6 @@
 CDIR := util
 
-SRC_FILES_LOCAL := 
+SRC_FILES_LOCAL := rem-util.c
 
 # id3 tag support (optional)
 ifeq "$(strip $(BUILD_TAGS))" "yes"

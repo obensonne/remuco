@@ -971,7 +971,7 @@ rem_server_up(const RemPPDescriptor *pp_desc,
 	RemServer	*server;
 	GSource		*src;
 
-	rem_log_init(REM_LL_DEBUG);
+	rem_log_init(REM_LL_DEBUG); // calls rem_create_needed_dirs()
 	
 	rem_api_check(pp_callbacks && pp_desc && pp_priv,
 			"arguments must not be NULL");

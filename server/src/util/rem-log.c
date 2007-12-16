@@ -1,5 +1,6 @@
 #include <remuco.h>
 #include <sys/stat.h>
+#include "rem-util.h"
 
 static gboolean initialized = FALSE;
 
@@ -41,25 +42,11 @@ priv_get_log_channel()
 {
 	GIOChannel	*channel = NULL;
 	GError 		*err;
-	gchar 		*log_file, *log_dir;
-	
-	
-	////////// log dir //////////
-	
-	log_dir = g_strdup_printf("%s/remuco", g_get_user_cache_dir());
-
-	if (g_mkdir_with_parents(log_dir, S_IRWXU) < 0) {
-		g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-				"could not create log directory (%s)", strerror(errno));
-		g_free(log_dir);
-		return NULL;
-	}
+	gchar 		*log_file;
 	
 	////////// build the log file name //////////
 	
-	log_file = g_strdup_printf("%s/log", log_dir);
-	
-	g_free(log_dir);
+	log_file = g_strdup_printf("%s/remuco/log", g_get_user_cache_dir());
 	
 	////////// open an IO channel //////////
 	
@@ -95,6 +82,8 @@ rem_log_init(RemLogLevel level)
 	if (initialized) return;
 		
 	initialized = TRUE;
+	
+	rem_create_needed_dirs();
 	
 	sink = priv_get_log_channel();
 	
