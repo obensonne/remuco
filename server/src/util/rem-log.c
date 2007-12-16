@@ -42,26 +42,12 @@ priv_get_log_channel()
 	GIOChannel	*channel = NULL;
 	GError 		*err;
 	gchar 		*log_file, *log_dir;
-	const gchar	*env;
 	
-	env = g_getenv("XDG_CONFIG_HOME");
 	
-	////////// detect the dir of the log file //////////
+	////////// log dir //////////
 	
-	if (env) {
-		log_dir = g_strdup_printf("%s/remuco", env);
-	} else {
-		env = g_getenv("HOME");
-		if (!env) {
-			g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-					"environent variable HOME is not set");
-			return NULL;
-		}
-		log_dir = g_strdup_printf("%s/.config/remuco", env);
-	}
-	
-	////////// create the dir (if needed) //////////
-	
+	log_dir = g_strdup_printf("%s/remuco", g_get_user_cache_dir());
+
 	if (g_mkdir_with_parents(log_dir, S_IRWXU) < 0) {
 		g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
 				"could not create log directory (%s)", strerror(errno));
