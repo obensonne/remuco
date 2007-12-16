@@ -1,5 +1,4 @@
 #include <remuco.h>
-#include <sys/stat.h>
 #include "rem-util.h"
 
 static gboolean initialized = FALSE;
