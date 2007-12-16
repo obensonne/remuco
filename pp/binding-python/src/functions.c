@@ -96,12 +96,12 @@ priv_conv_sl_py2c(PyObject *pylist, RemStringList *sl)
 		
 		if (item == Py_None) {
 			rem_sl_append(sl, NULL);
-		} else if (PyString_CheckExact(item)) {
+		} else if (PyString_Check(item)) {
 			rem_sl_append_const(sl, PyString_AS_STRING(item));
 		} else {
-			PyErr_Clear();
-			rempy_api_warn("invalide type (list element is not a string)");
-			return;			
+			item = PyObject_Str(item); // now a new ref
+			rem_sl_append_const(sl, PyString_AS_STRING(item));
+			Py_DECREF(item);
 		}
 	}
 }
@@ -276,13 +276,16 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 static void
 priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 {
+	PyObject	*po;
+	
 	if (ps_py->cap_pid == Py_None) {
 		g_string_truncate(ps->cap_pid, 0);
 	} else if (PyString_Check(ps_py->cap_pid)) {
-		g_string_assign(ps->cap_pid, PyString_AsString(ps_py->cap_pid));
+		g_string_assign(ps->cap_pid, PyString_AS_STRING(ps_py->cap_pid));
 	} else {
-		rempy_api_warn("PlayerStatus.cap_pid is not a string");
-		return;
+		po = PyObject_Str(ps_py->cap_pid);
+		g_string_assign(ps->cap_pid, PyString_AS_STRING(po));
+		Py_DECREF(po);
 	}
 	
 	if (ps_py->playlist == Py_None) {
@@ -344,7 +347,9 @@ static RemLibrary*
 rcb_get_library(RemPPPriv *priv)
 {
 	gboolean		ok;
-	PyObject		*args, *ret, *plids, *names, *flags, *item;
+	PyObject		*args, *ret;
+	PyObject		*plids, *names, *flags;
+	PyObject		*plid_py, *name_py, *flag_py;
 	RemLibrary		*lib;
 	guint			u, len;
 	const gchar		*plid, *name;
@@ -381,23 +386,31 @@ rcb_get_library(RemPPPriv *priv)
 	
 	for (u = 0; u < len; u++) {
 		
-		item = PyList_GET_ITEM(plids, u); // item is a borrowed ref
-		rempy_api_check(PyString_CheckExact(item),
-				"bad return from 'get_library': PLIDs must be strings");
-		plid = PyString_AS_STRING(item); // borrowed ref
-		
-		item = PyList_GET_ITEM(names, u); // item is a borrowed ref
-		rempy_api_check(PyString_CheckExact(item),
-				"bad return from 'get_library': names must be strings");
-		name = PyString_AS_STRING(item); // borrowed ref
+		plid_py = PyList_GET_ITEM(plids, u); // a borrowed ref
+		if (!PyString_Check(plid_py)) {
+			plid_py = PyObject_Str(plid_py); // now a new ref
+		} else {
+			Py_INCREF(plid_py); // now we can allways decref below
+		}
+		plid = PyString_AS_STRING(plid_py); // borrowed ref
 
-		item = PyList_GET_ITEM(flags, u); // item is a borrowed ref
-		rempy_api_check(PyInt_Check(item),
+		name_py = PyList_GET_ITEM(names, u); // a borrowed ref
+		if (!PyString_Check(name_py)) {
+			name_py = PyObject_Str(name_py); // now a new ref
+		} else {
+			Py_INCREF(name_py); // now we can allways decref below
+		}
+		name = PyString_AS_STRING(name_py); // borrowed ref
+
+		flag_py = PyList_GET_ITEM(flags, u); // item is a borrowed ref
+		rempy_api_check(PyInt_Check(flag_py),
 				"bad return from 'get_library': flags must be integers");
-		flag = (RemPloblistFlag) PyInt_AS_LONG(item);
+		flag = (RemPloblistFlag) PyInt_AS_LONG(flag_py);
 
 		rem_library_append_const(lib, plid, name, flag);
 		
+		Py_DECREF(plid_py);
+		Py_DECREF(name_py);
 	}
 	
 	Py_DECREF(ret);
@@ -410,6 +423,7 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 {
 	RemPlob			*plob;
 	PyObject		*args, *dict, *key, *val;
+	gboolean		key_dec, val_dec; // signal need for ref decrement
 	gint			pos;
 	
 	////////// call python function //////////
@@ -434,14 +448,25 @@ rcb_get_plob(RemPPPriv *priv, const gchar *pid)
 	pos = 0; key = NULL; val = NULL;
 	while (PyDict_Next(dict, &pos, &key, &val)) { // borrowed refs
 		
-		rempy_api_check(PyString_CheckExact(key),
-				"bad return from 'get_plob': dict must contain strings");
+		key_dec = FALSE; val_dec = FALSE;
+		
 		if (val == Py_None) continue;
-		rempy_api_check(PyString_CheckExact(val),
-				"bad return from 'get_plob': dict must contain strings");
+		
+		if (!PyString_Check(key)) {
+			key = PyObject_Str(key);
+			key_dec = TRUE;
+		}
+
+		if (!PyString_Check(val)) {
+			val = PyObject_Str(val);
+			val_dec = TRUE;
+		}
 
 		rem_plob_meta_add_const(
 				plob, PyString_AS_STRING(key), PyString_AS_STRING(val));
+		
+		if (key_dec) { Py_DECREF(key); }
+		if (val_dec) { Py_DECREF(val); }
 	}
 	
 	Py_DECREF(dict);
@@ -482,10 +507,13 @@ rcb_get_ploblist(RemPPPriv *priv, const gchar *plid)
 	for (u = 0; u < len; u++) {
 		
 		item = PyList_GET_ITEM(list, u); // item is a borrowed ref
-		rempy_api_check(PyString_CheckExact(item),
-				"bad return from 'get_ploblist': PIDs must be strings");
-		rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
-		
+		if (PyString_Check(item)) {
+			rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
+		} else {
+			item = PyObject_Str(item); // item is now a new ref
+			rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
+			Py_DECREF(item);
+		}
 	}
 	
 	Py_DECREF(list);
@@ -569,10 +597,13 @@ rcb_search(RemPPPriv *priv, const RemPlob *plob)
 	for (u = 0; u < len; u++) {
 		
 		item = PyList_GET_ITEM(list, u); // item is a borrowed ref
-		rempy_api_check(PyString_CheckExact(item),
-				"bad return from 'search': PIDs must be strings");
-		rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
-		
+		if (PyString_Check(item)) {
+			rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
+		} else {
+			item = PyObject_Str(item); // item is now a new ref
+			rem_sl_append_const(sl, PyString_AS_STRING(item)); // borrowed ref
+			Py_DECREF(item);
+		}
 	}
 	
 	Py_DECREF(list);
@@ -799,10 +830,13 @@ python_pp_log(gint level, PyObject	*args)
 	
 	rempy_api_check(ok, "bad arguments in remuco.log_...");
 	
-	rempy_api_check(PyString_Check(msg_py),
-			"bad argument #1 in remuco.log_... : expected string");
-	
-	msg = PyString_AS_STRING(msg_py);
+	if (PyString_Check(msg_py)) {
+		msg = PyString_AS_STRING(msg_py);
+	} else {
+		msg_py = PyObject_Str(msg_py);
+		msg = PyString_AS_STRING(msg_py);
+		Py_DECREF(msg_py);
+	}
 	
 	switch (level) {
 		case REM_LL_NOISE:
