@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 static void
-rem_img_handle_wand_error(MagickWand *mw)
+priv_handle_wand_error(MagickWand *mw)
 {
 	gchar		*msg;
 	ExceptionType	severity;
@@ -31,7 +31,7 @@ rem_img_handle_wand_error(MagickWand *mw)
 }
 
 static GByteArray*
-rem_img_file_to_ba(const gchar *file)
+priv_file_to_ba(const gchar *file)
 {
 	g_assert_debug(file);
 	
@@ -85,7 +85,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
  	
 	g_return_val_if_fail(file[0], NULL); 
 	
-	// init Wand and read image
+	////////// init Wand and read image //////////
 
 	MagickWandGenesis();
 	magick_wand = NewMagickWand();
@@ -96,12 +96,12 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	if (magick_ret == MagickFalse) {
 				
 		LOG_WARN("load image '%s' failed", file);
-		rem_img_handle_wand_error(magick_wand);
+		priv_handle_wand_error(magick_wand);
 		return NULL;
 		
 	}
 
-	// resize the image
+	////////// resize the image //////////
 
 	LOG_DEBUG("get dimensions..");
 
@@ -112,7 +112,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 
 	if (width_orig == 0 || height_orig == 0) {
 		LOG_WARN("image '%s' has 0 size", file);
-		rem_img_handle_wand_error(magick_wand);
+		priv_handle_wand_error(magick_wand);
 		return NULL;
 	}
 
@@ -137,7 +137,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	MagickResizeImage(
 		magick_wand, width_target, height_target, LanczosFilter, 1.0);
 		
-	// temporary write the resized image as PNG
+	////////// temporary write the resized image as PNG //////////
 	
 	tmp_file = g_strdup_printf("%s/remuco/art.png", g_get_user_cache_dir());
 
@@ -148,7 +148,7 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 		
 		g_free(tmp_file);
 		
-		rem_img_handle_wand_error(magick_wand);
+		priv_handle_wand_error(magick_wand);
 		
 		return NULL;
 	}
@@ -156,9 +156,9 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 	magick_wand = DestroyMagickWand(magick_wand);  // we are done with Magick
 	MagickWandTerminus();
 
-	// load the temporary image into a byte array
+	////////// load the temporary image into a byte array //////////
 	
-	ba = rem_img_file_to_ba(tmp_file);
+	ba = priv_file_to_ba(tmp_file);
 	
 	g_free(tmp_file);
 	
