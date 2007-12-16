@@ -43,7 +43,7 @@ priv_rx(GIOChannel *chan, guint8 *data, guint len)
 		read = 0;
 		ret = g_io_channel_read_chars(chan, (gchar*) data, len, &read, NULL);
 		
-		LOG_NOISE("read returned %i (read %u bytes)\n", ret, read);
+		LOG_NOISE("read returned %i (read %u bytes)", ret, read);
 
 		////////// handle: IO error //////////
 		
