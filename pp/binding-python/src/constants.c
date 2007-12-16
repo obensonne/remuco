@@ -20,7 +20,7 @@ rempy_constants_add(PyObject *m)
 	PyModule_AddStringConstant(m, "PLOB_META_TYPE_AUDIO", REM_PLOB_META_TYPE_AUDIO);
 	PyModule_AddStringConstant(m, "PLOB_META_TYPE_VIDEO", REM_PLOB_META_TYPE_VIDEO);
 	PyModule_AddStringConstant(m, "PLOB_META_ANY", REM_PLOB_META_ANY);
-	PyModule_AddStringConstant(m, "REM_PLOB_META_ART", REM_PLOB_META_ART);
+	PyModule_AddStringConstant(m, "PLOB_META_ART", REM_PLOB_META_ART);
 
 	PyModule_AddIntConstant(m, "PS_PBS_STOP", REM_PBS_STOP); 
 	PyModule_AddIntConstant(m, "PS_PBS_PLAY", REM_PBS_PLAY); 
