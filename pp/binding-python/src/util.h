@@ -28,10 +28,22 @@
 	"*************************************************************",		\
 	G_STRLOC, G_STRFUNC, ##args);
 
-#define rempy_api_warn(_msg) G_STMT_START {				\
-		if (PyErr_Occurred()) PyErr_Print();			\
-		REMPY_LOG_API_BUG(_msg);						\
-		PyErr_SetString(PyExc_TypeError, _msg);			\
+#define rempy_api_warn(_msg) G_STMT_START {					\
+		if (PyErr_Occurred()) {								\
+			PyObject	*type, *value, *trace, *str;		\
+			type = NULL; value = NULL; trace = NULL;		\
+			PyErr_Fetch(&type, &value, &trace);				\
+			if (value) {									\
+				str = PyObject_Str(value);					\
+				g_log(REM_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,	\
+						"Python Exception: %s", PyString_AS_STRING(str));	\
+				Py_DECREF(str);								\
+				Py_DECREF(value);							\
+			}												\
+			PyErr_Print();									\
+		}													\
+		PyErr_SetString(PyExc_TypeError, _msg);				\
+		REMPY_LOG_API_BUG(_msg);							\
 } G_STMT_END
 
 #define rempy_api_check(_expr, _msg) G_STMT_START {		\
