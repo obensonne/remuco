@@ -88,7 +88,7 @@ rem_dump_ba(GByteArray *ba)
 	ba_end = ba->data + ba->len;
 	for (u = 0, walker = ba->data; walker < ba_end; u = (u+1) % 16, walker++) {
 		if (u == 0) {
-			g_string_append(bin, "\n");			
+			g_string_append(dump, "\n");			
 		}
 		g_string_printf(dump, "%02hhX ", *walker);
 	}
