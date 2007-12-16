@@ -138,9 +138,8 @@ rem_img_get(const gchar *file, guint width_max, guint height_max)
 		magick_wand, width_target, height_target, LanczosFilter, 1.0);
 		
 	// temporary write the resized image as PNG
-
-	tmp_file = g_strdup_printf("%s/remuco-img-%s.png",
-					g_get_tmp_dir(), g_get_user_name());
+	
+	tmp_file = g_strdup_printf("%s/remuco/art.png", g_get_user_cache_dir());
 
 	magick_ret = MagickWriteImages(magick_wand, tmp_file, MagickTrue);
 	if (magick_ret == MagickFalse) {
