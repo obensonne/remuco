@@ -275,7 +275,7 @@ priv_build_ploblist(RemServer *s,
 static void
 priv_synchronize(RemServer* server)
 {
-	LOG_NOISE("called\n");
+	LOG_NOISE("called");
 	
 	RemPlayerStatusDiff	diff;
 	
@@ -336,7 +336,7 @@ priv_synchronize(RemServer* server)
 		g_hash_table_foreach(server->clients, &priv_htcb_tx, server);
 	}
 	
-	LOG_NOISE("done\n");
+	LOG_NOISE("done");
 }
 
 static void
@@ -987,7 +987,7 @@ rem_server_up(const RemPPDescriptor *pp_desc,
 				"invalid PP descriptor and/or callbacks configuration");
 	}
 	
-	server->pp_cb = g_memdup(pp_callbacks, sizeof(RemPPDescriptor));
+	server->pp_cb = g_memdup(pp_callbacks, sizeof(RemPPCallbacks));
 	server->pp_priv = (RemPPPriv*) pp_priv;
 
 	server->mc = g_main_context_default();
