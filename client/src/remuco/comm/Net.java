@@ -2,6 +2,7 @@ package remuco.comm;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.microedition.io.StreamConnection;
@@ -67,10 +68,7 @@ public final class Net {
 
 	protected boolean isUp() {
 
-		Log.asssert(this, (sc == null && dis == null && dos == null)
-				|| (sc != null && dis != null && dos != null));
-
-		return sc != null && dis != null && dos != null;
+		return check();
 
 	}
 
@@ -78,15 +76,18 @@ public final class Net {
 	 * Receives a message.
 	 * 
 	 * @param m
-	 *            the message with to store the received message id and binary
-	 *            data in
+	 *            The message to store the received message id and binary data
+	 *            in. {@link Message#sd} does not get touched. On error return,
+	 *            <code>m</code> is in an undefined state.
 	 * @return <b>-1</b> if receiving fails (in this case net is guaranteed to
 	 *         be down on method return), <b>0</b> if receiving was successful
 	 */
 	protected int recv(Message m) {
 
-		Log.asssert(this, sc != null && dis != null && dos != null);
-		Log.asssert(this, m.bd == null && m.sd == null);
+		if (!check())
+			return -1;
+
+		m.bd = null;
 
 		int size, skipped;
 
@@ -127,6 +128,10 @@ public final class Net {
 				return -1;
 			}
 
+		} catch (EOFException e) {
+			Log.ln("[NT] EOF on connection: " + e.getMessage());
+			down();
+			return -1;
 		} catch (IOException e) {
 			Log.ln("[NT] connection broken: " + e.getMessage());
 			down();
@@ -141,26 +146,32 @@ public final class Net {
 	 * Sends a message.
 	 * 
 	 * @param m
-	 *            the message with {@link Message#bd} != null
+	 *            The message with to send. Content does not get changed.
 	 * @return <b>-1</b> if sending fails (in this case net is guaranteed to be
 	 *         down on method return), <b>0</b> if sending was successful
 	 */
 	protected int send(Message m) {
 
-		Log.asssert(this, sc != null && dis != null && dos != null);
+		Log.asssert(this, m != null);
 
-		Log.ln("[NT] will now send data (" + m.bd.length + " bytes)");
+		if (!check())
+			return -1;
+
+		Log.ln("[NT] will now send data (" + (m.bd != null ? m.bd.length : 0)
+				+ " bytes + frame data)");
 
 		try {
 			dos.write(IO_PREFIX);
 			dos.writeInt(m.id);
-			dos.writeInt(m.bd.length);
-			dos.write(m.bd);
+			if (m.bd != null) {
+				dos.writeInt(m.bd.length);
+				dos.write(m.bd);
+			} else {
+				dos.writeInt(0);
+			}
 			dos.write(IO_SUFFIX);
 			dos.flush();
-			m.bd = null;
 		} catch (IOException e) {
-			m.bd = null;
 			Log.ln("[NT] connection broken: " + e.getMessage());
 			down();
 			return -1;
@@ -171,10 +182,18 @@ public final class Net {
 	}
 
 	/**
-	 * Set up the net. The net must be down (see {@link #down()}) to call this
-	 * method.
+	 * After a stream connection has been established with the server, this
+	 * method completes the connection setup by opening the input and output
+	 * streams and waiting for the <i>HELLO</i> message from the server.
 	 * <p>
-	 * This method receives the <i>HELLO</i> message from the server.
+	 * This method blocks until the <i>HELLO</i> message has been received, but
+	 * waiting time is limited by a certain maximum.
+	 * <p>
+	 * When this method returns (successfully) messages ({@link Message}) can
+	 * be sent and received with {@link #send(Message)} and
+	 * {@link #recv(Message)}.
+	 * <p>
+	 * The net must be down (see {@link #down()}) to call this method.
 	 * 
 	 * @param sc
 	 *            the {@link StreamConnection} to use for communication
@@ -309,6 +328,24 @@ public final class Net {
 
 		return 0;
 
+	}
+
+	/**
+	 * Checks the connection state. Calls {@link #down()} if needed.
+	 * 
+	 * @return <code>true</code> if the connection is up, <code>false</code>
+	 *         otherwise
+	 */
+	private boolean check() {
+
+		if (sc != null && dis != null && dos != null)
+			return true;
+
+		// shut down if not done already:
+		if (sc != null || dis != null || dos != null)
+			down();
+
+		return false;
 	}
 
 }

@@ -144,8 +144,6 @@ public final class Comm extends Thread implements IMessageSender {
 
 	public void sendMessage(Message m) {
 
-		Log.asssert(this, m.bd == null);
-
 		if (Remuco.EMULATION) {
 
 			es.sendMessage(m);
@@ -154,28 +152,23 @@ public final class Comm extends Thread implements IMessageSender {
 
 		}
 
-		if (net == null || !net.isUp()) {
-			return;
-		}
-
 		srz.sd2bd(m);
 
-		Log.asssert(this, m.bd);
+		if (net == null)
+			return;
 
-		if (net != null && net.isUp() && net.send(m) < 0) {
-
-			net = null;
-
-		}
+		net.send(m); // errors on 'net' this should be detected and handled
+		// by receiveMessages()
 
 	}
 
 	/**
-	 * Tries continuously to set up the net connection until success or a
-	 * serious error occurred.
+	 * Tries continuously (blocking!) to set up the net connection until
+	 * success, interrupted or a serious error occurred.
 	 * 
 	 * @return the net connection or <code>null</code> if a serious error
-	 *         occurred and proceeding does not make much sense
+	 *         occurred and proceeding does not make much sense or if
+	 *         {@link #interrupt()} is <code>true</code>
 	 * 
 	 */
 	private Net connect() {
@@ -229,42 +222,31 @@ public final class Comm extends Thread implements IMessageSender {
 	}
 
 	/**
-	 * Continuesly receives messages and delivers them (unserialized) to the
-	 * player. The method returns either if the net connection is broken or if
-	 * the flag {@link #interrupted} is true.
+	 * Continuously (blocking!) receives messages and delivers them
+	 * (unserialized) to the player. The method returns either if the net
+	 * connection is broken or if the flag {@link #interrupted} is true.
 	 * 
 	 * @param net
 	 *            the net connection
 	 */
 	private void receiveMessages() {
 
-		Log.asssert(this, net != null);
-
-		if (!net.isUp()) { // yes, this may happen
-			net.down();
-			net = null;
-			return;
-		}
-
 		Message m = new Message();
 
 		while (!interrupted) {
+
+			m.bd = null;
 
 			if (net.recv(m) < 0) {
 				net = null;
 				return;
 			}
 
-			if (m.bd != null) {
-
-				try {
-					srz.bd2sd(m);
-				} catch (BinaryDataExecption e) {
-					Log.ln("[CM] rxed dataObj is malformed (" + e.getMessage()
-							+ ")");
-					m.bd = null;
-					continue;
-				}
+			try {
+				srz.bd2sd(m);
+			} catch (BinaryDataExecption e) {
+				Log.ln("[CM] rxed data malformed (" + e.getMessage() + ")");
+				continue;
 			}
 
 			if (m.id == Message.ID_IFS_SRVDOWN) {
@@ -274,8 +256,6 @@ public final class Comm extends Thread implements IMessageSender {
 			}
 
 			mr.receiveMessage(m);
-
-			m.sd = null;
 
 		}
 
