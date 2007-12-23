@@ -78,8 +78,8 @@ public final class DeviceConnector extends RemoteDevice implements
 	}
 
 	/**
-	 * Initiates the creatin of a net connection to this device. Returns
-	 * immediately. To get the created connection call
+	 * Initiates the creation of a net connection to this device. Returns
+	 * <i>immediately</i>. To get the created connection call
 	 * {@link #getNetConnection()}
 	 * 
 	 * @throws UserException
@@ -95,7 +95,7 @@ public final class DeviceConnector extends RemoteDevice implements
 		try {
 
 			serviceRecords.removeAllElements();
-			
+
 			agent.searchServices(null, UUID_LIST, this, this);
 
 			searchingServices = true;
@@ -112,7 +112,8 @@ public final class DeviceConnector extends RemoteDevice implements
 
 	/**
 	 * Get the net connection to this device. Must be called after
-	 * {@link #createNetConnection()}.
+	 * {@link #createNetConnection()}. This method <i>blocks</i>, it waits
+	 * until service search and connection creation has been finished.
 	 * 
 	 * @return the created net connection or <code>null</code>, if it was not
 	 *         possible to connect (e.g. because the server is not running or
@@ -223,7 +224,7 @@ public final class DeviceConnector extends RemoteDevice implements
 		Log.ln("[DC] Service search finished. Return code: " + respCode);
 
 		searchingServices = false;
-		
+
 		synchronized (serviceRecords) {
 			serviceRecords.notify();
 		}
