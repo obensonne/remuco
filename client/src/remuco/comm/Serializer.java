@@ -27,42 +27,28 @@ public final class Serializer {
 	/**
 	 * Converts a message's binary data ({@link Message#bd}) into structured
 	 * data ({@link Message#sd}) according the message ID.
-	 * <p>
-	 * On return {@link Message#bd} is guaranteed to be <code>null</code> and
-	 * {@link Message#sd} to be not <code>null</code>.
+
 	 * 
 	 * @param m
 	 *            the message (for the message's ID must be a non-<code>null</code>
 	 *            data structure format vector in {@link Message#DSFVAin} !)
 	 * @throws BinaryDataExecption
-	 *             if the binary data is malformed (in this case
-	 *             {@link Message#sd} is guaranteed to be <code>null</code>)
-	 *             and {@link Message#bd} to be not <code>null</code>
+	 *             if the binary data is malformed (in this case the state of
+	 *             {@link Message#sd} is undefined)
 	 */
 	protected synchronized void bd2sd(Message m) throws BinaryDataExecption {
 
-		Log.asssert(this, m != null && m.sd == null);
+		Log.asssert(this, m != null);
 
 		if (m.bd == null)
-			return;
-
-		try {
-			m.sd = unserialize(Message.DSFVAin[m.id], m.bd);
-		} catch (BinaryDataExecption e) {
 			m.sd = null;
-			throw e;
-		}
-
-		m.bd = null;
-
+		else
+			m.sd = unserialize(Message.DSFVAin[m.id], m.bd);
 	}
 
 	/**
 	 * Converts the message's structured data ({@link Message#sd}) into binary
 	 * data ({@link Message#bd}) according the message ID.
-	 * <p>
-	 * On return {@link Message#bd} is guaranteed to be not <code>null</code>
-	 * and {@link Message#sd} to be <code>null</code>.
 	 * 
 	 * @param m
 	 *            the message (for the message's ID must be a non-<code>null</code>
@@ -70,14 +56,11 @@ public final class Serializer {
 	 */
 	protected synchronized void sd2bd(Message m) {
 
-		Log.asssert(this, m != null && m.bd == null);
+		Log.asssert(this, m != null);
 
 		if (m.sd == null)
-
-			m.bd = new byte[] {};
-
+			m.bd = null;
 		else
-
 			m.bd = serialize(m.sd, Message.DSFVAout[m.id]);
 
 	}
