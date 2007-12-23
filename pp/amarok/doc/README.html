@@ -2,7 +2,7 @@
 <HTML
 ><HEAD
 ><TITLE
->Amarok Player Proxy for Remuco Server 0.5</TITLE
+>Remuco Player Proxy for Amarok</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
@@ -21,7 +21,7 @@ CLASS="TITLEPAGE"
 CLASS="title"
 ><A
 NAME="AEN1"
->Amarok Player Proxy for Remuco Server 0.5</A
+>Remuco Player Proxy for Amarok</A
 ></H1
 ><HR></DIV
 ><DIV
@@ -48,7 +48,7 @@ HREF="#AEN31"
 ></DT
 ><DT
 >4. <A
-HREF="#AEN49"
+HREF="#AEN50"
 >Usage</A
 ></DT
 ><DT
@@ -58,7 +58,7 @@ HREF="#known-issues"
 ></DT
 ><DT
 >6. <A
-HREF="#AEN72"
+HREF="#AEN73"
 >Troubleshooting</A
 ></DT
 ><DT
@@ -209,10 +209,12 @@ NAME="AEN31"
 ></LI
 ><LI
 ><P
->DCOP tool (on Debian/Ubuntu contained in <TT
+>&#13;                    DCOP tool (on Debian/Ubuntu contained in
+                    <TT
 CLASS="filename"
 >kdelibs4c2a</TT
->)</P
+>)
+                </P
 ></LI
 ><LI
 ><P
@@ -223,6 +225,8 @@ CLASS="filename"
 >Python KDE interface (for Python 2.5)</P
 ></LI
 ></UL
+><P
+>The Amraok player proxy is actually an Amarok script.</P
 ><P
 >&#13;            Start Amarok's script manager (Tools -&#62; Script Manager) and
             choose <SPAN
@@ -241,7 +245,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN49"
+NAME="AEN50"
 >4. Usage</A
 ></H2
 ><P
@@ -317,9 +321,9 @@ CLASS="emphasis"
 ></LI
 ><LI
 ><P
->&#13;                    The library you can see on the client only contains
-                    playlists added by you. The lists contained in a
-                    fresh Amarok installation are not included.
+>&#13;                    The library you can see on the client contains only
+                    user-added playlists. The lists contained in a fresh
+                    Amarok installation are not included.
                 </P
 ></LI
 ><LI
@@ -354,16 +358,13 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN72"
+NAME="AEN73"
 >6. Troubleshooting</A
 ></H2
 ><P
 >&#13;            If you have problems running the player proxy, try to start
             the script from the command line (while Amarok is up):
         </P
-><PRE
-CLASS="programlisting"
->$ cd ~/kde/share/apps/amarok/scripts/remuco</PRE
 ><P
 >&#13;            <SAMP
 CLASS="computeroutput"
@@ -474,28 +475,26 @@ TARGET="_top"
 >
         </P
 ><P
->&#13;            The most current code is located in  'trunk'. Note that this
-            code is not always stable or in a working state. The sources
-            of specific releases of the several parts of the Remuco
-            system (server library, client, ...) are located in 'tags'
-            -- getting code from 'tags' ensures to have working code.
+>&#13;            The most current code is located in
+            <SPAN
+CLASS="QUOTE"
+>"trunk"</SPAN
+>
+            . Note that this code is not always stable or in a working
+            state. The sources of specific releases of the several parts
+            of the Remuco system (server library, client, ...) are
+            located in
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            -- getting code from
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            ensures to have working code.
         </P
-><DIV
-CLASS="example"
-><A
-NAME="AEN103"
-></A
-><P
-><B
->Example A-1. 
-                Check out the current development version of the server
-                library into the directory remuco-lib-trunk:
-            </B
-></P
-><P
->&#13;                $ svn co &#60;SVN-ROOT&#62;/trunk/lib remuco-lib-trunk
-            </P
-></DIV
 ><DIV
 CLASS="example"
 ><A
@@ -503,14 +502,44 @@ NAME="AEN106"
 ></A
 ><P
 ><B
->Example A-2. 
-                Check out the client source from release 0.6.0 into the
-                directory remuco-client-0.6.0:
+>Example A-1. 
+                Check out the current development version of the server
+                library into the directory <TT
+CLASS="filename"
+>remuco-lib-trunk</TT
+>:
             </B
 ></P
 ><P
->&#13;                $ svn co &#60;SVN-ROOT&#62;/tags/remuco-client-0.6.0 \
+>&#13;                <SAMP
+CLASS="computeroutput"
+>&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/lib remuco-lib-trunk
+                </SAMP
+>
+            </P
+></DIV
+><DIV
+CLASS="example"
+><A
+NAME="AEN111"
+></A
+><P
+><B
+>Example A-2. 
+                Check out the client source from release 0.6.0 into the
+                directory <TT
+CLASS="filename"
+>remuco-client-0.6.0</TT
+>:
+            </B
+></P
+><P
+>&#13;                <SAMP
+CLASS="computeroutput"
+>&#13;                $ svn co &#60;SVN-ROOT&#62;/tags/remuco-client-0.6.0
                 remuco-client-0.6.0
+                </SAMP
+>
             </P
 ></DIV
 ></DIV

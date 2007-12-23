@@ -1,379 +1,383 @@
 #!/usr/bin/python
 
-import sys
-import logging
 from xml.dom import minidom
-import pydcop, pcop
-import os
+import remuco
+import gobject
+import sys
+import traceback
 import signal
-import commands
-import thread
-import time
+from dcopext import DCOPClient, DCOPApp
+import fileinput
 import re
 
-try:
-    import remuco
-except:
-    print "The Python binding for the Remuco server library seems to be " \
-        "missing or broken. See the following error output for details:\n %s" \
-        % str(sys.exc_info()[1])
-    sys.exit()
+###############################################################################
 
-FEATURES = 0 \
-    | remuco.FEATURE_PLAYLIST \
-    | remuco.FEATURE_PLAYLIST_JUMP \
-    | remuco.FEATURE_PLAYLIST_MODE_REPEAT_ALBUM \
-    | remuco.FEATURE_PLAYLIST_MODE_REPEAT_ONE_PLOB \
-    | remuco.FEATURE_PLAYLIST_MODE_REPEAT_PLAYLIST \
-    | remuco.FEATURE_PLAYLIST_MODE_SHUFFLE \
-    | remuco.FEATURE_PLOB_EDIT \
-    | remuco.FEATURE_RATE \
-    | remuco.FEATURE_LIBRARY
+priv_global = None
 
-AMAROK_DIR = str ("%s/.kde/share/apps/amarok" % os.getenv("HOME"))
-PL_STATIC_FILE = str("%s/playlistbrowser_save.xml" % AMAROK_DIR)
-PL_STATIC_ELEM = "playlist"
-PL_STATIC_ATTR = "title"
-PL_STREAM_FILE = str("%s/streambrowser_save.xml" % AMAROK_DIR)
-PL_STREAM_ELEM = "stream"
-PL_STREAM_ATTR = "name"
-PL_SMART_FILE = str("%s/smartplaylistbrowser_save.xml" % AMAROK_DIR)
-PL_SMART_ELEM = "smartplaylist"
-PL_SMART_ATTR = "name"
-PL_DYNAMIC_FILE = str("%s/dynamicbrowser_save.xml" % AMAROK_DIR)
-PL_DYNAMIC_ELEM = "dynamic"
-PL_DYNAMIC_ATTR = "name"
+###############################################################################
 
-PL_FILES = (PL_STATIC_FILE, PL_STREAM_FILE, PL_SMART_FILE, PL_DYNAMIC_FILE)
-PL_ELEMS = (PL_STATIC_ELEM, PL_STREAM_ELEM, PL_SMART_ELEM, PL_DYNAMIC_ELEM)
-PL_ATTRS = (PL_STATIC_ATTR, PL_STREAM_ATTR, PL_SMART_ATTR, PL_DYNAMIC_ATTR)
-
-LIB_PLAYLISTS_RE = re.compile("playlist.*")
-
-class PlayerProxy:
-    """Kind of utitlity class for communication with Amarok."""
-       
+class PlayerProxyPriv:
+    """This class is just a box for our private data."""
+    
     def __init__(self):
+        
+        self.shutdown_in_progress = False
+        
+        # init some fields
+        self.ml = None
         self.server = None
-        self.app = None
         self.playlist_pids = []
         self.playlist_xml_items = []
-        self.old_pid = None
-        self.interrupted = False
+        
+        self.repeat = False    # see gcb_tick_repeat_shuffle()
+        self.shuffle = False   # see gcb_tick_repeat_shuffle()
 
-    def updateAmarokConnection(self):
-        """Get the dcop connection to Amarok.
+        # init amarok dcop connection
+        self.client = DCOPClient()
+        self.client.attach()
+        self.amarok = DCOPApp('amarok', self.client)
         
-        Checks the current connection to Amarok and reconnects if needed.
-        """
+        # regex to detect Singal Of Interest
+        # see http://amarok.kde.org/wiki/Script-Writing_HowTo
+        self.rx_SOI = re.compile("^(engineStateChange: .+)|(trackChange)|(volumeChange: [0-9]+)|(playlistChange: .+)")
         
-        if self.interrupted: return False
+        # regex to detect pids of streams
+        self.rx_stream_pid = re.compile("^[a-zA-Z]+://.+")
         
-        #logging.debug("check amarok connection")
-        if not self.app:
-            logging.debug("no connection, try to connect..")
-            self.app = pydcop.anyAppCalled("amarok")
-        if not self.app:
-            logging.debug("could not connect, amarok seems to be down")
-            return False
-        try:
-            logging.debug("amarok connection is there, test it...")
-            # next: a test if the connection to amarok works
-            self.app.player.getVolume()
-            logging.debug("connection works")
-            return True
-        except:
-            logging.warning("error in amarok connection." + \
-                            "discard connection and try to reconnect ..")
-            self.app = None
-            self.app = pydcop.anyAppCalled("amarok")
-            if not self.app:
-                logging.info("could not connect, amarok seems to be down")
-                return False
-            logging.info("reconnected to amarok")
-            return True
+###############################################################################
+#
+# Private/Misc Functions
+#
+###############################################################################
 
-    def updatePlaylist(self):
-        """Update the internal playlist.
-        
-        Request amarok to store the current playlist in an external file. Then we
-        read this file to create a list of PIDs (global var 'playlist_pids') and a
-        list of xml items (global var 'playlist_xml_items'). 
-        """
-        self.playlist_pids = []
-        
-        playlist_file = self.app.playlist.saveCurrentPlaylist()
-        
-        logging.debug("Current playlist in : %s" % playlist_file)
-        document = minidom.parse(playlist_file)
-        self.playlist_xml_items = document.getElementsByTagName("item")
-        
-        for item in self.playlist_xml_items:
-            pid = item.attributes["uniqueid"].value
-            if not pid or len(pid) == 0: # this seems to be a stream
-                pid = item.attributes["url"].value
-            self.playlist_pids.append(pid)
-            logging.debug("append pid %s", pid)
-            
-    def fixquery(self, table, column, left, right, default):
-        """Wrapper for a query for a single value.
-        
-        Does a query in 'table' for the value in 'column' where the column 'left'
-        has the value 'right'. If the query returns no ore more than one result,
-        'default' will be returnd, other wise the single returned result value.
-        """
-        result = self.query("SELECT %s FROM %s WHERE %s = \"%s\"" % \
-                         (column, table, left, right))
-        
-        if (len(result) != 1):
-            return default
-        else:
-            return result[0]
+def __connected(priv):
+    """Check if there is a working connection to Amarok."""
+    try:
+        ok, vol = priv.amarok.player.getVolume()
+    except:
+        ok = False
+    if not ok:
+        remuco.log_noise("not connected") 
+    return ok
+
+def __updatePlaylist(priv):
+    """Update the internal playlist.
     
-    def query(self, query):
-        
-        logging.debug("do query \"%s\"" % query)
+    Request amarok to store the current playlist in an external file. Then we
+    read this file to create a list of PIDs (global var 'playlist_pids') and a
+    list of xml items (global var 'playlist_xml_items'). 
+    """
+    priv.playlist_pids = []
     
-        # Because a pydcop function used by '__app.collection.query(query)' only
-        # works with latin1 strings (using python-dcop 3.5.5), an error may occur
-        # if 'query' contains characters not compatible with latin1. In this case
-        # we must use the tool 'dcop' because this accepts queries with all utf8
-        # characters.
-        # Note: This works on a system with default charset UTF8. I do not know
-        # how the dcop-tool-solution works on other systems.
+    ok, playlist_file = priv.amarok.playlist.saveCurrentPlaylist()
+    
+    remuco.log_noise("Current playlist in : %s" % playlist_file)
+    document = minidom.parse(playlist_file)
+    priv.playlist_xml_items = document.getElementsByTagName("item")
+    
+    remuco.log_debug("append pids")
+
+    for item in priv.playlist_xml_items:
+        remuco.log_noise("type: %s" % type(item.attributes["uniqueid"].value))
+        pid = item.attributes["uniqueid"].value
+        if not pid or len(pid) == 0: # this seems to be a stream
+            pid = item.attributes["url"].value
+        priv.playlist_pids.append(pid)
+        remuco.log_debug("append pid %s" % pid)
+
+def __get_plob_from_url(priv, url):
+    """Get plob meta data via an URL.
+    
+    Function to get meta data about a plob which has no 'uniqueid' and which
+    is therefore not stored in the database. This is valid for e.g. radio
+    streams. In this case we just have an URL and try to get the meta data
+    via the amarok dcop functions which give info about the current song or
+    via the current playlist.
+    """
+    
+    def tag_val(tag):
         try:
-            query = query.decode("utf8").encode("latin1")
-            result = self.app.collection.query(query)
-        except: #UnicodeDecodeError or UnicodeEncodeError:
-            output = commands.getoutput("dcop amarok collection query \"%s\"" % \
-                                        query.replace('"', '\\"'))
-            result = output.split("\n")
-        
-        return result
-            
-    def convertPidToUrl(self, pid):
-        """Get the url for a PID.
-        
-        'pid' is what Amarok stores as uniqueid.
-        """
-        return self.fixquery("uniqueid", "url", "uniqueid", pid, None)
-        
-    def getPlobFromUrl(self, url):
-        """Get plob meta data via an URL.
-        
-        Function to get meta data about a plob which has no 'uniqueid' and which
-        is therefore not stored in the database. This is valid for e.g. radio
-        streams. In this case we just have an URL and try to get the meta data
-        via the amarok dcop functions which give info about the current song or
-        via the current playlist.
-        """
-        
-        def tag_val(tag):
-            try:
-                val = item.getElementsByTagName(tag)[0].lastChild.nodeValue
-                return val.encode("utf8")
-            except AttributeError:
-                return ""
-            except IndexError:
-                return ""
-        
-        # if 'url' is the current active song, stream .. then its easy:
-        
-        if url == self.app.player.encodedURL():
+            val = item.getElementsByTagName(tag)[0].lastChild.nodeValue
+            return val.encode("utf8")
+        except AttributeError:
+            return ""
+        except IndexError:
+            return ""
     
-            plob = {remuco.PLOB_META_ARTIST : self.app.player.artist(), \
-                    remuco.PLOB_META_TITLE : self.app.player.title(), \
-                    remuco.PLOB_META_RATING : str(self.app.player.rating()), \
-                    remuco.PLOB_META_GENRE : self.app.player.genre(), \
-                    remuco.PLOB_META_YEAR : self.app.player.year(), \
-                    remuco.PLOB_META_COMMENT : self.app.player.comment(), \
-                    remuco.PLOB_META_ALBUM : self.app.player.album(), \
-                    remuco.PLOB_META_BITRATE : self.app.player.bitrate(), \
-                    remuco.PLOB_META_TRACK : self.app.player.track(), \
-                    remuco.PLOB_META_LENGTH : str(self.app.player.trackTotalTime()), \
+    # if 'url' is the current active song, stream .. then its easy:
+    
+    if url == priv.amarok.player.encodedURL()[1]:
+
+        plob = {remuco.PLOB_META_ARTIST : priv.amarok.player.artist()[1], \
+                remuco.PLOB_META_TITLE : priv.amarok.player.title()[1], \
+                remuco.PLOB_META_RATING : priv.amarok.player.rating()[1], \
+                remuco.PLOB_META_GENRE : priv.amarok.player.genre()[1], \
+                remuco.PLOB_META_YEAR : priv.amarok.player.year()[1], \
+                remuco.PLOB_META_COMMENT : priv.amarok.player.comment()[1], \
+                remuco.PLOB_META_ALBUM : priv.amarok.player.album()[1], \
+                remuco.PLOB_META_BITRATE : priv.amarok.player.bitrate()[1], \
+                remuco.PLOB_META_TRACK : priv.amarok.player.track()[1], \
+                remuco.PLOB_META_LENGTH : priv.amarok.player.trackTotalTime()[1], \
+                }
+    
+        __add_img_to_plob(priv, plob)
+        
+        return plob
+    
+    # hm, check if the url is in the current playlist, then its still easy:
+    
+    for item in priv.playlist_xml_items:
+        
+        if item.attributes["url"].value == url:
+            
+            plob = {remuco.PLOB_META_ARTIST : tag_val("Artist"), \
+                    remuco.PLOB_META_TITLE : tag_val("Title"), \
+                    remuco.PLOB_META_RATING : tag_val("Rating"), \
+                    remuco.PLOB_META_GENRE : tag_val("Genre"), \
+                    remuco.PLOB_META_YEAR : tag_val("Year"), \
+                    remuco.PLOB_META_COMMENT : tag_val("Comment"), \
+                    remuco.PLOB_META_ALBUM : tag_val("Album"), \
+                    remuco.PLOB_META_BITRATE : tag_val("Bitrate"), \
+                    remuco.PLOB_META_TRACK : tag_val("Track"), \
+                    remuco.PLOB_META_LENGTH : tag_val("Length") \
                     }
-        
-            self.addImgToPlob(plob)
+    
+            __add_img_to_plob(priv, plob)
             
             return plob
-        
-        # hm, check if the url is in the current playlist, then its still easy:
-        
-        for item in self.playlist_xml_items:
-            
-            if item.attributes["url"].value == url:
-                
-                plob = {remuco.PLOB_META_ARTIST : tag_val("Artist"), \
-                        remuco.PLOB_META_TITLE : tag_val("Title"), \
-                        remuco.PLOB_META_RATING : tag_val("Rating") + "/10", \
-                        remuco.PLOB_META_GENRE : tag_val("Genre"), \
-                        remuco.PLOB_META_YEAR : tag_val("Year"), \
-                        remuco.PLOB_META_COMMENT : tag_val("Comment"), \
-                        remuco.PLOB_META_ALBUM : tag_val("Album"), \
-                        remuco.PLOB_META_BITRATE : tag_val("Bitrate"), \
-                        remuco.PLOB_META_TRACK : tag_val("Track"), \
-                        remuco.PLOB_META_LENGTH : tag_val("Length") \
-                        }
-        
-                self.addImgToPlob(plob)
-                
-                return plob
-        
-        # damn, no way to get meta data for the url:
-        
-        logging.warning("cannot get info about the plob with url " + url)
-        
-        return {PLOB_META_TITLE : "unknown" }
+    
+    # damn, no way to get meta data for the url:
+    
+    remuco.log_warn("cannot get info about the plob with url %s" % url)
+    
+    return { PLOB_META_TITLE : "unknown" }
 
-    def addImgToPlob(self, plob):
+def __add_img_to_plob(priv, plob):
+    
+    if plob[remuco.PLOB_META_ALBUM] == priv.amarok.player.album()[1] and \
+       plob[remuco.PLOB_META_ARTIST] == priv.amarok.player.artist()[1]:
         
-        if plob[remuco.PLOB_META_ALBUM] == self.app.player.album() and \
-           plob[remuco.PLOB_META_ARTIST] == self.app.player.artist():
-            
-            img = self.app.player.coverImage()
-            if not img.endswith("nocover.png"):
-                plob[remuco.PLOB_META_IMG] = img
-        
-        else:
-        
-            query = "SELECT " + \
-                "path FROM images WHERE artist = \"%s\" AND album = \"%s\"" \
-                % (plob[remuco.PLOB_META_ARTIST], plob[remuco.PLOB_META_ALBUM])
-        
-            result = self.query(query)
-            
-            if not result or len(result) == 0: return
-            
-            names = ( "front", "cover", "album", "folder" )
-            types = ( ".png", ".jpg" )
-            
-            img = result[0] # fallback
-            
-            for type in types:
-                for name in names:
-                    for file in result:
-                        #print "check file " + file
-                        if file.lower().endswith(name + type):
-                            #print "use " + file
-                            img = file
-        
-            plob[remuco.PLOB_META_IMG] = img
-        
-##############################################################################
+        remuco.log_debug("get image of cap");
+        ok, img = priv.amarok.player.coverImage()
+        if ok and not img.endswith("nocover.png"):
+            plob[remuco.PLOB_META_ART] = img
+    
+#    else: # this does not work because the path we get here is relative
+#    
+#        remuco.log_debug("get image of any plob");
 #
-# Private functions
-#
-##############################################################################
+#        query = "SELECT " + \
+#            "path FROM images WHERE artist = \"%s\" AND album = \"%s\"" \
+#            % (plob[remuco.PLOB_META_ARTIST], plob[remuco.PLOB_META_ALBUM])
+#    
+#        result = __query(priv, query)
+#        
+#        if not result or len(result) == 0: return
+#        
+#        names = ( "front", "cover", "album", "folder" )
+#        types = ( "png", "jpg" )
+#        
+#        img = result[0] # fallback
+#        
+#        for type in types:
+#            for name in names:
+#                for file in result:
+#                    remuco.log_debug("check file %s" % file)
+#                    if file.lower().endswith("%s.%s" % (name, type)):
+#                        remuco.log_debug("use %s" % file)
+#                        img = file
+#    
+#        remuco.log_debug("hallo")
+#        plob[remuco.PLOB_META_IMG] = img
 
-
-def __catch_exit_sig(signum, frame):
+def __fix_query(priv, table, column, left, right, default):
+    """Wrapper for a query for a single value.
     
-    global __pp
+    Does a query in 'table' for the value in 'column' where the column 'left'
+    has the value 'right'. If the query returns no ore more than one result,
+    'default' will be returnd, other wise the single returned result value.
+    """
+    result = __query(priv, "SELECT %s FROM %s WHERE %s = \"%s\"" % \
+                     (column, table, left, right))
     
-    if __pp.interrupted: return
-    
-    __pp.interrupted = True
-    
-
-##############################################################################
-#
-# Player proxy interface
-#
-##############################################################################
-
-def pp_get_ps(pp):
-    
-    logging.debug("enter pp_get_ps()")
-
-    if not pp.updateAmarokConnection():
-        return (remuco.PS_STATE_OFF, 0, 0, 0, 0)
-    
-    # playback state
-    
-    state = pp.app.player.status()
-    if state == 0:
-        state = remuco.PS_STATE_STOP
-    elif state == 1:
-        state = remuco.PS_STATE_PAUSE
-    elif state == 2:
-        state = remuco.PS_STATE_PLAY
+    if (not result) or (len(result) != 1):
+        return default
     else:
-        state = remuco.PS_STATE_PROBLEM
+        return result[0]
 
-    # volume
+def __query(priv, query):
     
-    volume = pp.app.player.getVolume()
+    remuco.log_debug("do query \"%s\"" % query)
+
+    ok, result = priv.amarok.collection.query(str(query))
     
-    # repeat mode
+    if not ok:
+        remuco.log_error("collection query failed")
+        return None
     
-    if pp.app.player.repeatPlaylistStatus():
-        repeat = remuco.PS_REPEAT_MODE_PL
-    elif pp.app.player.repeatTrackStatus():
-        repeat = remuco.PS_REPEAT_MODE_PLOB
-    else:
-        repeat = remuco.PS_REPEAT_MODE_NONE
+    remuco.log_debug("query done: %s" % result)
+    
+    return result
+        
+def __convert_pid_to_url(priv, pid):
+    """Get the url for a PID.
+    
+    'pid' is what Amarok stores as uniqueid.
+    """
+    return __fix_query(priv, "uniqueid", "url", "uniqueid", pid, None)
+
+def acb_signal(src, cond, priv):
+    """Amarok signal callback function."""
+    
+    remuco.log_debug("signal from amarok")
+    
+    try:
+        input = src.readline()
+        
+        if len(input) == 0:
+            remuco.log_debug("EOF on stdin")
+            if not priv.shutdown_in_progress:
+                priv.shutdown_in_progress = True
+                remuco.down(priv.server)
+            return False
+        
+        remuco.log_debug("amarok says: %s" % input)
+        
+        if priv.rx_SOI.match(input) != None:
+            remuco.log_debug("notify server")
+            remuco.notify(priv.server)
+            
+    except:
+        remuco.log_error("exception: %s" % traceback.format_exc())
+
+    remuco.log_debug("acb_signal done")
+    return True
+
+def gcb_tick_repeat_shuffle(priv):
+    """Timer callback function to periodically check the repeat and shuffle
+    state.
+       
+    These values get requested via a timer function because there is no signal
+    for them.
+    """
+    
+    if not __connected(priv):
+        return True
+
+    ###### repeat ######
+    
+    repeat = priv.amarok.player.repeatPlaylistStatus()[1]
+    repeat |= priv.amarok.player.repeatTrackStatus()[1]
+
+    if repeat != priv.repeat:
+        priv.repeat = repeat
+        remuco.log_debug("repeat mode changed")
+        remuco.notify(priv.server)
     
     # Amarok has also some kind of album repeat, but there is no dcop function
     # to check if this is enabled
     
-    # shuffle mode
+    ###### repeat ######
+
+    shuffle = priv.amarok.player.randomModeStatus()[1]
     
-    if pp.app.player.randomModeStatus():
-        shuffle = remuco.PS_SHUFFLE_MODE_ON
+    if shuffle != priv.shuffle:
+        priv.shuffle = shuffle
+        remuco.log_debug("shuffle mode changed")
+        remuco.notify(priv.server)
+
+    return True
+
+###############################################################################
+#
+# Callback Functions for Remuco Server
+#
+###############################################################################
+
+def rcb_synchronize(priv, ps):
+    
+    remuco.log_debug("rcb_synchronize called")
+
+    if not __connected(priv):
+        ps.pbs = remuco.PS_PBS_OFF
+        ps.cap_pid = None
+        ps.playlist = []
+        return
+    
+    ###### playback state ######
+    
+    ok, state = priv.amarok.player.status()
+    if state == 0:
+        ps.pbs = remuco.PS_PBS_STOP
+    elif state == 1:
+        ps.pbs = remuco.PS_PBS_PAUSE
+    elif state == 2:
+        ps.pbs = remuco.PS_PBS_PLAY
     else:
-        shuffle = remuco.PS_SHUFFLE_MODE_OFF
-    
-    # playlist (we need this now to get the pid of the current song)
-    
-    pp.updatePlaylist()
+        remuco.log_warn("unknown pbs: %i" % state)
+        ps.pbs = remuco.PS_PBS_STOP
 
-    # playlist position and current plob pid
+    ###### volume ######
     
-    pos = pp.app.playlist.getActiveIndex()
-    if pos == -1:
-        if state != remuco.PS_STATE_PAUSE and state != remuco.PS_STATE_PLAY:
-            pp.old_pid = None
+    ok, ps.volume = priv.amarok.player.getVolume()
+    
+    ###### repeat mode ######
+
+    if priv.repeat:
+        ps.repeat = remuco.PS_REPEAT_MODE_PL
     else:
-        pp.old_pid = pp.playlist_pids[pos]
-
-    return ( state, volume, 0, repeat, shuffle)
-            
-                
-def pp_get_current_plob_pid(pp):
-
-    logging.debug("enter pp_get_current_plob_pid()")
-
-    if not pp.updateAmarokConnection():
-        return None
-
-    return (pp.old_pid)
-
-def pp_get_plob(pp, pid):
+        ps.repeat = remuco.PS_REPEAT_MODE_NONE
     
-    logging.debug("enter pp_get_plob(%s)" % pid)
-
-    if not pp.updateAmarokConnection():
-        return { remuco.PLOB_META_TITLE : "Amarok is down" }
+    ###### shuffle mode ######
     
-    if pid.startswith("http://") or pid.startswith("mms://"):
+    if priv.shuffle:
+        ps.shuffle = remuco.PS_SHUFFLE_MODE_ON
+    else:
+        ps.shuffle = remuco.PS_SHUFFLE_MODE_OFF
+
+    ###### playlist position and current plob pid ######
+    
+    __updatePlaylist(priv)
+    
+    ps.playlist = priv.playlist_pids
+    
+    ok, ps.cap_pos = priv.amarok.playlist.getActiveIndex()
+    if ps.cap_pos == -1:
+        ps.cap_pos == 0
+    else:
+        ps.cap_pid = priv.playlist_pids[ps.cap_pos]
+        
+    remuco.log_debug("rcb_synchronize done")
+    
+    return
+
+def rcb_get_plob(priv, pid):
+    
+    remuco.log_debug("rcb_get_plob(%s) called" % pid)
+    
+    if priv.rx_stream_pid.match(pid) != None:
         # is a stream, won't find info about it in the databse, so:
-        return pp.getPlobFromUrl(pid)
+        remuco.log_debug("stream url")
+        return __get_plob_from_url(priv, pid)
     
-    url = pp.fixquery("uniqueid", "url", "uniqueid", pid, None)
+    url = __fix_query(priv, "uniqueid", "url", "uniqueid", pid, None)
     
-    if (not url):
+    if not url:
+        remuco.log_warn("could not get url for pid")
         return { remuco.PLOB_META_TITLE : "unknown" }
     
     query = "SELECT " + \
         "album, artist, bitrate, comment, genre, length, title, track, year" + \
         " FROM tags WHERE url = \"%s\"" % url
     
-    result = pp.query(query)
+    result = __query(priv, query)
     
     if (not result or len(result) != 9):
-        logging.error("query '%s' has bad result: '%s'" % (query, str(result)))
+        remuco.log_error("query '%s' has bad result: '%s'" % (query, result))
         return None
-    
+    else:
+        remuco.log_debug("plob query successfull")
+        
     plob = {remuco.PLOB_META_ALBUM : result[0], 
             remuco.PLOB_META_ARTIST : result[1], \
             remuco.PLOB_META_BITRATE : result[2], \
@@ -386,263 +390,166 @@ def pp_get_plob(pp, pid):
             }
     
     plob[remuco.PLOB_META_ALBUM] = \
-        pp.fixquery("album", "name", "id", plob[remuco.PLOB_META_ALBUM], "")
+        __fix_query(priv, "album", "name", "id", plob[remuco.PLOB_META_ALBUM], "")
     
     plob[remuco.PLOB_META_ARTIST] = \
-        pp.fixquery("artist", "name", "id", plob[remuco.PLOB_META_ARTIST], "")
+        __fix_query(priv, "artist", "name", "id", plob[remuco.PLOB_META_ARTIST], "")
 
     plob[remuco.PLOB_META_RATING] = \
-        pp.fixquery("statistics", "rating", "url", url, "0")
+        __fix_query(priv, "statistics", "rating", "url", url, "0")
 
     plob[remuco.PLOB_META_GENRE] = \
-        pp.fixquery("genre", "name", "id", plob[remuco.PLOB_META_GENRE], "")
+        __fix_query(priv, "genre", "name", "id", plob[remuco.PLOB_META_GENRE], "")
     
     plob[remuco.PLOB_META_YEAR] = \
-        pp.fixquery("year", "name", "id", plob[remuco.PLOB_META_YEAR], "")
+        __fix_query(priv, "year", "name", "id", plob[remuco.PLOB_META_YEAR], "")
     
-    pp.addImgToPlob(plob)
+    __add_img_to_plob(priv, plob)
     
-    logging.debug("return plob %s" % url)
+    remuco.log_debug("added image")
+    
+    remuco.log_debug("return plob %s" % url)
 
     return plob
 
+#def rcb_get_library(priv):
+#    remuco.log_debug("rcb_get_library called")
+#    return (['pl1', 'pl2'], ['dub', 'jazz'], [0 , 0])
 
-def pp_get_ploblist(pp, plid):
+#def rcb_get_ploblist(priv, plid):
+#    remuco.log_debug("rcb_get_ploblist(%s) called" % plid)
+#    return ['333', '4444']
 
-    logging.debug("enter pp_get_ploblist(%s)" % plid)
+def rcb_notify(priv, event):
+    
+    remuco.log_debug("rcb_notify called ")
 
-    if not pp.updateAmarokConnection():
-        return []
-    
-    if (plid == remuco.PLOBLIST_PLID_PLAYLIST):
-        
-        return pp.playlist_pids
-    
-    elif (plid == remuco.PLOBLIST_PLID_QUEUE):
-        
-        return []
-    
+    if event == remuco.SERVER_EVENT_DOWN:
+        remuco.log_debug("EVENT: server is down now")        
+        priv.ml.quit()
+    elif even == remuco.SERVER_EVENT_ERROR:
+        remuco.log_debug("EVENT: server crashed")        
+        remuco.down(priv.server)
     else:
-    
-        logging.warning("not yet implemented")
-        return []
-    
+        print "ERROR: unknown event"
+        sys.exit()
     return
+
+#def rcb_play_ploblist(priv, plid):
+#    remuco.log_debug("rcb_play_ploblist called")
+#    return
+
+#def rcb_search(priv, plob):
+#    remuco.log_debug("rcb_search called")
+#    return
+
+def rcb_simple_control(priv, cmd, param):
     
+    remuco.log_debug("rcb_simple_control(%i, %i) called" % (cmd, param))
     
-def pp_get_library(pp):
-    
-    logging.debug("enter pp_get_library")
-    
-    library_pids = []
-    library_names = []
-    library_flags = []
-    
-    for file, elem, attr in zip(PL_FILES, PL_ELEMS, PL_ATTRS):
-    
-        document = minidom.parse(file)
-        
-        xml_items = document.getElementsByTagName(elem)
-        
-        for item in xml_items:
-            name = item.attributes[attr].value
-            if not name:
-                continue
-            logging.debug("found %s", name)
-            if library_pids.__contains__(name):
-                logging.warning("playlist name %s occurs twice" % name)
-            else:
-                library_pids.append(name);
-                library_names.append(name);
-                library_flags.append(0);
-    
-    return (library_pids, library_names, library_flags)
-    
-def pp_ctrl(pp, cmd, param):
-    
-    logging.debug("enter pp_ctrl(%i, %i)" % (cmd, param))
-    
-    if not pp.updateAmarokConnection():
-        return
-    
+    if not __connected(priv): return
+
     try:
         if cmd == remuco.SCTRL_CMD_STOP:
-            pp.app.player.stop()
+            priv.amarok.player.stop()
         elif cmd == remuco.SCTRL_CMD_PLAYPAUSE:
-            pp.app.player.playPause()
+            priv.amarok.player.playPause()
         elif cmd == remuco.SCTRL_CMD_NEXT:
-            pp.app.player.next()
+            priv.amarok.player.next()
         elif cmd == remuco.SCTRL_CMD_PREV:
-            pp.app.player.prev()
+            priv.amarok.player.prev()
         elif cmd == remuco.SCTRL_CMD_VOLUME:
-            pp.app.player.setVolume(param)
+            priv.amarok.player.setVolume(param)
         elif cmd == remuco.SCTRL_CMD_RESTART:
-            pp.app.player.stop()
-            pp.app.playlist.playByIndex(0)
-            pp.app.player.playPause()
+            priv.amarok.player.stop()
+            priv.amarok.playlist.playByIndex(0)
+            priv.amarok.player.playPause()
         elif cmd == remuco.SCTRL_CMD_JUMP:
-            pp.app.playlist.playByIndex(param - 1)
+            priv.amarok.playlist.playByIndex(param - 1)
         elif cmd == remuco.SCTRL_CMD_RATE:
-            pp.app.player.setRating(param)
+            priv.amarok.player.setRating(param)
         elif cmd == remuco.SCTRL_CMD_SEEK:
-            pp.app.player.seekRelative(param)
+            priv.amarok.player.seekRelative(param)
         else:
             logging.warning("command %d not supported", cmd)
     except:
-        logging.error(str(sys.exc_info()))
-        logging.warning("sctrl %d with param %d caused an error", cmd, param)
+        remuco.log_error(str(sys.exc_info()))
     else:
-        logging.debug("sctrl processed")
-    
-def pp_update_plob(pp, pid, meta):
+        remuco.log_debug("sctrl processed")
 
-    def idref_update(field, id_table, value):
-        """Update an ID-field from table 'tags'.
-        
-        Some fields in table 'tags' are IDs which refer to a row in another table
-        where the actual value is stored in column 'name'. This function
-        updates such fields.
-        """
-        id = pp.fixquery(id_table, "id", "name", value, None)
-        if not id:
-            logging.info("%s '%s' not yet present -> insert into table %s" % \
-                          (field, value, id_table))
-            pp.query("INSERT INTO %s (name) VALUES('%s')" % (id_table, value))
-            id = pp.fixquery(id_table, "id", "name", value, None)
-        pp.query("UPDATE tags SET %s=%s WHERE url = '%s'" % (field, id, url))
-    
-    logging.debug("enter pp_update_plob(%s, meta)" % pid)
+def rcb_update_plob(priv, plob):
+    remuco.log_debug("rcb_update_plob called")
 
-    if not pp.updateAmarokConnection():
-        return
-
-    meta_old = pp_get_plob(pp, pid)
-    if not meta_old:
-        logging.warning("no info about plob '%s' in db -> cannot update" % pid)
-        return
-
-    url = pp.convertPidToUrl(pid)
-
-    if not url:
-        logging.warning("could not find plob '%s' in db" % pid)
-        return
-        
-    logging.debug("changing meta information of '%s'" % url)
-
-    for mtn in meta.keys():
-        
-        if meta[mtn] == meta_old[mtn]: continue
-        
-        logging.debug("changing meta information '%s' to '%s'" % (mtn, meta[mtn]))
-        
-        if (mtn == remuco.PLOB_META_TITLE):
-            pp.query("UPDATE tags SET title='%s' WHERE url = '%s'" % \
-                        (meta[mtn], url))
-        elif (mtn == remuco.PLOB_META_ARTIST):
-            idref_update("artist", "artist", meta[mtn])
-        elif (mtn == remuco.PLOB_META_ALBUM):
-            idref_update("album", "album", meta[mtn])
-        elif (mtn == remuco.PLOB_META_YEAR):
-            idref_update("year", "year", meta[mtn])
-        elif (mtn == remuco.PLOB_META_GENRE):
-            idref_update("genre", "genre", meta[mtn])
-        elif (mtn == remuco.PLOB_META_RATING):
-            rate = pp.fixquery("statistics", "rating", "url", url, None)
-            if not rate:
-                logging.warning("no statistics stored yet for %s -> cannot " + \
-                                "set rating, please rate manually in Amarok" % url)
-                continue
-            pp.query("UPDATE statistics SET rating=%s WHERE url = '%s'" % \
-                        (meta[mtn], url))
-#        if (mtn == remuco.PLOB_META_COMMENT):
-#            pp.query("UPDATE tags SET comment='%s' WHERE url = '%s'" % \
-#                        (meta[mtn], url))
-#        does not work :/
-        else:
-            logging.warning("changing tag %s not supported" % mtn)
-
+def rcb_update_ploblist(priv, plid, pids):
+    remuco.log_debug("rcb_update_ploblist called")
     return
-    
-def pp_update_ploblist(pp, plid, list):
 
-    logging.debug("enter pp_update_ploblist(%s, list)" % plid)
-    
-    logging.warning("FUTURE FEATURE (not yet implemented on client side)")
-    
-def pp_play_ploblist(pp, plid):
-    
-    logging.debug("enter pp_play_ploblist(%s)" % plid)
-    
-    if not pp.updateAmarokConnection():
-        return
-
-    pp.app.playlist.clearPlaylist()
-    
-    pp.app.playlistbrowser.loadPlaylist(plid) # note: we have plid == name
-    
-def pp_search(pp, meta):
-    
-    logging.debug("enter pp_search(meta)")
-    
-    logging.warning("FUTURE FEATURE (not yet implemented on client side)")
-    
-def pp_error(pp, err):
-
-    logging.debug("enter pp_search(meta)")
-    
-    logging.error(err)
-    
-    pp.interrupted = True
-    
-    signal.alarm(1)
-
-##############################################################################
+def sighandler(signum, frame):
+    remuco.log_debug("got signal %i" % signum)
+    if not priv_global.shutdown_in_progress:
+        priv_global.shutdown_in_progress = True
+        remuco.down(priv_global.server)
 
 def main():
-    logging.basicConfig(level=logging.INFO, \
-               format='[ %(levelname)5s ] amarok-py-pp             : %(message)s')
-    #           format='%(asctime)s [ %(levelname)s ] amarok-pp : %(message)s')
 
-    # check corect system state
+    global priv_global
     
-    ret = os.system("dcopserver --serverid > /dev/null 2>&1")
-    if ret != 0:
-        logging.error("dcopserver is not running! Try to start Amarok first..")
-        exit()
+    priv = PlayerProxyPriv()
     
-    ret = os.system("dcop --help > /dev/null 2>&1")
-    if ret != 0:
-        logging.error("could not run dcop ! this tool is needed!")
-        exit()
+    priv_global = priv
+    
+    ###### misc initializations ######
 
-    global __pp
+    signal.signal(signal.SIGINT, sighandler)
+    signal.signal(signal.SIGTERM, sighandler)
     
-    __pp = PlayerProxy()
+    priv.ml = gobject.MainLoop()
     
-#    try:
-    __pp.server = remuco.start(__pp, FEATURES, "Amarok", 0, 10, 0, __name__)
-    logging.info("server started")
-#    except:
-#        print(str(sys.exc_traceback))
-#        logging.error("could not start server");
-#        exit()
+    ###### remuco related ######
     
-    signal.signal(signal.SIGINT, __catch_exit_sig)
-    signal.signal(signal.SIGTERM, __catch_exit_sig)
+    callbacks = remuco.PPCallbacks()
+    callbacks.snychronize = rcb_synchronize
+    callbacks.get_plob = rcb_get_plob
+    callbacks.notify = rcb_notify
+    callbacks.simple_control = rcb_simple_control
     
-    logging.info("here we go")
+    descriptor = remuco.PPDescriptor()
+    descriptor.player_name = "test"
+    descriptor.max_rating_value = 10
+    # amarok also has an album repeat, but no chance to get/set this via dcop
+    descriptor.supported_repeat_modes = remuco.PS_REPEAT_MODE_PL | \
+                                        remuco.PS_REPEAT_MODE_PLOB
+    descriptor.supported_shuffle_modes = remuco.PS_SHUFFLE_MODE_ON
+    descriptor.supports_playlist = True
+    descriptor.supports_playlist_jump = True
+    descriptor.supports_seek = True
     
-    # sleep until we get an signal to stop
-    while not __pp.interrupted:
-        signal.pause()
+    try:
+        priv.server = remuco.up(descriptor, callbacks, priv)
+    except:
+        remuco.log_error("error starting server: %s" % str(sys.exc_info()))
+        sys.exit()
+    
+    remuco.notify(priv.server)
 
-    logging.info("shutdown")
+    ###### amarok related ######
     
-    remuco.stop(__pp.server)
+    # catch signals form amarok
+    gobject.io_add_watch(sys.stdin, gobject.IO_IN, acb_signal, priv)
     
-    logging.info("ok, down")
+    # periodically check for change in repeat/shuffle mode
+    gobject.timeout_add(2000, gcb_tick_repeat_shuffle, priv, priority = gobject.PRIORITY_LOW)
+    
+    ###### here we go ######
 
-##############################################################################
+    remuco.log_debug("run mainloop")
+    
+    priv.ml.run()
+    
+    remuco.log_debug("back from mainloop .. bye")
 
+    
 if __name__ == "__main__":
+    
     main()
+    
