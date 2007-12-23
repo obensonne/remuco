@@ -27,7 +27,7 @@ def rcb_synchronize(priv, ps):
 
 def rcb_get_plob(priv, pid):
     remuco.log_debug("rcb_get_plob(%s) called" % pid)
-    return {'artist':'hans'}
+    return {remuco.PLOB_META_ARTIST:'hans', remuco.PLOB_META_ART : '/home/mondai/.kde/share/apps/amarok/albumcovers/cache/130@eb3a3d0cd807f61942797aab5c641905'}
 
 def rcb_get_library(priv):
     remuco.log_debug("rcb_get_library called")
