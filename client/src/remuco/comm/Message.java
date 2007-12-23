@@ -224,8 +224,8 @@ public final class Message {
 	/**
 	 * Message data in structured data format. Every class that implements
 	 * {@link IStructuredData} provides 2 methods which returns the objects
-	 * attributes as structered data or which sets its attributes based on
-	 * structered data.
+	 * attributes as structured data or which sets its attributes based on
+	 * structured data.
 	 * 
 	 * @see Serializer
 	 * 
