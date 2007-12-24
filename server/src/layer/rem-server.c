@@ -585,18 +585,6 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 		features |= REM_FEATURE_RATE;
 	}
 	
-	////////// repeat modes //////////
-	
-	if (desc->supported_repeat_modes & REM_REPEAT_MODE_ALBUM) {
-		features |= REM_FEATURE_REPEAT_MODE_ALBUM;
-	}
-	if (desc->supported_repeat_modes & REM_REPEAT_MODE_PL) {
-		features |= REM_FEATURE_REPEAT_MODE_PL;
-	}
-	if (desc->supported_repeat_modes & REM_REPEAT_MODE_PLOB) {
-		features |= REM_FEATURE_REPEAT_MODE_PLOB;
-	}
-	
 	////////// misc //////////
 
 	if (desc->supports_playlist) {
@@ -608,10 +596,6 @@ priv_create_player_info(const RemPPDescriptor *desc, const RemPPCallbacks *cbs)
 		LOG_DEBUG("Player/PP supports queue");
 	}
 
-	if (desc->supported_shuffle_modes & REM_SHUFFLE_MODE_ON) {
-		features |= REM_FEATURE_SHUFFLE_MODE;
-	}
-	
 	if (desc->supports_playlist_jump) {
 		features |= REM_FEATURE_PLAYLIST_JUMP;
 		if (!desc->supports_playlist) {

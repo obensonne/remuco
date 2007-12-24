@@ -24,11 +24,10 @@ typedef enum {
 	REM_FEATURE_PLAYLIST_EDIT		= 1 << 1,
 	/* Jump to a specific song in the current playlist */
 	REM_FEATURE_PLAYLIST_JUMP		= 1 << 2,
-	/* Show repeat and shuffle status */
-	REM_FEATURE_REPEAT_MODE_PLOB	= 1 << 3,
-	REM_FEATURE_REPEAT_MODE_ALBUM	= 1 << 4,
-	REM_FEATURE_REPEAT_MODE_PL		= 1 << 5,
-	REM_FEATURE_SHUFFLE_MODE		= 1 << 6,
+	//REM_FEATURE_					= 1 << 3,
+	//REM_FEATURE_					= 1 << 4,
+	//REM_FEATURE_					= 1 << 5,
+	//REM_FEATURE_					= 1 << 6,
 	/* Inspect the play queue */
 	REM_FEATURE_QUEUE				= 1 << 7,
 	/* Edit the play queue. <i>FUTURE FEATURE</i>  */

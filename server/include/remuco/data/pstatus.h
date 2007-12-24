@@ -30,28 +30,15 @@ typedef enum {
 } RemPlaybackState;
 
 /**
- * Playback shuffle modes.
+ * Various status flags.
  */
 typedef enum {
-	/** Sequential play order. */
-	REM_SHUFFLE_MODE_OFF = 0,
-	/** Random play order. */
-	REM_SHUFFLE_MODE_ON = 1
-} RemShuffleMode;
-
-/**
- * Playback repeat modes.
- */
-typedef enum {
-	/** No repeat. */
-	REM_REPEAT_MODE_NONE = 0,
-	/** Repeat the current plob. */
-	REM_REPEAT_MODE_PLOB = 1 << 0,
-	/** Repeat the current album. */
-	REM_REPEAT_MODE_ALBUM = 1 << 1,
-	/** Repeat the playlist. */
-	REM_REPEAT_MODE_PL = 1 << 2
-} RemRepeatMode;
+	REM_PS_FLAG_NONE = 0,
+	/** If set, indicates that the player's repeat mode is on. */
+	REM_PS_FLAG_REPEAT = 1 << 0,
+	/** If set, indicates that the player's shuffle mode is on. */
+	REM_PS_FLAG_SHUFFLE = 1 << 1	
+} RemPlayerStatusFlags;
 
 /**
  * The RemPPDescriptor struct describes the status of a media player.
@@ -63,10 +50,8 @@ typedef struct {
 	RemPlaybackState		pbs;
 	/** Volume. */
 	guint					volume;
-	/** Repeat mode. */
-	RemRepeatMode			repeat;
-	/** Suffle state. */
-	RemShuffleMode			shuffle;
+	/** Status flags. */
+	RemPlayerStatusFlags	flags;
 	/**
 	 * Position of the currently active plob in playlist (or queue).
 	 * - > 0 : position within playlist

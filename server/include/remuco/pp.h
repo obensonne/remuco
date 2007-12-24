@@ -217,10 +217,6 @@ typedef struct {
 	 * RemPPCallbacks::update_plob is set.
 	 */
 	gboolean		supports_tags;
-	/** The bitwise or'ed supported repeat modes. */
-	RemRepeatMode	supported_repeat_modes;
-	/** The bitwise or'ed supported shuffle modes. */
-	RemShuffleMode	supported_shuffle_modes;
 } RemPPDescriptor;
 
 /**

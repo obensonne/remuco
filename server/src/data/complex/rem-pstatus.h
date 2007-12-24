@@ -16,8 +16,7 @@
 typedef struct {
 	gint32	pbs,		// here this may also be REM_PS_PBS{ERROR,SRVOFF}
 			volume,
-			repeat,
-			shuffle,
+			flags,
 			cap_pos;
 } RemPlayerStatusBasic;
 

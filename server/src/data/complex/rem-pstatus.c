@@ -43,7 +43,7 @@ rem_player_status_destroy(RemPlayerStatus *ps)
 ///////////////////////////////////////////////////////////////////////////////
 
 static const guint REM_PLAYER_STATUS_BASIC_BFV[] = {
-	REM_BIN_DT_INT, 5,
+	REM_BIN_DT_INT, 4,
 	REM_BIN_DT_NONE
 };
 
@@ -113,14 +113,12 @@ rem_player_status_fp_update(RemPlayerStatus *ps, RemPlayerStatusFP *ps_fp)
 	
 	if ((ps_fp->priv.pbs != ps->pbs) ||
 		(ps_fp->priv.volume != ps->volume) ||
-		(ps_fp->priv.repeat != ps->repeat) ||
-		(ps_fp->priv.shuffle != ps->shuffle) ||
+		(ps_fp->priv.flags != ps->flags) ||
 		(ps_fp->priv.cap_pos != ps->cap_pos)) {
 		
 		ps_fp->priv.pbs = ps->pbs;
 		ps_fp->priv.volume = ps->volume;
-		ps_fp->priv.repeat = ps->repeat;
-		ps_fp->priv.shuffle = ps->shuffle;
+		ps_fp->priv.flags = ps->flags;
 		ps_fp->priv.cap_pos = ps->cap_pos;
 		result |= REM_PS_DIFF_SVRSP;
 	}
