@@ -277,7 +277,7 @@ def gcb_tick_repeat_shuffle(priv):
     # Amarok has also some kind of album repeat, but there is no dcop function
     # to check if this is enabled
     
-    ###### repeat ######
+    ###### shuffle ######
 
     shuffle = priv.amarok.player.randomModeStatus()[1]
     
@@ -321,19 +321,15 @@ def rcb_synchronize(priv, ps):
     
     ok, ps.volume = priv.amarok.player.getVolume()
     
-    ###### repeat mode ######
+    ###### flags ######
 
-    if priv.repeat:
-        ps.repeat = remuco.PS_REPEAT_MODE_PL
-    else:
-        ps.repeat = remuco.PS_REPEAT_MODE_NONE
+    ps.flags = 0
     
-    ###### shuffle mode ######
+    if priv.repeat:
+        ps.flags |= remuco.PS_FLAG_REPEAT
     
     if priv.shuffle:
-        ps.shuffle = remuco.PS_SHUFFLE_MODE_ON
-    else:
-        ps.shuffle = remuco.PS_SHUFFLE_MODE_OFF
+        ps.flags = remuco.PS_FLAG_SHUFFLE
 
     ###### playlist position and current plob pid ######
     
@@ -516,10 +512,6 @@ def main():
     descriptor = remuco.PPDescriptor()
     descriptor.player_name = "test"
     descriptor.max_rating_value = 10
-    # amarok also has an album repeat, but no chance to get/set this via dcop
-    descriptor.supported_repeat_modes = remuco.PS_REPEAT_MODE_PL | \
-                                        remuco.PS_REPEAT_MODE_PLOB
-    descriptor.supported_shuffle_modes = remuco.PS_SHUFFLE_MODE_ON
     descriptor.supports_playlist = True
     descriptor.supports_playlist_jump = True
     descriptor.supports_seek = True
