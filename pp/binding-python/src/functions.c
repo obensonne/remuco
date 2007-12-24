@@ -261,8 +261,6 @@ priv_conv_ppdescriptor_py2c(PyObject *po)
 	}
 	
 	ppd->max_rating_value = (guint) ppd_py->max_rating_value;
-	ppd->supported_repeat_modes = (RemRepeatMode) ppd_py->supported_repeat_modes;
-	ppd->supported_shuffle_modes = (RemShuffleMode) ppd_py->supported_shuffle_modes;
 	ppd->supports_playlist = (gboolean) ppd_py->supports_playlist;
 	ppd->supports_playlist_jump = (gboolean) ppd_py->supports_playlist_jump;
 	ppd->supports_queue = (gboolean) ppd_py->supports_queue;
@@ -311,8 +309,7 @@ priv_conv_pstatus_py2c(RemPyPlayerStatus *ps_py, RemPlayerStatus *ps)
 	}
 	
 	ps->cap_pos = ps_py->cap_pos;
-	ps->repeat = (RemRepeatMode) ps_py->repeat;
-	ps->shuffle = (RemShuffleMode) ps_py->shuffle;
+	ps->flags = (RemPlayerStatusFlags) ps_py->flags;
 	ps->pbs = (RemPlaybackState) ps_py->pbs;
 	ps->volume = ps_py->volume;
 }

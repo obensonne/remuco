@@ -8,8 +8,7 @@ typedef struct {
 	PyObject_HEAD
 	int			pbs;
 	int			volume;
-	int			repeat;
-	int			shuffle;
+	int			flags;
 	int			cap_pos;
 	PyObject	*cap_pid;
 	PyObject	*playlist;

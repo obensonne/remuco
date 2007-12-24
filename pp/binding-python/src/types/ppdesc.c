@@ -20,10 +20,6 @@ static PyMemberDef PPDescriptor_members[] = {
 			"See description of RemPPDescriptor in C API documentaion."},
 	{"supports_tags", T_INT, offsetof(RemPyPPDescriptor, supports_tags), 0,
 			"See description of RemPPDescriptor in C API documentaion."},
-	{"supported_repeat_modes", T_INT, offsetof(RemPyPPDescriptor, supported_repeat_modes), 0,
-			"See description of RemPPDescriptor in C API documentaion."},
-	{"supported_shuffle_modes", T_INT, offsetof(RemPyPPDescriptor, supported_shuffle_modes), 0,
-			"See description of RemPPDescriptor in C API documentaion."},
     {NULL}  /* Sentinel */
 };
 

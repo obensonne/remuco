@@ -15,8 +15,6 @@ typedef struct {
 	int			supports_queue;
 	int			supports_queue_jump;
 	int			supports_tags;
-	int			supported_repeat_modes;
-	int			supported_shuffle_modes;
 } RemPyPPDescriptor;
 
 int

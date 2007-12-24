@@ -26,14 +26,11 @@ rempy_constants_add(PyObject *m)
 	PyModule_AddIntConstant(m, "PS_PBS_PLAY", REM_PBS_PLAY); 
 	PyModule_AddIntConstant(m, "PS_PBS_PAUSE", REM_PBS_PAUSE); 
 	PyModule_AddIntConstant(m, "PS_PBS_OFF", REM_PBS_OFF); 
-	
-	PyModule_AddIntConstant(m, "PS_SHUFFLE_MODE_OFF", REM_SHUFFLE_MODE_OFF); 
-	PyModule_AddIntConstant(m, "PS_SHUFFLE_MODE_ON", REM_SHUFFLE_MODE_ON); 
-	PyModule_AddIntConstant(m, "PS_REPEAT_MODE_NONE", REM_REPEAT_MODE_NONE); 
-	PyModule_AddIntConstant(m, "PS_REPEAT_MODE_PLOB", REM_REPEAT_MODE_PLOB); 
-	PyModule_AddIntConstant(m, "PS_REPEAT_MODE_ALBUM", REM_REPEAT_MODE_ALBUM); 
-	PyModule_AddIntConstant(m, "PS_REPEAT_MODE_PL", REM_REPEAT_MODE_PL);
-	
+
+	PyModule_AddIntConstant(m, "PS_FLAG_NONE", REM_PS_FLAG_NONE); 
+	PyModule_AddIntConstant(m, "PS_FLAG_REPEAT", REM_PS_FLAG_REPEAT); 
+	PyModule_AddIntConstant(m, "PS_FLAG_SHUFFLE", REM_PS_FLAG_SHUFFLE); 
+
 	PyModule_AddIntConstant(m, "SCTRL_CMD_PLAYPAUSE", REM_SCTRL_CMD_PLAYPAUSE); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_STOP", REM_SCTRL_CMD_STOP); 
 	PyModule_AddIntConstant(m, "SCTRL_CMD_RESTART", REM_SCTRL_CMD_RESTART); 
