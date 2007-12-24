@@ -267,10 +267,9 @@ rcb_synchronize(RemPPPriv *priv, RemPlayerStatus *ps)
 
 	xmmsc_result_unref(result);
 
-	////////// repeat, shuffle //////////
+	////////// no repeat, no shuffle //////////
 	
-	ps->repeat = REM_REPEAT_MODE_NONE;
-	ps->shuffle = REM_SHUFFLE_MODE_OFF;
+	ps->flags = REM_PS_FLAG_NONE;
 	
 	////////// cap position //////////
 	
@@ -580,9 +579,8 @@ rcb_simple_control(RemPPPriv *priv, RemSimpleControlCommand cmd, gint param)
 			// X2 has no repeat mode
 			
 			break;
-		case REM_SCTRL_CMD_SHUFFLE:
 			
-			if (param == REM_SHUFFLE_MODE_OFF) break;
+		case REM_SCTRL_CMD_SHUFFLE:
 			
 			// X2 has no shuffle mode but tha playlist can be shuffled:
 			result = xmmsc_playlist_shuffle(priv->xc, XMMS_ACTIVE_PLAYLIST);
@@ -656,8 +654,6 @@ int main(int argc, char **argv) {
 	ppd.charset = NULL;
 	ppd.max_rating_value = 5;
 	ppd.player_name = g_strdup("XMMS2");
-	ppd.supported_repeat_modes = 0;
-	ppd.supported_shuffle_modes = REM_SHUFFLE_MODE_OFF | REM_SHUFFLE_MODE_ON;
 	ppd.supports_playlist = TRUE;
 	ppd.supports_playlist_jump = TRUE;
 	ppd.supports_queue = FALSE;
