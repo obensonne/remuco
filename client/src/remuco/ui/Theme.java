@@ -51,17 +51,16 @@ public final class Theme {
 			IMGID_PLOB_BORDER_RIGHT = 3, IMGID_PLOB_CORNER_TOP_LEFT = 4,
 			IMGID_PLOB_CORNER_TOP_RIGHT = 5, IMGID_PLOB_CORNER_BOTTOM_LEFT = 6,
 			IMGID_PLOB_CORNER_BOTTOM_RIGHT = 7, IMGID_STATUS_REPEAT_OFF = 8,
-			IMGID_STATUS_REPEAT_PLOB = 9, IMGID_STATUS_REPEAT_ALBUM = 10,
-			IMGID_STATUS_REPEAT_PL = 11, IMGID_STATUS_SHUFFLE_OFF = 12,
-			IMGID_STATUS_SHUFFLE_ON = 13, IMGID_STATUS_VOLUME_LEFT = 14,
-			IMGID_STATUS_VOLUME_RIGHT = 15, IMGID_STATUS_VOLUME_OFF = 16,
-			IMGID_STATUS_VOLUME_ON = 17, IMGID_STATUS_PBS_PLAY = 18,
-			IMGID_STATUS_PBS_PAUSE = 19, IMGID_STATUS_PBS_STOP = 20,
-			IMGID_STATUS_PBS_OFF = 21, IMGID_STATUS_PBS_SRVOFF = 22,
-			IMGID_STATUS_PBS_UNKNOWN = 23, IMGID_STATUS_PBS_ERROR = 24,
-			IMGID_PLOB_RATE_OFF = 25, IMGID_PLOB_RATE_ON = 26,
-			IMGID_STATUS_BORDER_LEFT = 27, IMGID_STATUS_BORDER_RIGHT = 28,
-			IMGID_COLORS = 29;
+			IMGID_STATUS_REPEAT_ON = 9, IMGID_STATUS_SHUFFLE_OFF = 10,
+			IMGID_STATUS_SHUFFLE_ON = 11, IMGID_STATUS_VOLUME_LEFT = 12,
+			IMGID_STATUS_VOLUME_RIGHT = 13, IMGID_STATUS_VOLUME_OFF = 14,
+			IMGID_STATUS_VOLUME_ON = 15, IMGID_STATUS_PBS_PLAY = 16,
+			IMGID_STATUS_PBS_PAUSE = 17, IMGID_STATUS_PBS_STOP = 18,
+			IMGID_STATUS_PBS_OFF = 19, IMGID_STATUS_PBS_SRVOFF = 20,
+			IMGID_STATUS_PBS_UNKNOWN = 21, IMGID_STATUS_PBS_ERROR = 22,
+			IMGID_PLOB_RATE_OFF = 23, IMGID_PLOB_RATE_ON = 24,
+			IMGID_STATUS_BORDER_LEFT = 25, IMGID_STATUS_BORDER_RIGHT = 26,
+			IMGID_COLORS = 27;
 
 	private static final String DEFAULT = "Korama";
 
@@ -72,8 +71,7 @@ public final class Theme {
 			"plob.border-right.png", "plob.corner-top-left.png",
 			"plob.corner-top-right.png", "plob.corner-bottom-left.png",
 			"plob.corner-bottom-right.png", "status.repeat-off.png",
-			"status.repeat-plob.png", "status.repeat-album.png",
-			"status.repeat-pl.png", "status.shuffle-off.png",
+			"status.repeat-on.png", "status.shuffle-off.png",
 			"status.shuffle-on.png", "status.volume-left.png",
 			"status.volume-right.png", "status.volume-off.png",
 			"status.volume-on.png", "status.pbs-play.png",
@@ -430,10 +428,8 @@ public final class Theme {
 		v.addElement(img[IMGID_STATUS_PBS_UNKNOWN]);
 		v.addElement(img[IMGID_STATUS_PBS_SRVOFF]);
 		v.addElement(img[IMGID_STATUS_PBS_STOP]);
-		v.addElement(img[IMGID_STATUS_REPEAT_ALBUM]);
 		v.addElement(img[IMGID_STATUS_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATUS_REPEAT_PL]);
-		v.addElement(img[IMGID_STATUS_REPEAT_PLOB]);
+		v.addElement(img[IMGID_STATUS_REPEAT_ON]);
 		v.addElement(img[IMGID_STATUS_SHUFFLE_OFF]);
 		v.addElement(img[IMGID_STATUS_SHUFFLE_ON]);
 		v.addElement(img[IMGID_STATUS_VOLUME_LEFT]);
@@ -461,10 +457,8 @@ public final class Theme {
 
 		Log.ln("[TH] VALIDATION: check state-repeat images for same width");
 
-		v.addElement(img[IMGID_STATUS_REPEAT_ALBUM]);
 		v.addElement(img[IMGID_STATUS_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATUS_REPEAT_PL]);
-		v.addElement(img[IMGID_STATUS_REPEAT_PLOB]);
+		v.addElement(img[IMGID_STATUS_REPEAT_ON]);
 
 		ok &= checkSizesEqual(v, false, true);
 

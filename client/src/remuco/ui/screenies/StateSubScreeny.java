@@ -14,8 +14,7 @@ public final class StateSubScreeny extends Screeny {
 	public static final int TYPE_STATE = 0;
 
 	private static final int[] IMGIDS_REPEAT = new int[] {
-			Theme.IMGID_STATUS_REPEAT_ALBUM, Theme.IMGID_STATUS_REPEAT_OFF,
-			Theme.IMGID_STATUS_REPEAT_PL, Theme.IMGID_STATUS_REPEAT_PLOB };
+			Theme.IMGID_STATUS_REPEAT_OFF, Theme.IMGID_STATUS_REPEAT_ON };
 
 	private static final int[] IMGIDS_SHUFFLE = new int[] {
 			Theme.IMGID_STATUS_SHUFFLE_OFF, Theme.IMGID_STATUS_SHUFFLE_ON };
@@ -27,11 +26,10 @@ public final class StateSubScreeny extends Screeny {
 			Theme.IMGID_STATUS_PBS_UNKNOWN };
 
 	private static final int[] VALUES_REPEAT = new int[] {
-			Status.REPEAT_MODE_ALBUM, Status.REPEAT_MODE_NONE,
-			Status.REPEAT_MODE_PL, Status.REPEAT_MODE_PLOB };
+			Status.FLAG_NONE, Status.FLAG_REPEAT};
 
 	private static final int[] VALUES_SHUFFLE = new int[] {
-			Status.SHUFFLE_MODE_OFF, Status.SHUFFLE_MODE_ON };
+			Status.FLAG_NONE, Status.FLAG_SHUFFLE };
 
 	private static final int[] VALUES_STATE = new int[] { Status.ST_ERROR,
 			Status.ST_OFF, Status.ST_PAUSE, Status.ST_PLAY, Status.ST_SRVOFF,
@@ -115,11 +113,11 @@ public final class StateSubScreeny extends Screeny {
 		switch (type) {
 
 		case TYPE_REPEAT:
-			val = s.getRepeatMode();
+			val = s.isRepeat() ? Status.FLAG_REPEAT : Status.FLAG_NONE;
 			break;
 
 		case TYPE_SHUFFLE:
-			val = s.getShuffleMode();
+			val = s.isShuffle() ? Status.FLAG_SHUFFLE : Status.FLAG_NONE;
 			break;
 
 		case TYPE_STATE:

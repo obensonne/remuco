@@ -22,7 +22,7 @@ public final class EmulatedServer implements IMessageSender {
 
 		private Status ps = new Status();
 
-		private int state, volume, plpos, repeat, shuffle;
+		private int state, volume, plpos, flags;
 
 		public void run() {
 
@@ -34,8 +34,7 @@ public final class EmulatedServer implements IMessageSender {
 
 						state = (int) Tools.random(Status.ST_COUNT);
 						volume = (int) Tools.random(100);
-						repeat = (int) Tools.random(4);
-						shuffle = (int) Tools.random(2);
+						flags = (int) Tools.random(4);
 
 					}
 
@@ -62,7 +61,7 @@ public final class EmulatedServer implements IMessageSender {
 
 		protected Status getState() {
 
-			ps.set(state, volume, plpos, repeat, shuffle);
+			ps.set(state, volume, plpos, flags);
 
 			return ps;
 

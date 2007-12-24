@@ -34,21 +34,15 @@ public final class Status implements IStructuredData {
 	/** Remuco client state (no server or player state) */
 	public static final byte ST_UNKNOWN = 50;
 
-	public static final byte SHUFFLE_MODE_OFF = 0;
+	public static final byte FLAG_NONE = 0;
 
-	public static final byte SHUFFLE_MODE_ON = 1;
+	public static final byte FLAG_REPEAT = 1 << 0;
 
-	public static final byte REPEAT_MODE_NONE = 0;
-
-	public static final byte REPEAT_MODE_PLOB = 1 << 0;
-
-	public static final byte REPEAT_MODE_ALBUM = 1 << 1;
-
-	public static final byte REPEAT_MODE_PL = 1 << 2;
+	public static final byte FLAG_SHUFFLE = 1 << 1;
 
 	// ////////////////////////////////////////////////////////////////////////
 
-	public static final int[] sdFormatVector = new int[] { DT_INT, 5 };
+	public static final int[] sdFormatVector = new int[] { DT_INT, 4 };
 
 	private static final int IVPOS_STATE = 0;
 
@@ -56,13 +50,11 @@ public final class Status implements IStructuredData {
 
 	private static final int IVPOS_PLPOS = 2;
 
-	private static final int IVPOS_REPMODE = 3;
-
-	private static final int IVPOS_SHFMODE = 4;
+	private static final int IVPOS_FLAGS = 3;
 
 	// ////////////////////////////////////////////////////////////////////////
 
-	private final int[] serialIv = new int[5];
+	private final int[] serialIv = new int[4];
 
 	private final Object[] serialBdv = new Object[] { serialIv };
 
@@ -127,12 +119,12 @@ public final class Status implements IStructuredData {
 		return Math.abs(serialIv[IVPOS_PLPOS]);
 	}
 
-	public int getRepeatMode() {
-		return serialIv[IVPOS_REPMODE];
+	public boolean isRepeat() {
+		return (serialIv[IVPOS_FLAGS] & FLAG_REPEAT) != 0;
 	}
 
-	public int getShuffleMode() {
-		return serialIv[IVPOS_SHFMODE];
+	public boolean isShuffle() {
+		return (serialIv[IVPOS_FLAGS] & FLAG_SHUFFLE) != 0;
 	}
 
 	public int getState() {
@@ -149,8 +141,7 @@ public final class Status implements IStructuredData {
 
 	public void reset() {
 		serialIv[IVPOS_PLPOS] = 0;
-		serialIv[IVPOS_REPMODE] = REPEAT_MODE_NONE;
-		serialIv[IVPOS_SHFMODE] = SHUFFLE_MODE_OFF;
+		serialIv[IVPOS_FLAGS] = FLAG_NONE;
 		serialIv[IVPOS_STATE] = ST_UNKNOWN;
 		serialIv[IVPOS_VOLUME] = 50;
 	}
@@ -174,14 +165,12 @@ public final class Status implements IStructuredData {
 	/**
 	 * @emulator Only used for testing!
 	 */
-	public void set(int state, int volume, int plpos, int repeat, int shuffle) {
+	public void set(int state, int volume, int plpos, int flags) {
 
 		serialIv[0] = state;
 		serialIv[1] = volume;
 		serialIv[2] = plpos;
-		serialIv[3] = repeat;
-		serialIv[4] = shuffle;
-
+		serialIv[3] = flags;
 	}
 
 	public String toString() {
