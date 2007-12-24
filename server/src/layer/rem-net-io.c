@@ -131,6 +131,8 @@ static gint
 priv_flush(GIOChannel *chan)
 {
 	GIOStatus ret;
+
+	g_msleep(100); // dodge a bug in g_io_channel_flush() / g_io_unix_write()
 	
 	ret = g_io_channel_flush(chan, NULL);
 	if (ret != G_IO_STATUS_NORMAL) {
