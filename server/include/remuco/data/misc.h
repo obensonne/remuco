@@ -47,13 +47,11 @@ typedef enum {
 	/** FUTURE FEATURE */
 	REM_SCTRL_CMD_SEEK,
 	/**
-	 * Set the repeat mode.
-	 * Param: the repeat mode (see RemRepeatMode)
+	 * Toogle repeat mode.
 	 */
 	REM_SCTRL_CMD_REPEAT,
 	/**
-	 * Set the shuffle mode.
-	 * Param: the shuffle mode (see RemShuffleMode)
+	 * Toogle shuffle mode.
 	 */
 	REM_SCTRL_CMD_SHUFFLE,
 	REM_SCTRL_CMD_COUNT
