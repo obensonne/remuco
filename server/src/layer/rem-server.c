@@ -8,6 +8,8 @@
 
 #define REM_POLL_IVAL		2000
 
+#define REM_PL_MAX_LEN		250
+
 typedef enum {
 	REM_MSG_ID_IGNORE,
 	REM_MSG_ID_IFS_PINFO,
@@ -237,7 +239,8 @@ priv_build_ploblist(RemServer *s,
 	const gchar		*pid;
 	GString			*title;
 	const gchar		*s1, *s2;
-	RemPlob		*plob;
+	RemPlob			*plob;
+	guint			len;
 	
 	rem_ploblist_clear(pl);
 	
@@ -247,7 +250,8 @@ priv_build_ploblist(RemServer *s,
 	
 	rem_sl_iterator_reset(pids);
 	
-	while((pid = rem_sl_iterator_next(pids))) {
+	len = 0;
+	while((pid = rem_sl_iterator_next(pids)) && len++ < REM_PL_MAX_LEN) {
 		
 		plob = s->pp_cb->get_plob(s->pp_priv, pid);
 		if (!plob) plob = rem_plob_new_unknown(pid);
@@ -261,7 +265,14 @@ priv_build_ploblist(RemServer *s,
 		rem_plob_destroy(plob);
 		
 		rem_ploblist_append_const(pl, pid, title->str);
+	}
+	
+	if (pid) { // playlist too long
 		
+		// we add a final entry (with the ID form the last plob) to inform
+		// that the following plobs have been discarded
+		g_string_printf(title, "Playlist truncated!");
+		rem_ploblist_append_const(pl, pid, title->str);
 	}
 	
 	g_string_free(title, TRUE);
