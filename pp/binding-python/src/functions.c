@@ -354,7 +354,7 @@ rcb_get_library(RemPPPriv *priv)
 	
 	////////// call python function //////////
 	
-	args = Py_BuildValue("O", priv->pp_priv);
+	args = Py_BuildValue("(O)", priv->pp_priv);
 	
 	ret = PyObject_Call(priv->pp_callbacks->get_library, args, NULL);
 
