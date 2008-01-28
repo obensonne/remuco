@@ -3,11 +3,18 @@ import rb, rhythmdb
 import os
 import remuco
 import sys
+import urlparse
+import urllib
 
 PLAYORDER_SHUFFLE = "shuffle"
 PLAYORDER_SHUFFLE2 = "random-by-age-and-rating"
 PLAYORDER_REPEAT = "linear-loop"
 PLAYORDER_NORMAL = "linear"
+
+COVER_FILE_NAMES = ("folder", "front", "album", "cover")
+COVER_FILE_TYPES = ("png", "jpeg", "jpg")
+
+DELIM = "__:;:___"
 
 class RemucoPlugin(rb.Plugin):
 
@@ -28,12 +35,17 @@ class RemucoPlugin(rb.Plugin):
         self.callbacks.get_plob = RemucoPlugin.cb_rem_get_plob
         self.callbacks.notify = RemucoPlugin.cb_rem_notify
         self.callbacks.simple_control = RemucoPlugin.cb_rem_simple_control
+        self.callbacks.get_library = RemucoPlugin.cb_rem_get_library
+        self.callbacks.play_ploblist = RemucoPlugin.cb_rem_play_ploblist
+        self.callbacks.get_ploblist = RemucoPlugin.cb_rem_get_ploblist
         
         self.descriptor = remuco.PPDescriptor()
         self.descriptor.player_name = "Rhythmbox"
         self.descriptor.max_rating_value = 5
         self.descriptor.supports_playlist = True
         self.descriptor.supports_playlist_jump = True
+        self.descriptor.supports_queue = True
+        self.descriptor.supports_queue_jump = False
         #descriptor.supports_seek = True
 
         ###### get file for cover cache ######
@@ -55,8 +67,9 @@ class RemucoPlugin(rb.Plugin):
         self.__cap_pid = None
         self.__cap_entry = None
         self.__source = None
-        self.__eview = None
         self.__qmodel = None
+        self.__queue = None
+        self.__queue_qmodel = None
          
         sp = self.shell.props.shell_player
         
@@ -79,6 +92,21 @@ class RemucoPlugin(rb.Plugin):
         self.cb_id_source_changed = sp.connect( \
                         "playing-source-changed", self.cb_rb_source_changed)
 
+        self.__queue = self.shell.props.queue_source
+        
+        if not self.__queue:
+            self.__queue_qmodel = None
+        else:
+            self.__queue_qmodel = self.__queue.props.query_model
+
+        # connect to 'entry change' signals from queue:
+        self.cb_rb_queue_row_added = self.__queue_qmodel.connect(\
+                        "row-inserted", self.cb_rb_queue_row_inserted)
+        self.cb_rb_queue_row_deleted = self.__queue_qmodel.connect(\
+                        "row-deleted", self.cb_rb_queue_row_deleted)
+        self.cb_rb_queue_rows_reordered = self.__queue_qmodel.connect(\
+                        "rows-reordered", self.cb_rb_queue_rows_reordered)
+
         ###### initially trigger the server to synchronize ######
         
         self.cb_rb_source_changed(sp, sp.props.source)
@@ -86,9 +114,14 @@ class RemucoPlugin(rb.Plugin):
         remuco.notify(self.server)
         
     def deactivate(self, shell):
+
+        if not self.server: return
         
         remuco.log_info("Rhythmbox-Remuco plugin deactivated")
         
+        server = self.server
+        self.server = None
+
         sp = self.shell.props.shell_player
 
         ###### disconnect from rhythmbox callback sources ######
@@ -98,29 +131,17 @@ class RemucoPlugin(rb.Plugin):
 
         sp.disconnect(self.cb_id_source_changed)
         
-        # this disconnects from callbacks of entry view model:
+        # this disconnects from callbacks of current source and query model:
         self.cb_rb_source_changed(sp, None)
         
+        # say bye to the queue
+        self.__queue_qmodel.disconnect(self.cb_rb_queue_row_added)
+        self.__queue_qmodel.disconnect(self.cb_rb_queue_row_deleted)
+        self.__queue_qmodel.disconnect(self.cb_rb_queue_rows_reordered)
+
         ###### shutdown the server ######
         
-        if self.server != None:
-            server = self.server
-            self.server = None
-            remuco.down(server)
-        
-    def tick(self):
-        
-        #gobject.timeout_add(2000, self.tick)
-        remuco.log_debug("tick")
-        if not self.server:
-            return False
-        else:
-            remuco.notify(self.server)
-            return True
-        
-    def idle_cb(self):
-        remuco.log_debug("idle")
-        return False
+        remuco.down(server)
         
     ###########################################################################
     #
@@ -171,8 +192,6 @@ class RemucoPlugin(rb.Plugin):
         
         ps.playlist = []
 
-        ps.cap_pos = 0
-        
         if self.__source != None:
             
             ### playlist ###
@@ -183,13 +202,25 @@ class RemucoPlugin(rb.Plugin):
                 uri = db.entry_get(row[0], rhythmdb.PROP_LOCATION)
                 ps.playlist.append(uri)
         
-            ### playlist postion ###
+        ##### queue #####
+        
+        ps.queue = []
+
+        if self.__queue_qmodel != None:
             
-            try:
+            for row in self.__queue_qmodel:
+                uri = db.entry_get(row[0], rhythmdb.PROP_LOCATION)
+                ps.queue.append(uri)
+        
+        ##### cap position #####
+        
+        try:
+            if sp.props.playing_from_queue:
+                ps.cap_pos = -(ps.queue.index(ps.cap_pid) + 1)
+            else:
                 ps.cap_pos = ps.playlist.index(ps.cap_pid) + 1
-            except:
-                ps.cap_pos = 0
-                
+        except:
+            ps.cap_pos = 0
         
         remuco.log_debug("rcb_synchronize done")
         
@@ -209,12 +240,12 @@ class RemucoPlugin(rb.Plugin):
         
         img = db.entry_request_extra_metadata(entry, "rb:coverArt")
         if not img:
-            file = None
-            remuco.log_debug("image: no")
+            file = self.__cover_from_pid(pid)
         else:
             img.save(self.__cover_cache, "png")
             file = self.__cover_cache
-            remuco.log_debug("image: yes (%s)" % str(file))
+
+        remuco.log_debug("image: %s" % str(file))
         
         plob = {remuco.PLOB_META_TITLE : db.entry_get(entry, rhythmdb.PROP_TITLE), \
                 remuco.PLOB_META_ART : file \
@@ -266,11 +297,20 @@ class RemucoPlugin(rb.Plugin):
                 
             elif cmd == remuco.SCTRL_CMD_JUMP:
                 
-                if sp.props.source != None:
+                # RB forgets to remove a song from the queue if it is playing
+                # and we jump tp another song, so we remove it now manually:
+                if sp.props.playing_from_queue:
+                    if self.__cap_pid != None:
+                        sp.pause()
+                        remuco.log_debug("remove %s from queue" % self.__cap_pid)
+                        self.shell.remove_from_queue(self.__cap_pid)
+                
+                if self.__qmodel != None:
                     i = 1
-                    model = sp.props.source.get_entry_view().props.model
-                    for row in model:
+                    for row in self.__qmodel:
                         if i == param:
+                            #if sp.get_playing_source != self.__source:
+                            #    sp.set_playing_source(self.__source)
                             sp.play_entry(row[0])
                             break
                         i += 1
@@ -287,6 +327,59 @@ class RemucoPlugin(rb.Plugin):
             remuco.log_error(str(sys.exc_info()))
         else:
             remuco.log_debug("sctrl processed")
+
+    def cb_rem_get_library(self):
+        
+        plids = []
+        names = []
+        flags = []
+        
+        slm = self.shell.props.sourcelist_model
+        
+        if not slm:
+            return (plids, names, flags)
+        
+        for group in slm:
+            group_name = group[2]
+            for source in group.iterchildren():
+                source_name = source[2]
+                plids.append("%s%s%s" % (group_name, DELIM, source_name))
+                remuco.log_debug(plids[plids.__len__() - 1])
+                names.append(source_name)
+                flags.append(0)
+        
+        return (plids, names, flags)
+
+    def cb_rem_play_ploblist(self, plid):
+        
+        source = self.__get_source(plid)
+        
+        if not source:
+            return
+        
+        sp = self.shell.props.shell_player
+        sp.set_selected_source(source)
+        sp.set_playing_source(source)
+        sp.do_next()
+                        
+    def cb_rem_get_ploblist(self, plid):
+        
+        pl = []
+        
+        source = self.__get_source(plid)
+        
+        if not source:
+            return pl
+        
+        db = self.shell.props.db
+
+        model = source.get_entry_view().props.model
+        
+        for row in model:
+            uri = db.entry_get(row[0], rhythmdb.PROP_LOCATION)
+            pl.append(uri)
+
+        return pl
 
     ###########################################################################
     #
@@ -305,13 +398,14 @@ class RemucoPlugin(rb.Plugin):
         remuco.notify(self.server)
         
     def cb_rb_source_changed(self, sp, source):
+        """Obtains the query model related to the new source."""
 
         if self.__source == source:
             return
         
         remuco.log_debug("cb_rb_source_changed: %s" % str(source))
         
-        ###### disconnect callbacks of old entry view model ######
+        ###### disconnect callbacks of old source ######
         
         if self.__source != None:
             
@@ -319,63 +413,85 @@ class RemucoPlugin(rb.Plugin):
         
         self.__source = source
         
-        ###### connect to callbacks of new entry view model ######
+        ###### connect to callbacks of new source ######
         
         if self.__source != None:
 
             self.cb_id_pl_filter_changed = self.__source.connect(\
                             "filter-changed", self.cb_rb_source_filter_changed)
 
-            self.__eview_changed(self.__source.get_entry_view())
+        ###### handle the new query model (if there is one) ######
         
-        else:
-            
-            self.__eview_changed(None)
+        try:
+            qmodel = self.__source.get_entry_view().props.model 
+        except:
+            qmodel = None
+
+        self.__qmodel_changed(qmodel)
+
+    def cb_rb_source_filter_changed(self, source):
+        """Obtains the query model related to the source' new filter."""
         
+        remuco.log_debug("source filter changed: %s" % str(source))
+        
+        ###### handle the new query model (if there is one) ######
+
+        try:
+            qmodel = self.__source.get_entry_view().props.model 
+        except:
+            qmodel = None
+
+        self.__qmodel_changed(qmodel)
+
+    def cb_rb_qmodel_row_inserted(self, qm, gtp, gti):
+        #remuco.log_debug("qmodel row inserted (last)")
         if not self.server: return
         remuco.notify(self.server)
+    
+    def cb_rb_qmodel_row_deleted(self, qm, gtp):
+        #remuco.log_debug("qmodel row deleted")
+        if not self.server: return
+        remuco.notify(self.server)
+    
+    def cb_rb_qmodel_rows_reordered(self, qm, gtp, gti, gp):
+        #remuco.log_debug("qmodel rows reordered")
+        if not self.server: return
+        remuco.notify(self.server)
+ 
+    def cb_rb_queue_row_inserted(self, qm, gtp, gti):
+        remuco.log_debug("queue row inserted")
+        if not self.server: return
+        remuco.notify(self.server)
+    
+    def cb_rb_queue_row_deleted(self, qm, gtp):
+        remuco.log_debug("queue row deleted")
+        if not self.server: return
+        remuco.notify(self.server)
+    
+    def cb_rb_queue_rows_reordered(self, qm, gtp, gti, gp):
+        remuco.log_debug("queue rows reordered")
+        if not self.server: return
+        remuco.notify(self.server) 
 
-    def __eview_changed(self, eview):
-        
-        if self.__eview == eview:
-            return
-        
-        remuco.log_debug("__eview_changed: %s" % str(eview))
-
-        if self.__eview != None:
-            
-            self.__eview.disconnect(self.cb_id_pl_entry_added)
-            self.__eview.disconnect(self.cb_id_pl_entry_deleted)
-            self.__eview.disconnect(self.cb_id_pl_selction_changed)
-            self.__eview.disconnect(self.cb_id_pl_sort_order_changed)            
-            
-        self.__eview = eview
-        
-        if self.__eview != None:
-        
-            self.cb_id_pl_entry_added = self.__eview.connect(\
-                            "entry-added", self.cb_rb_eview_entry_added)
-            self.cb_id_pl_entry_deleted = self.__eview.connect(\
-                            "entry-deleted", self.cb_rb_eview_entry_deleted)
-            self.cb_id_pl_selction_changed = self.__eview.connect(\
-                            "selection-changed", self.cb_rb_eview_selection_changed)
-            self.cb_id_pl_sort_order_changed = self.__eview.connect(\
-                            "sort-order-changed", self.cb_rb_eview_sort_order_changed)
-        
-            self.__qmodel_changed(self.__eview.props.model)
-            
-        else:
-
-            self.__qmodel_changed(None)
-        
-        return
-        
+    ###########################################################################
+    #
+    # Misc
+    #
+    ###########################################################################
+ 
     def __qmodel_changed(self, qmodel):
-
+        """Configures callback functions for the new query model.
+        
+        Disconnects from callbacks of old query model and connects to callbacks
+        of the new query model. The callbacks get called if entries get inserted,
+        removed or reordered in the query model."""
+        
         if self.__qmodel == qmodel:
             return
 
         remuco.log_debug("__qmodel_changed: %s" % str(qmodel))
+
+        ###### disconnect callbacks of old query model ######
 
         if self.__qmodel != None:
             
@@ -385,65 +501,67 @@ class RemucoPlugin(rb.Plugin):
             
         self.__qmodel = qmodel
         
+        ###### connect to callbacks of new query model ######
+
         if self.__qmodel != None:
             
             self.cb_id_pl_row_added = self.__qmodel.connect(\
                             "row-inserted", self.cb_rb_qmodel_row_inserted)
             self.cb_id_pl_row_deleted = self.__qmodel.connect(\
                             "row-deleted", self.cb_rb_qmodel_row_deleted)
-            # wird aufgerufen, wenn man mit der muas einen song nach oben oder
-            # unten schiebt
             self.cb_id_pl_rows_reordered = self.__qmodel.connect(\
                             "rows-reordered", self.cb_rb_qmodel_rows_reordered)
             
+        ###### notify the server (playlist change) ######
+
         if self.server != None:
             remuco.notify(self.server)
         
         return
 
-    def cb_rb_qmodel_row_inserted(self, qm, gtp, gti):
-        #if not self.connected_sqm.has_pending_changes():
-        remuco.log_debug("qmodel row inserted (last)")
-        if not self.server: return
-        remuco.notify(self.server)
-    
-    def cb_rb_qmodel_row_deleted(self, qm, gtp):
-        remuco.log_debug("qmodel row deleted")
-        if not self.server: return
-        remuco.notify(self.server)
-    
-    def cb_rb_qmodel_rows_reordered(self, qm, gtp, gti, gp):
-        remuco.log_debug("qmodel rows reordered")
-        if not self.server: return
-        remuco.notify(self.server)
- 
-    def cb_rb_source_filter_changed(self, source):
-        remuco.log_debug("source filter changed")
-        if not self.server: return
-        remuco.notify(self.server)
+    def __cover_from_pid(self, pid):
+        """Returns the full path to a cover file related to pid.
+        
+        Returns 'None' if no cover has been found in the songs folder.
+        """
+        
+        elems = urlparse.urlparse(pid)
+        
+        if elems[0] != "file":
+            return None
+        
+        path = urllib.url2pathname(elems[2])
+        path = os.path.dirname(path)
+        
+        for name in COVER_FILE_NAMES:
+            for type in COVER_FILE_TYPES:
+                file = os.path.join(path, "%s.%s" % (name, type))
+                if os.path.isfile(file):
+                    return file
+                file_cap = os.path.join(path, "%s.%s" % (name.capitalize(), type))
+                if os.path.isfile(file_cap):
+                    return file
+                
+        return None
 
-    def cb_rb_eview_entry_added(self, view, entry):
-        remuco.log_debug("eview entry added")
-        if not self.server: return
-        remuco.notify(self.server)
+    def __get_source(self, plid):
+        """Get the source object of source 'plid'."""
+        
+        slm = self.shell.props.sourcelist_model
+        
+        if not slm:
+            return None
 
-    def cb_rb_eview_entry_deleted(self, view, entry):
-        remuco.log_debug("eview entry deleted")
-        if not self.server: return
-        remuco.notify(self.server)
-
-    def cb_rb_eview_selection_changed(self, eview):
-        remuco.log_debug("eview selection changed")
-        if eview != None:
-            self.__qmodel_changed(eview.props.model)
-        else:
-            self.__qmodel_changed(None)
-
-    def cb_rb_eview_sort_order_changed(self, view):
-        remuco.log_debug("eview sort order changed")
-        if not self.server: return
-        remuco.notify(self.server)
-
+        group_name, source_name = plid.split(DELIM)
+        
+        if not group_name or not source_name:
+            return None
+        
+        for group in slm:
+            if group_name == group[2]:
+                for source in group.iterchildren():
+                    if source_name == source[2]:
+                        return source[3]
 
 if __name__ == "__main__":
     
