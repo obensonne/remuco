@@ -48,9 +48,9 @@ public final class Status implements IStructuredData {
 
 	private static final int IVPOS_VOLUME = 1;
 
-	private static final int IVPOS_PLPOS = 2;
+	private static final int IVPOS_PLPOS = 3;
 
-	private static final int IVPOS_FLAGS = 3;
+	private static final int IVPOS_FLAGS = 2;
 
 	// ////////////////////////////////////////////////////////////////////////
 
