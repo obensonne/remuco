@@ -18,7 +18,7 @@ public final class PlobScreeny extends Screeny {
 
 	private boolean fullScreenImage = false;
 
-	private ImageScreeny screenyImage;
+	private ImageScreeny screenyImage, screenyImageClear;
 
 	private PlobDescScreeny screenyPlobDesc;
 
@@ -31,6 +31,7 @@ public final class PlobScreeny extends Screeny {
 		screenyPlobDesc = new PlobDescScreeny(theme);
 		screenyRate = new RateScreeny(theme, pi);
 		screenyImage = new ImageScreeny(theme);
+		screenyImageClear = new ImageScreeny(theme);
 
 	}
 
@@ -134,6 +135,9 @@ public final class PlobScreeny extends Screeny {
 
 		screenyImage.initRepresentation(borderSize, borderSize, TOP_LEFT, width
 				- 2 * borderSize, height - 2 * borderSize);
+		
+		screenyImageClear.initRepresentation(borderSize, borderSize, TOP_LEFT,
+				width - 2 * borderSize, height - 2 * borderSize);
 
 	}
 
@@ -145,6 +149,7 @@ public final class PlobScreeny extends Screeny {
 
 		} else {
 
+			screenyImageClear.draw(g); // removes any plob images artefacts
 			screenyPlobDesc.draw(g);
 			screenyRate.draw(g);
 
