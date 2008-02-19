@@ -246,8 +246,16 @@ class RemucoPlugin(rb.Plugin):
             file = self.__cover_cache
 
         remuco.log_debug("image: %s" % str(file))
-        
+
         plob = {remuco.PLOB_META_TITLE : db.entry_get(entry, rhythmdb.PROP_TITLE), \
+                remuco.PLOB_META_ARTIST: db.entry_get(entry, rhythmdb.PROP_ARTIST), \
+                remuco.PLOB_META_ALBUM : db.entry_get(entry, rhythmdb.PROP_ALBUM), \
+                remuco.PLOB_META_GENRE : db.entry_get(entry, rhythmdb.PROP_GENRE), \
+                remuco.PLOB_META_BITRATE : db.entry_get(entry, rhythmdb.PROP_BITRATE), \
+                remuco.PLOB_META_LENGTH : db.entry_get(entry, rhythmdb.PROP_DURATION), \
+                remuco.PLOB_META_RATING : int(db.entry_get(entry, rhythmdb.PROP_RATING)), \
+                remuco.PLOB_META_TRACK : db.entry_get(entry, rhythmdb.PROP_TRACK_NUMBER), \
+                remuco.PLOB_META_YEAR : db.entry_get(entry, rhythmdb.PROP_YEAR), \
                 remuco.PLOB_META_ART : file \
                }
 
@@ -263,8 +271,7 @@ class RemucoPlugin(rb.Plugin):
             remuco.log_debug("EVENT: server crashed")        
             remuco.down(self.server)
         else:
-            remuco.log_error("ERROR: unknown event")
-            self.deactivate(self.shell)
+            remuco.log_warn("EVENT: unknown")
         return
     
     def cb_rem_simple_control(self, cmd, param):
@@ -296,6 +303,9 @@ class RemucoPlugin(rb.Plugin):
                 sp.set_volume(float(param) / 100)
                 
             elif cmd == remuco.SCTRL_CMD_JUMP:
+                
+                # jump to a queue position is not supported
+                if param < 0: return
                 
                 # RB forgets to remove a song from the queue if it is playing
                 # and we jump tp another song, so we remove it now manually:
@@ -540,7 +550,7 @@ class RemucoPlugin(rb.Plugin):
                     return file
                 file_cap = os.path.join(path, "%s.%s" % (name.capitalize(), type))
                 if os.path.isfile(file_cap):
-                    return file
+                    return file_cap
                 
         return None
 
