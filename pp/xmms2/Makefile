@@ -81,7 +81,7 @@ uninstall:
 dist: clean
 	mkdir -p build/$(PKG_FULLNAME)
 	cp Makefile build/$(PKG_FULLNAME)/
-	cp -r src doc build/$(PKG_FULLNAME)/
+	cp -r remuco-xmms2.c doc build/$(PKG_FULLNAME)/
 	find build/$(PKG_FULLNAME) -type d -name ".svn" | xargs rm -rf
 	mkdir dist
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
