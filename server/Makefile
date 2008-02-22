@@ -39,8 +39,7 @@ dist: clean doc
 	mkdir -p build/$(PKG_FULLNAME)
 	cp Makefile remuco.pc.in build/$(PKG_FULLNAME)/
 	cp -r doc src include build/$(PKG_FULLNAME)/
-	find build/$(PKG_FULLNAME)/ -type d -name ".svn" | \
-		xargs rm -rf
+	find build/$(PKG_FULLNAME) -type d -name ".svn" | xargs rm -rf
 	mkdir dist
 	tar zcf dist/$(PKG_FULLNAME).tar.gz -C build $(PKG_FULLNAME)
 
