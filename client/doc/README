@@ -34,38 +34,41 @@ remotely control (music) players.
 
 2. Building
 
+ You can skip this step if you've downloaded the binary package.
+
  The client uses the Ant build system (  http://ant.apache.org/ ), so make sure
 Ant is installed on your system. To build the client, edit the file
 build.properties and adjust it to your situation. Then run:
 
-$ ant dist.jar
+ $ ant dist.jar
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 3. Installation
 
  The client application is in the file dist/remuco.jar and the application's
-descriptor is in the file dist/remuco.jad . Install them on your phone (how to
+descriptor is in the file dist/remuco.jad. Install them on your phone (how to
 do this is device dependent).
 
  Once you installed the client on your phone, consider to set permissions in
 that way that Remuco is allowed to use Bluetooth. This releases you from allays
-acknowledging y connection to the server (of course you need to trust Remuco :)
+acknowledging a connection to the server (of course you need to trust Remuco :)
 )
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 4. Usage
 
- When you start the Remuco client, it automatically scans for near bluetooth
-devices. After a few seconds it presents you a list of detected devices. Choose
-your computer which runs the Remuco server.
+ When you start the Remuco client, you can scan for near bluetooth devices
+(once you've found some, Remuco remembers them so you do not have to scan again
+on next startup of the client). After a few seconds it presents you a list of
+detected devices. Choose your computer which runs the Remuco server.
 
  The client then connects to the server. Once the connection is up, you see the
 current music player state displayed on your device.
 
  Play around with the keys and the entries in the menus, I think that's the
-best way to get familiar with the client. Some notes anyway: If your change the
+best way to get familiar with the client. Some notes anyway: If you change the
 key configuration, the change applies immediately but it get stored only when
 the client exits.
 
@@ -73,7 +76,7 @@ the client exits.
 
 5. Creating New Themes
 
-TODO
+ TODO
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
