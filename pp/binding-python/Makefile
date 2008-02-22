@@ -10,7 +10,7 @@ PKG_VERSION := $(shell python setup.py --version)
 PKG_BASENAME := remuco-python
 PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
-DEBUG ?= yes
+DEBUG ?= no
 DO_LOG_NOISE ?= no
 
 ###############################################################################
