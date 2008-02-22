@@ -5,7 +5,7 @@
 ###############################################################################
 
 PREFIX ?= /usr
-DEBUG ?= yes
+DEBUG ?= no
 
 PKG_VERSION := 0.6.0
 PKG_BASENAME := remuco-server
@@ -37,7 +37,7 @@ uninstall:
 
 dist: clean doc
 	mkdir -p build/$(PKG_FULLNAME)
-	cp Makefile remuco.pc.in build/$(PKG_FULLNAME)/
+	cp api.doxyfile Makefile remuco.pc.in build/$(PKG_FULLNAME)/
 	cp -r doc src include build/$(PKG_FULLNAME)/
 	find build/$(PKG_FULLNAME) -type d -name ".svn" | xargs rm -rf
 	mkdir dist
