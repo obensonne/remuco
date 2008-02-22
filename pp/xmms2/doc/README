@@ -4,11 +4,11 @@ Remuco Player Proxy for XMMS2
 
 Table of Contents
 1. Introduction
-2. Features
-3. Requirements
-4. Building
-5. Installation
-6. Usage
+2. Requirements
+3. Building
+4. Installation
+5. Usage
+6. Known Issues
 7. Troubleshooting
 A. General Information
 
@@ -31,18 +31,7 @@ A. General Information
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. Features
-
- At  http://remuco.sourceforge.net/index.php?title=Features you can find a list
-of all Remuco features.
-
- The XMMS2 player proxy supports the following of these features:
-
-  • TODO
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-3. Requirements
+2. Requirements
 
   • Remuco server library 0.6.x
 
@@ -50,7 +39,7 @@ of all Remuco features.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4. Building
+3. Building
 
 To build, run:
 
@@ -60,34 +49,34 @@ This automatically checks for build requirements.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. Installation
+4. Installation
 
-To install, run:
+ To install, run:
 
-$ make install
+ $ make install
 
  This installs the XMMS2 player proxy into $XDG_CONFIG_HOME/xmms2/startup.d
 ($XDG_CONFIG_HOME mostly expands to ~/.config).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-6. Usage
+5. Usage
 
  The player proxy automatically starts when XMMS2 starts (since it has been
 installed in the startup scripts directory).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+6. Known Issues
+
+  •  Cover support not yet tested.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 7. Troubleshooting
 
- If you have problems with the XMMS2 player proxy, temporary move it from the
-XMMS2 startup scripts directory to another location (e.g. path/to), restart the
-XMMS2 daemon and then start the player proxy by hand:
-
- $ path/to/remuco-xmms2
-
- If this does not solve your problem, feel free to ask for support at the help
-forum (see Feedback, Help, Bugs, Discussion etc. ).
+ If you have problems, have a look into the Remuco logs in ~/.cache/remuco/log.
+Visit the help forum if the log does not help you.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
