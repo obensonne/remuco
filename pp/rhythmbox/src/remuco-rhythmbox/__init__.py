@@ -71,6 +71,7 @@ class RemucoPlugin(rb.Plugin):
         self.__queue = None
         self.__queue_qmodel = None
         self.__porder = None
+        self.__volume = None
          
         sp = self.shell.props.shell_player
         
@@ -108,8 +109,7 @@ class RemucoPlugin(rb.Plugin):
         self.cb_id_queue_rows_reordered = self.__queue_qmodel.connect(\
                         "rows-reordered", self.cb_rb_queue_rows_reordered)
 
-        self.cb_id_poll_playorder = gobject.timeout_add(\
-                        5000, self.__cb_rb_poll_playorder)
+        self.cb_id_poll_misc = gobject.timeout_add(3000, self.__cb_poll_misc)
 
         ###### initially trigger the server to synchronize ######
         
@@ -130,7 +130,7 @@ class RemucoPlugin(rb.Plugin):
 
         ###### disconnect from rhythmbox callback sources ######
         
-        gobject.source_remove(self.cb_id_poll_playorder)
+        gobject.source_remove(self.cb_id_poll_misc)
         
         sp.disconnect(self.cb_id_playing_changed)
         sp.disconnect(self.cb_id_playing_uri_changed)        
@@ -172,6 +172,8 @@ class RemucoPlugin(rb.Plugin):
 
         ps.volume = int(sp.get_volume() * 100)
         
+        self.__volume = ps.volume
+        
         ##### flags #####
 
         order = sp.props.play_order
@@ -183,7 +185,7 @@ class RemucoPlugin(rb.Plugin):
         elif order == PLAYORDER_SHUFFLE or order == PLAYORDER_SHUFFLE2:
             ps.flags = remuco.PS_FLAG_SHUFFLE
         
-        self.__porder = order # checked later in self.__cb_rb_poll_playorder()
+        self.__porder = order # checked later in self.__cb_poll_misc()
         
         ##### pid #####
         
@@ -309,6 +311,8 @@ class RemucoPlugin(rb.Plugin):
             elif cmd == remuco.SCTRL_CMD_VOLUME:
                 
                 sp.set_volume(float(param) / 100)
+                
+                remuco.notify(self.server) # volume change
                 
             elif cmd == remuco.SCTRL_CMD_JUMP:
                 
@@ -497,11 +501,19 @@ class RemucoPlugin(rb.Plugin):
     #
     ###########################################################################
 
-    def __cb_rb_poll_playorder(self):
+    def __cb_poll_misc(self):
+        """Polls RB for state information without change signals.""" 
         
-        order = self.shell.props.shell_player.props.play_order
+        sp = self.shell.props.shell_player
+        
+        order = sp.props.play_order
         
         if order != self.__porder:
+            remuco.notify(self.server)
+        
+        volume = int(sp.get_volume() * 100)
+
+        if volume != self.__volume:
             remuco.notify(self.server)
         
         return True
