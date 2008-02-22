@@ -349,18 +349,18 @@ priv_synchronize(RemServer* server)
 	
 	LOG_NOISE("done");
 	
-	LOG_DEBUG("==============================================================");
-	LOG_DEBUG("= New Player Status                                          =");
-	LOG_DEBUG("= ---------------------------------------------------------- =");
-	LOG_DEBUG("= ");
-	LOG_DEBUG("= PID    : %s", server->pstatus->cap_pid->str);
-	LOG_DEBUG("= POS    : %i", server->pstatus->cap_pos);
-	LOG_DEBUG("= PBS    : %u", server->pstatus->pbs);
-	LOG_DEBUG("= PL-Len : %u", rem_sl_length(server->pstatus->playlist));
-	LOG_DEBUG("= QU-Len : %u", rem_sl_length(server->pstatus->queue));
-	LOG_DEBUG("= Volume : %u", server->pstatus->volume);
-	LOG_DEBUG("= Flags  : %2X", server->pstatus->flags);
-	LOG_DEBUG("==============================================================");
+	LOG_NOISE("==============================================================");
+	LOG_NOISE("= New Player Status                                          =");
+	LOG_NOISE("= ---------------------------------------------------------- =");
+	LOG_NOISE("= ");
+	LOG_NOISE("= PID    : %s", server->pstatus->cap_pid->str);
+	LOG_NOISE("= POS    : %i", server->pstatus->cap_pos);
+	LOG_NOISE("= PBS    : %u", server->pstatus->pbs);
+	LOG_NOISE("= PL-Len : %u", rem_sl_length(server->pstatus->playlist));
+	LOG_NOISE("= QU-Len : %u", rem_sl_length(server->pstatus->queue));
+	LOG_NOISE("= Volume : %u", server->pstatus->volume);
+	LOG_NOISE("= Flags  : %2X", server->pstatus->flags);
+	LOG_NOISE("==============================================================");
 }
 
 static void
