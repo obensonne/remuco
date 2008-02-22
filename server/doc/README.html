@@ -2,7 +2,7 @@
 <HTML
 ><HEAD
 ><TITLE
->Remuco Server 0.5</TITLE
+>Remuco Server 0.6</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
@@ -21,7 +21,7 @@ CLASS="TITLEPAGE"
 CLASS="title"
 ><A
 NAME="AEN1"
->Remuco Server 0.5</A
+>Remuco Server 0.6</A
 ></H1
 ><HR></DIV
 ><DIV
@@ -53,12 +53,12 @@ HREF="#AEN23"
 ></DT
 ><DT
 >5. <A
-HREF="#AEN33"
+HREF="#AEN26"
 >Writing Player Proxies</A
 ></DT
 ><DT
 >A. <A
-HREF="#AEN36"
+HREF="#AEN29"
 >General Information</A
 ></DT
 ><DD
@@ -70,7 +70,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN50"
+HREF="#AEN43"
 >Source Code Access</A
 ></DT
 ></DL
@@ -126,14 +126,17 @@ NAME="AEN10"
 >2. Building</A
 ></H2
 ><P
->To build, run:</P
+>&#13;            To build, run:
+        </P
 ><P
-><B
+>&#13;            <B
 CLASS="command"
 >$ make</B
-></P
+>
+        </P
 ><P
->This automatically checks for build requirements.</P
+>&#13;            This automatically checks for build requirements.
+        </P
 ></DIV
 ><DIV
 CLASS="section"
@@ -144,18 +147,21 @@ NAME="AEN16"
 >3. Installation</A
 ></H2
 ><P
->To install, run (with super user privileges):</P
+>&#13;            To install, run (with super user privileges):
+        </P
 ><P
-><B
+>&#13;            <B
 CLASS="command"
 >$ make install</B
-></P
+>
+        </P
 ><P
 >&#13;            This installs into /usr/... If you prefer another prefix,
             e.g. /usr/local, run the following instead:
         </P
 ><P
->$ PREFIX=/usr/local make install</P
+>&#13;            $ PREFIX=/usr/local make install
+        </P
 ></DIV
 ><DIV
 CLASS="section"
@@ -166,40 +172,7 @@ NAME="AEN23"
 >4. Usage</A
 ></H2
 ><P
->&#13;            This is a library, it's used by player proxies. However, you can
-            configure it a bit ..
-        </P
-><P
->&#13;            In case you want to use a Remuco client to remotely shutdown your
-            system, place a shell script in <TT
-CLASS="filename"
->$XDG_CONFIG_HOME/remuco
-            </TT
-> called  <TT
-CLASS="filename"
->system-shutdown.sh </TT
->
-            (usally <TT
-CLASS="filename"
->XDG_CONFIG_HOME</TT
-> extends to
-            <TT
-CLASS="filename"
->~/.config</TT
->).
-            The Remuco server will run this when it receives the shutdown command
-            from a client. Make sure an ordinary user (especially the one
-            running the player proxy you use) is able to shut down the system
-            with this script. More info on this can be found at <A
-HREF="http://www.ma.utexas.edu/users/stirling/computergeek/shutdown.html"
-TARGET="_top"
->http://www.ma.utexas.edu/users/stirling/computergeek/shutdown.html</A
->
-            or at <A
-HREF="https://help.ubuntu.com/community/Sudoers"
-TARGET="_top"
->https://help.ubuntu.com/community/Sudoers</A
->.
+>&#13;            This is a library, it's used by player proxies.
         </P
 ></DIV
 ><DIV
@@ -207,18 +180,21 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN33"
+NAME="AEN26"
 >5. Writing Player Proxies</A
 ></H2
 ><P
->TODO ref to the doxygen API</P
+>&#13;            TODO .. for now I just can refer you to the source code of the
+            existent player proxies and the API documentation in the
+            server source package.
+        </P
 ></DIV
 ><DIV
 CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN36"
+NAME="AEN29"
 >A. General Information</A
 ></H1
 ><P
@@ -278,7 +254,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN50"
+NAME="AEN43"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -321,7 +297,7 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN60"
+NAME="AEN53"
 ></A
 ><P
 ><B
@@ -345,7 +321,7 @@ CLASS="command"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN65"
+NAME="AEN58"
 ></A
 ><P
 ><B

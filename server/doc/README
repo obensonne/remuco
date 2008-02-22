@@ -1,4 +1,4 @@
-Remuco Server 0.5
+Remuco Server 0.6
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -34,46 +34,37 @@ player proxies which interact with a specific (music) player.
 
 2. Building
 
-To build, run:
+ To build, run:
 
-$ make
+ $ make
 
-This automatically checks for build requirements.
+ This automatically checks for build requirements.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 3. Installation
 
-To install, run (with super user privileges):
+ To install, run (with super user privileges):
 
-$ make install
+ $ make install
 
  This installs into /usr/... If you prefer another prefix, e.g. /usr/local, run
 the following instead:
 
-$ PREFIX=/usr/local make install
+ $ PREFIX=/usr/local make install
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 4. Usage
 
- This is a library, it's used by player proxies. However, you can configure it
-a bit ..
-
- In case you want to use a Remuco client to remotely shutdown your system,
-place a shell script in $XDG_CONFIG_HOME/remuco called system-shutdown.sh
-(usally XDG_CONFIG_HOME extends to ~/.config). The Remuco server will run this
-when it receives the shutdown command from a client. Make sure an ordinary user
-(especially the one running the player proxy you use) is able to shut down the
-system with this script. More info on this can be found at http://
-www.ma.utexas.edu/users/stirling/computergeek/shutdown.html or at https://
-help.ubuntu.com/community/Sudoers.
+ This is a library, it's used by player proxies.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 5. Writing Player Proxies
 
-TODO ref to the doxygen API
+ TODO .. for now I just can refer you to the source code of the existent player
+proxies and the API documentation in the server source package.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
