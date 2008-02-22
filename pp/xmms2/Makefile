@@ -64,18 +64,18 @@ remuco-xmms2: remuco-xmms2.o
 	$(CC) -o remuco-xmms2 remuco-xmms2.o $(LFLAGS)
 	chmod +x remuco-xmms2
 
-install: all
+install-bin: all
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
 	$(INSTALL_EXE) remuco-xmms2 $(DESTDIR)$(PREFIX)/bin
 
-install-user: all
+install: all
 	install -d $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 	install remuco-xmms2 $(DESTDIR)$(X2_CONFIG_DIR)/startup.d
 
-uninstall:
+uninstall-bin:
 	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-xmms2
 
-uninstall-user:
+uninstall:
 	rm -f $(DESTDIR)$(X2_CONFIG_DIR)/startup.d/remuco-xmms2
 
 dist: clean
