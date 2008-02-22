@@ -1,4 +1,4 @@
-Remuco Server 0.5 - Python Binding
+Remuco Server 0.6 - Python Binding
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -26,36 +26,36 @@ A. General Information
 
  The Python binding is an interface to the Remuco server library for player
 proxies written in Python. It must be installed in order to use a Python player
-proxy, for instance the one for Amarok.
+proxy, for instance the one for Rhythmbox.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 2. Building
 
-To build, run:
+ To build, run:
 
-$ make
+ $ make
 
-This automatically checks for build requirements.
+ This automatically checks for build requirements.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 3. Installation
 
-To install, run (with super user privileges):
+ To install, run (with super user privileges):
 
-$ make install
+ $ make install
 
  This installs into /usr/... If you prefer another prefix, e.g. /usr/local, run
 the following instead:
 
-$ PREFIX=/usr/local make install
+ $ PREFIX=/usr/local make install
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 4. Use of the binding when developing a Python player proxy
 
-Please refer to the 'Player Proxy Writing Guide'.
+ TODO
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -96,9 +96,9 @@ several parts of the Remuco system (server library, client, ...) are located in
 "tags" -- getting code from "tags" ensures to have working code.
 
 Example A-1. Check out the current development version of the server library
-into the directory remuco-lib-trunk:
+into the directory remuco-server-trunk:
 
-  $ svn co <SVN-ROOT>/trunk/lib remuco-lib-trunk
+  $ svn co <SVN-ROOT>/trunk/server remuco-server-trunk
 
 Example A-2. Check out the client source from release 0.6.0 into the directory
 remuco-client-0.6.0:

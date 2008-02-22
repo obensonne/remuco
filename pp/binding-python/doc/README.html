@@ -2,7 +2,7 @@
 <HTML
 ><HEAD
 ><TITLE
->Remuco Server 0.5 - Python Binding</TITLE
+>Remuco Server 0.6 - Python Binding</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
@@ -21,7 +21,7 @@ CLASS="TITLEPAGE"
 CLASS="title"
 ><A
 NAME="AEN1"
->Remuco Server 0.5 - Python Binding</A
+>Remuco Server 0.6 - Python Binding</A
 ></H1
 ><HR></DIV
 ><DIV
@@ -108,7 +108,7 @@ NAME="AEN7"
 >&#13;            The Python binding is an interface to the Remuco server
             library for player proxies written in Python. It must be
             installed in order to use a Python player proxy, for
-            instance the one for Amarok.
+            instance the one for Rhythmbox.
         </P
 ></DIV
 ><DIV
@@ -120,14 +120,17 @@ NAME="AEN10"
 >2. Building</A
 ></H2
 ><P
->To build, run:</P
+>&#13;            To build, run:
+        </P
 ><P
-><B
+>&#13;            <B
 CLASS="command"
 >$ make</B
-></P
+>
+        </P
 ><P
->This automatically checks for build requirements.</P
+>&#13;            This automatically checks for build requirements.
+        </P
 ></DIV
 ><DIV
 CLASS="section"
@@ -138,18 +141,21 @@ NAME="AEN16"
 >3. Installation</A
 ></H2
 ><P
->To install, run (with super user privileges):</P
+>&#13;            To install, run (with super user privileges):
+        </P
 ><P
-><B
+>&#13;            <B
 CLASS="command"
 >$ make install</B
-></P
+>
+        </P
 ><P
 >&#13;            This installs into /usr/... If you prefer another prefix,
             e.g. /usr/local, run the following instead:
         </P
 ><P
->$ PREFIX=/usr/local make install</P
+>&#13;            $ PREFIX=/usr/local make install
+        </P
 ></DIV
 ><DIV
 CLASS="section"
@@ -160,7 +166,8 @@ NAME="AEN23"
 >4. Use of the binding when developing a Python player proxy</A
 ></H2
 ><P
->Please refer to the 'Player Proxy Writing Guide'.</P
+>&#13;            TODO
+        </P
 ></DIV
 ><DIV
 CLASS="appendix"
@@ -276,17 +283,18 @@ NAME="AEN50"
 ><B
 >Example A-1. 
                 Check out the current development version of the server
-                library into the directory <TT
+                library into the directory
+                <TT
 CLASS="filename"
->remuco-lib-trunk</TT
+>remuco-server-trunk</TT
 >:
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
->&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/lib remuco-lib-trunk
-                </SAMP
+>&#13;                <B
+CLASS="command"
+>&#13;                    $ svn co &#60;SVN-ROOT&#62;/trunk/server remuco-server-trunk
+                </B
 >
             </P
 ></DIV
@@ -306,11 +314,11 @@ CLASS="filename"
             </B
 ></P
 ><P
->&#13;                <SAMP
-CLASS="computeroutput"
+>&#13;                <B
+CLASS="command"
 >&#13;                $ svn co &#60;SVN-ROOT&#62;/tags/remuco-client-0.6.0
                 remuco-client-0.6.0
-                </SAMP
+                </B
 >
             </P
 ></DIV
