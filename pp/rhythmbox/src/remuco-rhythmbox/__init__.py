@@ -70,6 +70,7 @@ class RemucoPlugin(rb.Plugin):
         self.__qmodel = None
         self.__queue = None
         self.__queue_qmodel = None
+        self.__porder = None
          
         sp = self.shell.props.shell_player
         
@@ -100,12 +101,15 @@ class RemucoPlugin(rb.Plugin):
             self.__queue_qmodel = self.__queue.props.query_model
 
         # connect to 'entry change' signals from queue:
-        self.cb_rb_queue_row_added = self.__queue_qmodel.connect(\
+        self.cb_id_queue_row_inserted = self.__queue_qmodel.connect(\
                         "row-inserted", self.cb_rb_queue_row_inserted)
-        self.cb_rb_queue_row_deleted = self.__queue_qmodel.connect(\
+        self.cb_id_queue_row_deleted = self.__queue_qmodel.connect(\
                         "row-deleted", self.cb_rb_queue_row_deleted)
-        self.cb_rb_queue_rows_reordered = self.__queue_qmodel.connect(\
+        self.cb_id_queue_rows_reordered = self.__queue_qmodel.connect(\
                         "rows-reordered", self.cb_rb_queue_rows_reordered)
+
+        self.cb_id_poll_playorder = gobject.timeout_add(\
+                        5000, self.__cb_rb_poll_playorder)
 
         ###### initially trigger the server to synchronize ######
         
@@ -126,6 +130,8 @@ class RemucoPlugin(rb.Plugin):
 
         ###### disconnect from rhythmbox callback sources ######
         
+        gobject.source_remove(self.cb_id_poll_playorder)
+        
         sp.disconnect(self.cb_id_playing_changed)
         sp.disconnect(self.cb_id_playing_uri_changed)        
 
@@ -135,10 +141,10 @@ class RemucoPlugin(rb.Plugin):
         self.cb_rb_source_changed(sp, None)
         
         # say bye to the queue
-        self.__queue_qmodel.disconnect(self.cb_rb_queue_row_added)
-        self.__queue_qmodel.disconnect(self.cb_rb_queue_row_deleted)
-        self.__queue_qmodel.disconnect(self.cb_rb_queue_rows_reordered)
-
+        self.__queue_qmodel.disconnect(self.cb_id_queue_row_inserted)
+        self.__queue_qmodel.disconnect(self.cb_id_queue_row_deleted)
+        self.__queue_qmodel.disconnect(self.cb_id_queue_rows_reordered)
+        
         ###### shutdown the server ######
         
         remuco.down(server)
@@ -176,6 +182,8 @@ class RemucoPlugin(rb.Plugin):
             ps.flags = remuco.PS_FLAG_REPEAT
         elif order == PLAYORDER_SHUFFLE or order == PLAYORDER_SHUFFLE2:
             ps.flags = remuco.PS_FLAG_SHUFFLE
+        
+        self.__porder = order # checked later in self.__cb_rb_poll_playorder()
         
         ##### pid #####
         
@@ -488,6 +496,15 @@ class RemucoPlugin(rb.Plugin):
     # Misc
     #
     ###########################################################################
+
+    def __cb_rb_poll_playorder(self):
+        
+        order = self.shell.props.shell_player.props.play_order
+        
+        if order != self.__porder:
+            remuco.notify(self.server)
+        
+        return True
  
     def __qmodel_changed(self, qmodel):
         """Configures callback functions for the new query model.
