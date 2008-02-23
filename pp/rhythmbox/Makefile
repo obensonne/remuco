@@ -12,6 +12,8 @@ PKG_FULLNAME := $(PKG_BASENAME)-$(PKG_VERSION)
 
 RB_PLUGIN_DIR := $(HOME)/.gnome2/rhythmbox/plugins
 
+RB_PLUGIN_DIR_SYS := $(PREFIX)/lib/rhythmbox/plugins
+
 ###############################################################################
 #
 # Standard Targets
@@ -22,10 +24,18 @@ all:
 	true
 
 install:
+	mkdir $(RB_PLUGIN_DIR)
 	cp -r src/remuco-rhythmbox $(RB_PLUGIN_DIR)
 
 uninstall:
 	rm -rf $(RB_PLUGIN_DIR)/remuco-rhythmbox
+
+install-sys:
+	mkdir -p $(DESTDIR)$(RB_PLUGIN_DIR_SYS)
+	cp -r src/remuco-rhythmbox $(DESTDIR)$(RB_PLUGIN_DIR_SYS)
+
+uninstall-sys:
+	rm -rf $(DESTDIR)/$(RB_PLUGIN_DIR)/remuco-rhythmbox
 
 dist: clean
 	mkdir -p build/$(PKG_FULLNAME)
