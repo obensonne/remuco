@@ -37,6 +37,8 @@ build-stamp: configure-stamp
 	$(MAKE)
 	#docbook-to-man debian/remuco-python.sgml > remuco-python.1
 
+	chmod +x src/remuco-rhythmbox/__init__.py
+
 	touch $@
 
 clean:
@@ -81,7 +83,7 @@ binary-arch: build install doc-prepare
 #	dh_installpam
 #	dh_installmime
 #	dh_python # deprecated
-#	dh_pysupport
+	dh_pysupport remuco-rhythmbox /usr/lib/rhythmbox/plugins
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
