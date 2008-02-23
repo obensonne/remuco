@@ -1,0 +1,18 @@
+Source: remuco-rhythmbox
+Section: sound
+Priority: extra
+Maintainer: Christian Buennig <masala@web.de>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: remuco-xmms2
+Architecture: any
+Depends: ${shlibs:Depends}, rhythmbox (>= 0.11), python-remuco (>= 0.6)
+Conflicts: python-remuco (>= 0.7)
+Description: Remuco player proxy for Rhythmbox
+ Remuco is Bluetooth remote control system for media player.
+ .
+ This is the player proxy for Rhythmbox. You need this package to remotely control
+ Rhythmbox with the Remuco system.
+ .
+  Homepage: http://remuco.sourceforge.net/
