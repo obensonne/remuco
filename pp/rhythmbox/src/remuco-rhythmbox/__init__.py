@@ -1,4 +1,6 @@
-import gobject, gtk
+#!/usr/bin/python
+
+import gobject
 import rb, rhythmdb
 import os
 import remuco
@@ -604,5 +606,5 @@ class RemucoPlugin(rb.Plugin):
 
 if __name__ == "__main__":
     
-    print "hallo"
+    print "This is a python module."
     
