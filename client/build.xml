@@ -22,7 +22,7 @@
      Creating a souce package:
      ^^^^^^^^^^^^^^^^^^^^^^^^^^
      
-     Run target 'dist.src'.
+     Run target 'dist'.
      
      The source package will be placed in the directory 'dist'.
                    
@@ -89,9 +89,12 @@
     <property name="midlet.vendor" value="remuco.sf.net"/>
     <property name="midlet.data-size" value="2048"/>
     
-    <property name="dist.pkg-name"
+    <property name="dist.pkg-name.src"
         value="remuco-client-${midlet.version}"/>
 
+    <property name="dist.pkg-name.bin"
+        value="remuco-client-${midlet.version}.bin"/>
+    
     <!-- =================== We need Linux ================================ -->
 
     <target name="checkForLinux">
@@ -232,32 +235,32 @@
         <copy todir="dist" file="build/jar/${midlet.jar}" />
     </target>
     
-    <target name="dist" depends="clean,emulation.disable,dist.jar"
+    <target name="dist.bin" depends="clean,emulation.disable,dist.jar"
             description="--> create a pkg including all files, which are worth to deploy" >
         
         <!-- create and fill package dir -->
-        <mkdir dir="build/dist/${dist.pkg-name}"/>
-        <copy todir="build/dist/${dist.pkg-name}">
+        <mkdir dir="build/dist-bin/${dist.pkg-name.bin}"/>
+        <copy todir="build/dist-bin/${dist.pkg-name.bin}">
             <fileset dir="dist">
                 <include name="*.jar"/>
                 <include name="*.jad"/>
             </fileset>
         </copy>
-        <mkdir dir="build/dist/${dist.pkg-name}/doc"/>
-        <copy todir="build/dist/${dist.pkg-name}/doc">
+        <mkdir dir="build/dist-bin/${dist.pkg-name.bin}/doc"/>
+        <copy todir="build/dist-bin/${dist.pkg-name.bin}/doc">
             <fileset dir="doc" />
         </copy>
         
         <!-- create the package -->
-        <tar destfile="dist/${dist.pkg-name}.tar.gz"
-            compression="gzip" basedir="build/dist" />
+        <tar destfile="dist/${dist.pkg-name.bin}.tar.gz"
+            compression="gzip" basedir="build/dist-bin" />
         
     </target>
     
     
-    <target name="dist.src" depends="clean">
-        <mkdir dir="build/dist-src/${dist.pkg-name}" />
-        <copy todir="build/dist-src/${dist.pkg-name}">
+    <target name="dist" depends="clean">
+        <mkdir dir="build/dist-src/${dist.pkg-name.src}" />
+        <copy todir="build/dist-src/${dist.pkg-name.src}">
             <fileset dir="${basedir}">
                 <include name="src/**/*"/>
                 <include name="doc/**/*"/>
@@ -268,7 +271,7 @@
             </fileset>
         </copy>
         <mkdir dir="dist"/>
-        <tar destfile="dist/${dist.pkg-name}.tar.gz"
+        <tar destfile="dist/${dist.pkg-name.src}.tar.gz"
             compression="gzip" basedir="build/dist-src">
         </tar>
     </target>
