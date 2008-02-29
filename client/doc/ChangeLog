@@ -1,3 +1,7 @@
+0.6.1	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* fixed an issue on SE W300 when selecting a server to connect to
+
 0.6.0	Christian Bünnig <mondai@users.sourceforge.net>
 
 	* in development ...

@@ -20,13 +20,16 @@ public final class DeviceSelectorScreen extends List implements
 		CommandListener, IDeviceSearcher {
 
 	private static final Command CMD_DELETE_KNOWN_DEVICE = new Command(
-			"Forget Device", Command.SCREEN, 2);
+			"Forget Device", Command.SCREEN, 3);
 
 	private static final Command CMD_SCAN = new Command("Scan", Command.SCREEN,
-			1);
+			2);
 
 	private static final Command CMD_SHOW_KNOWN_DEVICES = new Command(
-			"Known devices", Command.SCREEN, 2);
+			"Known devices", Command.SCREEN, 3);
+
+	private static final Command CMD_CONNECT = new Command(
+			"Connect", Command.SCREEN, 1);
 
 	private final Alert alertScanProblem, alertForgetDevice;
 
@@ -80,7 +83,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		int index;
 
-		if (c == List.SELECT_COMMAND) { // DEVICE SELECTED //
+		if (c == CMD_CONNECT) { // DEVICE SELECTED //
 
 			index = getSelectedIndex();
 
@@ -88,7 +91,7 @@ public final class DeviceSelectorScreen extends List implements
 			Config.knownDevicesAdd(devices[2 * index], devices[2 * index + 1]);
 
 			// notify parent that user has selected a device
-			parent.commandAction(c, d);
+			parent.commandAction(SELECT_COMMAND, d);
 
 		} else if (c == CMD_SCAN) { // SCAN //
 
@@ -141,6 +144,7 @@ public final class DeviceSelectorScreen extends List implements
 				Config.knownDevicesGet().copyInto(devices);
 			} else {
 				removeCommand(CMD_DELETE_KNOWN_DEVICE);
+				removeCommand(CMD_CONNECT);
 			}
 
 			delete(index);
@@ -259,10 +263,12 @@ public final class DeviceSelectorScreen extends List implements
 			append(devName, null);
 		}
 
-		if (devices.length > 0)
-			setSelectCommand(SELECT_COMMAND);
-		else
-			removeCommand(SELECT_COMMAND);
+		if (devices.length > 0) {
+			setSelectCommand(CMD_CONNECT);
+			setSelectedIndex(0, true);
+		} else {
+			removeCommand(CMD_CONNECT);
+		}
 
 	}
 }
