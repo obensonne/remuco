@@ -250,7 +250,7 @@ def main():
 
     remuco.log_debug("run mainloop")
     
-    fpp.ml.run()
+    fpp.ml.run() # blocks until fpp.ml.guit() gets called -> see rcb_notify()
     
     remuco.log_debug("back from mainloop .. bye")
 
