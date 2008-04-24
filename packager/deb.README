@@ -12,3 +12,5 @@ Schritt 3 geht auch hiermit:
 $ dh_make --library --email "mondai@users.sourceforge.net" --copyright GPL --file ../remuco-server-0.6.0.tar.gz
 - dann muss aber danach das von dh_make erstellte debian-verz. im ausgepackten source-verz. vor schritt 4 wieder gelöscht werden
 
+Log zwischen 2 Revisionen erhalten:
+svn log https://remuco.svn.sourceforge.net/svnroot/remuco/branches/0.7.0 -r 637:633
