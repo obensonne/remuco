@@ -1,0 +1,90 @@
+.TH man 1 "24 April 2008" "1.0" "Remuco"
+.SH NAME
+remuco-server \- server
+.P
+remuco-bpp \- basic player proxy
+.P
+remuco-bpp-launcher \- launcher for basic player proxies
+.SH SYNOPSIS
+.\" Syntax goes here. 
+.B remuco-server
+.P
+.B remuco-bpp
+\fIPLAYER-NAME\fR
+.P
+.B remuco-bpp-launcher
+[--log-here]
+.SH DESCRIPTION
+.B Remuco
+is a Bluetooth/WLAN remote control system for Linux media players. With
+Remuco you can remotely control your favorite media player - amongst others you
+can switch to the next, previous or any other media within the current
+playlist, browse your media library and activate other playlists, rate your
+media and adjust volume. On the mobile (i.e. the remote control) it displays
+information about the current media, including cover art. Visit http://
+remuco.sourceforge.net for a complete feature list, screenshots and a list of
+supported media players.
+.P
+.B remuco-server
+is a daemon that intermediates between Remuco clients and Remuco player proxies.
+Player proxies communicate with the server via DBus. So acutally there is no
+need to start the server manually - it gets started automatically if a player
+proxy wants to talk to the daemon. If started manually logging goes to standard
+out instead of a log file.
+.P
+.B remuco-bpp
+is a program that reads a basic player proxy (BPP) file and acts as a
+player proxy for the corresponding media player. \fIPLAYER-NAME\fR specifies
+the BPP file to load (see below in section FILES).
+.B remuco-bpp
+gets started automatically
+by
+.B remuco-bpp-launcher.
+If started manually logging goes to standard out instead of a log file.
+.P
+.B remuco-bpp-launcher
+is a program that looks for present BPP files and runs
+.B remuco-bpp
+for each file found.
+The optional argument \fI--log--here\fR directs logging to standard out instead
+of a log file.
+.SH FILES
+.IP \(bu 2 
+.I $XDG_CACHE_HOME/remuco/Server.log
+\- log output of
+.B remuco-server
+.IP \(bu 2 
+.I $XDG_CONFIG_HOME/remuco/Server.conf
+\- configuration for
+.B remuco-server
+.IP \(bu 2 
+.I $XDG_CACHE_HOME/remuco/PLAYER-NAME.log
+\- log output of
+.B remuco-bpp
+started with argument \fIPLAYER-NAME\fR.
+.IP \(bu 2 
+.I $XDG_CACHE_HOME/remuco/Launcher.log
+\- log output of
+.B remuco-bpp-launcher
+.IP \(bu 2 
+.I $XDG_CONFIG_HOME/remuco/debug
+\- debug flag (if this file is present, the applications described here
+enable debug output)
+.P
+.IP \(bu 2 
+.I $XDG_CONFIG_HOME/remuco/*.bpp
+\- BPP files (for instance
+.B remuco-bpp
+started with argument 'Totem' would read
+\fI$XDG_CONFIG_HOME/remuco/Totem.bpp\fR)
+.P
+Note: $XDG_CACHE_HOME and $XDG_CONFIG_HOME usually expand to ~/.cache and ~/.config
+(see http://standards.freedesktop.org/basedir-spec/).
+.SH BUGS
+Remuco bug tracker: https://sourceforge.net/tracker/?group_id=166515&atid=839315 
+.SH AUTHOR
+.nf
+Oben Sonne (obensonne@googlemail.com)
+.fi
+.SH HISTORY
+2008 \- Initial version.

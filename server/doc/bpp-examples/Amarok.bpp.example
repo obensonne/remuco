@@ -1,0 +1,20 @@
+[config]
+
+[commands]
+
+running = dcop amarok
+
+playpause = dcop amarok player playPause
+next = dcop amarok player next
+prev = dcop amarok player prev
+next = dcop amarok player next
+stop = dcop amarok player stop
+seek-fwd = dcop amarok player seekRelative 5
+seek-bwd = dcop amarok player seekRelative -5
+volume-set = dcop amarok player setVolume $PARAM
+jump = dcop amarok playlist playByIndex $PARAM
+
+playing = dcop amarok player isPlaying
+volume = dcop amarok player getVolume
+plob = dcop amarok player nowPlaying
+playlist = cat `dcop amarok playlist saveCurrentPlaylist` | grep "<Title>" | sed -e "s,^ *<Title>\\(.*\\)</Title> *,\\1,"

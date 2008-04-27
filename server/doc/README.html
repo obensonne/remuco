@@ -1,0 +1,527 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Remuco Server 0.7</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
+><BODY
+CLASS="article"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN1"
+>Remuco Server 0.7</A
+></H1
+><DIV
+><DIV
+CLASS="abstract"
+><P
+></P
+><A
+NAME="AEN5"
+></A
+><P
+>&#13;            Remuco is a Bluetooth/WLAN remote control system for Linux media
+            players. With Remuco you can remotely control your favorite
+            media player - amongst others you can switch to the next,
+            previous or any other media within the current playlist,
+            browse your media library and activate other playlists, rate
+            your media and adjust volume. On the mobile (i.e. the remote
+            control) it displays information about the current media,
+            including cover art. Visit
+            <A
+HREF="http://remuco.sourceforge.net"
+TARGET="_top"
+>http://remuco.sourceforge.net</A
+>
+            for a complete feature list, screenshots and a list of
+            supported media players.
+        </P
+><P
+></P
+></DIV
+></DIV
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>1. <A
+HREF="#AEN8"
+>Introduction</A
+></DT
+><DT
+>2. <A
+HREF="#AEN11"
+>Building</A
+></DT
+><DT
+>3. <A
+HREF="#AEN17"
+>Installation</A
+></DT
+><DT
+>4. <A
+HREF="#AEN26"
+>Usage</A
+></DT
+><DD
+><DL
+><DT
+>4.1. <A
+HREF="#AEN28"
+>Server</A
+></DT
+><DT
+>4.2. <A
+HREF="#AEN33"
+>Basic Player Proxies (BPP)</A
+></DT
+></DL
+></DD
+><DT
+>5. <A
+HREF="#AEN44"
+>Troubleshooting</A
+></DT
+><DD
+><DL
+><DT
+>5.1. <A
+HREF="#AEN47"
+>General</A
+></DT
+></DL
+></DD
+><DT
+>A. <A
+HREF="#AEN58"
+>General Information</A
+></DT
+><DD
+><DL
+><DT
+>A.1. <A
+HREF="#feedback"
+>Feedback, Help, Bugs, Discussion etc.</A
+></DT
+><DT
+>A.2. <A
+HREF="#AEN72"
+>Source Code Access</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="AEN8"
+>1. Introduction</A
+></H2
+><P
+>&#13;            This documentation is about the Remuco server. The server runs
+            on your computer and intermediates between media players
+            (respectively their Remuco player proxies) and Remuco
+            clients.
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN11"
+>2. Building</A
+></H2
+><P
+>&#13;            To build the server, run:
+        </P
+><P
+>&#13;            <B
+CLASS="command"
+>$ make</B
+>
+        </P
+><P
+>&#13;        	This also checks build requirements and tells you what is
+        	needed if something is missing.
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN17"
+>3. Installation</A
+></H2
+><P
+>&#13;        	To install the server, run (as root, if needed):
+        </P
+><P
+>&#13;            <B
+CLASS="command"
+>$ make install</B
+>
+        </P
+><P
+>&#13;        	This installs the server below <TT
+CLASS="filename"
+>/usr/bin</TT
+>.
+            For an alternative installation prefix run: 
+        </P
+><P
+>&#13;            <B
+CLASS="command"
+>$ PREFIX=/home/xyz/opt make install</B
+>
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN26"
+>4. Usage</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN28"
+>4.1. Server</A
+></H3
+><P
+>&#13;        		The server gets automatically started by DBus, if player proxies
+        		contact the server.
+        	</P
+><P
+>&#13;        		The server's behavior can be adjusted with the file
+        		<TT
+CLASS="filename"
+>~/.config/remuco/Server.conf</TT
+>. An example
+        		of this file is contained in this package.
+        	</P
+></DIV
+><DIV
+CLASS="section"
+><HR><H3
+CLASS="section"
+><A
+NAME="AEN33"
+>4.2. Basic Player Proxies (BPP)</A
+></H3
+><P
+>&#13;        		Basic player proxies are simple configuration files which
+        		provide a fast and easy way to extend Remuco with support
+        		for a certain media player (see the website for more detailed
+        		information on BPPs). To enable BPPs, you have to start the BPP
+        		launcher:
+        	</P
+><P
+>&#13;	            <B
+CLASS="command"
+>$ remuco-bpp-launcher</B
+>
+	        </P
+><P
+>&#13;	        	The launcher looks for all present BPPs and activates
+	        	them if the corresponding media player is running.
+	        </P
+><P
+>&#13;	        	Example BPPs are contained in this package. You may copy the
+	        	BPPs you need to <TT
+CLASS="filename"
+>~/.config/remuco</TT
+> (with
+	        	the suffix <TT
+CLASS="filename"
+>.example</TT
+> removed). Have a look
+	        	into the BPP files you've copied - it may be necessary to
+	        	adjust them for your system.
+	        </P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>&#13;		        	The Remuco website may provide more
+		        	BPPs or more recent versions of the BPPs in this package.
+		        </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN44"
+>5. Troubleshooting</A
+></H2
+><P
+>&#13;		To track down errors, please try the steps below. If this does not
+		solve your problem, come to the help forum.
+	</P
+><DIV
+CLASS="section"
+><HR><H3
+CLASS="section"
+><A
+NAME="AEN47"
+>5.1. General</A
+></H3
+><P
+>&#13;            If something fails, it is a good idea to set Remuco into debug
+            mode. This is done by creating the file
+            <TT
+CLASS="filename"
+>~/.config/remuco/debug</TT
+>, for instance:
+        </P
+><P
+>&#13;        	<B
+CLASS="command"
+>$ touch ~/.config/remuco/debug </B
+>
+        </P
+><P
+>&#13;        	This tells the server and all player proxies to enable
+        	debug output. The server log can be found in
+        	<TT
+CLASS="filename"
+>~/.cache/remuco/Server.log</TT
+>. Log sinks of
+        	player proxies are proxy specific.
+        </P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>&#13;				Don't forget to remove
+				<TT
+CLASS="filename"
+>~/.config/remuco/debug</TT
+>
+				once you don't need the debug output anymore.
+	        </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="appendix"
+><HR><H1
+CLASS="appendix"
+><A
+NAME="AEN58"
+>A. General Information</A
+></H1
+><P
+>&#13;        The Remuco project is hosted on SourceForge at
+        <A
+HREF="http://remuco.sourceforge.net"
+TARGET="_top"
+>http://remuco.sourceforge.net</A
+>.
+        It is licensed under the GPLv2 or any newer version.
+    </P
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="feedback"
+>A.1. Feedback, Help, Bugs, Discussion etc.</A
+></H2
+><P
+>&#13;            You can get support and help at the help forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568227"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568227</A
+>
+        </P
+><P
+>&#13;            To file bugs please visit the bug tracker:
+            <A
+HREF="https://sourceforge.net/tracker/?group_id=166515&#38;atid=839315"
+TARGET="_top"
+>https://sourceforge.net/tracker/?group_id=166515&#38;atid=839315</A
+>
+        </P
+><P
+>&#13;            If you miss a nice feature, take a look at the feature
+            request tracker:
+            <A
+HREF="https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318"
+TARGET="_top"
+>https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318</A
+>
+        </P
+><P
+>&#13;            For all other things to talk about, use the discussion
+            forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568226"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568226</A
+>
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN72"
+>A.2. Source Code Access</A
+></H2
+><P
+>&#13;            You can get the source code via SVN. The SVN root is:
+            <A
+HREF="https://remuco.svn.sourceforge.net/svnroot/remuco"
+TARGET="_top"
+>https://remuco.svn.sourceforge.net/svnroot/remuco</A
+>
+        </P
+><P
+>&#13;            To browse the SVN repository visit:
+            <A
+HREF="http://remuco.svn.sourceforge.net/viewvc/remuco"
+TARGET="_top"
+>http://remuco.svn.sourceforge.net/viewvc/remuco</A
+>
+        </P
+><P
+>&#13;            The most current code is located in
+            <SPAN
+CLASS="QUOTE"
+>"trunk"</SPAN
+>.
+            Note that this code is not always stable or in a working
+            state. The sources of specific releases are located in
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            -- getting code from
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            ensures to have working code.
+        </P
+><DIV
+CLASS="example"
+><A
+NAME="AEN82"
+></A
+><P
+><B
+>Example A-1. 
+                Check out the current development version of the server
+                into the directory
+                <TT
+CLASS="filename"
+>remuco-server-trunk</TT
+>:
+            </B
+></P
+><P
+>&#13;                <B
+CLASS="command"
+>$ svn co &#60;SVN-ROOT&#62;/trunk/server remuco-server-trunk</B
+>
+            </P
+></DIV
+><DIV
+CLASS="example"
+><A
+NAME="AEN87"
+></A
+><P
+><B
+>Example A-2. 
+                Check out the client source from release 0.7.0 into the
+                directory <TT
+CLASS="filename"
+>remuco-client-0.7.0</TT
+>:
+            </B
+></P
+><P
+>&#13;                <B
+CLASS="command"
+>$ svn co &#60;SVN-ROOT&#62;/tags/client-0.7.0 remuco-client-0.7.0</B
+>
+            </P
+></DIV
+></DIV
+></DIV
+></DIV
+></BODY
+></HTML
+>

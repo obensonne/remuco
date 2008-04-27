@@ -1,0 +1,155 @@
+##############################################################################
+#
+# Inoffensive / one-time leaks
+#
+##############################################################################
+
+{
+   <g_get_user_cache_dir()>
+   Memcheck:Leak
+   fun:malloc
+   obj:*
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwnam_r
+   obj:*
+   fun:g_get_user_cache_dir
+}
+{
+   <g_get_user_config_dir()>
+   Memcheck:Leak
+   fun:malloc
+   obj:*
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwnam_r
+   obj:*
+   obj:*
+   fun:g_get_user_config_dir
+}
+{
+   <g_type_init()>
+   Memcheck:Leak
+   fun:calloc
+   fun:g_malloc0
+   obj:*
+   obj:*
+   fun:g_type_init_with_debug_flags
+   fun:g_type_init
+}
+{
+   <g_type_init()>
+   Memcheck:Leak
+   fun:calloc
+   fun:g_malloc0
+   obj:*
+   obj:*
+   fun:g_type_register_fundamental
+   obj:*
+   fun:g_type_init_with_debug_flags
+   fun:g_type_init
+   fun:main
+}
+{
+   <g_get_user_config_dir()>
+   Memcheck:Leak
+   fun:malloc
+   obj:*
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwnam_r
+   obj:*
+   obj:*
+   fun:g_get_user_config_dir
+}
+
+###############################################################################
+#
+# GLib should know what it is doing
+#
+###############################################################################
+
+{
+   <g_get_user_config_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:__nss_passwd_lookup
+   fun:getpwnam_r
+   obj:*
+   obj:*
+   fun:g_get_user_config_dir
+}
+{
+   <g_get_user_config_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:_nss_compat_getpwnam_r
+   fun:getpwnam_r
+   obj:*
+   obj:*
+   fun:g_get_user_config_dir
+}
+{
+   <g_get_user_config_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:_nss_compat_getpwnam_r
+   fun:getpwnam_r
+   obj:*
+   obj:*
+   fun:g_get_user_config_dir
+}
+
+
+
+# I hope strcmp is knows waht it does..
+#{
+#   <insert a suppression name here>
+#   Memcheck:Addr1
+#   fun:strcmp
+#   fun:g_str_equal
+#   fun:g_hash_table_lookup
+#}
+#{
+#   <insert a suppression name here>
+#   Memcheck:Addr1
+#   fun:strcmp
+#   fun:g_str_equal
+#   fun:g_hash_table_remove
+#}

@@ -1,0 +1,39 @@
+[misc]
+
+# This section contains miscellaneous options.
+
+# The type of the image to send to clients. Possible are all types understood
+# by ImageMagick. Default is 'jpg' as it generally provides small image sizes
+# and therefore reduces server <-> client communication. However, certain mobile
+# devices do not understand JPEG, in that case you must set this to 'png' (which
+# mostly means bigger images).
+# If set to 'none' or '' then no images will be send to clients.
+#img = jpg 
+
+# The maximum length of lists (playlists, queue). Any list from a player will
+# be truncated to this limit before it gets send to a client.
+# Default value is '100'.
+#list-limit = 100
+
+# A command to shut down your computer. Gets executed when a client issues
+# the command 'Shutdown Host'. The user running Remuco must have appropriate
+# rights to execute this command.
+# Default value is 'sudo /sbin/shutdown'.
+#shutdown = sudo /sbin/shutdown
+
+[net]
+
+# This section contains network related options.
+
+# 'true' enables clients to connect with WLAN.
+# Default value is 'true'.
+#ip = true
+
+# The TCP port clients can connect to with WLAN.
+# Default value is '34271'.
+#ip-port = 34271
+
+# 'true' enables clients to connect with Bluetooth. 
+# Default value is 'true'.
+bt = true
+

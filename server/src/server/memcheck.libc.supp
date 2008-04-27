@@ -1,0 +1,136 @@
+##############################################################################
+#
+# Probably inoffensive errors
+#
+##############################################################################
+
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   fun:__nss_passwd_lookup
+}
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/i686/cmov/libnss_compat-2.6.1.so
+   fun:_nss_compat_getpwnam_r
+}
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+}
+
+# IConv makes noise:
+{
+   <iconv_open()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   fun:iconv_open
+}
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+}
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+}
+{
+   <__libc_dlopen_mode()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+}
+{
+   <iconv_open()>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlsym
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   fun:iconv_open
+}

@@ -1,0 +1,17 @@
+[config]
+
+tick = 10
+
+[commands]
+
+running = pidof totem
+
+playpause = totem --play-pause
+
+next = totem --next
+prev = totem --previous
+
+seek-fwd = totem --seek-fwd
+seek-bwd = totem --seek-bwd
+
+#plob = totem --printplaying

@@ -1,0 +1,223 @@
+###############################################################################
+#
+# Image Magick should know what it is doing
+#
+###############################################################################
+
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Cond
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Cond
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:dlopen
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:lt_dlopenadvise
+   fun:lt_dlopen
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Cond
+   obj:*
+   obj:*
+   fun:_dl_sym
+   obj:*
+   obj:*
+   obj:*
+   fun:dlsym
+   obj:*
+   fun:lt_dlsym
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_dl_sym
+   obj:*
+   obj:*
+   obj:*
+   fun:dlsym
+   obj:*
+   fun:lt_dlsym
+   fun:OpenModule
+   fun:GetMagickInfo
+   fun:SetImageInfo
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickReadImage()>
+   Memcheck:Cond
+   fun:strlen
+   fun:NewXMLTree
+   fun:GetImageProperty
+   fun:SetImageProfile
+   obj:*
+   obj:*
+   obj:*
+   fun:jpeg_consume_input
+   fun:jpeg_read_header
+   obj:*
+   fun:ReadImage
+   fun:MagickReadImage
+}
+{
+   <MagickWriteImages()>
+   Memcheck:Cond
+   obj:*
+   fun:deflate
+   obj:*
+   obj:*
+   fun:png_write_info
+   obj:*
+   obj:*
+   fun:WriteImage
+   fun:WriteImages
+   fun:MagickWriteImages
+}

@@ -1,0 +1,164 @@
+Remuco Server 0.7
+
+ Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
+Remuco you can remotely control your favorite media player - amongst others you
+can switch to the next, previous or any other media within the current
+playlist, browse your media library and activate other playlists, rate your
+media and adjust volume. On the mobile (i.e. the remote control) it displays
+information about the current media, including cover art. Visit http://
+remuco.sourceforge.net for a complete feature list, screenshots and a list of
+supported media players.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Table of Contents
+1. Introduction
+2. Building
+3. Installation
+4. Usage
+
+    4.1. Server
+    4.2. Basic Player Proxies (BPP)
+
+5. Troubleshooting
+
+    5.1. General
+
+A. General Information
+
+    A.1. Feedback, Help, Bugs, Discussion etc.
+    A.2. Source Code Access
+
+1. Introduction
+
+ This documentation is about the Remuco server. The server runs on your
+computer and intermediates between media players (respectively their Remuco
+player proxies) and Remuco clients.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. Building
+
+ To build the server, run:
+
+ $ make
+
+ This also checks build requirements and tells you what is needed if something
+is missing.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. Installation
+
+ To install the server, run (as root, if needed):
+
+ $ make install
+
+ This installs the server below /usr/bin. For an alternative installation
+prefix run:
+
+ $ PREFIX=/home/xyz/opt make install
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. Usage
+
+4.1. Server
+
+ The server gets automatically started by DBus, if player proxies contact the
+server.
+
+ The server's behavior can be adjusted with the file ~/.config/remuco/
+Server.conf. An example of this file is contained in this package.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.2. Basic Player Proxies (BPP)
+
+ Basic player proxies are simple configuration files which provide a fast and
+easy way to extend Remuco with support for a certain media player (see the
+website for more detailed information on BPPs). To enable BPPs, you have to
+start the BPP launcher:
+
+ $ remuco-bpp-launcher
+
+ The launcher looks for all present BPPs and activates them if the
+corresponding media player is running.
+
+ Example BPPs are contained in this package. You may copy the BPPs you need to
+~/.config/remuco (with the suffix .example removed). Have a look into the BPP
+files you've copied - it may be necessary to adjust them for your system.
+
+Note The Remuco website may provide more BPPs or more recent versions of the
+     BPPs in this package.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. Troubleshooting
+
+ To track down errors, please try the steps below. If this does not solve your
+problem, come to the help forum.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5.1. General
+
+ If something fails, it is a good idea to set Remuco into debug mode. This is
+done by creating the file ~/.config/remuco/debug, for instance:
+
+ $ touch ~/.config/remuco/debug
+
+ This tells the server and all player proxies to enable debug output. The
+server log can be found in ~/.cache/remuco/Server.log. Log sinks of player
+proxies are proxy specific.
+
+Note Don't forget to remove ~/.config/remuco/debug once you don't need the
+     debug output anymore.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A. General Information
+
+ The Remuco project is hosted on SourceForge at http://remuco.sourceforge.net.
+It is licensed under the GPLv2 or any newer version.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.1. Feedback, Help, Bugs, Discussion etc.
+
+ You can get support and help at the help forum: https://sourceforge.net/forum/
+forum.php?forum_id=568227
+
+ To file bugs please visit the bug tracker: https://sourceforge.net/tracker/?
+group_id=166515&atid=839315
+
+ If you miss a nice feature, take a look at the feature request tracker: https:
+//sourceforge.net/tracker/?group_id=166515&atid=839318
+
+ For all other things to talk about, use the discussion forum: https://
+sourceforge.net/forum/forum.php?forum_id=568226
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.2. Source Code Access
+
+ You can get the source code via SVN. The SVN root is: https://
+remuco.svn.sourceforge.net/svnroot/remuco
+
+ To browse the SVN repository visit: http://remuco.svn.sourceforge.net/viewvc/
+remuco
+
+ The most current code is located in "trunk". Note that this code is not always
+stable or in a working state. The sources of specific releases are located in
+"tags" -- getting code from "tags" ensures to have working code.
+
+Example A-1. Check out the current development version of the server into the
+directory remuco-server-trunk:
+
+ $ svn co <SVN-ROOT>/trunk/server remuco-server-trunk
+
+Example A-2. Check out the client source from release 0.7.0 into the directory
+remuco-client-0.7.0:
+
+ $ svn co <SVN-ROOT>/tags/client-0.7.0 remuco-client-0.7.0
+

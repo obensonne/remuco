@@ -1,0 +1,11 @@
+[config]
+
+tick = 4
+
+[commands]
+
+present = true
+#running = true
+
+volume = echo `date +%N` 100 % p | dc
+playpause = echo hallo
