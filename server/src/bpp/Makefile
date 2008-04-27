@@ -103,12 +103,6 @@ dbus-server-glue.h: ../server/server.xml
 		../server/server.xml > dbus-server-glue.h
 	# we want shorter function names:
 	sed -i dbus-server-glue.h -e "s/net_sf_remuco_Server/rem_server/g"
-	# the following is just to fix a missing CDT feature, remove for prod.
-	#sed -i dbus-server-glue.h \
-	#	-e "s/^static *//" \
-	#	-e "s/^#ifdef G_HAVE_INLINE.*$$//" \
-	#	-e "s/^inline.*$$//" \
-	#	-e "s/^#endif$$//"
 
 dbus-pp-glue.h: ../server/pp.xml
 	dbus-binding-tool --mode=glib-server --prefix=rem_pp \

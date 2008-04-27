@@ -106,12 +106,6 @@ dbus-pp-glue.h: pp.xml
 	dbus-binding-tool --mode=glib-client pp.xml > dbus-pp-glue.h
 	# we want shorter function names:
 	sed -i dbus-pp-glue.h -e "s/net_sf_remuco_PP/rem_pp/g"
-	# the following is just to fix a missing CDT feature, remove for prod.
-	#sed -i dbus-pp-glue.h \
-	#	-e "s/^static *//" \
-	#	-e "s/^#ifdef G_HAVE_INLINE.*$$//" \
-	#	-e "s/^inline.*$$//" \
-	#	-e "s/^#endif$$//"
 
 dbus-clean:
 	rm -f $(DBUS_SERVICE_NAME).service

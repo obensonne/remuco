@@ -9,10 +9,10 @@ G_BEGIN_DECLS
 #ifndef DBUS_GLIB_CLIENT_WRAPPERS_rem_server
 #define DBUS_GLIB_CLIENT_WRAPPERS_rem_server
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_check (DBusGProxy *proxy, const guint IN_version, GError **error)
 
@@ -22,7 +22,7 @@ rem_server_check (DBusGProxy *proxy, const guint IN_version, GError **error)
 
 typedef void (*rem_server_check_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_check_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -32,10 +32,10 @@ rem_server_check_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_check_async (DBusGProxy *proxy, const guint IN_version, rem_server_check_reply callback, gpointer userdata)
 
@@ -46,10 +46,10 @@ rem_server_check_async (DBusGProxy *proxy, const guint IN_version, rem_server_ch
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "Check", rem_server_check_async_callback, stuff, g_free, G_TYPE_UINT, IN_version, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_hello (DBusGProxy *proxy, const char * IN_player, const guint IN_flags, const guint IN_rating, GError **error)
 
@@ -59,7 +59,7 @@ rem_server_hello (DBusGProxy *proxy, const char * IN_player, const guint IN_flag
 
 typedef void (*rem_server_hello_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_hello_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -69,10 +69,10 @@ rem_server_hello_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_hello_async (DBusGProxy *proxy, const char * IN_player, const guint IN_flags, const guint IN_rating, rem_server_hello_reply callback, gpointer userdata)
 
@@ -83,10 +83,10 @@ rem_server_hello_async (DBusGProxy *proxy, const char * IN_player, const guint I
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "Hello", rem_server_hello_async_callback, stuff, g_free, G_TYPE_STRING, IN_player, G_TYPE_UINT, IN_flags, G_TYPE_UINT, IN_rating, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_update_state (DBusGProxy *proxy, const char * IN_player, const guint IN_playback, const guint IN_volume, const gboolean IN_repeat, const gboolean IN_shuffle, const guint IN_position, const gboolean IN_queue, GError **error)
 
@@ -96,7 +96,7 @@ rem_server_update_state (DBusGProxy *proxy, const char * IN_player, const guint 
 
 typedef void (*rem_server_update_state_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_update_state_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -106,10 +106,10 @@ rem_server_update_state_async_callback (DBusGProxy *proxy, DBusGProxyCall *call,
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_update_state_async (DBusGProxy *proxy, const char * IN_player, const guint IN_playback, const guint IN_volume, const gboolean IN_repeat, const gboolean IN_shuffle, const guint IN_position, const gboolean IN_queue, rem_server_update_state_reply callback, gpointer userdata)
 
@@ -120,10 +120,10 @@ rem_server_update_state_async (DBusGProxy *proxy, const char * IN_player, const 
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "UpdateState", rem_server_update_state_async_callback, stuff, g_free, G_TYPE_STRING, IN_player, G_TYPE_UINT, IN_playback, G_TYPE_UINT, IN_volume, G_TYPE_BOOLEAN, IN_repeat, G_TYPE_BOOLEAN, IN_shuffle, G_TYPE_UINT, IN_position, G_TYPE_BOOLEAN, IN_queue, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_update_plob (DBusGProxy *proxy, const char * IN_player, const char * IN_id, const char * IN_img, const GHashTable* IN_meta, GError **error)
 
@@ -133,7 +133,7 @@ rem_server_update_plob (DBusGProxy *proxy, const char * IN_player, const char * 
 
 typedef void (*rem_server_update_plob_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_update_plob_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -143,10 +143,10 @@ rem_server_update_plob_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, 
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_update_plob_async (DBusGProxy *proxy, const char * IN_player, const char * IN_id, const char * IN_img, const GHashTable* IN_meta, rem_server_update_plob_reply callback, gpointer userdata)
 
@@ -157,10 +157,10 @@ rem_server_update_plob_async (DBusGProxy *proxy, const char * IN_player, const c
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "UpdatePlob", rem_server_update_plob_async_callback, stuff, g_free, G_TYPE_STRING, IN_player, G_TYPE_STRING, IN_id, G_TYPE_STRING, IN_img, dbus_g_type_get_map ("GHashTable", G_TYPE_STRING, G_TYPE_STRING), IN_meta, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_update_playlist (DBusGProxy *proxy, const char * IN_player, const char ** IN_ids, const char ** IN_names, GError **error)
 
@@ -170,7 +170,7 @@ rem_server_update_playlist (DBusGProxy *proxy, const char * IN_player, const cha
 
 typedef void (*rem_server_update_playlist_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_update_playlist_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -180,10 +180,10 @@ rem_server_update_playlist_async_callback (DBusGProxy *proxy, DBusGProxyCall *ca
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_update_playlist_async (DBusGProxy *proxy, const char * IN_player, const char ** IN_ids, const char ** IN_names, rem_server_update_playlist_reply callback, gpointer userdata)
 
@@ -194,10 +194,10 @@ rem_server_update_playlist_async (DBusGProxy *proxy, const char * IN_player, con
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "UpdatePlaylist", rem_server_update_playlist_async_callback, stuff, g_free, G_TYPE_STRING, IN_player, G_TYPE_STRV, IN_ids, G_TYPE_STRV, IN_names, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_update_queue (DBusGProxy *proxy, const char * IN_player, const char ** IN_ids, const char ** IN_names, GError **error)
 
@@ -207,7 +207,7 @@ rem_server_update_queue (DBusGProxy *proxy, const char * IN_player, const char *
 
 typedef void (*rem_server_update_queue_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_update_queue_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -217,10 +217,10 @@ rem_server_update_queue_async_callback (DBusGProxy *proxy, DBusGProxyCall *call,
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_update_queue_async (DBusGProxy *proxy, const char * IN_player, const char ** IN_ids, const char ** IN_names, rem_server_update_queue_reply callback, gpointer userdata)
 
@@ -231,10 +231,10 @@ rem_server_update_queue_async (DBusGProxy *proxy, const char * IN_player, const 
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "UpdateQueue", rem_server_update_queue_async_callback, stuff, g_free, G_TYPE_STRING, IN_player, G_TYPE_STRV, IN_ids, G_TYPE_STRV, IN_names, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_server_bye (DBusGProxy *proxy, const char * IN_player, GError **error)
 
@@ -244,7 +244,7 @@ rem_server_bye (DBusGProxy *proxy, const char * IN_player, GError **error)
 
 typedef void (*rem_server_bye_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_server_bye_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -254,10 +254,10 @@ rem_server_bye_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *us
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_server_bye_async (DBusGProxy *proxy, const char * IN_player, rem_server_bye_reply callback, gpointer userdata)
 
