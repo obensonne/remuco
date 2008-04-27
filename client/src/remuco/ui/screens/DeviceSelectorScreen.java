@@ -86,10 +86,10 @@ public final class DeviceSelectorScreen extends List implements
 		textfieldHost = new TextField("Host", "192.168.0.26", 256,
 				TextField.NON_PREDICTIVE);
 		formHost.append(textfieldHost);
-		formHost.append("To connect with Bluetooth:");
+		formHost.append("Bluetooth:\n");
 		formHost.append("Enter a Bluetooth hardware address in the format "
-				+ "001122AABBFF.");
-		formHost.append("To connect with WiFI:");
+				+ "001122AABBFF.\n");
+		formHost.append("WLAN:\n");
 		formHost.append("Enter an IP address or a host name, optionally "
 				+ "append a colon and a port number (e.g. '192.168.4.5:3452'"
 				+ " or 'my.host.name:36542').");
@@ -102,9 +102,9 @@ public final class DeviceSelectorScreen extends List implements
 
 		alertWelcome = new Alert("Remuco");
 		alertWelcome.setType(AlertType.INFO);
-		alertWelcome.setString("Currently there are no known server devices."
+		alertWelcome.setString("Currently there are no known server devices. "
 				+ "On the next screen, do a scan for (Bluetooth) "
-				+ "devices or add a (Bluetooth/WiFi) device manually.");
+				+ "devices or add a (Bluetooth/WLAN) device manually.");
 		alertWelcome.setTimeout(Alert.FOREVER);
 
 		ws = new WaitingScreen();
