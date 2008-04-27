@@ -1,2 +1,0 @@
-name = Remuco
-type = generic
