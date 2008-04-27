@@ -1,5 +1,0 @@
-0.6.0	Christian Bünnig <mondai@users.sourceforge.net>
-
-	* server now implemented as a library to be used by player proxies
-	* many new features
-	
