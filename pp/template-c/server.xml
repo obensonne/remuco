@@ -1,0 +1,46 @@
+<node name="/net/sf/remuco/Server">
+        <interface name="net.sf.remuco.Server">
+                <method name="Check">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_check"/>
+                        <arg type="u" name="version" direction="in" />
+                </method>
+                <method name="Hello">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_hello"/>
+                        <arg type="s" name="player" direction="in" />
+                        <arg type="u" name="flags" direction="in" />
+                        <arg type="u" name="rating" direction="in" />
+                </method>
+                <method name="UpdateState">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_update_state"/>
+                        <arg type="s" name="player" direction="in" />
+                        <arg type="u" name="playback" direction="in" />
+                        <arg type="u" name="volume" direction="in" />
+                        <arg type="b" name="repeat" direction="in" />
+                        <arg type="b" name="shuffle" direction="in" />
+                        <arg type="i" name="position" direction="in" />
+                </method>
+                <method name="UpdatePlob">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_update_plob"/>
+                        <arg type="s" name="player" direction="in" />
+                        <arg type="s" name="id" direction="in" />
+                        <arg type="s" name="img" direction="in" />
+                        <arg type="a{ss}" name="meta" direction="in" />
+                </method>
+                <method name="UpdatePlaylist">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_update_playlist"/>
+                        <arg type="s" name="player" direction="in" />
+                        <arg type="as" name="ids" direction="in" />
+                        <arg type="as" name="names" direction="in" />
+                </method>
+                <method name="UpdateQueue">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_update_queue"/>
+                        <arg type="s" name="player" direction="in" />
+                        <arg type="as" name="ids" direction="in" />
+                        <arg type="as" name="names" direction="in" />
+                </method>
+                <method name="Bye">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_bye"/>
+                        <arg type="s" name="player" direction="in" />
+                </method>
+        </interface>
+</node>

@@ -1,0 +1,155 @@
+Remuco Client 0.7
+
+ Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
+Remuco you can remotely control your favorite media player - amongst others you
+can switch to the next, previous or any other media within the current
+playlist, browse your media library and activate other playlists, rate your
+media and adjust volume. On the mobile (i.e. the remote control) it displays
+information about the current media, including cover art. Visit http://
+remuco.sourceforge.net for a complete feature list, screenshots and a list of
+supported media players.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Table of Contents
+1. Introduction
+2. Requirements
+3. Installation
+
+    3.1. System
+    3.2. User
+
+4. Troubleshooting
+
+    4.1. General
+    4.2. Rhythmbox
+
+A. General Information
+
+    A.1. Feedback, Help, Bugs, Discussion etc.
+    A.2. Source Code Access
+
+1. Introduction
+
+ This documentation is about the Rhythmbox player proxy. This proxy is actually
+a plugin for Rhythmbox.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. Requirements
+
+  •  Ryhthmbox >= 0.11.5
+
+  •  Python interface to DBUS (python-dbus)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. Installation
+
+3.1. System
+
+ For system wide installation run (as root):
+
+ $ make install
+
+ This installs the player proxy into Rhythmbox' system wide plugin directory.
+
+Note You can adjust the install destination by setting the environment variable
+     PREFIX (/usr is used as default).
+
+ Start Rhythmbox and activate the Remuco plugin.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.2. User
+
+ For user specific installation, run:
+
+ $ make install-user
+
+ This installs the player proxy into the Rhythmbox' user plugin directory (~
+/.gnome2/rhythmbox/plugins)
+
+ Start Rhythmbox and activate the Remuco plugin.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. Troubleshooting
+
+ To track down errors, please try the steps below. If this does not solve your
+problem, come to the help forum.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.1. General
+
+ If something fails, it is a good idea to set Remuco into debug mode. This is
+done by creating the file ~/.config/remuco/debug, for instance:
+
+ $ touch ~/.config/remuco/debug
+
+ This tells the server and all player proxies to enable debug output. The
+server log can be found in ~/.cache/remuco/Server.log. Log sinks of player
+proxies are proxy specific.
+
+Note Don't forget to remove ~/.config/remuco/debug once you don't need the
+     debug output anymore.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.2. Rhythmbox
+
+ To debug the Rhythmbox player proxy, start Rhythmbox from the command line
+with enabled debug out, for instance:
+
+ $ rhythmbox -D remuco # Rhythmbox with debug output
+
+The log output hopefully indicates the problem.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A. General Information
+
+ The Remuco project is hosted on SourceForge at http://remuco.sourceforge.net.
+It is licensed under the GPLv2 or any newer version.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.1. Feedback, Help, Bugs, Discussion etc.
+
+ You can get support and help at the help forum: https://sourceforge.net/forum/
+forum.php?forum_id=568227
+
+ To file bugs please visit the bug tracker: https://sourceforge.net/tracker/?
+group_id=166515&atid=839315
+
+ If you miss a nice feature, take a look at the feature request tracker: https:
+//sourceforge.net/tracker/?group_id=166515&atid=839318
+
+ For all other things to talk about, use the discussion forum: https://
+sourceforge.net/forum/forum.php?forum_id=568226
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.2. Source Code Access
+
+ You can get the source code via SVN. The SVN root is: https://
+remuco.svn.sourceforge.net/svnroot/remuco
+
+ To browse the SVN repository visit: http://remuco.svn.sourceforge.net/viewvc/
+remuco
+
+ The most current code is located in "trunk". Note that this code is not always
+stable or in a working state. The sources of specific releases are located in
+"tags" -- getting code from "tags" ensures to have working code.
+
+Example A-1. Check out the current development version of the server into the
+directory remuco-server-trunk:
+
+ $ svn co <SVN-ROOT>/trunk/server remuco-server-trunk
+
+Example A-2. Check out the client source from release 0.7.0 into the directory
+remuco-client-0.7.0:
+
+ $ svn co <SVN-ROOT>/tags/client-0.7.0 remuco-client-0.7.0
+

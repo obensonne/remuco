@@ -1,0 +1,78 @@
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   fun:__nss_passwd_lookup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/i686/cmov/libnss_compat-2.6.1.so
+   fun:_nss_compat_getpwnam_r
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   obj:/lib/ld-2.6.1.so
+   fun:__libc_dlopen_mode
+}
+
+# g_get_user_cache_dir() returns a const string, so free not allowed.
+# Anyway, this is no problem since it is a one-time leak
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/tls/i686/cmov/libc-2.6.1.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwnam_r
+   obj:/usr/lib/libglib-2.0.so.0.1400.1
+   fun:g_get_user_cache_dir
+   fun:rem_log_init
+   fun:main
+}
+
+# No idea how to prevent this. Hope it is a one-time leak.
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:g_malloc0
+   obj:/usr/lib/libgobject-2.0.so.0.1400.1
+   obj:/usr/lib/libgobject-2.0.so.0.1400.1
+   fun:g_type_init_with_debug_flags
+   fun:g_type_init
+   fun:main
+}

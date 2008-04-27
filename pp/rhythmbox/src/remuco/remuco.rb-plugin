@@ -1,0 +1,9 @@
+[RB Plugin]
+Loader=python
+Module=remuco
+IAge=1
+Name=Remuco
+Description=Rhythmbox player proxy for Remuco.
+Authors=Christian Buennig <mondai@users.sourceforge.net>
+Copyright=Copyright © 2008 Christian Buennig
+Website=http://remuco.sourceforge.net/
