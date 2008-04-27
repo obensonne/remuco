@@ -1,0 +1,48 @@
+0.7.0	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* adapted to new server - see the server changelog for more information
+	* major internal refactoring
+
+0.6.1	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* fixed an issue on SE W300 when selecting a server to connect to
+
+0.6.0	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* in development ...
+
+0.5.1	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* fixed wrong volume adjustment in canvas variant when done adjustment
+	  exceeds possible adjustment
+	* fixed image loading error which occured on some mobiles
+	* extended java-doc
+	* improved handling if there is not enough memory to receive player
+	  state data
+	* removed some noisy logging (key events in canvas variant)
+
+0.5.0	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* introduced new themeable GUI based on canvas
+	* improved user interface and interaction and error handling when
+	  connecting to the server
+	* discard player state data if there is not enough memory to process it
+	* client packages contains now 3 client versions:
+	  - simple (text based UI)
+	  - canvas (graphical UI using keys and joystick)
+	  - legacy (CLDC-1.0 and MIDP-1.0 compliant version, text based UI)
+	* adjusted protocol version (this client needs a server >= 0.4.3)
+
+0.4.2	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* minor UI improvements
+	* minor internal (non-functional) changes
+
+0.4.1	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* when rating a song, now the song screen is updated immediately to
+	reflect that change
+
+0.4.0	Christian Bünnig <mondai@users.sourceforge.net>
+
+	* initial 0.4.0 release
