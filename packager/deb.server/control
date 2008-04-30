@@ -3,7 +3,7 @@ Section: sound
 Priority: extra
 Maintainer: Oben Sonne <obensonne@googlemail.com>
 Build-Depends: debhelper (>= 5), libbluetooth-dev, libmagick9-dev, libdbus-glib-1-dev, pkg-config
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 
 Package: remuco-server
 Architecture: any

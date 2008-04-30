@@ -3,7 +3,7 @@ Section: sound
 Priority: extra
 Maintainer: Oben Sonne <obensonne@googlemail.com>
 Build-Depends: debhelper (>= 5)
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 
 Package: remuco-rhythmbox
 Architecture: any
