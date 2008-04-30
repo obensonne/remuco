@@ -1,11 +1,13 @@
 #!/bin/sh
 
-. ./config
-
 ########################### CHANGE THIS ######################################
 
-PKG=remuco-xmms2-0.7.0
-PKG_DEB=remuco-xmms2_0.7.0.orig
+
+[ -z "$1" ] && echo "Missing component name" && exit
+
+CONF=deb.$1.conf
+
+[ ! -e $CONF ] && echo "Missing file $CONF" && exit 1 
 
 ##############################################################################
 
@@ -20,7 +22,7 @@ rm -rf build
 
 mkdir build
 
-svn co $BRANCH/pp/xmms2 build/svn-co
+svn co $URL build/svn-co
 
 make -C build/svn-co dist || die
 
@@ -30,9 +32,11 @@ tar zxf build/$PKG.tar.gz -C build || die
 
 mv build/$PKG.tar.gz build/$PKG_DEB.tar.gz
 
-cp -r deb.xmms2 build/$PKG/debian
+cp -r deb.server build/$PKG/debian
 
-cd build/$PKG && debuild || die
+rm -rf build/$PKG/debian/.svn
+
+cd build/$PKG && debuild -S || die
 
 echo "---- DONE ----"
 
