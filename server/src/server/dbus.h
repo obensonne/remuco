@@ -5,7 +5,7 @@
 
 ////////// server <-> proxy interaction protocol version //////////
 
-#define REM_SERVER_PP_PROTO_VERSION		1
+#define REM_SERVER_PP_PROTO_VERSION		2
 
 ////////// server errors exported via dbus //////////
 
