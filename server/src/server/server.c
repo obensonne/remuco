@@ -381,7 +381,8 @@ shutdown_sys(RemServer *server)
 static gboolean
 pp_reply_handle_error(GError *err, RemPPRequest *req)
 {
-	if (err) {
+	if (err && err->domain == DBUS_GERROR) {
+		
 		if (err->code == DBUS_GERROR_NO_REPLY) {
 			LOG_WARN_GERR(err, "no reply from pp %s, probably it is busy",
 						  req->player);
@@ -394,6 +395,11 @@ pp_reply_handle_error(GError *err, RemPPRequest *req)
 			g_hash_table_remove(req->server->pht, req->player);
 		}
 		
+		return FALSE;
+	
+	} else if (err) {
+		
+		LOG_ERROR_GERR(err, "error in reply from pp %s", req->player);
 		return FALSE;
 		
 	} else {
