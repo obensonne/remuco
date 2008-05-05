@@ -1321,7 +1321,7 @@ rem_server_check(RemServer *server, guint version, GError **err)
 {
 	LOG_INFO("called");
 	
-	if (version != REM_DBUS_IF_VERSION) {
+	if (version != REM_SERVER_PP_PROTO_VERSION) {
 		g_set_error(err, REM_SERVER_ERR_DOMAIN, 0, REM_SERVER_ERR_VERSION_MISMATCH);
 		return FALSE;
 	}
