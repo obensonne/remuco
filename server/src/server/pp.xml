@@ -19,5 +19,8 @@
                         <arg type="as" name="ids" direction="out" />
                         <arg type="as" name="names" direction="out" />
                 </method>
+                <method name="Bye">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_pp_bye"/>
+                </method>
         </interface>
 </node>

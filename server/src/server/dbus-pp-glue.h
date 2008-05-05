@@ -9,10 +9,10 @@ G_BEGIN_DECLS
 #ifndef DBUS_GLIB_CLIENT_WRAPPERS_rem_pp
 #define DBUS_GLIB_CLIENT_WRAPPERS_rem_pp
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_pp_control (DBusGProxy *proxy, const guint IN_control, const gint IN_param_i, const char * IN_param_s, GError **error)
 
@@ -22,7 +22,7 @@ rem_pp_control (DBusGProxy *proxy, const guint IN_control, const gint IN_param_i
 
 typedef void (*rem_pp_control_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
-void
+static void
 rem_pp_control_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -32,10 +32,10 @@ rem_pp_control_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *us
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_pp_control_async (DBusGProxy *proxy, const guint IN_control, const gint IN_param_i, const char * IN_param_s, rem_pp_control_reply callback, gpointer userdata)
 
@@ -46,10 +46,10 @@ rem_pp_control_async (DBusGProxy *proxy, const guint IN_control, const gint IN_p
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "Control", rem_pp_control_async_callback, stuff, g_free, G_TYPE_UINT, IN_control, G_TYPE_INT, IN_param_i, G_TYPE_STRING, IN_param_s, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_pp_request_plob (DBusGProxy *proxy, const char * IN_id, GHashTable** OUT_meta, GError **error)
 
@@ -59,7 +59,7 @@ rem_pp_request_plob (DBusGProxy *proxy, const char * IN_id, GHashTable** OUT_met
 
 typedef void (*rem_pp_request_plob_reply) (DBusGProxy *proxy, GHashTable *OUT_meta, GError *error, gpointer userdata);
 
-void
+static void
 rem_pp_request_plob_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -70,10 +70,10 @@ rem_pp_request_plob_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, voi
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_pp_request_plob_async (DBusGProxy *proxy, const char * IN_id, rem_pp_request_plob_reply callback, gpointer userdata)
 
@@ -84,10 +84,10 @@ rem_pp_request_plob_async (DBusGProxy *proxy, const char * IN_id, rem_pp_request
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "RequestPlob", rem_pp_request_plob_async_callback, stuff, g_free, G_TYPE_STRING, IN_id, G_TYPE_INVALID);
 }
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 gboolean
 rem_pp_request_ploblist (DBusGProxy *proxy, const char * IN_id, char *** OUT_nested_ids, char *** OUT_nested_names, char *** OUT_ids, char *** OUT_names, GError **error)
 
@@ -97,7 +97,7 @@ rem_pp_request_ploblist (DBusGProxy *proxy, const char * IN_id, char *** OUT_nes
 
 typedef void (*rem_pp_request_ploblist_reply) (DBusGProxy *proxy, char * *OUT_nested_ids, char * *OUT_nested_names, char * *OUT_ids, char * *OUT_names, GError *error, gpointer userdata);
 
-void
+static void
 rem_pp_request_ploblist_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
@@ -111,10 +111,10 @@ rem_pp_request_ploblist_async_callback (DBusGProxy *proxy, DBusGProxyCall *call,
   return;
 }
 
-
-
-
-
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
 DBusGProxyCall*
 rem_pp_request_ploblist_async (DBusGProxy *proxy, const char * IN_id, rem_pp_request_ploblist_reply callback, gpointer userdata)
 
@@ -124,6 +124,43 @@ rem_pp_request_ploblist_async (DBusGProxy *proxy, const char * IN_id, rem_pp_req
   stuff->cb = G_CALLBACK (callback);
   stuff->userdata = userdata;
   return dbus_g_proxy_begin_call (proxy, "RequestPloblist", rem_pp_request_ploblist_async_callback, stuff, g_free, G_TYPE_STRING, IN_id, G_TYPE_INVALID);
+}
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+gboolean
+rem_pp_bye (DBusGProxy *proxy, GError **error)
+
+{
+  return dbus_g_proxy_call (proxy, "Bye", error, G_TYPE_INVALID, G_TYPE_INVALID);
+}
+
+typedef void (*rem_pp_bye_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
+
+static void
+rem_pp_bye_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+{
+  DBusGAsyncData *data = (DBusGAsyncData*) user_data;
+  GError *error = NULL;
+  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
+  (*(rem_pp_bye_reply)data->cb) (proxy, error, data->userdata);
+  return;
+}
+
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+DBusGProxyCall*
+rem_pp_bye_async (DBusGProxy *proxy, rem_pp_bye_reply callback, gpointer userdata)
+
+{
+  DBusGAsyncData *stuff;
+  stuff = g_new (DBusGAsyncData, 1);
+  stuff->cb = G_CALLBACK (callback);
+  stuff->userdata = userdata;
+  return dbus_g_proxy_begin_call (proxy, "Bye", rem_pp_bye_async_callback, stuff, g_free, G_TYPE_INVALID);
 }
 #endif /* defined DBUS_GLIB_CLIENT_WRAPPERS_rem_pp */
 

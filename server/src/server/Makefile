@@ -28,9 +28,11 @@ endif
 ###############################################################################
 
 PKG_CONFIG_REQ := glib-2.0 dbus-glib-1 bluez Wand
+PKG_CONFIG_REQ_BPP := glib-2.0 dbus-glib-1
 
 CFLAGS := $(shell pkg-config --cflags $(PKG_CONFIG_REQ) 2>/dev/null)
 LFLAGS := $(shell pkg-config --libs $(PKG_CONFIG_REQ) 2>/dev/null)
+LFLAGS_BPP := $(shell pkg-config --libs $(PKG_CONFIG_REQ_BPP) 2>/dev/null)
 
 ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
@@ -42,7 +44,11 @@ endif
 HDR_FILES = $(shell find -maxdepth 1 -type f -name "*.h")
 #| sed -e "s,^\./,,"
 SRC_FILES := $(shell find -maxdepth 1 -type f -name "*.c")
+SRC_FILES := $(subst ./bpp.c,,$(SRC_FILES))
 OBJ_FILES := $(subst .c,.o,$(SRC_FILES))
+
+SRC_FILES_BPP := bpp.c dbus.c util.c config.c log.c
+OBJ_FILES_BPP := $(subst .c,.o,$(SRC_FILES_BPP))
 
 ###############################################################################
 #
@@ -50,7 +56,7 @@ OBJ_FILES := $(subst .c,.o,$(SRC_FILES))
 #
 ##############################################################################
 
-all: stamp-build-requirements remuco-server
+all: stamp-build-requirements remuco-server remuco-bpp
 
 install: all dbus-install
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
@@ -63,7 +69,7 @@ clean: dbus-clean
 	find -type f -name "*.o" | xargs rm -f
 	find -type f -name "*~" | xargs rm -f
 	rm -f stamp-*
-	rm -f remuco-server
+	rm -f remuco-server remuco-bpp
 	rm -f massif.*
 
 ###############################################################################
@@ -75,12 +81,15 @@ clean: dbus-clean
 %.o: %.c $(HDR_FILES)
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
-remuco-server: $(OBJ_FILES) 
+remuco-server: dbus-server-glue.h dbus-pp-glue.h $(OBJ_FILES) 
 	$(CC) $(LFLAGS) $(OBJ_FILES) -o remuco-server
+
+remuco-bpp: bpp-dbus-server-glue.h bpp-dbus-pp-glue.h $(OBJ_FILES_BPP)
+	$(CC) $(LFLAGS_BPP) $(OBJ_FILES_BPP) -o remuco-bpp
 
 ###############################################################################
 #
-# DBUS
+# DBUS - server
 #
 ##############################################################################
 
@@ -109,7 +118,26 @@ dbus-pp-glue.h: pp.xml
 
 dbus-clean:
 	rm -f $(DBUS_SERVICE_NAME).service
-	
+
+###############################################################################
+#
+# DBUS - basic player proxy
+#
+##############################################################################
+
+bpp-dbus-server-glue.h: server.xml
+	dbus-binding-tool --mode=glib-client server.xml > bpp-dbus-server-glue.h
+	# we want shorter function names:
+	sed -i bpp-dbus-server-glue.h -e "s/net_sf_remuco_Server/rem_server/g"
+
+bpp-dbus-pp-glue.h: pp.xml
+	dbus-binding-tool --mode=glib-server --prefix=rem_pp \
+		pp.xml > bpp-dbus-pp-glue.h
+	# remove some 'const', because bpp has to edit some vars:
+	sed -i bpp-dbus-pp-glue.h \
+		-e "s/^static const DBusGMethodInfo/static DBusGMethodInfo/" \
+		-e "s/^const DBusGObjectInfo/static DBusGObjectInfo/"
+
 ###############################################################################
 #
 # Check Requirements
@@ -141,18 +169,22 @@ stamp-build-requirements:
 #
 ##############################################################################
 
+XDG_CONFIG_HOME ?= $(HOME)/.config
+REM_CONFIG_DIR := $(XDG_CONFIG_HOME)/remuco
+
 VGS ?= no
 
-~/.config/remuco/debug:
-	mkdir -p ~/.config/remuco
-	touch ~/.config/remuco/debug
+$(REM_CONFIG_DIR)/debug:
+	mkdir -p $(REM_CONFIG_DIR)
+	touch $(REM_CONFIG_DIR)/debug
 
-memcheck: all ~/.config/remuco/debug
+###### Server ######
+
+memcheck: all $(REM_CONFIG_DIR)/debug
 	G_SLICE=always-malloc G_DEBUG=gc-friendly \
 		valgrind -v \
 		--tool=memcheck \
 		--leak-check=full \
-		--leak-resolution=high \
 		--num-callers=20 \
 		--gen-suppressions=$(VGS) \
 		--suppressions=memcheck.server.supp \
@@ -161,7 +193,7 @@ memcheck: all ~/.config/remuco/debug
 		--suppressions=memcheck.libc.supp \
 		./remuco-server
 
-massif: all ~/.config/remuco/debug
+massif: all $(REM_CONFIG_DIR)/debug
 	G_SLICE=always-malloc G_DEBUG=gc-friendly \
 		valgrind \
 		--tool=massif \
@@ -183,3 +215,40 @@ massif: all ~/.config/remuco/debug
 		--alloc-fn=g_slice_alloc \
 		--alloc-fn=g_slice_alloc0 \
 		./remuco-server
+
+###### BPP ######
+
+memcheck-bpp: all $(REM_CONFIG_DIR)/debug
+	G_SLICE=always-malloc G_DEBUG=gc-friendly \
+		valgrind -v \
+		--tool=memcheck \
+		--leak-check=full \
+		--num-callers=20 \
+		--gen-suppressions=$(VGS) \
+		--suppressions=memcheck.bpp.supp \
+		--suppressions=memcheck.glib.supp \
+		--suppressions=memcheck.libc.supp \
+		./remuco-bpp $(BPP)
+
+massifi-bpp: all $(REM_CONFIG_DIR)/debug
+	G_SLICE=always-malloc G_DEBUG=gc-friendly \
+		valgrind \
+		--tool=massif \
+		--depth=20 \
+		--format=html \
+		--alloc-fn=g_memdup \
+		--alloc-fn=g_strdup \
+                --alloc-fn=g_strdup_printf \
+		--alloc-fn=g_strdupv \
+		--alloc-fn=g_malloc \
+		--alloc-fn=g_malloc0 \
+		--alloc-fn=g_realloc \
+		--alloc-fn=g_try_malloc \
+		--alloc-fn=g_try_malloc0 \
+		--alloc-fn=g_try_realloc \
+		--alloc-fn=dbus_malloc \
+		--alloc-fn=dbus_malloc0 \
+		--alloc-fn=dbus_realloc \
+		--alloc-fn=g_slice_alloc \
+		--alloc-fn=g_slice_alloc0 \
+		./remuco-bpp $(BPP)

@@ -135,7 +135,66 @@
    obj:*
    fun:g_get_user_config_dir
 }
-
+{
+   <g_get_user_cache_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:__nss_passwd_lookup
+   fun:getpwnam_r
+   obj:*
+   fun:g_get_user_cache_dir
+}
+{
+   <g_get_user_cache_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:_nss_compat_getpwnam_r
+   fun:getpwnam_r
+   obj:*
+   fun:g_get_user_cache_dir
+}
+{
+   <g_get_user_cache_dir()>
+   Memcheck:Addr4
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:*
+   fun:_nss_compat_getpwnam_r
+   fun:getpwnam_r
+   obj:*
+   fun:g_get_user_cache_dir
+}
 
 
 # I hope strcmp is knows waht it does..

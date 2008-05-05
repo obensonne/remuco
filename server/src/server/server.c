@@ -12,6 +12,7 @@
 
 #include "net.h"
 #include "serial.h"
+#include "bppl.h"
 #include "dbus.h"
 #include "dbus-pp-glue.h"
 #include "util.h"
@@ -166,20 +167,21 @@ typedef struct {
 
 struct _RemServer {
 
-	GObject			parent;
+	GObject					parent;
 	
-	DBusGConnection	*bus;
+	DBusGConnection			*bus;
 	
-	GMainLoop		*ml;
-	RemState		state;
-	GHashTable		*sht, *cht, *pht;
-	gchar			**plist;
-	gboolean		plist_sync_triggered;
+	GMainLoop				*ml;
+	RemState				state;
+	GHashTable				*sht, *cht, *pht;
+	gchar					**plist;
+	gboolean				plist_sync_triggered;
 	
-	RemServerConfig	*config;
+	RemServerConfig			*config;
 	
-	RemImg			*ri;
-	RemNetMsg		msg;
+	RemBasicProxyLauncher	*bppl;
+	RemImg					*ri;
+	RemNetMsg				msg;
 	
 };
 
@@ -193,7 +195,6 @@ G_DEFINE_TYPE(RemServer, rem_server, G_TYPE_OBJECT);
 
 static void
 rem_server_class_init(RemServerClass *class) {
-	// nothing to do
 }
 
 static void
@@ -241,118 +242,6 @@ rem_server_bye(RemServer *server, gchar *player,
 
 
 #include "dbus-server-glue.h"
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// private functions - shutdown procedure
-//
-///////////////////////////////////////////////////////////////////////////////
-
-static gboolean
-shutdown_finish(RemServer *server)
-{
-	rem_img_down(server->ri);
-	
-	g_hash_table_destroy(server->cht);
-
-	g_free(server->plist);
-	
-	g_byte_array_free(server->msg.ba, TRUE);
-	
-	g_main_loop_quit(server->ml);
-	
-	return FALSE;
-}
-
-static gboolean
-shutdown_cleanup(RemServer *server)
-{
-	GList		*l, *el;
-	RemClient	*client;
-	gboolean	ok;
-	
-	g_hash_table_destroy(server->sht);
-	g_hash_table_destroy(server->pht);
-	
-	////////// say bye to the clients //////////
-	
-	server->msg.id = REM_MSG_ID_IFS_SRVDOWN;
-	server->msg.ba->len = 0;
-
-	l = g_hash_table_get_values(server->cht);
-	
-	for (el = l; el; el = el->next) {
-		
-		client = (RemClient*) el->data;
-		
-		ok = rem_net_tx(client->net, &server->msg);
-	}
-	
-	////////// do the rest //////////
-	
-	if (l)
-		// wait a bit until real shutdown, to ensure clients receive bye message
-		g_timeout_add(1000, (GSourceFunc) &shutdown_finish, server);
-	else
-		shutdown_finish(server);
-
-	g_list_free(l);
-	
-	
-	return FALSE;
-}
-
-/** Initiates shutdown (real shutdown happens in main loop callback funcs). */
-static void
-shutdown(RemServer *server)
-{
-	if (server->state == REM_STATE_SHUTTING_DOWN)
-		return;
-	
-	g_assert(server->state == REM_STATE_RUNNING); // don't call me when starting
-	
-	server->state = REM_STATE_SHUTTING_DOWN;
-	
-	g_idle_add_full(G_PRIORITY_HIGH, (GSourceFunc) &shutdown_cleanup,
-					server, NULL);
-}
-
-static void
-shutdown_sys(RemServer *server)
-{
-	GError		*err;
-	gchar		*stdout, *stderr;
-	gint		exit;
-	
-	if (server->state == REM_STATE_SHUTTING_DOWN)
-		return;
-
-	if (!server->config->cmd_shutdown) {
-		LOG_INFO("system shutdown disabled");
-		return;
-	}
-	
-	//shutdown(server);
-
-	LOG_INFO("system shutdown: '%s'", server->config->cmd_shutdown);
-	
-	err = NULL; stdout = NULL; stderr = NULL; exit = 0;
-	g_spawn_command_line_sync(server->config->cmd_shutdown, &stdout, &stderr,
-							  &exit, &err);
-	
-	if (err) {
-		LOG_ERROR_GERR(err, "failed to execute shutdown command");
-		exit = 0;
-	}
-	
-	if (exit) {
-		LOG_WARN("shutdown command failed:\n%s%s", stdout, stderr);
-		LOG_WARN("maybe the remuco process is not allowed to shut down");
-	}
-	
-	g_free(stdout);
-	g_free(stderr);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -567,6 +456,141 @@ pp_reply_request_ploblist(DBusGProxy *proxy, gchar **nested_ids,
 		g_hash_table_remove(req->server->cht, req->client_chan);
 
 	rem_pp_request_destroy(req);
+}
+
+static void
+pp_reply_bye(DBusGProxy *proxy, GError *err, gpointer data)
+{
+	if (err)
+		g_error_free(err);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// private functions - shutdown procedure
+//
+///////////////////////////////////////////////////////////////////////////////
+
+static gboolean
+shutdown_finish(RemServer *server)
+{
+	rem_bppl_down(server->bppl);
+	
+	g_hash_table_destroy(server->pht);
+	g_hash_table_destroy(server->cht);
+
+	rem_img_down(server->ri);
+	
+	g_free(server->plist);
+	
+	g_byte_array_free(server->msg.ba, TRUE);
+	
+	g_main_loop_quit(server->ml);
+	
+	return FALSE;
+}
+
+static gboolean
+shutdown_cleanup(RemServer *server)
+{
+	GList		*l, *el;
+	RemClient	*client;
+	RemPP		*proxy;
+	gboolean	ok;
+	
+	g_hash_table_destroy(server->sht);
+	
+	////////// say bye to the proxies //////////
+	
+	l = g_hash_table_get_values(server->pht);
+	
+	for (el = l; el; el = el->next) {
+		
+		proxy = (RemPP*) el->data;
+		
+		rem_pp_bye_async(proxy->dbus, (rem_pp_bye_reply) &pp_reply_bye, NULL);
+	}
+	
+	g_list_free(l);
+
+	////////// say bye to the clients //////////
+	
+	server->msg.id = REM_MSG_ID_IFS_SRVDOWN;
+	server->msg.ba->len = 0;
+
+	l = g_hash_table_get_values(server->cht);
+	
+	for (el = l; el; el = el->next) {
+		
+		client = (RemClient*) el->data;
+		
+		ok = rem_net_tx(client->net, &server->msg);
+	}
+	
+	////////// do the rest //////////
+	
+	if (l)
+		// wait a bit until real shutdown, to ensure clients receive bye message
+		g_timeout_add(1000, (GSourceFunc) &shutdown_finish, server);
+	else
+		shutdown_finish(server);
+
+	g_list_free(l);
+	
+	
+	return FALSE;
+}
+
+/** Initiates shutdown (real shutdown happens in main loop callback funcs). */
+static void
+shutdown(RemServer *server)
+{
+	if (server->state == REM_STATE_SHUTTING_DOWN)
+		return;
+	
+	g_assert(server->state == REM_STATE_RUNNING); // don't call me when starting
+	
+	server->state = REM_STATE_SHUTTING_DOWN;
+	
+	g_idle_add_full(G_PRIORITY_HIGH, (GSourceFunc) &shutdown_cleanup,
+					server, NULL);
+}
+
+static void
+shutdown_sys(RemServer *server)
+{
+	GError		*err;
+	gchar		*stdout, *stderr;
+	gint		exit;
+	
+	if (server->state == REM_STATE_SHUTTING_DOWN)
+		return;
+
+	if (!server->config->cmd_shutdown) {
+		LOG_INFO("system shutdown disabled");
+		return;
+	}
+	
+	//shutdown(server);
+
+	LOG_INFO("system shutdown: '%s'", server->config->cmd_shutdown);
+	
+	err = NULL; stdout = NULL; stderr = NULL; exit = 0;
+	g_spawn_command_line_sync(server->config->cmd_shutdown, &stdout, &stderr,
+							  &exit, &err);
+	
+	if (err) {
+		LOG_ERROR_GERR(err, "failed to execute shutdown command");
+		exit = 0;
+	}
+	
+	if (exit) {
+		LOG_WARN("shutdown command failed:\n%s%s", stdout, stderr);
+		LOG_WARN("maybe the remuco process is not allowed to shut down");
+	}
+	
+	g_free(stdout);
+	g_free(stderr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1780,6 +1804,10 @@ int main(int argc, char **argv) {
 		g_object_unref(server);
 		return 1;
 	}
+	
+	////////// bpp launcher //////////
+	
+	server->bppl = rem_bppl_up();
 	
 	////////// misc initializations //////////
 	
