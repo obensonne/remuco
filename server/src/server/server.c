@@ -59,17 +59,6 @@
 #define REM_CTL_IGNORE				0
 #define REM_CTL_SHUTDOWN			0x0100
 
-////////// dbus related constants //////////
-
-/** The Remuco DBUS interface version. */
-#define REM_DBUS_IF_VERSION				1
-
-#define REM_SERVER_ERR_DOMAIN			g_quark_from_string("rem_server_error")
-
-#define REM_SERVER_ERR_INVALID_DATA		"rem_server_invalid_data"
-#define REM_SERVER_ERR_VERSION_MISMATCH	"rem_server_version_mismatch"
-#define REM_SERVER_ERR_UNKNOWN_PLAYER	"rem_server_unknown_player"
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // types and structs
