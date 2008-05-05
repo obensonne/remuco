@@ -9,7 +9,7 @@
 
 ////////// server errors exported via dbus //////////
 
-#define REM_SERVER_ERROR_DOMAIN			g_quark_from_string("rem_server_error")
+#define REM_SERVER_ERR_DOMAIN			g_quark_from_string("rem_server_error")
 
 #define REM_SERVER_ERR_INVALID_DATA		"rem_server_invalid_data"
 #define REM_SERVER_ERR_VERSION_MISMATCH	"rem_server_version_mismatch"
