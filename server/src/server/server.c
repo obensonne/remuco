@@ -1709,7 +1709,7 @@ int main(int argc, char **argv) {
 	global_config.net.bt_on = TRUE;
 	global_config.net.ip_on = TRUE;
 	global_config.net.ip_port = 34271;
-	global_config.cmd_shutdown = "sudo /sbin/shutdown";
+	global_config.cmd_shutdown = NULL;
 	global_config.img = "jpg";
 	global_config.list_limit = 100;
 	
