@@ -11,15 +11,25 @@
 #img = jpg 
 
 # The maximum length of lists (playlists, queue). Any list from a player will
-# be truncated to this limit before it gets send to a client.
-# Default value is '100'.
+# be truncated to this limit before it gets send to a client. This is because
+# the limited memory of mobile devices. 
+# Default value is '100'. Increase it if you have a mobile device with a lot
+# of RAM.
 #list-limit = 100
 
 # A command to shut down your computer. Gets executed when a client issues
 # the command 'Shutdown Host'. The user running Remuco must have appropriate
-# rights to execute this command.
-# Default value is 'sudo /sbin/shutdown'.
-#shutdown = sudo /sbin/shutdown
+# rights to execute this command. For instance you could this set this option
+# 'sudo /sbin/shutdown'.
+# Default value is '', i.e. system shutdown by a client is disabled.
+#shutdown = 
+
+# As described in the manual page, normally basic player proxies (BPPs) only
+# get started if the server has been started manually (i.e. not automatically
+# by a full player proxy). If you set this to 'true', the server always starts
+# BPPs, independent of how it has been started.
+# Default value is 'false'.
+#always-start-bpps = false
 
 [net]
 
