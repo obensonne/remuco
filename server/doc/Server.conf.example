@@ -24,12 +24,13 @@
 # Default value is '', i.e. system shutdown by a client is disabled.
 #shutdown = 
 
-# As described in the manual page, normally basic player proxies (BPPs) only
-# get started if the server has been started manually (i.e. not automatically
-# by a full player proxy). If you set this to 'true', the server always starts
-# BPPs, independent of how it has been started.
-# Default value is 'false'.
-#always-start-bpps = false
+# Whenever the server gets started, it also activates all installed basic
+# player proxies (BPP-files in ~/.config/remuco). You can adjust the server
+# to only activate basic player proxies if it has been started manually (i.e.
+# not automatically by a full player proxy). To do so set this option to
+# 'false'.
+# Default value is 'true'.
+#always-start-bpps = true
 
 [net]
 

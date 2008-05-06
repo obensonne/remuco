@@ -27,18 +27,16 @@ player proxies. If you use Remuco \fIonly\fR for players with \fIfull\fR
 player
 proxies (e.g. Rhythmbox, XMMS2) you do not need to care about starting the
 server - it gets started automatically by full player proxies. If you use
-Remuco for players with \fIbasic\fR player proxies (Amarok, MPD, Totem) and
-optionally also for players with full player proxies, start it
-manually - or let your desktop environment (GNOME, KDE, ..) start the server at
-login.
+Remuco (also) for players with \fIbasic\fR player proxies (Amarok, MPD, Totem)
+you have to start the server manually (if it has not been started already by a
+full player proxy). If you use basic player proxies it is a good idea to let
+your desktop environment (GNOME, KDE, ..) start the server at login.
 The optional argument \fI--log-here\fR redirects log output to stdout/err.
 .P
 .B remuco-bpp
 is a program that reads a basic player proxy (BPP) file and acts as a
 player proxy for the corresponding media player. \fIPLAYER-NAME\fR specifies
-the BPP file to load (see below in section FILES). If the server has been
-started manually (and this is what you should do if you want to use BPPs), it
-runs
+the BPP file to load (see below in section FILES). The server runs
 .B remuco-bpp
 automatically for every present BPP file. So you only need this tool if you want
 to debug a special BPP. If 

@@ -1737,7 +1737,7 @@ int main(int argc, char **argv) {
 	config_g.cmd_shutdown = NULL;
 	config_g.img = "jpg";
 	config_g.list_limit = 100;
-	config_g.always_start_bpps = FALSE;	
+	config_g.always_start_bpps = TRUE;	
 	
 	////////// load and check configuration //////////
 	
