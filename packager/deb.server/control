@@ -16,5 +16,4 @@ Description: Remuco server
  media and adjust volume. On the mobile (i.e. the remote control) it displays
  information about the current media, including cover art.
  .
- This package contains the server and the launcher for basic player proxies
- (BPPs).
+ This package contains the server.

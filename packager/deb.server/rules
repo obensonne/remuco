@@ -25,12 +25,7 @@ build: build-stamp
 build-stamp: configure-stamp 
 	dh_testdir
 
-	# Add here commands to compile the package.
 	$(MAKE)
-	#docbook-to-man debian/remuco-server.sgml > remuco-server.1
-
-	mv doc/remuco.1 .
-	rm -f doc/COPYING
 
 	touch $@
 
@@ -39,7 +34,6 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 
-	# Add here commands to clean up after the build process.
 	$(MAKE) clean
 
 	dh_clean 
@@ -47,11 +41,13 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_clean -k
 	dh_installdirs
 
-	# Add here commands to install the package into debian/remuco-server.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/remuco-server install
+	
+	# remove extra license file
+	rm -f $(CURDIR)/debian/remuco-server/usr/share/doc/remuco-server/COPYING.gz
 
 
 # Build architecture-independent files here.
@@ -65,9 +61,9 @@ binary-arch: build install
 	dh_installchangelogs 
 	dh_installdocs
 	dh_installexamples
-	dh_install
+#	dh_install
 #	dh_installmenu
-#	dh_installdebconf	
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
@@ -76,13 +72,9 @@ binary-arch: build install
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
-	dh_installman remuco.1
-	dh_link \
-		usr/share/man/man1/remuco.1 usr/share/man/man1/remuco-server.1 \
-		usr/share/man/man1/remuco.1 usr/share/man/man1/remuco-bpp.1 \
-		usr/share/man/man1/remuco.1 usr/share/man/man1/remuco-bpp-launcher.1
-#	dh_link
-	dh_strip
+#	dh_installman
+#	dh_link 
+#	dh_strip
 	dh_compress
 	dh_fixperms
 #	dh_perl

@@ -1,3 +1,9 @@
+remuco-server (0.7.1-1) hardy; urgency=low
+
+  * New upstream release.
+
+ -- Oben Sonne <obensonne@googlemail.com>  Tue, 6 May 2008 22:10:12 +0200
+
 remuco-server (0.7.0-1) hardy; urgency=low
 
   * Initial release.
