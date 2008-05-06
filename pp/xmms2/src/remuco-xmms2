@@ -39,7 +39,7 @@ ERROR_DISCONNECTED = "disconnected"
 #
 ###############################################################################
 
-SERVER_PP_PROTO_VERSION = 1
+SERVER_PP_PROTO_VERSION = 2
 
 # dbus constants
 
@@ -463,6 +463,12 @@ class PP(dbus.service.Object):
             
         return nested_ids, nested_names, ids, names
             
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='', out_signature='')
+    def Bye(self):
+        log_msg("server said bye")
+        self.down()
+
     ###########################################################################
     # Synchronization with XMMS2 server
     ###########################################################################
