@@ -72,7 +72,7 @@ typedef struct {
 	gchar			*cmd_shutdown;
 	gchar			*img;
 	guint			list_limit;
-	gboolean		allways_start_bpps;
+	gboolean		always_start_bpps;
 	
 } RemServerConfig;
 
@@ -1675,7 +1675,7 @@ static const RemConfigEntry	config_desc[] = {
 	{ "misc", "sys-shutdown-cmd", G_TYPE_STRING, FALSE, &config_g.cmd_shutdown },
 	{ "misc", "img", G_TYPE_STRING, FALSE, &config_g.img },
 	{ "misc", "list-limit", G_TYPE_INT, FALSE, &config_g.list_limit },
-	{ "misc", "allways-start-bpps", G_TYPE_BOOLEAN, FALSE, &config_g.allways_start_bpps },
+	{ "misc", "always-start-bpps", G_TYPE_BOOLEAN, FALSE, &config_g.always_start_bpps },
 	{ NULL, NULL, G_TYPE_INVALID, FALSE, NULL }
 };
 
@@ -1737,7 +1737,7 @@ int main(int argc, char **argv) {
 	config_g.cmd_shutdown = NULL;
 	config_g.img = "jpg";
 	config_g.list_limit = 100;
-	config_g.allways_start_bpps = FALSE;	
+	config_g.always_start_bpps = FALSE;	
 	
 	////////// load and check configuration //////////
 	
@@ -1809,7 +1809,7 @@ int main(int argc, char **argv) {
 	
 	////////// bpp launcher //////////
 	
-	if (!started_by_dbus || server->config->allways_start_bpps)
+	if (!started_by_dbus || server->config->always_start_bpps)
 		server->bppl = rem_bppl_up();
 	else
 		// if we do not use BPPs, shut down automatically once there are no
