@@ -76,7 +76,7 @@ bpp_exited(GPid pid, gint status, RemBasicProxy *proxy)
 		LOG_WARN("BPP %s exited unnormally -> don't try to restart", proxy->name);
 	}
 	
-	log = g_build_filename(g_get_user_cache_dir(), "remcuo", proxy->name, NULL);
+	log = g_build_filename(g_get_user_cache_dir(), "remuco", proxy->name, NULL);
 	
 	LOG_WARN("inspect the BPP's log file for more information (%s.log)", log);
 	
