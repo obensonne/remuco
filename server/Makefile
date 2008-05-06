@@ -12,15 +12,19 @@ PKG := remuco-server-$(VERSION)
 
 all: check-pkg-config
 	make -C src all
+	make -C doc all
 
 install: check-pkg-config
 	make -C src install
+	make -C doc install
 
 uninstall:
 	make -C src uninstall
+	make -C doc uninstall
 	
 clean:
 	make -C src clean
+	make -C doc clean
 	rm -rf build
 	rm -rf dist
 	
