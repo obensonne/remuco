@@ -7,7 +7,7 @@
 PREFIX ?= /usr
 DEBUG := no
 
-VERSION := 0.7.0
+VERSION := 0.7.1
 PKG := remuco-server-$(VERSION)
 
 all: check-pkg-config
