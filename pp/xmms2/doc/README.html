@@ -2,7 +2,7 @@
 <HTML
 ><HEAD
 ><TITLE
->Remuco Client 0.7</TITLE
+>Remuco Client 0.7.1</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
@@ -21,7 +21,7 @@ CLASS="TITLEPAGE"
 CLASS="title"
 ><A
 NAME="AEN1"
->Remuco Client 0.7</A
+>Remuco Client 0.7.1</A
 ></H1
 ><DIV
 ><DIV
@@ -98,14 +98,14 @@ HREF="#AEN38"
 ></DT
 ><DT
 >3.2. <A
-HREF="#AEN49"
+HREF="#AEN52"
 >XMMS2</A
 ></DT
 ></DL
 ></DD
 ><DT
 >A. <A
-HREF="#AEN61"
+HREF="#AEN64"
 >General Information</A
 ></DT
 ><DD
@@ -117,7 +117,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN75"
+HREF="#AEN78"
 >Source Code Access</A
 ></DT
 ></DL
@@ -288,8 +288,21 @@ CLASS="command"
         	<TT
 CLASS="filename"
 >~/.cache/remuco/Server.log</TT
->. Log sinks of
-        	player proxies are proxy specific.
+>. Logging of basic
+            player proxies (e.g. Amarok, MPD, Totem) go to
+            <TT
+CLASS="filename"
+>~/.cache/remuco/PLAYER.log</TT
+>
+            where <TT
+CLASS="filename"
+>PLAYER</TT
+> means the basic player proxy's
+            player name. Log sinks of full player proxies (e.g. Rhythmbox,
+            XMMS2) are proxy specific.
+        </P
+><P
+>&#13;            Inspect the relevant log files to detect what is wrong.
         </P
 ><DIV
 CLASS="note"
@@ -329,7 +342,7 @@ CLASS="section"
 ><HR><H3
 CLASS="section"
 ><A
-NAME="AEN49"
+NAME="AEN52"
 >3.2. XMMS2</A
 ></H3
 ><P
@@ -370,7 +383,7 @@ CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN61"
+NAME="AEN64"
 >A. General Information</A
 ></H1
 ><P
@@ -430,7 +443,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN75"
+NAME="AEN78"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -471,7 +484,7 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN85"
+NAME="AEN88"
 ></A
 ><P
 ><B
@@ -494,7 +507,7 @@ CLASS="command"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN90"
+NAME="AEN93"
 ></A
 ><P
 ><B
