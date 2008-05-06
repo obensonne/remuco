@@ -502,6 +502,7 @@ pp_new(const gchar* name, Config *config)
 {
 	RemPP			*pp;
 	GError			*err;
+	DBusGProxy		*self_test_proxy;
 	
 	////////// init //////////
 	
@@ -528,7 +529,7 @@ pp_new(const gchar* name, Config *config)
 	pp->argv[2] = NULL; // commands go here;
 	pp->argv[3] = NULL;
 	
-	////////// dbus //////////
+	////////// dbus connection //////////
 	
 	object_info_update(pp->name);
 	
@@ -539,6 +540,39 @@ pp_new(const gchar* name, Config *config)
 		pp_destroy(pp);
 		return NULL;
 	}
+	
+	////////// chek if there already is a proxy for our player //////////
+	
+	self_test_proxy = rem_dbus_proxy(pp->dbus_conn, pp->name);
+	
+	err = NULL;
+	dbus_g_proxy_call(self_test_proxy, "Control", &err,
+					  G_TYPE_UINT, REM_CTL_IGNORE, G_TYPE_INT, 0,
+					  G_TYPE_STRING, "", G_TYPE_INVALID, G_TYPE_INVALID);
+
+	g_object_unref(self_test_proxy);
+	
+	if (err && err->domain == DBUS_GERROR &&
+		err->code == DBUS_GERROR_SERVICE_UNKNOWN) {
+		
+		LOG_DEBUG("ok, no proxy for %s running yet", pp->name);
+		g_error_free(err);
+		
+	} else if (err) {
+		
+		LOG_WARN_GERR(err, "failed to talk pp %s - however, it looks like a "
+					  "proxy for %s is already running", pp->name, pp->name);
+		pp_destroy(pp);
+		return NULL;
+		
+	} else {
+		
+		LOG_WARN("a proxy for %s is already running", pp->name);
+		pp_destroy(pp);
+		return NULL;
+	}
+	
+	////////// get dbus proxy for server //////////
 	
 	pp->dbus_proxy = rem_dbus_proxy(pp->dbus_conn, "Server");
 	
