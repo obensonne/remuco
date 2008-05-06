@@ -60,7 +60,7 @@ all: stamp-build-requirements remuco-server remuco-bpp
 
 install: all dbus-install
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
-	$(INSTALL_EXE) remuco-server $(DESTDIR)$(PREFIX)/bin
+	$(INSTALL_EXE) remuco-server remuco-bpp $(DESTDIR)$(PREFIX)/bin
 
 uninstall: dbus-uninstall
 	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco-server
