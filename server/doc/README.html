@@ -2,7 +2,7 @@
 <HTML
 ><HEAD
 ><TITLE
->Remuco Server 0.7</TITLE
+>Remuco Server 0.7.1</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
@@ -21,7 +21,7 @@ CLASS="TITLEPAGE"
 CLASS="title"
 ><A
 NAME="AEN1"
->Remuco Server 0.7</A
+>Remuco Server 0.7.1</A
 ></H1
 ><DIV
 ><DIV
@@ -80,37 +80,23 @@ HREF="#AEN17"
 HREF="#AEN26"
 >Usage</A
 ></DT
-><DD
-><DL
-><DT
->4.1. <A
-HREF="#AEN28"
->Server</A
-></DT
-><DT
->4.2. <A
-HREF="#AEN33"
->Basic Player Proxies (BPP)</A
-></DT
-></DL
-></DD
 ><DT
 >5. <A
-HREF="#AEN44"
+HREF="#AEN29"
 >Troubleshooting</A
 ></DT
 ><DD
 ><DL
 ><DT
 >5.1. <A
-HREF="#AEN47"
+HREF="#AEN32"
 >General</A
 ></DT
 ></DL
 ></DD
 ><DT
 >A. <A
-HREF="#AEN58"
+HREF="#AEN46"
 >General Information</A
 ></DT
 ><DD
@@ -122,7 +108,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN72"
+HREF="#AEN60"
 >Source Code Access</A
 ></DT
 ></DL
@@ -186,14 +172,14 @@ CLASS="command"
 ><P
 >&#13;        	This installs the server below <TT
 CLASS="filename"
->/usr/bin</TT
+>/usr</TT
 >.
-            For an alternative installation prefix run: 
+            For an alternative installation prefix run (for instance): 
         </P
 ><P
 >&#13;            <B
 CLASS="command"
->$ PREFIX=/home/xyz/opt make install</B
+>$ PREFIX=/usr/local make install</B
 >
         </P
 ></DIV
@@ -205,101 +191,16 @@ CLASS="section"
 NAME="AEN26"
 >4. Usage</A
 ></H2
-><DIV
-CLASS="section"
-><H3
-CLASS="section"
-><A
-NAME="AEN28"
->4.1. Server</A
-></H3
 ><P
->&#13;        		The server gets automatically started by DBus, if player proxies
-        		contact the server.
-        	</P
-><P
->&#13;        		The server's behavior can be adjusted with the file
-        		<TT
-CLASS="filename"
->~/.config/remuco/Server.conf</TT
->. An example
-        		of this file is contained in this package.
-        	</P
-></DIV
-><DIV
-CLASS="section"
-><HR><H3
-CLASS="section"
-><A
-NAME="AEN33"
->4.2. Basic Player Proxies (BPP)</A
-></H3
-><P
->&#13;        		Basic player proxies are simple configuration files which
-        		provide a fast and easy way to extend Remuco with support
-        		for a certain media player (see the website for more detailed
-        		information on BPPs). To enable BPPs, you have to start the BPP
-        		launcher:
-        	</P
-><P
->&#13;	            <B
-CLASS="command"
->$ remuco-bpp-launcher</B
->
-	        </P
-><P
->&#13;	        	The launcher looks for all present BPPs and activates
-	        	them if the corresponding media player is running.
-	        </P
-><P
->&#13;	        	Example BPPs are contained in this package. You may copy the
-	        	BPPs you need to <TT
-CLASS="filename"
->~/.config/remuco</TT
-> (with
-	        	the suffix <TT
-CLASS="filename"
->.example</TT
-> removed). Have a look
-	        	into the BPP files you've copied - it may be necessary to
-	        	adjust them for your system.
-	        </P
-><DIV
-CLASS="note"
-><P
-></P
-><TABLE
-CLASS="note"
-WIDTH="100%"
-BORDER="0"
-><TR
-><TD
-WIDTH="25"
-ALIGN="CENTER"
-VALIGN="TOP"
-><IMG
-SRC="../images/note.gif"
-HSPACE="5"
-ALT="Note"></TD
-><TD
-ALIGN="LEFT"
-VALIGN="TOP"
-><P
->&#13;		        	The Remuco website may provide more
-		        	BPPs or more recent versions of the BPPs in this package.
-		        </P
-></TD
-></TR
-></TABLE
-></DIV
-></DIV
+>&#13;            Usage information can be found in the manual page (remuco).
+        </P
 ></DIV
 ><DIV
 CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN44"
+NAME="AEN29"
 >5. Troubleshooting</A
 ></H2
 ><P
@@ -311,7 +212,7 @@ CLASS="section"
 ><HR><H3
 CLASS="section"
 ><A
-NAME="AEN47"
+NAME="AEN32"
 >5.1. General</A
 ></H3
 ><P
@@ -334,8 +235,21 @@ CLASS="command"
         	<TT
 CLASS="filename"
 >~/.cache/remuco/Server.log</TT
->. Log sinks of
-        	player proxies are proxy specific.
+>. Logging of basic
+            player proxies (e.g. Amarok, MPD, Totem) go to
+            <TT
+CLASS="filename"
+>~/.cache/remuco/PLAYER.log</TT
+>
+            where <TT
+CLASS="filename"
+>PLAYER</TT
+> means the basic player proxy's
+            player name. Log sinks of full player proxies (e.g. Rhythmbox,
+            XMMS2) are proxy specific.
+        </P
+><P
+>&#13;            Inspect the relevant log files to detect what is wrong.
         </P
 ><DIV
 CLASS="note"
@@ -376,7 +290,7 @@ CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN58"
+NAME="AEN46"
 >A. General Information</A
 ></H1
 ><P
@@ -436,7 +350,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN72"
+NAME="AEN60"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -477,7 +391,7 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN82"
+NAME="AEN70"
 ></A
 ><P
 ><B
@@ -500,7 +414,7 @@ CLASS="command"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN87"
+NAME="AEN75"
 ></A
 ><P
 ><B

@@ -1,4 +1,4 @@
-Remuco Server 0.7
+Remuco Server 0.7.1
 
  Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
 Remuco you can remotely control your favorite media player - amongst others you
@@ -16,10 +16,6 @@ Table of Contents
 2. Building
 3. Installation
 4. Usage
-
-    4.1. Server
-    4.2. Basic Player Proxies (BPP)
-
 5. Troubleshooting
 
     5.1. General
@@ -54,43 +50,16 @@ is missing.
 
  $ make install
 
- This installs the server below /usr/bin. For an alternative installation
-prefix run:
+ This installs the server below /usr. For an alternative installation prefix
+run (for instance):
 
- $ PREFIX=/home/xyz/opt make install
+ $ PREFIX=/usr/local make install
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 4. Usage
 
-4.1. Server
-
- The server gets automatically started by DBus, if player proxies contact the
-server.
-
- The server's behavior can be adjusted with the file ~/.config/remuco/
-Server.conf. An example of this file is contained in this package.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-4.2. Basic Player Proxies (BPP)
-
- Basic player proxies are simple configuration files which provide a fast and
-easy way to extend Remuco with support for a certain media player (see the
-website for more detailed information on BPPs). To enable BPPs, you have to
-start the BPP launcher:
-
- $ remuco-bpp-launcher
-
- The launcher looks for all present BPPs and activates them if the
-corresponding media player is running.
-
- Example BPPs are contained in this package. You may copy the BPPs you need to
-~/.config/remuco (with the suffix .example removed). Have a look into the BPP
-files you've copied - it may be necessary to adjust them for your system.
-
-Note The Remuco website may provide more BPPs or more recent versions of the
-     BPPs in this package.
+ Usage information can be found in the manual page (remuco).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -109,8 +78,12 @@ done by creating the file ~/.config/remuco/debug, for instance:
  $ touch ~/.config/remuco/debug
 
  This tells the server and all player proxies to enable debug output. The
-server log can be found in ~/.cache/remuco/Server.log. Log sinks of player
-proxies are proxy specific.
+server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
+proxies (e.g. Amarok, MPD, Totem) go to ~/.cache/remuco/PLAYER.log where PLAYER
+means the basic player proxy's player name. Log sinks of full player proxies
+(e.g. Rhythmbox, XMMS2) are proxy specific.
+
+ Inspect the relevant log files to detect what is wrong.
 
 Note Don't forget to remove ~/.config/remuco/debug once you don't need the
      debug output anymore.
