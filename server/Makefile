@@ -11,11 +11,11 @@ VERSION := 0.7.1
 PKG := remuco-server-$(VERSION)
 
 all: check-pkg-config
-	make -C src all
+	DEBUG=$(DEBUG) make -C src all
 	make -C doc all
 
 install: check-pkg-config
-	make -C src install
+	DEBUG=$(DEBUG) make -C src install
 	make -C doc install
 
 uninstall:
