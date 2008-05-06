@@ -47,7 +47,7 @@ DELIM = "__:;:___"
 #
 ###############################################################################
 
-SERVER_PP_PROTO_VERSION = 1
+SERVER_PP_PROTO_VERSION = 2
 
 # dbus constants
 
@@ -568,6 +568,17 @@ class PP(dbus.service.Object):
             log_exc("error while requesting a ploblist (but we are lenient):")
             return ([], [], [], [])
 
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='', out_signature='')
+    def Bye(self):
+        """Remuco PP DBus interface method.
+        
+        Called by the Remuco server to tell us we should shut down.
+        """
+        
+        log_msg("server said bye")
+        self.__suicide(None)
+        
     ###########################################################################
     # Rhythmbox signal callbacks
     ###########################################################################
@@ -880,7 +891,8 @@ class PP(dbus.service.Object):
         
         self.deactivate(shell)
 
-        rb.error_dialog(title = "Remuco Error", message = msg)
+        if msg != None:
+            rb.error_dialog(title = "Remuco Error", message = msg)
         
     def __reconnect_to_server(self):
         """Reconnect to the server.
