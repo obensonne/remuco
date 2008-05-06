@@ -1,4 +1,4 @@
-Remuco Client 0.7
+Remuco Client 0.7.1
 
  Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
 Remuco you can remotely control your favorite media player - amongst others you
@@ -89,8 +89,12 @@ done by creating the file ~/.config/remuco/debug, for instance:
  $ touch ~/.config/remuco/debug
 
  This tells the server and all player proxies to enable debug output. The
-server log can be found in ~/.cache/remuco/Server.log. Log sinks of player
-proxies are proxy specific.
+server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
+proxies (e.g. Amarok, MPD, Totem) go to ~/.cache/remuco/PLAYER.log where PLAYER
+means the basic player proxy's player name. Log sinks of full player proxies
+(e.g. Rhythmbox, XMMS2) are proxy specific.
+
+ Inspect the relevant log files to detect what is wrong.
 
 Note Don't forget to remove ~/.config/remuco/debug once you don't need the
      debug output anymore.
