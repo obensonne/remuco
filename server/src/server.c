@@ -72,6 +72,7 @@ typedef struct {
 	gchar			*cmd_shutdown;
 	gchar			*img;
 	guint			list_limit;
+	gboolean		allways_start_bpps;
 	
 } RemServerConfig;
 
@@ -1663,17 +1664,18 @@ rem_server_bye(RemServer *server, gchar *player,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static RemServer		*global_server; // global refrence for signal handler
+static RemServer		*server_g; // global refrence for signal handler
 
-static RemServerConfig	global_config;
+static RemServerConfig	config_g;
 
 static const RemConfigEntry	config_desc[] = {
-	{ "net", "ip", G_TYPE_BOOLEAN, FALSE, &global_config.net.ip_on },
-	{ "net", "ip-port", G_TYPE_INT, FALSE, &global_config.net.ip_port },
-	{ "net", "bt", G_TYPE_BOOLEAN, FALSE, &global_config.net.bt_on },
-	{ "misc", "shutdown", G_TYPE_STRING, FALSE, &global_config.cmd_shutdown },
-	{ "misc", "img", G_TYPE_STRING, FALSE, &global_config.img },
-	{ "misc", "list-limit", G_TYPE_INT, FALSE, &global_config.list_limit },
+	{ "net", "ip", G_TYPE_BOOLEAN, FALSE, &config_g.net.ip_on },
+	{ "net", "ip-port", G_TYPE_INT, FALSE, &config_g.net.ip_port },
+	{ "net", "bt", G_TYPE_BOOLEAN, FALSE, &config_g.net.bt_on },
+	{ "misc", "sys-shutdown-cmd", G_TYPE_STRING, FALSE, &config_g.cmd_shutdown },
+	{ "misc", "img", G_TYPE_STRING, FALSE, &config_g.img },
+	{ "misc", "list-limit", G_TYPE_INT, FALSE, &config_g.list_limit },
+	{ "misc", "allways-start-bpps", G_TYPE_BOOLEAN, FALSE, &config_g.allways_start_bpps },
 	{ NULL, NULL, G_TYPE_INVALID, FALSE, NULL }
 };
 
@@ -1681,8 +1683,8 @@ static void
 sighandler(gint sig)
 {
 	LOG_INFO("received signal %s", g_strsignal(sig));
-	if (global_server && global_server->state == REM_STATE_RUNNING)
-		shutdown(global_server);
+	if (server_g && server_g->state == REM_STATE_RUNNING)
+		shutdown(server_g);
 }
 
 int main(int argc, char **argv) {
@@ -1698,11 +1700,10 @@ int main(int argc, char **argv) {
 	
 	started_by_dbus = (gboolean) g_getenv("DBUS_STARTER_ADDRESS");
 
-	if (started_by_dbus) {
-		logname = "Server";
-	} else {
-		g_print("- - - manual invocation -> log goes to stdout/err - - -\n");
+	if (argc > 1 && g_str_equal(argv[1], "--log-here")) { 
 		logname = NULL;
+	} else {
+		logname = "Server";
 	}
 	
 	ok = rem_util_create_cache_dir();
@@ -1728,14 +1729,15 @@ int main(int argc, char **argv) {
 	
 	////////// set default configuration //////////
 
-	memclr(RemServerConfig, &global_config);
+	memclr(RemServerConfig, &config_g);
 	
-	global_config.net.bt_on = TRUE;
-	global_config.net.ip_on = TRUE;
-	global_config.net.ip_port = 34271;
-	global_config.cmd_shutdown = NULL;
-	global_config.img = "jpg";
-	global_config.list_limit = 100;
+	config_g.net.bt_on = TRUE;
+	config_g.net.ip_on = TRUE;
+	config_g.net.ip_port = 34271;
+	config_g.cmd_shutdown = NULL;
+	config_g.img = "jpg";
+	config_g.list_limit = 100;
+	config_g.allways_start_bpps = FALSE;	
 	
 	////////// load and check configuration //////////
 	
@@ -1743,23 +1745,23 @@ int main(int argc, char **argv) {
 	if (!ok)
 		return 1;
 
-	if (!global_config.net.bt_on && !global_config.net.ip_on) {
+	if (!config_g.net.bt_on && !config_g.net.ip_on) {
 		
 		LOG_ERROR("neither Bluetooth nor IP is activated");
 		return 1;
 	}
 	
-	if (global_config.net.ip_port >= 65536) {
+	if (config_g.net.ip_port >= 65536) {
 	
 		LOG_ERROR("invalid port number");
 		return 1;
 	}
 	
-	if (strlen(global_config.img) == 0 ||
-		g_str_equal(global_config.img, REM_IMG_NONE)) {
+	if (strlen(config_g.img) == 0 ||
+		g_str_equal(config_g.img, REM_IMG_NONE)) {
 		
-		g_free(global_config.img);
-		global_config.img = NULL;
+		g_free(config_g.img);
+		config_g.img = NULL;
 	}
 	
 	////////// init server type //////////
@@ -1768,9 +1770,9 @@ int main(int argc, char **argv) {
 	
 	server = g_object_new(rem_server_get_type(), NULL);
 	
-	server->config = &global_config;
+	server->config = &config_g;
 	
-	global_server = server;
+	server_g = server;
 	
 	////////// net (bt, ip, ..) //////////
 	
@@ -1807,7 +1809,12 @@ int main(int argc, char **argv) {
 	
 	////////// bpp launcher //////////
 	
-	server->bppl = rem_bppl_up();
+	if (!started_by_dbus || server->config->allways_start_bpps)
+		server->bppl = rem_bppl_up();
+	else
+		// if we do not use BPPs, shut down automatically once there are no
+		// more player proxies
+		g_timeout_add(30000, (GSourceFunc) &pp_ping, server);
 	
 	////////// misc initializations //////////
 	
@@ -1826,9 +1833,6 @@ int main(int argc, char **argv) {
 	
 	////////// here we go //////////
 	
-	// periodically watch pps (shut down if there are no pps)
-	g_timeout_add(30000, (GSourceFunc) &pp_ping, server);
-
 	server->state = REM_STATE_RUNNING;
 	
 	LOG_INFO("here we go ..");
