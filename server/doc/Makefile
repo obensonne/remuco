@@ -31,13 +31,14 @@ install: all
 	ln -sf remuco.1.gz $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1.gz
 	ln -sf remuco.1.gz $(DESTDIR)$(PREFIX)/share/man/man1/remuco-bpp.1.gz
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/doc/remuco-server
+	cp -r bpp-examples $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	$(INSTALL_DAT) COPYING README README.html Server.conf.example changelog \
 		$(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/COPYING
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/changelog
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/README
 	
-uninstall: dbus-uninstall
+uninstall:
 	rm -rf $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/remuco.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1.gz
