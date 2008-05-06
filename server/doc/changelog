@@ -1,3 +1,12 @@
+0.7.1	Oben Sonne <obensonne@googlemail.com>
+
+	* mostly internal changes
+	* merged bpp and server parts
+	* removed tool remuco-bpp-launcher (bpps get started by server now)
+	* added 'bye' function to pp dbus interface
+	* bumped server pp protocol version to 2
+	* remuco-bpp checks if there already is a proxy for the given player
+
 0.7.0	Oben Sonne <obensonne@googlemail.com>
 
 	* Initial release of the 0.7 series.
