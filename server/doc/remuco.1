@@ -3,17 +3,13 @@
 remuco-server \- server
 .P
 remuco-bpp \- basic player proxy
-.P
-remuco-bpp-launcher \- launcher for basic player proxies
 .SH SYNOPSIS
 .\" Syntax goes here. 
 .B remuco-server
+[\fI--log-here\fR]
 .P
 .B remuco-bpp
 \fIPLAYER-NAME\fR
-.P
-.B remuco-bpp-launcher
-[--log-here]
 .SH DESCRIPTION
 .B Remuco
 is a Bluetooth/WLAN remote control system for Linux media players. With
@@ -26,28 +22,26 @@ remuco.sourceforge.net for a complete feature list, screenshots and a list of
 supported media players.
 .P
 .B remuco-server
-is a daemon that intermediates between Remuco clients and Remuco player proxies.
-Player proxies communicate with the server via DBus. So acutally there is no
-need to start the server manually - it gets started automatically if a player
-proxy wants to talk to the daemon. If started manually logging goes to standard
-out instead of a log file.
+is a daemon (DBus service) that intermediates between Remuco clients and Remuco
+player proxies. You have to start the server \fImanually\fR if you want to use
+basic player proxies (e.g. Amarok, Totem, MPD). The server gets started
+\fIautomatically\fR by full player proxies (e.g. Rhythmbox, XMMS2) - note that
+basic player proxies do not get activated if the server gets started
+automatically (unless specified different in the server configuration)!
+If the optional argument \fI--log-here\fR is given, logging goes
+to stdout/err instead of a log file.
 .P
 .B remuco-bpp
 is a program that reads a basic player proxy (BPP) file and acts as a
 player proxy for the corresponding media player. \fIPLAYER-NAME\fR specifies
-the BPP file to load (see below in section FILES).
+the BPP file to load (see below in section FILES). If the server has been
+started manually (and this is what you should do if you want to use BPPs), it
+runs
 .B remuco-bpp
-gets started automatically
-by
-.B remuco-bpp-launcher.
-If started manually logging goes to standard out instead of a log file.
-.P
-.B remuco-bpp-launcher
-is a program that looks for present BPP files and runs
+automatically for every present BPP file. So you only need this tool if you want
+to debug a special BPP. If 
 .B remuco-bpp
-for each file found.
-The optional argument \fI--log--here\fR directs logging to standard out instead
-of a log file.
+gets started manually, it logs to stdout/err instead of a log file.
 .SH FILES
 .IP \(bu 2 
 .I $XDG_CACHE_HOME/remuco/Server.log
@@ -57,19 +51,16 @@ of a log file.
 .I $XDG_CONFIG_HOME/remuco/Server.conf
 \- configuration for
 .B remuco-server
+(there is an example configuration in the doc dir)
 .IP \(bu 2 
 .I $XDG_CACHE_HOME/remuco/PLAYER-NAME.log
 \- log output of
 .B remuco-bpp
 started with argument \fIPLAYER-NAME\fR.
 .IP \(bu 2 
-.I $XDG_CACHE_HOME/remuco/Launcher.log
-\- log output of
-.B remuco-bpp-launcher
-.IP \(bu 2 
 .I $XDG_CONFIG_HOME/remuco/debug
 \- debug flag (if this file is present, the applications described here
-enable debug output)
+enable debug output - and full player proxies are supposed to do the same)
 .P
 .IP \(bu 2 
 .I $XDG_CONFIG_HOME/remuco/*.bpp
