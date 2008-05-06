@@ -33,10 +33,11 @@ install: all
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	cp -r bpp-examples $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	$(INSTALL_DAT) COPYING README README.html Server.conf.example changelog \
-		$(DESTDIR)$(PREFIX)/share/doc/remuco-server
+		THANKS $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/COPYING
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/changelog
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/README
+	gzip -f9 $(DESTDIR)$(PREFIX)/share/doc/remuco-server/THANKS
 	
 uninstall:
 	rm -rf $(DESTDIR)$(PREFIX)/share/doc/remuco-server
