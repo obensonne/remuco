@@ -711,26 +711,26 @@ rem_pp_bye(RemPP *pp, GError **err)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static RemPP				*global_pp = NULL;
+static RemPP	*pp_g = NULL;
 
-static Config			global_config;
+static Config	config_g;
 
 static const RemConfigEntry	config_desc[] = {
-	{ "config", "tick", G_TYPE_INT, FALSE, &global_config.tick },
-	{ "config", "shell", G_TYPE_STRING, FALSE, &global_config.shell },
-	{ "commands", "running", G_TYPE_STRING, FALSE, &global_config.cmd_running },
-	{ "commands", "playpause", G_TYPE_STRING, FALSE, &global_config.cmd_playpause },
-	{ "commands", "stop", G_TYPE_STRING, FALSE, &global_config.cmd_stop },
-	{ "commands", "next", G_TYPE_STRING, FALSE, &global_config.cmd_next },
-	{ "commands", "prev", G_TYPE_STRING, FALSE, &global_config.cmd_prev },
-	{ "commands", "jump", G_TYPE_STRING, FALSE, &global_config.cmd_jump },
-	{ "commands", "seek-fwd", G_TYPE_STRING, FALSE, &global_config.cmd_seek_fwd },
-	{ "commands", "seek-bwd", G_TYPE_STRING, FALSE, &global_config.cmd_seek_bwd },
-	{ "commands", "volume-set", G_TYPE_STRING, FALSE, &global_config.cmd_volume_set },
-	{ "commands", "volume", G_TYPE_STRING, FALSE, &global_config.cmd_volume },
-	{ "commands", "playing", G_TYPE_STRING, FALSE, &global_config.cmd_playing },
-	{ "commands", "plob", G_TYPE_STRING, FALSE, &global_config.cmd_plob },
-	{ "commands", "playlist", G_TYPE_STRING, FALSE, &global_config.cmd_playlist },
+	{ "config", "tick", G_TYPE_INT, FALSE, &config_g.tick },
+	{ "config", "shell", G_TYPE_STRING, FALSE, &config_g.shell },
+	{ "commands", "running", G_TYPE_STRING, FALSE, &config_g.cmd_running },
+	{ "commands", "playpause", G_TYPE_STRING, FALSE, &config_g.cmd_playpause },
+	{ "commands", "stop", G_TYPE_STRING, FALSE, &config_g.cmd_stop },
+	{ "commands", "next", G_TYPE_STRING, FALSE, &config_g.cmd_next },
+	{ "commands", "prev", G_TYPE_STRING, FALSE, &config_g.cmd_prev },
+	{ "commands", "jump", G_TYPE_STRING, FALSE, &config_g.cmd_jump },
+	{ "commands", "seek-fwd", G_TYPE_STRING, FALSE, &config_g.cmd_seek_fwd },
+	{ "commands", "seek-bwd", G_TYPE_STRING, FALSE, &config_g.cmd_seek_bwd },
+	{ "commands", "volume-set", G_TYPE_STRING, FALSE, &config_g.cmd_volume_set },
+	{ "commands", "volume", G_TYPE_STRING, FALSE, &config_g.cmd_volume },
+	{ "commands", "playing", G_TYPE_STRING, FALSE, &config_g.cmd_playing },
+	{ "commands", "plob", G_TYPE_STRING, FALSE, &config_g.cmd_plob },
+	{ "commands", "playlist", G_TYPE_STRING, FALSE, &config_g.cmd_playlist },
 	{ NULL, NULL, G_TYPE_INVALID, FALSE, NULL }
 };
 
@@ -738,8 +738,8 @@ static void
 sighandler(gint sig)
 {
 	LOG_INFO("received signal %s", g_strsignal(sig));
-	if (global_pp && global_pp->ml)
-		g_main_loop_quit(global_pp->ml);
+	if (pp_g && pp_g->ml)
+		g_main_loop_quit(pp_g->ml);
 }
 
 int main(int argc, char **argv)
@@ -760,10 +760,10 @@ int main(int argc, char **argv)
 	
 	////////// set default config //////////
 	
-	memclr(Config, &global_config);
+	memclr(Config, &config_g);
 	
-	global_config.tick = 5;
-	global_config.shell = "/bin/sh";
+	config_g.tick = 5;
+	config_g.shell = "/bin/sh";
 	
 	////////// load and check config //////////
 	
@@ -772,7 +772,7 @@ int main(int argc, char **argv)
 	if (!ok)
 		return 1;
 	
-	ok = check_config(&global_config);
+	ok = check_config(&config_g);
 	
 	if (!ok)
 		return 1;
@@ -811,11 +811,11 @@ int main(int argc, char **argv)
 	
 	////////// pp init //////////
 	
-	pp = pp_new(name, &global_config);
+	pp = pp_new(name, &config_g);
 	if (!pp)
 		return 1;
 	
-	global_pp = pp;
+	pp_g = pp;
 	
 	////////// check if player is running, otherwise .. bye //////////
 	
