@@ -1,0 +1,20 @@
+[config]
+
+[commands]
+
+running = mpc
+
+playpause = mpc toggle
+next = mpc next
+prev = mpc prev
+stop = mpc stop
+seek-fwd = mpc seek +5s
+seek-bwd = mpc seek -5s
+volume-set = mpc volume $PARAM
+mute = mpc volume 0
+jump = mpc play $( expr $PARAM + 2 )
+
+playing = mpc | fgrep playing
+volume = mpc | fgrep volume | cut -d ' ' -f2 | tr -d '%'
+plob = mpc | head -n1
+playlist = mpc playlist
