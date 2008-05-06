@@ -1,11 +1,69 @@
 [config]
 
-tick = 4
+# The shell to use.
+# Default is '/bin/sh'
+#shell = /bin/sh
+
+# The interval in seconds to check for changes in player state.
+# Default is 5.
+#tick = 5
 
 [commands]
 
-present = true
-#running = true
+# This command is executed to check if the player of this proxy is running
+# or not. It should return 0 if the player is running and != 0 if the player
+# is not running. If you see no chance to check if the player is running, set
+# this to 'true'.
+# running = foo is-running
 
-volume = echo `date +%N` 100 % p | dc
-playpause = echo hallo
+### control commands ###
+
+# The command to toggle play/pause.
+#playpause = foo toggle-play-pause 
+
+# The command to switch to the next song/video/..
+#next = foo next 
+
+# The command to switch to the previous song/video/..
+#prev = foo prev
+
+# The command to stop playing.
+#stop = foo stop
+
+# The command to seek forward for some seconds.
+#seek-fwd = foo seek +5s
+
+# The command to seek backward for some seconds.
+#seek-bwd = foo seek -5s
+
+# The command to set the volume. $PARAM will be replaced by value between 0 and
+# 100 (percent).
+#volume-set = foo set-volume $PARAM
+
+# The command to jump to a specific playlist position. $PARAM will be replaced
+# with the position (starting from 0).
+#jump = foo jump-to-position $PARAM
+
+### commands to get information about the player ###
+
+# The command to check if the player is currently playing something. If yes
+# it should print out 'true' or 'yes', if not it should print out 'false' or
+# 'no'.
+playing = echo yes 
+
+# The command to get the volume. It should print out an integer between 0 and
+# 100.
+volume = echo 56
+
+# The command to get a one line description of the currently played song/video.
+# Typically something like ARTIST - TITLE.
+plob = echo "John Doe - Foo Bar Song"
+
+# The command to get the playlist. Each line printed out is considered as the
+# description of a playlist entry. 
+playlist = echo -e "song1\\nsong2\\nsong3"
+
+### some notes ###
+
+If you use backslashes in your shell commands, escape them with an additional
+backslash!
