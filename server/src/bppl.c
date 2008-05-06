@@ -78,8 +78,7 @@ bpp_exited(GPid pid, gint status, RemBasicProxy *proxy)
 	
 	log = g_build_filename(g_get_user_cache_dir(), "remcuo", proxy->name, NULL);
 	
-	LOG_WARN("inspect the BPP's log file for more information (%s.%s)",
-			 log, proxy->name);
+	LOG_WARN("inspect the BPP's log file for more information (%s.log)", log);
 	
 	g_free(log);
 	
