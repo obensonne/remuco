@@ -7,7 +7,7 @@
 
 CONF=deb.$1.conf
 
-[ ! -e $CONF ] && echo "Missing file $CONF" && exit 1 
+[ ! -e $CONF ] && echo "Missing file $CONF" && exit 1
 
 ##############################################################################
 
@@ -18,11 +18,13 @@ die() {
 
 ##############################################################################
 
+. ./$CONF
+
 rm -rf build
 
 mkdir build
 
-svn co $URL build/svn-co
+svn co $URL build/svn-co || die
 
 make -C build/svn-co dist || die
 
