@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <glib/gstdio.h>	// for S_IRWXU
+#include <errno.h>
 
 #include "util.h"
 
@@ -410,8 +411,7 @@ rem_util_s2b(const gchar *s)
 			g_str_equal(s, "y") || g_str_equal(s, "Y");
 }
 
-gboolean
-rem_util_create_cache_dir()
+rem_util_create_cache_dir(GError **err)
 {
 	gchar		*cache_dir;
 	gboolean	ok;
@@ -421,13 +421,11 @@ rem_util_create_cache_dir()
 	
 	ret = g_mkdir_with_parents(cache_dir, S_IRWXU);
 	if (ret < 0) {
-		LOG_ERRNO("failed to create cache/log dir '%s'", cache_dir);
-		ok = FALSE;
-	} else {
-		ok = TRUE;
+		g_set_error(err, 0, 0, "mkdir on '%s' failed: %s", cache_dir,
+					g_strerror(errno));
 	}
 	
 	g_free(cache_dir);
 	
-	return ok;	
+	return;	
 }

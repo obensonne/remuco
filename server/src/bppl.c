@@ -60,7 +60,7 @@ bpp_exited(GPid pid, gint status, RemBasicProxy *proxy)
 {
 	gchar	*log;
 	
-	LOG_DEBUG("BPP %s exited", proxy->name);
+	LOG_DEBUG("%s is down", proxy->name);
 	
 	g_spawn_close_pid(pid);
 	
@@ -97,7 +97,7 @@ bpp_launch(gpointer key, gpointer value, gpointer data)
 	if (proxy->pid) // already running
 		return;
 
-	LOG_DEBUG("starting BPP '%s'", proxy->name);
+	LOG_DEBUG("starting BPP for %s", proxy->name);
 	
 	proxy->launcher->argv[1] = proxy->name;
 	err = NULL;
@@ -303,5 +303,14 @@ rem_bppl_down(RemBasicProxyLauncher *launcher)
 	g_hash_table_destroy(launcher->proxies);
 	
 	g_slice_free(RemBasicProxyLauncher, launcher);
+}
+
+guint
+rem_bppl_bpp_count(RemBasicProxyLauncher *launcher)
+{
+	g_assert(launcher);
+	g_assert(launcher->proxies);
+	
+	return g_hash_table_size(launcher->proxies);
 }
 

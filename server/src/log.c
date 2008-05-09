@@ -80,7 +80,7 @@ gcb_log_handler_std(const gchar *domain,
 }
 
 static void
-gcb_log_handler_devnull(const gchar *domain,
+gcb_log_handler_none(const gchar *domain,
 						  GLogLevelFlags level,
 						  const gchar *message,
 						  gpointer data)
@@ -115,7 +115,7 @@ get_file(const gchar *name)
 	
 	g_free(basename);
 	
-	LOG_INFO("logging goes to %s", file);
+	g_print("logging goes to %s\n", file);
 	
 	return file;
 }
@@ -125,17 +125,57 @@ get_level()
 {
 	gchar			*file;
 	RemLogLevel		level;
-	
-	level = REM_LL_INFO;
+	gboolean		debug;
 	
 	file = g_build_filename(g_get_user_config_dir(), "remuco", "debug", NULL);
 
-	if (g_file_test(file, G_FILE_TEST_IS_REGULAR))
-		level = REM_LL_DEBUG;
-
+	debug = g_file_test(file, G_FILE_TEST_IS_REGULAR);
+	
 	g_free(file);
+
+	level = debug ? REM_LL_DEBUG : REM_LL_INFO;
+
+	g_print("debug log is %s\n", debug ? "enabled" : "disabled");
 	
 	return level;
+}
+
+static void
+log_enc_info()
+{
+	gboolean	fne_is_utf8;
+	const gchar **filename_enc_list, *locale_enc;
+	guint		u;
+	GString		*gs;
+	
+	locale_enc = NULL;
+	g_get_charset(&locale_enc);
+	LOG_DEBUG("locale encoding: %s", locale_enc);
+	
+	filename_enc_list = NULL;
+	fne_is_utf8 = g_get_filename_charsets(&filename_enc_list);
+	
+	if (filename_enc_list) {
+		
+		gs = g_string_new("filename encodings: ");
+
+		for (u = 0; filename_enc_list[u]; u++)
+			g_string_append_printf(gs, "%s, ", filename_enc_list[u]);
+		
+		LOG_DEBUG("%s", gs->str);
+		
+		g_string_free(gs, TRUE);
+		
+	} else {
+		
+		LOG_WARN("no filename encodings specifed");		
+	}
+	
+	if (!fne_is_utf8) {
+		
+		LOG_WARN("it looks like your filename encoding is not UTF-8 - "
+				 "this may cause problems.");
+	}	
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -144,7 +184,7 @@ get_level()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void
+gboolean
 rem_log_init(const gchar *name)
 {
 	GIOChannel		*channel;
@@ -163,14 +203,12 @@ rem_log_init(const gchar *name)
 	ts = g_string_new("12345.789");
 	
 	// at first, suppress everything:
-	g_log_set_handler(REM_LOG_DOMAIN, REM_LL_DEBUG, gcb_log_handler_devnull, NULL);
+	g_log_set_handler(REM_LOG_DOMAIN, REM_LL_DEBUG, gcb_log_handler_none, NULL);
 	
 	// by default, log all with severity <= INFO to stdout 
 	g_log_set_handler(REM_LOG_DOMAIN, REM_LL_INFO, gcb_log_handler_std, NULL);
 	
 	level = get_level();
-	
-	LOG_INFO("debug log is %s", level == REM_LL_DEBUG ? "enabled" : "disabled");
 	
 	log_file = get_file(name);
 	
@@ -195,8 +233,10 @@ rem_log_init(const gchar *name)
 		
 		g_free(log_file);
 
-		if (!channel)
-			LOG_ERROR_GERR(err, "failed to open log file");
+		if (!channel) {
+			g_printerr("failed to open log file (%s)\n", err->message);
+			return FALSE;
+		}
 	}
 	
 	if (channel) { // print a log header
@@ -218,29 +258,12 @@ rem_log_init(const gchar *name)
 		g_log_set_handler(REM_LOG_DOMAIN, level, gcb_log_handler_std, NULL);
 	}
 	
+	g_print("logging is up\n");
+	
 	////////// just to know .. //////////
 	
-	gboolean	fne_is_utf8;
-	const gchar **filename_enc_list, *locale_enc;
-	guint		u;
+	log_enc_info();
 	
-	locale_enc = NULL;
-	g_get_charset(&locale_enc);
-	LOG_DEBUG("locale encoding: %s", locale_enc);
-	
-	filename_enc_list = NULL;
-	fne_is_utf8 = g_get_filename_charsets(&filename_enc_list);
-	if (filename_enc_list) {
-		LOG_DEBUG("filename encodings:");
-		for (u = 0; filename_enc_list[u]; u++)
-			LOG_DEBUG("%s", filename_enc_list[u]);
-	} else {
-		LOG_WARN("no filename encodings specifed");		
-	}
-	if (!fne_is_utf8) {
-		LOG_WARN("it looks like your filename encoding is not UTF-8 - "
-				 "this may cause problems.");
-	}
-	
+	return TRUE;
 }
 

@@ -1,0 +1,10 @@
+<node name="/net/sf/remuco/Shell">
+        <interface name="net.sf.remuco.Shell">
+                <method name="Ping">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_shell_ping"/>
+                </method>
+                <method name="Shutdown">
+                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_shell_shutdown"/>
+                </method>
+        </interface>
+</node>

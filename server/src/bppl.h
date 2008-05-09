@@ -11,4 +11,7 @@ rem_bppl_up(void);
 void
 rem_bppl_down(RemBasicProxyLauncher *bppl);
 
+guint
+rem_bppl_bpp_count(RemBasicProxyLauncher *launcher);
+
 #endif /*BPPL_H_*/

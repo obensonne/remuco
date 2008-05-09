@@ -36,7 +36,7 @@ typedef enum {
  * @param level specifies which messages to log
  * @param name used for the log file name
  */
-void
+gboolean
 rem_log_init(const gchar *component);
 
 G_END_DECLS
