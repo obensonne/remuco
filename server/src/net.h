@@ -31,6 +31,7 @@ typedef struct {
 	GIOChannel	*chan;
 	gchar		*addr;
 	gboolean	flushing;
+	gboolean	say_bye;
 } RemNetClient;
 
 typedef struct _RemNetServerPriv RemNetServerPriv;
@@ -54,19 +55,16 @@ GHashTable*
 rem_net_up(RemNetConfig *config);
 
 RemNetClient*
-rem_net_accept(RemNetServer *Server);
+rem_net_hello(RemNetServer *Server);
+
+void
+rem_net_bye(RemNetClient *client);
 
 gboolean
 rem_net_rx(RemNetClient *client, RemNetMsg *msg);
 
 gboolean
 rem_net_tx(RemNetClient *client, const RemNetMsg *msg);
-
-gboolean
-rem_net_hello(RemNetClient* client);
-
-void
-rem_net_bye(RemNetClient *client);
 
 #ifdef REM_NET_PRIV
 

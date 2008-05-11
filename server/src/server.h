@@ -36,10 +36,19 @@ rem_server_get_type(void);
 ///////////////////////////////////////////////////////////////////////////////
 
 gboolean
-rem_server_up(RemServer *server, GMainLoop *ml);
+rem_server_up(RemServer *server);
 
 void
 rem_server_down(RemServer *server);
+
+gboolean
+rem_server_disable_proxy(RemServer *server, const gchar *name);
+
+gchar**
+rem_server_get_proxies(RemServer *server);
+
+gchar**
+rem_server_get_clients(RemServer *server);
 
 ///////////////////////////////////////////////////////////////////////////////
 //

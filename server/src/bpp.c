@@ -108,7 +108,6 @@ static const RemConfigEntry	config_entries[] = {
 struct _RemBasicProxyPriv {
 	
 	gchar			*name;
-	guint			flags;
 	Config			*config;
 	GMainLoop		*ml;
 	gchar			*argv[4]; // { shell, '-c', cmd, NULL }
@@ -116,6 +115,7 @@ struct _RemBasicProxyPriv {
 	DBusGProxy		*dbus_proxy;
 	GHashTable		*plob;
 	gboolean		idle_sync_triggered;
+	gint			ret;
 	
 };
 
@@ -138,6 +138,16 @@ rem_basic_proxy_init(RemBasicProxy *bpp)
 // private functions
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+static void
+stop(RemBasicProxy *bpp, gint retval)
+{
+	bpp->priv->ret = retval;
+	
+	if (bpp->priv->ml) {
+		g_main_loop_quit(bpp->priv->ml);
+	}
+}
 
 /**
  * Execute a command.
@@ -173,10 +183,7 @@ execute(RemBasicProxy *bpp, const gchar *cmd, gchar **out)
 	
 	if (err) { // serious error
 		LOG_ERROR_GERR(err, "failed to run '%s'", cmd);
-		g_free(stdout);
-		g_free(stderr);
-		bpp->error = TRUE;
-		rem_bpp_down(bpp);
+		stop(bpp, REM_BPP_RET_ERROR);
 		return FALSE;
 	}
 	
@@ -219,13 +226,13 @@ pp_running(RemBasicProxy *bpp)
 	
 	running = execute(bpp, bpp->priv->config->cmd_running, NULL);
 	
-	if (bpp->error) {
+	if (bpp->priv->ret == REM_BPP_RET_ERROR) {
 		return FALSE;
 	}
 
 	if (!running) {
 		LOG_INFO("player is down");
-		rem_bpp_down(bpp);
+		stop(bpp, REM_BPP_RET_OK);
 		return FALSE;
 	}
 
@@ -243,39 +250,13 @@ handle_server_error(RemBasicProxy *bpp, GError *err)
 			
 		LOG_WARN_GERR(err, "no reply from server, probably it is busy");
 		return TRUE; // don't care
+		
+	} else if (err) {
+
+		LOG_ERROR_GERR(err, "failed to talk to server");
+		stop(bpp, REM_BPP_RET_ERROR);
+		return FALSE;			
 	}
-	
-	if (err->domain = REM_SERVER_ERR_DOMAIN) {
-		
-		if (g_str_equal(err->message, REM_SERVER_ERR_UNKNOWN_PLAYER)) {
-			g_error_free(err);
-			LOG_INFO("have to reconnect to server");
-			err = NULL;
-			net_sf_remuco_Server_hello(bpp->priv->dbus_proxy, bpp->priv->name,
-									   bpp->priv->flags, 0, &err);
-			if (err) {
-				LOG_ERROR_GERR(err, "failed to say hello to server");
-				bpp->error = TRUE;
-				rem_bpp_down(bpp);
-				return FALSE;
-			} else {
-				return TRUE;
-			}
-			
-		} else {
-			
-			LOG_ERROR_GERR(err, "unexpected server error (looks like a bug)");
-			bpp->error = TRUE;
-			rem_bpp_down(bpp);
-			return FALSE;			
-		}
-		
-	}
-		
-	LOG_ERROR_GERR(err, "failed to talk to server");
-	bpp->error = TRUE;
-	rem_bpp_down(bpp);
-	return FALSE;			
 }
 
 /** Get the current player state. */
@@ -512,8 +493,7 @@ gboolean
 rem_pp_bye(RemBasicProxy *bpp, GError **err)
 {
 	LOG_INFO("server said bye");
-	bpp->priv->dbus_proxy = NULL; // prevent a 'bye' to the server
-	rem_bpp_down(bpp);
+	stop(bpp, REM_BPP_RET_SERVER_BYE);
 	return TRUE;
 }
 
@@ -523,35 +503,27 @@ rem_pp_bye(RemBasicProxy *bpp, GError **err)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- * On successfull setup, TRUE is returned. Otherwise FALSE is returned and
- * bpp->error says if there was an error (TRUE) or if the player was simply not
- * running (FALSE).
- */
-gboolean
-rem_bpp_up(RemBasicProxy *bpp, const gchar *name, GMainLoop *ml)
+gint
+rem_bpp_up(RemBasicProxy *bpp, const gchar *name)
 {
 	gboolean			ok;
 	GError				*err;
 	gboolean			one_cmd_is_set;
-	
+	guint				flags;
+
 	g_assert(!bpp->priv);
-	
-	bpp->error = FALSE;
 	
 	////////// load and check config //////////
 	
 	ok = rem_config_load(name, "bpp", TRUE, config_entries);
 	
 	if (!ok) {
-		bpp->error = TRUE;
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 	
 	if (config.tick < 1) {
 		LOG_ERROR("tick must be > 0");
-		bpp->error = TRUE;
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 	
 	one_cmd_is_set =
@@ -564,27 +536,20 @@ rem_bpp_up(RemBasicProxy *bpp, const gchar *name, GMainLoop *ml)
 	
 	if (!one_cmd_is_set) {
 		LOG_ERROR("at least one command must be set");
-		bpp->error = TRUE;
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 	
 	if (config.cmd_volume_set && !config.cmd_volume) {
 			
 		LOG_ERROR("command 'volume-set' requires command 'volume'");
-		bpp->error = TRUE;
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 		
-	////////// pp init //////////
+	////////// early initializations //////////
 
 	bpp->priv = g_slice_new0(RemBasicProxyPriv);
 	
 	bpp->priv->config = &config;
-	
-	bpp->priv->flags =
-		REM_FLAG_BPP |
-		(bpp->priv->config->cmd_volume ? 0 : REM_FLAG_VOLUME_UNKNOWN) |
-		(bpp->priv->config->cmd_playing ? 0 : REM_FLAG_PLAYBACK_UNKNOWN);
 	
 	////////// argument vector for child processes //////////
 	
@@ -593,6 +558,18 @@ rem_bpp_up(RemBasicProxy *bpp, const gchar *name, GMainLoop *ml)
 	bpp->priv->argv[2] = NULL; // commands go here;
 	bpp->priv->argv[3] = NULL;
 	
+	////////// check if player is running, otherwise .. bye //////////
+	
+	if (!pp_running(bpp)) {
+		g_slice_free(RemBasicProxyPriv, bpp->priv);
+		if (bpp->priv->ret == REM_BPP_RET_ERROR) {
+			return REM_BPP_RET_ERROR;
+		} else {
+			g_assert(bpp->priv->ret == REM_BPP_RET_OK);
+			return REM_BPP_RET_PLAYER_DOWN;
+		}
+	}
+	
 	////////// dbus connection //////////
 	
 	err = NULL;
@@ -600,74 +577,75 @@ rem_bpp_up(RemBasicProxy *bpp, const gchar *name, GMainLoop *ml)
 	if (err) {
 		LOG_ERROR_GERR(err, "failed to connect to dbus");
 		g_slice_free(RemBasicProxyPriv, bpp->priv);
-		bpp->error = TRUE;
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 	
-	////////// get dbus proxy for server //////////
+	////////// dbus proxy for server //////////
 	
 	bpp->priv->dbus_proxy = rem_dbus_proxy(bpp->priv->dbus_conn, "Server");
 	
-	////////// check if player is running, otherwise .. bye //////////
+	////////// say hello to server //////////
 	
-	if (!pp_running(bpp)) {
+	flags =	REM_FLAG_BPP |
+		(bpp->priv->config->cmd_volume ? 0 : REM_FLAG_VOLUME_UNKNOWN) |
+		(bpp->priv->config->cmd_playing ? 0 : REM_FLAG_PLAYBACK_UNKNOWN);
+	
+	err = NULL;
+	net_sf_remuco_Server_hello(bpp->priv->dbus_proxy, name, flags, 0, &err);
+	if (err) {
+		LOG_ERROR_GERR(err, "failed to say hello to server");
 		g_slice_free(RemBasicProxyPriv, bpp->priv);
-		return FALSE;
+		return REM_BPP_RET_ERROR;
 	}
 	
-	////////// go for it //////////
-	
-	g_timeout_add(bpp->priv->config->tick * 1000, (GSourceFunc) &sync, bpp);
+	////////// late intializations //////////
 	
 	bpp->priv->name = g_strdup(name);
 
-	err = NULL;
-	net_sf_remuco_Server_hello(bpp->priv->dbus_proxy, bpp->priv->name,
-							   bpp->priv->flags, 0, &err);
-	if (err) {
-		LOG_ERROR_GERR(err, "failed to say hello to server");
-		g_free(bpp->priv->name);
-		g_slice_free(RemBasicProxyPriv, bpp->priv);
-		bpp->error = TRUE;
-		return FALSE;
-	}
-	
-	
 	bpp->priv->plob = g_hash_table_new_full(&g_str_hash, &g_str_equal, NULL,
 											&g_free);
+
+	g_timeout_add(bpp->priv->config->tick * 1000, (GSourceFunc) &sync, bpp);
 	
-	g_main_loop_ref(ml);
-	
-	bpp->priv->ml = ml;
-	
-	return TRUE;
+	return REM_BPP_RET_OK;
 }
 
-void
-rem_bpp_down(RemBasicProxy *bpp)
+gint
+rem_bpp_run(RemBasicProxy *bpp)
 {
-	RemBasicProxyPriv	*priv;
+	gboolean			ok;
+	GError				*err;
+	gboolean			one_cmd_is_set;
+	gint				ret;
+
+	g_assert(bpp->priv);
 	
-	if (!bpp->priv)
-		return;
+	////////// run //////////
 	
-	priv = bpp->priv;
+	bpp->priv->ml = g_main_loop_new(NULL, FALSE);
 	
-	bpp->priv = NULL;
+	g_main_loop_run(bpp->priv->ml);
+	
+	////////// clean up //////////
 	
 	LOG_INFO("goind down");
 	
-	if (priv->dbus_proxy) // if server said bye, dbus-proxy is NULL
-		net_sf_remuco_Server_bye(priv->dbus_proxy, priv->name, NULL);
+	if (bpp->priv->ret != REM_BPP_RET_SERVER_BYE) {
+		dbus_g_proxy_call_no_reply(bpp->priv->dbus_proxy, "Bye",
+								   G_TYPE_STRING, bpp->priv->name, G_TYPE_INVALID,
+								   G_TYPE_INVALID);
+	}
 	
-	g_free(priv->name);
+	g_free(bpp->priv->name);
 	
-	if (priv->plob)
-		g_hash_table_destroy(priv->plob);
+	if (bpp->priv->plob)
+		g_hash_table_destroy(bpp->priv->plob);
 
-	g_main_loop_quit(priv->ml);
+	g_main_loop_unref(bpp->priv->ml);
 	
-	g_main_loop_unref(priv->ml);
+	ret = bpp->priv->ret;
 	
-	g_slice_free(RemBasicProxyPriv, priv);
+	g_slice_free(RemBasicProxyPriv, bpp->priv);
+	
+	return ret;
 }

@@ -14,43 +14,6 @@ static
 inline
 #endif
 gboolean
-net_sf_remuco_Server_check (DBusGProxy *proxy, const guint IN_version, GError **error)
-
-{
-  return dbus_g_proxy_call (proxy, "Check", error, G_TYPE_UINT, IN_version, G_TYPE_INVALID, G_TYPE_INVALID);
-}
-
-typedef void (*net_sf_remuco_Server_check_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
-
-static void
-net_sf_remuco_Server_check_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
-{
-  DBusGAsyncData *data = (DBusGAsyncData*) user_data;
-  GError *error = NULL;
-  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
-  (*(net_sf_remuco_Server_check_reply)data->cb) (proxy, error, data->userdata);
-  return;
-}
-
-static
-#ifdef G_HAVE_INLINE
-inline
-#endif
-DBusGProxyCall*
-net_sf_remuco_Server_check_async (DBusGProxy *proxy, const guint IN_version, net_sf_remuco_Server_check_reply callback, gpointer userdata)
-
-{
-  DBusGAsyncData *stuff;
-  stuff = g_new (DBusGAsyncData, 1);
-  stuff->cb = G_CALLBACK (callback);
-  stuff->userdata = userdata;
-  return dbus_g_proxy_begin_call (proxy, "Check", net_sf_remuco_Server_check_async_callback, stuff, g_free, G_TYPE_UINT, IN_version, G_TYPE_INVALID);
-}
-static
-#ifdef G_HAVE_INLINE
-inline
-#endif
-gboolean
 net_sf_remuco_Server_hello (DBusGProxy *proxy, const char * IN_player, const guint IN_flags, const guint IN_rating, GError **error)
 
 {

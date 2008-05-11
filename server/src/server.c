@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "server.h"
+#include "daemon.h"
 #include "common.h"
 #include "config.h"
 #include "net.h"
@@ -34,7 +35,7 @@
 #define REM_MSG_ID_SYN_PLOB			4	/** currently active plob */
 #define REM_MSG_ID_SYN_PLAYLIST		5
 #define REM_MSG_ID_SYN_QUEUE		6
-#define REM_MSG_ID_IFS_SRVDOWN		7
+#define REM_MSG_ID_IFS_BYE			7
 #define REM_MSG_ID_IFC_CINFO		8
 #define REM_MSG_ID_SEL_PLAYER		9
 #define REM_MSG_ID_CTL				10
@@ -104,7 +105,7 @@ static const RemConfigEntry	config_entries[] = {
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef struct _Proxy Proxy;
-typedef struct _Client RemClient;
+typedef struct _Client Client;
 
 struct _Client {
 	
@@ -188,7 +189,7 @@ struct _RemServerPriv {
 
 	DBusGConnection			*dbus_conn;
 	GMainLoop				*ml;
-	gboolean				shutting_down;
+	gboolean				stopping;
 	
 	RemBasicProxyLauncher	*bppl;
 	RemImg					*ri;
@@ -266,7 +267,7 @@ static void
 pp_reply_request_plob(DBusGProxy *dbus_proxy, GHashTable *meta, GError *err,
 					  ProxyRequest *req)
 {
-	RemClient	*client;
+	Client	*client;
 	Proxy		*pp;
 	gchar		**as;
 	gboolean	ok;
@@ -281,7 +282,7 @@ pp_reply_request_plob(DBusGProxy *dbus_proxy, GHashTable *meta, GError *err,
 		return;
 	}
 
-	if (req->server->priv->shutting_down) {
+	if (req->server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		if (meta) g_hash_table_destroy(meta);
 		return;
@@ -338,7 +339,7 @@ pp_reply_request_ploblist(DBusGProxy *dbus_proxy, gchar **nested_ids,
 						  gchar **nested_names, gchar **ids, gchar **names,
 						  GError *err, ProxyRequest *req)
 {
-	RemClient	*client;
+	Client	*client;
 	Proxy		*pp;
 	gboolean	ok;
 	gchar		*name;	// ploblist name
@@ -354,7 +355,7 @@ pp_reply_request_ploblist(DBusGProxy *dbus_proxy, gchar **nested_ids,
 		return;
 	}
 
-	if (req->server->priv->shutting_down) {
+	if (req->server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return;
 	}
@@ -427,102 +428,71 @@ pp_reply_request_ploblist(DBusGProxy *dbus_proxy, gchar **nested_ids,
 	proxy_request_destroy(req);
 }
 
-static void
-pp_reply_bye(DBusGProxy *dbus_proxy, GError *err, gpointer data)
-{
-	if (err)
-		g_error_free(err);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // private functions - shutdown procedure
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static gboolean
-shutdown_stage2(RemServer *server)
+static void
+cleanup(RemServer *server)
 {
-	rem_bppl_down(server->priv->bppl);
+	GList	*l, *el;
 	
-	g_hash_table_destroy(server->priv->pht);
-	g_hash_table_destroy(server->priv->cht);
-
-	rem_img_down(server->priv->ri);
+	if (!server)
+		return;
+	
+	if (!server->priv)
+		return;
+	
+	if (server->priv->sht)
+		g_hash_table_destroy(server->priv->sht);
+	
+	if (server->priv->pht)
+		g_hash_table_destroy(server->priv->pht);
+	
+	if (server->priv->cht) {
+		
+		l = g_hash_table_get_values(server->priv->cht);
+		for (el = l; el; el = el->next) {
+			((Client*) el->data)->net->say_bye = TRUE;
+		}
+		g_list_free(l);
+		g_hash_table_destroy(server->priv->cht);
+	}
+	
+	if (server->priv->bppl)
+		rem_bppl_down(server->priv->bppl);
+	
+	if (server->priv->ri)
+		rem_img_down(server->priv->ri);
 	
 	g_free(server->priv->plist);
 	
-	g_byte_array_free(server->priv->msg.ba, TRUE);
-	
-	g_main_loop_quit(server->priv->ml);
-
-	g_main_loop_unref(server->priv->ml);
+	if (server->priv->msg.ba)
+		g_byte_array_free(server->priv->msg.ba, TRUE);
 	
 	g_slice_free(RemServerPriv, server->priv);
 	
 	server->priv = NULL;
-	
-	return FALSE;
-}
-
-static gboolean
-shutdown_stage1(RemServer *server)
-{
-	GList		*l, *el;
-	RemClient	*client;
-	Proxy		*proxy;
-	gboolean	ok;
-	
-	g_assert(server->priv->shutting_down);
-	
-	g_hash_table_destroy(server->priv->sht);
-	
-	////////// say bye to the proxies //////////
-	
-	l = g_hash_table_get_values(server->priv->pht);
-	
-	for (el = l; el; el = el->next) {
-		
-		proxy = (Proxy*) el->data;
-		
-		net_sf_remuco_PP_bye_async(proxy->dbus_proxy,
-			(net_sf_remuco_PP_bye_reply) &pp_reply_bye, NULL);
-	}
-	
-	g_list_free(l);
-
-	////////// say bye to the clients //////////
-	
-	server->priv->msg.id = REM_MSG_ID_IFS_SRVDOWN;
-	server->priv->msg.ba->len = 0;
-
-	l = g_hash_table_get_values(server->priv->cht);
-	
-	for (el = l; el; el = el->next) {
-		
-		client = (RemClient*) el->data;
-		
-		ok = rem_net_tx(client->net, &server->priv->msg);
-	}
-	
-	g_list_free(l);
-
-	////////// do the rest //////////
-	
-	// give clients and proxies a chance to receive bye message
-	g_timeout_add(1000, (GSourceFunc) &shutdown_stage2, server);
-	
-	return FALSE;
 }
 
 static void
-shutdown_sys(RemServer *server)
+stop(RemServer *server)
+{
+	LOG_DEBUG("stop server");
+	
+	rem_daemon_stop();
+}
+
+static void
+shutdown_system(RemServer *server)
 {
 	GError		*err;
 	gchar		*stdout, *stderr;
 	gint		exit;
 	
-	if (server->priv->shutting_down)
+	if (server->priv->stopping)
 		return;
 
 	if (!server->priv->config->cmd_shutdown) {
@@ -545,7 +515,6 @@ shutdown_sys(RemServer *server)
 	
 	if (exit) {
 		LOG_WARN("shutdown command failed:\n%s%s", stdout, stderr);
-		LOG_WARN("maybe the remuco process is not allowed to shut down");
 	}
 	
 	g_free(stdout);
@@ -563,7 +532,7 @@ shutdown_sys(RemServer *server)
  * Client automatically gets removed on error.
  */
 static gboolean
-client_send_playlist(RemClient *client, gboolean send_queue)
+client_send_playlist(Client *client, gboolean send_queue)
 {
 	gchar		*pl_id, *pl_name, **ids, **names;
 	gboolean	ok;
@@ -601,7 +570,7 @@ static gboolean
 client_sync_plist(RemServer *server)
 {
 	GList		*l, *el;
-	RemClient	*client;
+	Client	*client;
 	gboolean	ok;
 	
 	LOG_INFO("sync player list with clients");
@@ -619,7 +588,7 @@ client_sync_plist(RemServer *server)
 	el = l;
 	while(el) {
 		
-		client = (RemClient*) el->data;
+		client = (Client*) el->data;
 		el = el->next;
 		
 		if (!client->encoding)	// skip clients which did not send client info
@@ -645,7 +614,7 @@ static gboolean
 client_sync_state(Proxy *pp)
 {
 	GSList		*l;
-	RemClient	*client;
+	Client	*client;
 	gboolean	ok;
 	
 	pp->state.triggered_sync_state = FALSE;
@@ -655,7 +624,7 @@ client_sync_state(Proxy *pp)
 	l = pp->clients;
 	while (l) {
 
-		client = (RemClient*) l->data;
+		client = (Client*) l->data;
 		l = l->next;
 		
 		g_assert(client->encoding);
@@ -666,7 +635,6 @@ client_sync_state(Proxy *pp)
 					   pp->state.position, pp->state.queue);
 		
 		ok = rem_net_tx(client->net, &pp->server->priv->msg);
-		
 		if (!ok)
 			g_hash_table_remove(pp->server->priv->cht, client->net->chan);
 	}
@@ -678,7 +646,7 @@ static gboolean
 client_sync_plob(Proxy *pp)
 {
 	GSList		*l;
-	RemClient	*client;
+	Client	*client;
 	gboolean	ok;
 	GByteArray	*plob_img_data;
 	
@@ -689,7 +657,7 @@ client_sync_plob(Proxy *pp)
 	l = pp->clients;
 	while (l) {
 
-		client = (RemClient*) l->data;
+		client = (Client*) l->data;
 		l = l->next;
 		
 		g_assert(client->encoding);
@@ -719,14 +687,14 @@ static gboolean
 client_sync_playlist(Proxy *pp)
 {
 	GSList		*l;
-	RemClient	*client;
+	Client	*client;
 	
 	pp->state.triggered_sync_playlist = FALSE;
 	
 	l = pp->clients;
 	while (l) {
 
-		client = (RemClient*) l->data;
+		client = (Client*) l->data;
 		l = l->next; // do this now, because the next may free current 'c'
 		
 		g_assert(client->encoding); 
@@ -741,14 +709,14 @@ static gboolean
 client_sync_queue(Proxy *pp)
 {
 	GSList		*l;
-	RemClient	*client;
+	Client	*client;
 	
 	pp->state.triggered_sync_queue = FALSE;
 	
 	l = pp->clients;
 	while (l) {
 
-		client = (RemClient*) l->data;
+		client = (Client*) l->data;
 		l = l->next; // do this now, because the next may free current 'c'
 		
 		g_assert(client->encoding); 
@@ -761,7 +729,7 @@ client_sync_queue(Proxy *pp)
 
 /** Called by io_client() to handle a client info message. */
 static gboolean
-client_welcome(RemClient *client)
+client_welcome(Client *client)
 {
 	gboolean	ok;
 	
@@ -821,7 +789,7 @@ client_welcome(RemClient *client)
 
 /** Called by io_client() to handle a player selection message. */
 static gboolean
-client_give_player(RemClient *client)
+client_give_player(Client *client)
 {
 	gboolean		ok;
 	gchar			*player;
@@ -930,7 +898,7 @@ client_give_player(RemClient *client)
 
 /** Called by io_client() to handle messages from a fully connected client. */
 static gboolean
-client_handle_message(RemClient *client)
+client_handle_message(Client *client)
 {
 	gboolean		ok;
 	gchar			*param, *id;
@@ -969,7 +937,7 @@ client_handle_message(RemClient *client)
 			
 			if (u == REM_CTL_SHUTDOWN) {
 				g_free(param);
-				shutdown_sys(client->server);
+				shutdown_system(client->server);
 				return TRUE;
 			}
 			
@@ -1051,9 +1019,9 @@ client_handle_message(RemClient *client)
 	
 }
 
-/** Callback for client hashtable to get comletely rid of a client. */
+/** Callback for client hashtable to get completely rid of a client. */
 static void
-client_bye(RemClient *client)
+client_remove(Client *client)
 {
 	if (!client)
 		return;
@@ -1070,7 +1038,7 @@ client_bye(RemClient *client)
 	
 	g_free(client->encoding);
 	
-	g_slice_free(RemClient, client);
+	g_slice_free(Client, client);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1088,7 +1056,8 @@ pp_get(RemServer *server, const gchar *player, GError **err)
 	
 	if (!pp) {
 		LOG_WARN("pp %s did not say hello before", player);
-		g_set_error(err, REM_SERVER_ERR_DOMAIN, 0, REM_SERVER_ERR_UNKNOWN_PLAYER);
+		g_set_error(err, REM_SERVER_ERR_DOMAIN, REM_SERVER_ERR_UNKNOWN_NUM,
+					REM_SERVER_ERR_UNKNOWN);
 	}
 	
 	return pp;
@@ -1101,14 +1070,14 @@ pp_ping(RemServer *server)
 	Proxy			*pp;
 	ProxyRequest	*req;
 	
-	if (server->priv->shutting_down)
+	if (server->priv->stopping)
 		return FALSE;
 	
 	l = g_hash_table_get_values(server->priv->pht);
 	
 	if (!l) {
 		LOG_INFO("there are no player proxies -> going down");
-		shutdown(server);
+		rem_server_down(server);
 		return FALSE;
 	}
 	
@@ -1133,16 +1102,24 @@ pp_ping(RemServer *server)
 
 /** Callback for pp hashtable to get comletely rid of a pp. */
 static void
-pp_bye(Proxy *pp)
+pp_remove(Proxy *pp)
 {
 	GSList		*el;
-	RemClient	*client;
+	Client	*client;
 	
 	if (!pp)
 		return;
 	
-	LOG_INFO("bye %s", pp->desc->name);
+	LOG_INFO("remove %s", pp->desc->name);
 	
+	if (pp->dbus_proxy && pp->desc && pp->desc->name) {
+		
+		LOG_DEBUG("say bye to %s", pp->desc->name);
+		
+		dbus_g_proxy_call_no_reply(pp->dbus_proxy, "Bye",
+								   G_TYPE_INVALID, G_TYPE_INVALID);
+	}
+
 	//g_object_unref(pp->dbus); // FIXME: not needed
 	
 	if (pp->desc) {
@@ -1159,7 +1136,7 @@ pp_bye(Proxy *pp)
 	
 	for (el = pp->clients; el; el = el->next) {
 		
-		client = (RemClient*) el->data;
+		client = (Client*) el->data;
 		client->pp = NULL;
 	}
 	
@@ -1172,7 +1149,7 @@ pp_bye(Proxy *pp)
 	
 	////////// trigger player list sync with the clients //////////
 	
-	if (!pp->server->priv->shutting_down &&
+	if (!pp->server->priv->stopping &&
 		!pp->server->priv->plist_sync_triggered) {
 	
 		pp->server->priv->plist_sync_triggered = TRUE;
@@ -1191,7 +1168,7 @@ pp_bye(Proxy *pp)
 ///////////////////////////////////////////////////////////////////////////////
 
 static gboolean
-io_client(GIOChannel *chan, GIOCondition cond, RemClient *client)
+io_client(GIOChannel *chan, GIOCondition cond, Client *client)
 {
 	gboolean		ok;
 	
@@ -1246,7 +1223,7 @@ static gboolean
 io_server(GIOChannel *chan, GIOCondition cond, RemServer *server)
 {
 	RemNetServer	*server_net;
-	RemClient		*client;
+	Client			*client;
 	RemNetClient	*client_net;
 	gboolean		ok;
 	
@@ -1256,16 +1233,12 @@ io_server(GIOChannel *chan, GIOCondition cond, RemServer *server)
 
 		server_net = g_hash_table_lookup(server->priv->sht, chan);
 		
-		client_net = rem_net_accept(server_net);
+		client_net = rem_net_hello(server_net);
 		
 		if (!client_net) // error log in rem_net_accept()
 			return TRUE;
 		
-		ok = rem_net_hello(client_net);
-		if (!ok)
-			rem_net_bye(client_net);
-		
-		client = g_slice_new0(RemClient);
+		client = g_slice_new0(Client);
 		
 		client->net = client_net;
 
@@ -1284,7 +1257,7 @@ io_server(GIOChannel *chan, GIOCondition cond, RemServer *server)
 		
 		LOG_ERROR("error on server socket");
 		
-		shutdown(server);
+		rem_server_down(server);
 		
 		return FALSE;
 		
@@ -1306,37 +1279,24 @@ io_server_watch(GIOChannel *chan, RemNetServer *server_net, RemServer *server)
 ///////////////////////////////////////////////////////////////////////////////
 
 gboolean
-rem_server_check(RemServer *server, guint version, GError **err)
-{
-	LOG_INFO("called");
-	
-	if (version != REM_SERVER_PP_PROTO_VERSION) {
-		g_set_error(err, REM_SERVER_ERR_DOMAIN, 0, REM_SERVER_ERR_VERSION_MISMATCH);
-		return FALSE;
-	}
-	
-	return TRUE;
-}
-
-gboolean
 rem_server_hello(RemServer *server, gchar* player,
 				 guint flags, guint rating,
 				 GError **err)
 {
 	Proxy		*pp;
 	
-	////////// check if not known already and name is valid //////////
-	
-	LOG_INFO("player '%s' says hello", player);
-
-	if (server->priv->shutting_down) {
-		LOG_DEBUG("shutting down -> ignore");
+	if (g_str_equal(player, "Shell")) {
+		LOG_DEBUG("ping from Shell");
 		return TRUE;
 	}
 	
+	////////// check if not known already and name is valid //////////
+	
+	LOG_INFO("pp '%s' says hello", player);
+
 	if (g_hash_table_lookup(server->priv->pht, player)) {
 		
-		LOG_WARN("player '%s' said hello again .. name conflict?", player);
+		LOG_WARN("pp '%s' said hello again .. name conflict?", player);
 		return TRUE;
 	}
 
@@ -1397,7 +1357,7 @@ rem_server_update_state(RemServer *server, gchar *player,
 	
 	LOG_DEBUG("from %s", player);
 	
-	if (server->priv->shutting_down) {
+	if (server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return TRUE;
 	}
@@ -1442,7 +1402,7 @@ rem_server_update_plob(RemServer *server, gchar *player,
 
 	LOG_DEBUG("from %s", player);
 
-	if (server->priv->shutting_down) {
+	if (server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return TRUE;
 	}
@@ -1498,7 +1458,7 @@ rem_server_update_playlist(RemServer *server, gchar *player,
 	
 	LOG_DEBUG("from %s", player);
 
-	if (server->priv->shutting_down) {
+	if (server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return TRUE;
 	}
@@ -1560,7 +1520,7 @@ rem_server_update_queue(RemServer *server, gchar *player,
 	
 	LOG_DEBUG("from %s", player);
 
-	if (server->priv->shutting_down) {
+	if (server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return TRUE;
 	}
@@ -1610,12 +1570,20 @@ gboolean
 rem_server_bye(RemServer *server, gchar *player,
 			   GError **err)
 {
+	Proxy	*pp;
+
 	LOG_DEBUG("from %s", player);
 
-	if (server->priv->shutting_down) {
+	if (server->priv->stopping) {
 		LOG_DEBUG("shutting down -> ignore");
 		return TRUE;
 	}
+	
+	pp = pp_get(server, player, err);
+	if (!pp)
+		return FALSE; // err set by pp_get()
+
+	pp->dbus_proxy = NULL; // prevents a 'bye' to the pp
 	
 	g_hash_table_remove(server->priv->pht, player);
 	
@@ -1624,12 +1592,12 @@ rem_server_bye(RemServer *server, gchar *player,
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// main
+// internal interface
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 gboolean
-rem_server_up(RemServer *server, GMainLoop *ml)
+rem_server_up(RemServer *server)
 {
 	RemServerPriv		*priv;
 	gboolean			ok;
@@ -1684,7 +1652,9 @@ rem_server_up(RemServer *server, GMainLoop *ml)
 		return FALSE;
 	}
 	
-	g_hash_table_foreach(priv->sht, (GHFunc) &io_server_watch, priv);
+	server->priv = priv;
+	g_hash_table_foreach(priv->sht, (GHFunc) &io_server_watch, server);
+	server->priv = NULL;
 
 	////////// dbus //////////
 	
@@ -1714,45 +1684,96 @@ rem_server_up(RemServer *server, GMainLoop *ml)
 	priv->msg.ba = g_byte_array_sized_new(1024);
 	
 	priv->cht = g_hash_table_new_full(&g_direct_hash, &g_direct_equal, NULL,
-										(GDestroyNotify) &client_bye);
+										(GDestroyNotify) &client_remove);
 	
 	priv->pht = g_hash_table_new_full(&g_str_hash, &g_str_equal, NULL,
-										(GDestroyNotify) &pp_bye);
+										(GDestroyNotify) &pp_remove);
 
 	if (priv->config->img)
 		priv->ri = rem_img_up(priv->config->img);
 	
 	////////// here we go //////////
 	
-	priv->shutting_down = FALSE;
-	
-	g_main_loop_ref(ml);
-	
-	priv->ml = ml;
+	priv->stopping = FALSE;
 	
 	server->priv = priv;
 	
 	return TRUE;
 }
 
-/**
- * Initiates the shut down process. Server still needs the main loop running!
- * Server will stop the main loop if shutdown is finished.
- */
 void
 rem_server_down(RemServer *server)
 {
-	g_assert(server && server->priv);
+	g_assert(server);
+
+	cleanup(server);
+}
+
+gboolean
+rem_server_disable_proxy(RemServer *server, const gchar *name)
+{
+	return g_hash_table_remove(server->priv->pht, name);	
+}
+
+gchar**
+rem_server_get_proxies(RemServer *server)
+{
+	GList	*l, *el;
+	gchar	**proxies;
+	guint	u, len;
 	
-	if (server->priv->shutting_down) {
-		LOG_DEBUG("already shutting down");
-		return;
+	l = g_hash_table_get_keys(server->priv->pht);
+	
+	len = g_list_length(l);
+	
+	LOG_DEBUG("proxy list len: %u", len);
+	
+	proxies = g_new0(gchar*, len + 1);
+	
+	el = l;
+	
+	for (u = 0; u < len; u++) {
+		
+		g_assert(el && el->data);
+		
+		proxies[u] = g_strdup((gchar*) el->data);
+		
+		el = el->next;
 	}
+		
+	g_list_free(l);
+
+	return proxies;
+}
+
+gchar**
+rem_server_get_clients(RemServer *server)
+{
+	GList	*l, *el;
+	gchar	**clients;
+	guint	u, len;
+	Client	*client;
 	
-	server->priv->shutting_down = TRUE;
+	l = g_hash_table_get_values(server->priv->cht);
 	
-	LOG_DEBUG("shutting down");
+	len = g_list_length(l);
 	
-	g_idle_add_full(G_PRIORITY_HIGH, (GSourceFunc) &shutdown_stage1,
-					server, NULL);
+	clients = g_new0(gchar*, len + 1);
+	
+	el = l;
+	
+	for (u = 0; u < len; u++) {
+		
+		g_assert(el && el->data);
+		
+		client = (Client*) el->data;
+		
+		clients[u] = g_strdup(client->net->addr);
+		
+		el = el->next;
+	}
+		
+	g_list_free(l);
+
+	return clients;
 }

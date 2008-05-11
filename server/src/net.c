@@ -31,16 +31,39 @@ enum _RemNetServerType {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static const guint8 REM_IO_PREFIX[] = { 0xFF, 0xFF, 0xFF, 0xFF};
-static const guint8 REM_IO_SUFFIX[] = { 0xFE, 0xFE, 0xFE, 0xFE};
+#define REM_MSG_ID_BYE		0xFF
+
+static const guint8			REM_IO_PREFIX[] = { 0xFF, 0xFF, 0xFF, 0xFF};
+static const guint8			REM_IO_SUFFIX[] = { 0xFE, 0xFE, 0xFE, 0xFE};
 
 #define REM_PROTO_VERSION	0x07
 
 #define REM_IO_PREFIX_LEN	4
 #define REM_IO_SUFFIX_LEN	4
 
+static const guint8			REM_IO_HELLO[] = {
+		0xFF, 0xFF, 0xFF, 0xFF,
+		REM_PROTO_VERSION,
+		0xFE, 0xFE, 0xFE, 0xFE
+};
+
+#define REM_IO_HELLO_LEN	9
+
+#define REM_MSG_ID_IFS_BYE	0x07
+
+/** Bye message (valid RemNetMsg with id = 0x07) */
+static const guint8			REM_IO_BYE[] = {
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0x00, 0x00, 0x00, REM_MSG_ID_IFS_BYE,
+		0x00, 0x00, 0x00, 0x00,
+		0xFE, 0xFE, 0xFE, 0xFE
+};
+
+#define REM_IO_BYE_LEN	16
+
 #define REM_IO_RETRY_WAIT	25000	// us => 25 ms
 #define REM_IO_RETRY_MAX	20		// waiting at most 500 ms for data
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -51,10 +74,10 @@ static const guint8 REM_IO_SUFFIX[] = { 0xFE, 0xFE, 0xFE, 0xFE};
 static gboolean
 rx(GIOChannel *chan, guint8 *data, guint len)
 {
-	g_assert(chan && data && len); 
-	
 	GIOStatus	ret;
 	guint		read, retry;
+	
+	g_assert(chan && data && len); 
 	
 	retry = 0;
 	
@@ -126,10 +149,10 @@ tx(GIOChannel *chan, const guint8 *data, guint len)
 		if (written < len) {
 			
 			//LOG_DEBUG("could not write all data, retry");
-			g_usleep(REM_IO_RETRY_WAIT);
 			retry++;
 			data += written;
 			len -= written;
+			g_usleep(REM_IO_RETRY_WAIT);
 			continue;
 		}
 		
@@ -170,7 +193,7 @@ flush(RemNetClient *client)
 
 	if (chan->write_buf == NULL || chan->write_buf->len == 0) {
 		
-		client->flushing = FALSE;		
+		client->flushing = FALSE;
 		return FALSE;
 	}
 	
@@ -206,23 +229,6 @@ flush(RemNetClient *client)
 		return FALSE;
 	}
 	
-}
-
-/** Currently only used for small message, see also flush_cb() */
-static gboolean
-flush_all(GIOChannel *chan)
-{
-	GIOStatus ret;
-	
-	g_msleep(100); // dodge a bug in g_io_channel_flush() / g_io_unix_write()
-	
-	ret = g_io_channel_flush(chan, NULL);
-	if (ret != G_IO_STATUS_NORMAL) {
-		LOG_ERROR("flushing channel failed");
-		return FALSE;
-	}
-	
-	return TRUE;
 }
 
 /** Callback for server hashtable value destroy function */
@@ -294,22 +300,6 @@ rem_net_up(RemNetConfig *config)
 	}
 	
 	return sht;
-}
-
-RemNetClient*
-rem_net_accept(RemNetServer *server)
-{
-	switch (server->priv_type) {
-		case REM_NET_SERVER_TYPE_BT:
-			return rem_net_bt_accept(server);
-			
-		case REM_NET_SERVER_TYPE_IP:
-			return rem_net_ip_accept(server);
-			
-		default:
-			g_assert_not_reached();
-			return NULL;
-	}	
 }
 
 /**
@@ -488,45 +478,72 @@ rem_net_tx(RemNetClient *client, const RemNetMsg *msg)
 	return TRUE;	
 }
 
-/** Sends HELLO message to a client */
-gboolean
-rem_net_hello(RemNetClient* client)
+/** Accept a client and send HELLO message to a client */
+RemNetClient*
+rem_net_hello(RemNetServer *server)
 {
+	RemNetClient	*client;
 	gboolean		ok;
-	const guint8	pv = REM_PROTO_VERSION;
 	
-	LOG_DEBUG("send hello code to %s", client->addr);
+	switch (server->priv_type) {
+		case REM_NET_SERVER_TYPE_BT:
+			client = rem_net_bt_accept(server);
+			break;
+		case REM_NET_SERVER_TYPE_IP:
+			client = rem_net_ip_accept(server);
+			break;
+		default:
+			g_assert_not_reached();
+			break;
+	}
 	
-	ok = tx(client->chan, REM_IO_PREFIX, REM_IO_PREFIX_LEN);
-	if (!ok) return FALSE;
+	if (!client)
+		return NULL;
 	
-	ok = tx(client->chan, &pv, 1);
-	if (!ok) return FALSE;
+	LOG_DEBUG("send 'hello' to %s", client->addr);
+	
+	g_io_channel_set_buffered(client->chan, FALSE);
+	
+	ok = tx(client->chan, REM_IO_HELLO, REM_IO_HELLO_LEN);
+	if (!ok) {
+		rem_net_bye(client);
+		return NULL;
+	}
 
-	ok = tx(client->chan, REM_IO_SUFFIX, REM_IO_SUFFIX_LEN);
-	if (!ok) return FALSE;
-
-	ok = flush_all(client->chan);
-	if (!ok) return FALSE;
+	g_io_channel_set_buffered(client->chan, TRUE);
 
 	LOG_DEBUG("done");
 
-	return TRUE;
+	return client;
 }
 
 void
 rem_net_bye(RemNetClient *client)
 {
-	LOG_DEBUG("disconnect client %s", client->addr);
+	gboolean	buffer_has_data;
 	
 	if (!client)
 		return;
 	
 	// this removes the client's flush callback (if any)
-	// it gets flushed below by g_io_channel_shutdown()
 	g_source_remove_by_user_data(client);
 	
 	if (client->chan) {
+	
+		if (client->say_bye) {
+			
+			LOG_DEBUG("send 'bye' to %s", client->addr);
+			
+			// g_io_channel_set_buffered() is not allowed if buffer is not empty
+			buffer_has_data = flush(client);
+			if (!buffer_has_data) {
+				g_io_channel_set_buffered(client->chan, FALSE);
+				tx(client->chan, REM_IO_BYE, REM_IO_BYE_LEN);
+				g_usleep(10000); // wait a moment before closing the channel
+			}
+			
+			LOG_DEBUG("done");
+		}
 		
 		g_io_channel_shutdown(client->chan, FALSE, NULL);
 		g_io_channel_unref(client->chan);

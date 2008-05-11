@@ -60,20 +60,30 @@ bpp_exited(GPid pid, gint status, RemBasicProxy *proxy)
 {
 	gchar	*log;
 	
-	LOG_DEBUG("%s is down", proxy->name);
-	
 	g_spawn_close_pid(pid);
 	
 	proxy->pid = 0;
 
 	if (WIFEXITED(status)) {
-		if (WEXITSTATUS(status) == 0) {
-			return; // normal exit
-		} else {
-			LOG_WARN("BPP %s exited with error -> don't try to restart", proxy->name);
+		switch (WEXITSTATUS(status)) {
+			case REM_BPP_RET_ERROR:
+				LOG_WARN("BPP %s experienced errors", proxy->name);
+				break;
+			case REM_BPP_RET_PLAYER_DOWN:
+				LOG_DEBUG("%s is not running", proxy->name);
+				return;
+			case REM_BPP_RET_SERVER_BYE:
+				LOG_DEBUG("BPP %s has been disabled", proxy->name);
+				break;
+			case REM_BPP_RET_OK:
+				LOG_DEBUG("%s has gone down", proxy->name);
+				return;
+			default:
+				g_assert_not_reached();
+				break;
 		}
 	} else {
-		LOG_WARN("BPP %s exited unnormally -> don't try to restart", proxy->name);
+		LOG_WARN("BPP %s exited unnormally", proxy->name);
 	}
 	
 	log = g_build_filename(g_get_user_cache_dir(), "remuco", proxy->name, NULL);
@@ -81,6 +91,8 @@ bpp_exited(GPid pid, gint status, RemBasicProxy *proxy)
 	LOG_WARN("inspect the BPP's log file for more information (%s.log)", log);
 	
 	g_free(log);
+	
+	LOG_DEBUG("disable BPP %s", proxy->name);
 	
 	g_hash_table_remove(proxy->launcher->proxies, proxy->name);
 }

@@ -411,6 +411,7 @@ rem_util_s2b(const gchar *s)
 			g_str_equal(s, "y") || g_str_equal(s, "Y");
 }
 
+void
 rem_util_create_cache_dir(GError **err)
 {
 	gchar		*cache_dir;

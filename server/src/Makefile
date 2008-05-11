@@ -104,7 +104,7 @@ remuco-bpp: pp-glue-s.h server-glue-c.h $(OBJ_FILES_BPP)
 #
 ##############################################################################
 
-DBUS_SERVICE_NAME := net.sf.remuco.Server
+DBUS_SERVICE_NAME := net.sf.remuco.Shell
 
 DBUS_SERVICE_DIR := $(shell pkg-config dbus-1 --variable=session_bus_services_dir)
 
@@ -129,7 +129,7 @@ shell-glue-s.h: shell.xml
 	dbus-binding-tool --mode=glib-server --prefix=rem_shell \
 		shell.xml > shell-glue-s.h
 
-shell-glue-c.h: pp.xml
+shell-glue-c.h: shell.xml
 	dbus-binding-tool --mode=glib-client shell.xml > shell-glue-c.h
 
 pp-glue-s.h: pp.xml
@@ -223,6 +223,18 @@ massif: all $(REM_CONFIG_DIR)/debug
 		--alloc-fn=g_slice_alloc \
 		--alloc-fn=g_slice_alloc0 \
 		./remuco-server -fl
+
+memcheck-ctl: all $(REM_CONFIG_DIR)/debug
+	G_SLICE=always-malloc G_DEBUG=gc-friendly PATH=./:$(PATH) \
+		valgrind \
+		--tool=memcheck \
+		--leak-check=full \
+		--num-callers=20 \
+		--gen-suppressions=$(VGS) \
+		--suppressions=memcheck.glib.supp \
+		--suppressions=memcheck.magick.supp \
+		--suppressions=memcheck.libc.supp \
+		./remuco $(ARGS)
 
 ###### BPP ######
 

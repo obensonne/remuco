@@ -9,8 +9,6 @@ typedef struct {
 	
 	GObject				parent;
 	
-	gboolean			error;
-	
 	RemBasicProxyPriv	*priv;
 	
 } RemBasicProxy;
@@ -63,11 +61,10 @@ rem_pp_bye(RemBasicProxy *bpp, GError **err);
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-gboolean
-rem_bpp_up(RemBasicProxy *bpp, const gchar *name, GMainLoop *ml);
+gint
+rem_bpp_up(RemBasicProxy *bpp, const gchar *name);
 
-void
-rem_bpp_down(RemBasicProxy *bpp);
-
+gint
+rem_bpp_run(RemBasicProxy *bpp);
 
 #endif /*BPP_H_*/

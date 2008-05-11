@@ -26,6 +26,13 @@ G_BEGIN_DECLS
 
 #define REM_ENV_BPP_EXTRA_DIR		"REM_EXTRA_BPP_DIR"
 
+typedef enum {
+	REM_BPP_RET_OK = 0,			// was running for a while, player is down now
+	REM_BPP_RET_PLAYER_DOWN,	// did not start because player is down
+	REM_BPP_RET_ERROR,			// an error occured
+	REM_BPP_RET_SERVER_BYE		// stopped because server said bye
+} RemBasicProxyReturn;
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // common macors

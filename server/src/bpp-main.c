@@ -4,9 +4,9 @@
 #include "common.h"
 #include "pp-glue-s.h"
 #include "pp-glue-c.h"
+#include "shell-glue-c.h"
 #include "dbus.h"
 
-static GMainLoop		*ml;
 static RemBasicProxy	*bpp;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,14 +93,6 @@ object_info_update(const gchar *name)
 	oi->method_infos = mi;
 }
 
-static void
-sighandler(gint sig)
-{
-	LOG_INFO("received signal %s", g_strsignal(sig));
-	
-	rem_bpp_down(bpp);
-}
-
 int
 main (int argc, char *argv[])
 {
@@ -169,8 +161,6 @@ main (int argc, char *argv[])
 	
 	g_type_init();
 	
-	ml = g_main_loop_new(NULL, FALSE);
-	
 	////////// connect to dbus //////////
 	
 	err = NULL;
@@ -218,19 +208,36 @@ main (int argc, char *argv[])
 	
 	} else {
 		
-		LOG_WARN("a proxy for %s is already running", name);
+		LOG_ERROR("a proxy for %s is already running", name);
 		return 1;
 	}
 
+	////////// start the server //////////
+	
+	if (!started_by_bppl) {
+		
+		dbus_proxy_tmp = rem_dbus_proxy(dbus_conn, "Shell");
+		
+		err = NULL;
+		net_sf_remuco_Shell_start(dbus_proxy_tmp, REM_SERVER_PP_PROTO_VERSION,
+								  &err);
+		
+		g_object_unref(dbus_proxy_tmp);
+		
+		if (err) {
+			LOG_ERROR_GERR(err, "failed to start server");
+			return 1;
+		}
+	}
 	////////// set up the proxy //////////
 	
 	bpp = g_object_new(REM_BASIC_PROXY_TYPE, NULL);
 	
-	ok = rem_bpp_up(bpp, name, ml);
+	ret = rem_bpp_up(bpp, name);
 	
-	if (!ok) {
+	if (ret != REM_BPP_RET_OK) {
 		g_object_unref(bpp);
-		return bpp->error ? 1 : 0;
+		return ret;
 	}
 	
 	////////// export proxy to dbus //////////
@@ -245,32 +252,9 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
-	////////// signal handling //////////
-	
-	memclr(struct sigaction, &siga);
-	siga.sa_handler = &sighandler;
-
-	ok = sigaction(SIGINT, &siga, NULL) == 0;
-	ok &= sigaction(SIGTERM, &siga, NULL) == 0;
-	ok &= sigaction(SIGUSR1, &siga, NULL) == 0;
-	ok &= sigaction(SIGUSR2, &siga, NULL) == 0;
-	
-	if (!ok) {
-		LOG_ERROR("failed to set up signal handler");
-		return 1;
-	}
-
 	////////// start the main loop //////////
 	
-	LOG_INFO("here we go ..");
-	
-	g_main_loop_run(ml);
-	
-	LOG_INFO("bye");
-		
-	g_main_loop_unref(ml);
-
-	ret = bpp->error ? 1 : 0;
+	ret = rem_bpp_run(bpp);
 	
 	g_object_unref(bpp);
 	

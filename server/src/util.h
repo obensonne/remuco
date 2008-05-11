@@ -69,8 +69,8 @@ rem_util_str_is_valid_dbus_name(const gchar *s);
 gboolean
 rem_util_s2b(const gchar *s);
 
-gboolean
-rem_util_create_cache_dir();
+void
+rem_util_create_cache_dir(GError **err);
 
 G_END_DECLS
 

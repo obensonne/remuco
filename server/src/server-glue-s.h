@@ -53,7 +53,7 @@ G_BEGIN_DECLS
 #endif /* !G_ENABLE_DEBUG */
 
 
-/* BOOLEAN:STRING,STRING,STRING,BOXED,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:1) */
+/* BOOLEAN:STRING,STRING,STRING,BOXED,POINTER (/tmp/dbus-binding-tool-c-marshallers.OI20AU:1) */
 extern void dbus_glib_marshal_rem_server_BOOLEAN__STRING_STRING_STRING_BOXED_POINTER (GClosure     *closure,
                                                                                       GValue       *return_value,
                                                                                       guint         n_param_values,
@@ -106,7 +106,7 @@ dbus_glib_marshal_rem_server_BOOLEAN__STRING_STRING_STRING_BOXED_POINTER (GClosu
   g_value_set_boolean (return_value, v_return);
 }
 
-/* BOOLEAN:STRING,UINT,UINT,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:2) */
+/* BOOLEAN:STRING,UINT,UINT,POINTER (/tmp/dbus-binding-tool-c-marshallers.OI20AU:2) */
 extern void dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_POINTER (GClosure     *closure,
                                                                             GValue       *return_value,
                                                                             guint         n_param_values,
@@ -157,7 +157,7 @@ dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_POINTER (GClosure     *cl
   g_value_set_boolean (return_value, v_return);
 }
 
-/* BOOLEAN:STRING,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:3) */
+/* BOOLEAN:STRING,POINTER (/tmp/dbus-binding-tool-c-marshallers.OI20AU:3) */
 extern void dbus_glib_marshal_rem_server_BOOLEAN__STRING_POINTER (GClosure     *closure,
                                                                   GValue       *return_value,
                                                                   guint         n_param_values,
@@ -204,7 +204,7 @@ dbus_glib_marshal_rem_server_BOOLEAN__STRING_POINTER (GClosure     *closure,
   g_value_set_boolean (return_value, v_return);
 }
 
-/* BOOLEAN:STRING,BOXED,BOXED,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:4) */
+/* BOOLEAN:STRING,BOXED,BOXED,POINTER (/tmp/dbus-binding-tool-c-marshallers.OI20AU:4) */
 extern void dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER (GClosure     *closure,
                                                                               GValue       *return_value,
                                                                               guint         n_param_values,
@@ -255,54 +255,7 @@ dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER (GClosure     *
   g_value_set_boolean (return_value, v_return);
 }
 
-/* BOOLEAN:UINT,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:5) */
-extern void dbus_glib_marshal_rem_server_BOOLEAN__UINT_POINTER (GClosure     *closure,
-                                                                GValue       *return_value,
-                                                                guint         n_param_values,
-                                                                const GValue *param_values,
-                                                                gpointer      invocation_hint,
-                                                                gpointer      marshal_data);
-void
-dbus_glib_marshal_rem_server_BOOLEAN__UINT_POINTER (GClosure     *closure,
-                                                    GValue       *return_value G_GNUC_UNUSED,
-                                                    guint         n_param_values,
-                                                    const GValue *param_values,
-                                                    gpointer      invocation_hint G_GNUC_UNUSED,
-                                                    gpointer      marshal_data)
-{
-  typedef gboolean (*GMarshalFunc_BOOLEAN__UINT_POINTER) (gpointer     data1,
-                                                          guint        arg_1,
-                                                          gpointer     arg_2,
-                                                          gpointer     data2);
-  register GMarshalFunc_BOOLEAN__UINT_POINTER callback;
-  register GCClosure *cc = (GCClosure*) closure;
-  register gpointer data1, data2;
-  gboolean v_return;
-
-  g_return_if_fail (return_value != NULL);
-  g_return_if_fail (n_param_values == 3);
-
-  if (G_CCLOSURE_SWAP_DATA (closure))
-    {
-      data1 = closure->data;
-      data2 = g_value_peek_pointer (param_values + 0);
-    }
-  else
-    {
-      data1 = g_value_peek_pointer (param_values + 0);
-      data2 = closure->data;
-    }
-  callback = (GMarshalFunc_BOOLEAN__UINT_POINTER) (marshal_data ? marshal_data : cc->callback);
-
-  v_return = callback (data1,
-                       g_marshal_value_peek_uint (param_values + 1),
-                       g_marshal_value_peek_pointer (param_values + 2),
-                       data2);
-
-  g_value_set_boolean (return_value, v_return);
-}
-
-/* BOOLEAN:STRING,UINT,UINT,BOOLEAN,BOOLEAN,UINT,BOOLEAN,POINTER (/tmp/dbus-binding-tool-c-marshallers.CCS4AU:6) */
+/* BOOLEAN:STRING,UINT,UINT,BOOLEAN,BOOLEAN,UINT,BOOLEAN,POINTER (/tmp/dbus-binding-tool-c-marshallers.OI20AU:5) */
 extern void dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_BOOLEAN_BOOLEAN_UINT_BOOLEAN_POINTER (GClosure     *closure,
                                                                                                          GValue       *return_value,
                                                                                                          guint         n_param_values,
@@ -367,20 +320,19 @@ G_END_DECLS
 
 #include <dbus/dbus-glib.h>
 static const DBusGMethodInfo dbus_glib_rem_server_methods[] = {
-  { (GCallback) rem_server_check, dbus_glib_marshal_rem_server_BOOLEAN__UINT_POINTER, 0 },
-  { (GCallback) rem_server_hello, dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_POINTER, 42 },
-  { (GCallback) rem_server_update_state, dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_BOOLEAN_BOOLEAN_UINT_BOOLEAN_POINTER, 104 },
-  { (GCallback) rem_server_update_plob, dbus_glib_marshal_rem_server_BOOLEAN__STRING_STRING_STRING_BOXED_POINTER, 221 },
-  { (GCallback) rem_server_update_playlist, dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER, 295 },
-  { (GCallback) rem_server_update_queue, dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER, 365 },
-  { (GCallback) rem_server_bye, dbus_glib_marshal_rem_server_BOOLEAN__STRING_POINTER, 432 },
+  { (GCallback) rem_server_hello, dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_POINTER, 0 },
+  { (GCallback) rem_server_update_state, dbus_glib_marshal_rem_server_BOOLEAN__STRING_UINT_UINT_BOOLEAN_BOOLEAN_UINT_BOOLEAN_POINTER, 62 },
+  { (GCallback) rem_server_update_plob, dbus_glib_marshal_rem_server_BOOLEAN__STRING_STRING_STRING_BOXED_POINTER, 179 },
+  { (GCallback) rem_server_update_playlist, dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER, 253 },
+  { (GCallback) rem_server_update_queue, dbus_glib_marshal_rem_server_BOOLEAN__STRING_BOXED_BOXED_POINTER, 323 },
+  { (GCallback) rem_server_bye, dbus_glib_marshal_rem_server_BOOLEAN__STRING_POINTER, 390 },
 };
 
 const DBusGObjectInfo dbus_glib_rem_server_object_info = {
   0,
   dbus_glib_rem_server_methods,
-  7,
-"net.sf.remuco.Server\0Check\0S\0version\0I\0u\0\0net.sf.remuco.Server\0Hello\0S\0player\0I\0s\0flags\0I\0u\0rating\0I\0u\0\0net.sf.remuco.Server\0UpdateState\0S\0player\0I\0s\0playback\0I\0u\0volume\0I\0u\0repeat\0I\0b\0shuffle\0I\0b\0position\0I\0u\0queue\0I\0b\0\0net.sf.remuco.Server\0UpdatePlob\0S\0player\0I\0s\0id\0I\0s\0img\0I\0s\0meta\0I\0a{ss}\0\0net.sf.remuco.Server\0UpdatePlaylist\0S\0player\0I\0s\0ids\0I\0as\0names\0I\0as\0\0net.sf.remuco.Server\0UpdateQueue\0S\0player\0I\0s\0ids\0I\0as\0names\0I\0as\0\0net.sf.remuco.Server\0Bye\0S\0player\0I\0s\0\0\0",
+  6,
+"net.sf.remuco.Server\0Hello\0S\0player\0I\0s\0flags\0I\0u\0rating\0I\0u\0\0net.sf.remuco.Server\0UpdateState\0S\0player\0I\0s\0playback\0I\0u\0volume\0I\0u\0repeat\0I\0b\0shuffle\0I\0b\0position\0I\0u\0queue\0I\0b\0\0net.sf.remuco.Server\0UpdatePlob\0S\0player\0I\0s\0id\0I\0s\0img\0I\0s\0meta\0I\0a{ss}\0\0net.sf.remuco.Server\0UpdatePlaylist\0S\0player\0I\0s\0ids\0I\0as\0names\0I\0as\0\0net.sf.remuco.Server\0UpdateQueue\0S\0player\0I\0s\0ids\0I\0as\0names\0I\0as\0\0net.sf.remuco.Server\0Bye\0S\0player\0I\0s\0\0\0",
 "\0",
 "\0"
 };

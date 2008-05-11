@@ -5,11 +5,13 @@
 
 #include "server.h"
 
+typedef struct _RemShellPriv RemShellPriv;
+
 typedef struct {
 
 	GObject					parent;
 
-	RemServer				*server;
+	RemShellPriv			*priv;
 	
 } RemShell;
 
@@ -31,14 +33,35 @@ rem_shell_get_type(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// internal interface
+//
+///////////////////////////////////////////////////////////////////////////////
+
+gboolean
+rem_shell_up(RemShell *shell, RemServer *server);
+
+void
+rem_shell_down(RemShell *shell);
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // dbus interface
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 gboolean
-rem_shell_ping(RemShell *shell, GError **err);
+rem_shell_start(RemShell *shell, guint version, GError **err);
 
 gboolean
-rem_shell_shutdown(RemShell *shell, GError **err);
+rem_shell_stop(RemShell *shell, GError **err);
+
+gboolean
+rem_shell_get_proxies(RemShell *shell, gchar ***proxies, GError **err);
+
+gboolean
+rem_shell_get_clients(RemShell *shell, gchar ***clients, GError **err);
+
+gboolean
+rem_shell_disable_proxy(RemShell *shell, gchar *proxy, GError **err);
 
 #endif /*SHELL_H_*/

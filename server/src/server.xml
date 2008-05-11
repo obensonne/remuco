@@ -1,9 +1,5 @@
 <node name="/net/sf/remuco/Server">
         <interface name="net.sf.remuco.Server">
-                <method name="Check">
-                        <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_check"/>
-                        <arg type="u" name="version" direction="in" />
-                </method>
                 <method name="Hello">
                         <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="rem_server_hello"/>
                         <arg type="s" name="player" direction="in" />

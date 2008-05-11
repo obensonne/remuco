@@ -1,3 +1,4 @@
+#include "daemon.h"
 #include "common.h"
 #include "server.h"
 #include "shell.h"
@@ -41,6 +42,14 @@ static const GOptionEntry option_entries[] =
 static GMainLoop	*ml;
 static RemServer	*server;
 static RemShell		*shell;
+
+void
+rem_daemon_stop()
+{
+	g_assert(ml);
+	
+	g_main_loop_quit(ml);
+}
 
 int 
 main (int argc, char *argv[])
@@ -105,13 +114,11 @@ main (int argc, char *argv[])
 	
 	g_type_init();
 	
-	ml = g_main_loop_new(NULL, FALSE);
-	
 	////////// set up the server //////////
 	
 	server = g_object_new(REM_SERVER_TYPE, NULL);
 	
-	ok = rem_server_up(server, ml);
+	ok = rem_server_up(server);
 	
 	if (!ok) {
 		return 1;
@@ -121,8 +128,7 @@ main (int argc, char *argv[])
 
 	shell = g_object_new(REM_SHELL_TYPE, NULL);
 
-	shell->server = server;
-	
+	ok = rem_shell_up(shell, server);
 	if (!ok) {
 		return 1;
 	}
@@ -156,15 +162,22 @@ main (int argc, char *argv[])
 	
 	LOG_INFO("here we go ..");
 	
+	ml = g_main_loop_new(NULL, FALSE);
+	
 	g_main_loop_run(ml);
 	
-	LOG_INFO("bye");
-		
+	LOG_INFO("going down");
+
 	g_main_loop_unref(ml);
+	ml = NULL;
 	
+	rem_shell_down(shell);
 	g_object_unref(shell);
 	
+	rem_server_down(server);
 	g_object_unref(server);
 	
+	LOG_INFO("bye");
+
 	return 0;
 }

@@ -14,21 +14,21 @@ static
 inline
 #endif
 gboolean
-net_sf_remuco_Shell_ping (DBusGProxy *proxy, GError **error)
+net_sf_remuco_Shell_disable_proxy (DBusGProxy *proxy, const char * IN_proxy, GError **error)
 
 {
-  return dbus_g_proxy_call (proxy, "Ping", error, G_TYPE_INVALID, G_TYPE_INVALID);
+  return dbus_g_proxy_call (proxy, "DisableProxy", error, G_TYPE_STRING, IN_proxy, G_TYPE_INVALID, G_TYPE_INVALID);
 }
 
-typedef void (*net_sf_remuco_Shell_ping_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
+typedef void (*net_sf_remuco_Shell_disable_proxy_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
 
 static void
-net_sf_remuco_Shell_ping_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+net_sf_remuco_Shell_disable_proxy_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
   GError *error = NULL;
   dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
-  (*(net_sf_remuco_Shell_ping_reply)data->cb) (proxy, error, data->userdata);
+  (*(net_sf_remuco_Shell_disable_proxy_reply)data->cb) (proxy, error, data->userdata);
   return;
 }
 
@@ -37,35 +37,36 @@ static
 inline
 #endif
 DBusGProxyCall*
-net_sf_remuco_Shell_ping_async (DBusGProxy *proxy, net_sf_remuco_Shell_ping_reply callback, gpointer userdata)
+net_sf_remuco_Shell_disable_proxy_async (DBusGProxy *proxy, const char * IN_proxy, net_sf_remuco_Shell_disable_proxy_reply callback, gpointer userdata)
 
 {
   DBusGAsyncData *stuff;
   stuff = g_new (DBusGAsyncData, 1);
   stuff->cb = G_CALLBACK (callback);
   stuff->userdata = userdata;
-  return dbus_g_proxy_begin_call (proxy, "Ping", net_sf_remuco_Shell_ping_async_callback, stuff, g_free, G_TYPE_INVALID);
+  return dbus_g_proxy_begin_call (proxy, "DisableProxy", net_sf_remuco_Shell_disable_proxy_async_callback, stuff, g_free, G_TYPE_STRING, IN_proxy, G_TYPE_INVALID);
 }
 static
 #ifdef G_HAVE_INLINE
 inline
 #endif
 gboolean
-net_sf_remuco_Shell_shutdown (DBusGProxy *proxy, GError **error)
+net_sf_remuco_Shell_get_proxies (DBusGProxy *proxy, char *** OUT_proxies, GError **error)
 
 {
-  return dbus_g_proxy_call (proxy, "Shutdown", error, G_TYPE_INVALID, G_TYPE_INVALID);
+  return dbus_g_proxy_call (proxy, "GetProxies", error, G_TYPE_INVALID, G_TYPE_STRV, OUT_proxies, G_TYPE_INVALID);
 }
 
-typedef void (*net_sf_remuco_Shell_shutdown_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
+typedef void (*net_sf_remuco_Shell_get_proxies_reply) (DBusGProxy *proxy, char * *OUT_proxies, GError *error, gpointer userdata);
 
 static void
-net_sf_remuco_Shell_shutdown_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+net_sf_remuco_Shell_get_proxies_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
 {
   DBusGAsyncData *data = (DBusGAsyncData*) user_data;
   GError *error = NULL;
-  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
-  (*(net_sf_remuco_Shell_shutdown_reply)data->cb) (proxy, error, data->userdata);
+  char ** OUT_proxies;
+  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_STRV, &OUT_proxies, G_TYPE_INVALID);
+  (*(net_sf_remuco_Shell_get_proxies_reply)data->cb) (proxy, OUT_proxies, error, data->userdata);
   return;
 }
 
@@ -74,14 +75,126 @@ static
 inline
 #endif
 DBusGProxyCall*
-net_sf_remuco_Shell_shutdown_async (DBusGProxy *proxy, net_sf_remuco_Shell_shutdown_reply callback, gpointer userdata)
+net_sf_remuco_Shell_get_proxies_async (DBusGProxy *proxy, net_sf_remuco_Shell_get_proxies_reply callback, gpointer userdata)
 
 {
   DBusGAsyncData *stuff;
   stuff = g_new (DBusGAsyncData, 1);
   stuff->cb = G_CALLBACK (callback);
   stuff->userdata = userdata;
-  return dbus_g_proxy_begin_call (proxy, "Shutdown", net_sf_remuco_Shell_shutdown_async_callback, stuff, g_free, G_TYPE_INVALID);
+  return dbus_g_proxy_begin_call (proxy, "GetProxies", net_sf_remuco_Shell_get_proxies_async_callback, stuff, g_free, G_TYPE_INVALID);
+}
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+gboolean
+net_sf_remuco_Shell_get_clients (DBusGProxy *proxy, char *** OUT_clients, GError **error)
+
+{
+  return dbus_g_proxy_call (proxy, "GetClients", error, G_TYPE_INVALID, G_TYPE_STRV, OUT_clients, G_TYPE_INVALID);
+}
+
+typedef void (*net_sf_remuco_Shell_get_clients_reply) (DBusGProxy *proxy, char * *OUT_clients, GError *error, gpointer userdata);
+
+static void
+net_sf_remuco_Shell_get_clients_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+{
+  DBusGAsyncData *data = (DBusGAsyncData*) user_data;
+  GError *error = NULL;
+  char ** OUT_clients;
+  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_STRV, &OUT_clients, G_TYPE_INVALID);
+  (*(net_sf_remuco_Shell_get_clients_reply)data->cb) (proxy, OUT_clients, error, data->userdata);
+  return;
+}
+
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+DBusGProxyCall*
+net_sf_remuco_Shell_get_clients_async (DBusGProxy *proxy, net_sf_remuco_Shell_get_clients_reply callback, gpointer userdata)
+
+{
+  DBusGAsyncData *stuff;
+  stuff = g_new (DBusGAsyncData, 1);
+  stuff->cb = G_CALLBACK (callback);
+  stuff->userdata = userdata;
+  return dbus_g_proxy_begin_call (proxy, "GetClients", net_sf_remuco_Shell_get_clients_async_callback, stuff, g_free, G_TYPE_INVALID);
+}
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+gboolean
+net_sf_remuco_Shell_start (DBusGProxy *proxy, const guint IN_version, GError **error)
+
+{
+  return dbus_g_proxy_call (proxy, "Start", error, G_TYPE_UINT, IN_version, G_TYPE_INVALID, G_TYPE_INVALID);
+}
+
+typedef void (*net_sf_remuco_Shell_start_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
+
+static void
+net_sf_remuco_Shell_start_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+{
+  DBusGAsyncData *data = (DBusGAsyncData*) user_data;
+  GError *error = NULL;
+  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
+  (*(net_sf_remuco_Shell_start_reply)data->cb) (proxy, error, data->userdata);
+  return;
+}
+
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+DBusGProxyCall*
+net_sf_remuco_Shell_start_async (DBusGProxy *proxy, const guint IN_version, net_sf_remuco_Shell_start_reply callback, gpointer userdata)
+
+{
+  DBusGAsyncData *stuff;
+  stuff = g_new (DBusGAsyncData, 1);
+  stuff->cb = G_CALLBACK (callback);
+  stuff->userdata = userdata;
+  return dbus_g_proxy_begin_call (proxy, "Start", net_sf_remuco_Shell_start_async_callback, stuff, g_free, G_TYPE_UINT, IN_version, G_TYPE_INVALID);
+}
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+gboolean
+net_sf_remuco_Shell_stop (DBusGProxy *proxy, GError **error)
+
+{
+  return dbus_g_proxy_call (proxy, "Stop", error, G_TYPE_INVALID, G_TYPE_INVALID);
+}
+
+typedef void (*net_sf_remuco_Shell_stop_reply) (DBusGProxy *proxy, GError *error, gpointer userdata);
+
+static void
+net_sf_remuco_Shell_stop_async_callback (DBusGProxy *proxy, DBusGProxyCall *call, void *user_data)
+{
+  DBusGAsyncData *data = (DBusGAsyncData*) user_data;
+  GError *error = NULL;
+  dbus_g_proxy_end_call (proxy, call, &error, G_TYPE_INVALID);
+  (*(net_sf_remuco_Shell_stop_reply)data->cb) (proxy, error, data->userdata);
+  return;
+}
+
+static
+#ifdef G_HAVE_INLINE
+inline
+#endif
+DBusGProxyCall*
+net_sf_remuco_Shell_stop_async (DBusGProxy *proxy, net_sf_remuco_Shell_stop_reply callback, gpointer userdata)
+
+{
+  DBusGAsyncData *stuff;
+  stuff = g_new (DBusGAsyncData, 1);
+  stuff->cb = G_CALLBACK (callback);
+  stuff->userdata = userdata;
+  return dbus_g_proxy_begin_call (proxy, "Stop", net_sf_remuco_Shell_stop_async_callback, stuff, g_free, G_TYPE_INVALID);
 }
 #endif /* defined DBUS_GLIB_CLIENT_WRAPPERS_net_sf_remuco_Shell */
 
