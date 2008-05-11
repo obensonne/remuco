@@ -51,6 +51,10 @@ SERVER_PP_PROTO_VERSION = 2
 
 # dbus constants
 
+DBUS_SHELL_SERVICE = "net.sf.remuco.Shell"
+DBUS_SHELL_PATH = "/net/sf/remuco/Shell"
+DBUS_SHELL_IFACE = "net.sf.remuco.Shell"
+
 DBUS_SERVER_SERVICE = "net.sf.remuco.Server"
 DBUS_SERVER_PATH = "/net/sf/remuco/Server"
 DBUS_SERVER_IFACE = "net.sf.remuco.Server"
@@ -58,12 +62,6 @@ DBUS_SERVER_IFACE = "net.sf.remuco.Server"
 DBUS_PP_SERVICE = "net.sf.remuco.%s" % PLAYER
 DBUS_PP_PATH = "/net/sf/remuco/%s" % PLAYER
 DBUS_PP_IFACE = "net.sf.remuco.%s" % PLAYER
-
-# errors returned by server
-
-SERVER_ERR_INVALID_DATA = "rem_server_invalid_data"
-SERVER_ERR_VERSION_MISMATCH = "rem_server_version_mismatch"
-SERVER_ERR_UNKNOWN_PLAYER = "rem_server_unknown_player"
 
 # dbus errors
 
@@ -238,20 +236,14 @@ class PP(dbus.service.Object):
         
         bus = dbus.SessionBus()
         
-        server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH,
-                                      follow_name_owner_changes=True)
+        shell_proxy = bus.get_object(DBUS_SHELL_SERVICE, DBUS_SHELL_PATH)
         
-        server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
+        rem_shell = dbus.Interface(shell_proxy, DBUS_SHELL_IFACE)
         
         try:
-            server.Check(SERVER_PP_PROTO_VERSION)
+            rem_shell.Start(SERVER_PP_PROTO_VERSION)
         except DBusException, e:
-            if e.message == SERVER_ERR_VERSION_MISMATCH:
-                rb.error_dialog(
-                    title = "Remuco Error",
-                    message = "The Remuco server has an incompatible version."
-                )
-            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+            if e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
                 rb.error_dialog(
                     title = "Remuco Error",
                     message = "It looks like the Remuco server is not installed."
@@ -259,9 +251,14 @@ class PP(dbus.service.Object):
             else:
                 rb.error_dialog(
                     title = "Remuco Error",
-                    message = "Failed to talk to server (%s)." % e.message
+                    message = "Failed to connect to server (%s)." % e.message
                 )
             return False
+        
+        server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH,
+                                      follow_name_owner_changes=True)
+        
+        server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
         
         try:
             server.Hello(PLAYER, 0, RATING_MAX)
@@ -747,10 +744,7 @@ class PP(dbus.service.Object):
                 self.__state_repeat, self.__state_shuffle,
                 self.__state_position, self.__state_queue)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to server")
-                self.__reconnect_to_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from server (probably busy)")
             else:
                 self.__suicide("Failed to talk to server (%s)" % str(e.message))
@@ -802,10 +796,7 @@ class PP(dbus.service.Object):
         try:
             server.UpdatePlob(PLAYER, id, img_file, meta)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to server")
-                self.__reconnect_to_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from server (probably busy)")
             else:
                 self.__suicide("Failed to talk to server (%s)" % str(e.message))
@@ -832,10 +823,7 @@ class PP(dbus.service.Object):
         try:
             server.UpdatePlaylist(PLAYER, ids, names)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to server")
-                self.__reconnect_to_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from server (probably busy)")
             else:
                 self.__suicide("Failed to talk to server (%s)" % str(e.message))
@@ -862,10 +850,7 @@ class PP(dbus.service.Object):
         try:
             server.UpdateQueue(PLAYER, ids, names)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to server")
-                self.__reconnect_to_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from server (probably busy)")
             else:
                 self.__suicide("Failed to talk to server (%s)" % str(e.message))
@@ -879,7 +864,7 @@ class PP(dbus.service.Object):
     def __suicide(self, msg):
         """Shut down the Remuco plugin.
         
-        To be called when a serious error occured. 'msg' shall describe the
+        To be called when a serious error occurred. 'msg' shall describe the
         error - it will be displayed to the user. 
         """
 
@@ -893,31 +878,6 @@ class PP(dbus.service.Object):
 
         if msg != None:
             rb.error_dialog(title = "Remuco Error", message = msg)
-        
-    def __reconnect_to_server(self):
-        """Reconnect to the server.
-        
-        This may be necessary if the server has been shut down during our life
-        time. The reason for shut down may be - e.g. - that we did not reply
-        in time to a request from the server (e.g. because RB was very busy for
-        some reason) and the server considered us as dead.
-        """
-        
-        server = self.__server
-        
-        if not server:
-            return
-
-        try:
-            server.Hello(PLAYER, 0, RATING_MAX)
-        except DBusException, e:
-            self.__suicide("Failed to connect to server (%s)." % e.message)
-            return
-        
-        self.__trigger_sync_state()
-        self.__trigger_sync_plob()
-        self.__trigger_sync_playlist()
-        self.__trigger_sync_queue()
         
     def __do_jump(self, id, index):
         """Jump to a specific song (index) in a specific source (id)."""
