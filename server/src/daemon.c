@@ -1,3 +1,5 @@
+#include <signal.h>	// for sigaction() etc.
+
 #include "daemon.h"
 #include "common.h"
 #include "server.h"
@@ -51,6 +53,14 @@ rem_daemon_stop()
 	g_main_loop_quit(ml);
 }
 
+static void
+sighandler(gint sig)
+{
+	LOG_INFO("received signal %s", g_strsignal(sig));
+	if (ml)
+		rem_daemon_stop();
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -60,7 +70,8 @@ main (int argc, char *argv[])
 	const gchar			*logname;
 	gchar				*help;
 	DBusGConnection		*conn;
-
+	struct sigaction	siga;
+	
 	////////// handle command line options //////////
 	
 	context = g_option_context_new("- Remuco server daemon");
@@ -157,6 +168,21 @@ main (int argc, char *argv[])
 		LOG_ERROR_GERR(err, "failed to register dbus service");
 		return 1;
 	}
+
+	////////// signal handling //////////
+	
+	memclr(struct sigaction, &siga);
+	siga.sa_handler = &sighandler;
+
+	ok = sigaction(SIGINT, &siga, NULL) == 0;
+	ok &= sigaction(SIGTERM, &siga, NULL) == 0;
+	ok &= sigaction(SIGUSR1, &siga, NULL) == 0;
+	ok &= sigaction(SIGUSR2, &siga, NULL) == 0;
+	
+	if (!ok) {
+		LOG_ERROR("failed to set up signal handler");
+		return 1;
+	}	
 
 	////////// start the main loop //////////
 	
