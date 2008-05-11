@@ -30,6 +30,12 @@
 # Default value is 'true'.
 #enable-bpps = true
 
+# The server pings clients every 'ping' seconds to check the connection. You
+# may set a lower value here if you have a phone that automatically cuts a
+# connection if there is no transfer for some seconds.
+# Default value is 30 (seconds).
+#ping = 30
+
 [net]
 
 # This section contains network related options.
