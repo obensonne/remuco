@@ -43,6 +43,10 @@ SERVER_PP_PROTO_VERSION = 2
 
 # dbus constants
 
+DBUS_SHELL_SERVICE = "net.sf.remuco.Shell"
+DBUS_SHELL_PATH = "/net/sf/remuco/Shell"
+DBUS_SHELL_IFACE = "net.sf.remuco.Shell"
+
 DBUS_SERVER_SERVICE = "net.sf.remuco.Server"
 DBUS_SERVER_PATH = "/net/sf/remuco/Server"
 DBUS_SERVER_IFACE = "net.sf.remuco.Server"
@@ -50,12 +54,6 @@ DBUS_SERVER_IFACE = "net.sf.remuco.Server"
 DBUS_PP_SERVICE = "net.sf.remuco.%s" % PLAYER
 DBUS_PP_PATH = "/net/sf/remuco/%s" % PLAYER
 DBUS_PP_IFACE = "net.sf.remuco.%s" % PLAYER
-
-# errors returned by server
-
-SERVER_ERR_INVALID_DATA = "rem_server_invalid_data"
-SERVER_ERR_VERSION_MISMATCH = "rem_server_version_mismatch"
-SERVER_ERR_UNKNOWN_PLAYER = "rem_server_unknown_player"
 
 # dbus errors
 
@@ -187,6 +185,7 @@ class PP(dbus.service.Object):
         # used for quick change checks after a control
         self.__fast_state_check_triggered = False
         self.__fast_plob_check_triggered = False
+        self.__fast_playlist_check_triggered = False
         
         ###### connect to xmms2 ######
         
@@ -202,23 +201,19 @@ class PP(dbus.service.Object):
         
         bus = dbus.SessionBus()
         
-        dbus.service.Object.add_to_connection(self, bus, DBUS_PP_PATH)
-
-        server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH,
-                                      follow_name_owner_changes=True)
+        shell_proxy = bus.get_object(DBUS_SHELL_SERVICE, DBUS_SHELL_PATH)
         
-        server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
+        shell = dbus.Interface(shell_proxy, DBUS_SHELL_IFACE)
         
         try:
-            server.Check(SERVER_PP_PROTO_VERSION)
+            shell.Start(SERVER_PP_PROTO_VERSION)
         except DBusException, e:
-            if e.message == SERVER_ERR_VERSION_MISMATCH:
-                log_msg("Remuco server has an incompatible version.")
-            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
-                log_msg("Remuco server is not (properly) installed")
-            else:
-                log_exc("failed to talk to Remuco server")
+            log_exc("failed to connect to Remuco server")
             return False
+
+        server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH)
+        
+        server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
         
         try:
             server.Hello(PLAYER, 0, RATING_MAX)
@@ -228,6 +223,8 @@ class PP(dbus.service.Object):
         
         self.__server = server
         
+        dbus.service.Object.add_to_connection(self, bus, DBUS_PP_PATH)
+
         dbus_service_name = dbus.service.BusName(DBUS_PP_SERVICE, bus)
         
         ###### setup main loop ######
@@ -290,6 +287,7 @@ class PP(dbus.service.Object):
         
         do_check_state = False
         do_check_plob = False
+        do_check_playlist = False
 
         if command == CTL_STOP:
             
@@ -362,6 +360,7 @@ class PP(dbus.service.Object):
             do_check_plob = True
             
             if paramS != PLAYLIST_ID:
+                do_check_playlist = True
                 result = self.__xmms.playlist_load(paramS) 
                 result.wait()
                 if result.iserror():
@@ -372,6 +371,7 @@ class PP(dbus.service.Object):
             result.wait()
             result = self.__xmms.playback_tickle()
             result.wait()
+            
 
         elif command == CTL_RATE: #############################################
             
@@ -406,6 +406,11 @@ class PP(dbus.service.Object):
             # idle would be too fast, so here a small timeout:
             gobject.timeout_add(250, self.check_plob_once)
             self.__fast_plob_check_triggered = True
+        
+        if do_check_playlist and not self.__fast_playlist_check_triggered:
+            # idle would be too fast, so here a small timeout:
+            gobject.timeout_add(250, self.check_playlist_once)
+            self.__fast_playlist_check_triggered = True
         
 
     @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
@@ -638,10 +643,7 @@ class PP(dbus.service.Object):
                 self.__state_repeat, self.__state_shuffle,
                 self.__state_position, False)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to Remuco server")
-                self.__reconnect_to_remuco_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from Remuco server (probably busy)")
             else:
                 log_exc("failed to talk to Remuco server")
@@ -659,10 +661,7 @@ class PP(dbus.service.Object):
             self.__server.UpdatePlob(PLAYER,
                 self.__plob_id, self.__plob_img, self.__plob_meta)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to Remuco server")
-                self.__reconnect_to_remuco_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from Remuco server (probably busy)")
             else:
                 log_exc("failed to talk to Remuco server")
@@ -679,10 +678,7 @@ class PP(dbus.service.Object):
             self.__server.UpdatePlaylist(PLAYER,
                 self.__playlist_ids, self.__playlist_names)
         except DBusException, e:
-            if e.message == SERVER_ERR_UNKNOWN_PLAYER:
-                log_msg("have to reconnect to Remuco server")
-                self.__reconnect_to_remuco_server()
-            elif e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
                 log_msg("no reply from Remuco server (probably busy)")
             else:
                 log_exc("failed to talk to Remuco server")
@@ -709,27 +705,6 @@ class PP(dbus.service.Object):
         else:
             return True
         
-
-    def __reconnect_to_remuco_server(self):
-        """Reconnect to the Remuco server.
-        
-        This may be necessary if the server has been shut down during our life
-        time. The reason for shut down may be - e.g. - that we did not reply
-        in time to a request from the server because we were too busy (for some
-        reason).
-        """
-        
-        try:
-            self.__server.Hello(PLAYER, 0, RATING_MAX)
-        except DBusException, e:
-            log_exc("failed to say hello to Remuco server")
-            self.down()
-            return
-
-        self.__sync_state()
-        self.__sync_plob()
-        self.__sync_playlist()
-
     def __get_plob(self, id):
         
         def get_meta(key):
