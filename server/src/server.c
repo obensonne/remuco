@@ -69,6 +69,7 @@ typedef struct {
 	gboolean		bt_on;
 	gboolean		ip_on;
 	gboolean		ip_port;
+	guint			ping;
 	gchar			*cmd_shutdown;
 	gchar			*img;
 	guint			list_limit;
@@ -81,6 +82,7 @@ static Config config = {
 		TRUE,	/* bt_on */
 		TRUE,	/* ip_on */
 		34271,	/* ip_port */
+		30,		/* ping */
 		NULL,	/* cmd_shutdown */
 		"jpg",	/* img */
 		100,	/* list_limit */
@@ -91,6 +93,7 @@ static const RemConfigEntry	config_entries[] = {
 	{ "net", "bt", G_TYPE_BOOLEAN, FALSE, &config.bt_on },
 	{ "net", "ip", G_TYPE_BOOLEAN, FALSE, &config.ip_on },
 	{ "net", "ip-port", G_TYPE_INT, FALSE, &config.ip_port },
+	{ "net", "ping", G_TYPE_INT, FALSE, &config.ping },
 	{ "misc", "sys-shutdown-cmd", G_TYPE_STRING, FALSE, &config.cmd_shutdown },
 	{ "misc", "img", G_TYPE_STRING, FALSE, &config.img },
 	{ "misc", "list-limit", G_TYPE_INT, FALSE, &config.list_limit },
@@ -1041,6 +1044,28 @@ client_remove(Client *client)
 	g_slice_free(Client, client);
 }
 
+static gboolean
+client_ping(Client *client)
+{
+	gboolean	ok;
+	
+	LOG_DEBUG("ping client %s", client->net->addr);
+	
+	client->server->priv->msg.id = REM_MSG_ID_IGNORE;
+	client->server->priv->msg.ba->len = 0;
+	
+	ok = rem_net_tx(client->net, &client->server->priv->msg);
+	
+	if (!ok) {
+		LOG_WARN("failed to ping client %s", client->net->addr);
+		g_hash_table_remove(client->server->priv->cht, client->net->chan);
+		return FALSE;
+	} else {
+		LOG_DEBUG("done");
+		return TRUE;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // private functions - misc
@@ -1244,6 +1269,9 @@ io_server(GIOChannel *chan, GIOCondition cond, RemServer *server)
 
 		g_io_add_watch(client_net->chan, G_IO_INERRHUPNVAL,
 					   (GIOFunc) &io_client, client);
+		
+		g_timeout_add(server->priv->config->ping * 1000,
+					  (GSourceFunc) &client_ping, client);
 		
 		client->server = server;
 		
