@@ -27,15 +27,18 @@ INSTALL_DIR := $(INSTALL) -m 755 -d
 ###############################################################################
 
 all:
+	py_compilefiles src/remuco/__init__.py
 
 install: all
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/lib/rhythmbox/plugins/remuco
-	$(INSTALL_DAT) src/remuco/__init__.py src/remuco/remuco.rb-plugin \
+	$(INSTALL_DAT) src/remuco/__init__.py src/remuco/__init__.pyc \
+		src/remuco/remuco.rb-plugin \
 		$(DESTDIR)$(PREFIX)/lib/rhythmbox/plugins/remuco
 
-install-user:
+install-user: all
 	$(INSTALL_DIR) $(HOME)/.gnome2/rhythmbox/plugins/remuco
-	$(INSTALL_DAT) src/remuco/__init__.py src/remuco/remuco.rb-plugin \
+	$(INSTALL_DAT) src/remuco/__init__.py src/remuco/__init__.pyc \
+		src/remuco/remuco.rb-plugin \
 		$(HOME)/.gnome2/rhythmbox/plugins/remuco
 
 uninstall:
