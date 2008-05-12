@@ -18,10 +18,11 @@ Table of Contents
     2.1. System
     2.2. User
 
-3. Troubleshooting
+3. Usage
+4. Troubleshooting
 
-    3.1. General
-    3.2. XMMS2
+    4.1. General
+    4.2. XMMS2
 
 A. General Information
 
@@ -66,14 +67,23 @@ Note You can adjust the install destination by setting the environment variable
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. Troubleshooting
+3. Usage
+
+ If you've installed the XMMS2 player proxy into the XMMS2 startup script
+directory (as described above), then it gets started automatically by XMMS2.
+The XMMS2 player proxy automatically starts the Remuco server. So actually you
+do not have to do anything.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. Troubleshooting
 
  To track down errors, please try the steps below. If this does not solve your
 problem, come to the help forum.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3.1. General
+4.1. General
 
  If something fails, it is a good idea to set Remuco into debug mode. This is
 done by creating the file ~/.config/remuco/debug, for instance:
@@ -82,9 +92,9 @@ done by creating the file ~/.config/remuco/debug, for instance:
 
  This tells the server and all player proxies to enable debug output. The
 server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
-proxies (e.g. Amarok, MPD, Totem) go to ~/.cache/remuco/PLAYER.log where PLAYER
-means the basic player proxy's player name. Log sinks of full player proxies
-(e.g. Rhythmbox, XMMS2) are proxy specific.
+proxies (e.g. Amarok, MPD, Totem) goes to ~/.cache/remuco/PLAYER.log where
+PLAYER means the basic player proxy's player name. Log sinks of full player
+proxies (e.g. Rhythmbox, XMMS2) are proxy specific.
 
  Inspect the relevant log files to detect what is wrong.
 
@@ -93,7 +103,7 @@ Note Don't forget to remove ~/.config/remuco/debug once you don't need the
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3.2. XMMS2
+4.2. XMMS2
 
  To debug the XMMS2 player proxy, remove it from the XMMS2 startup script
 directory and start it manually (when XMMS2 is running) to see its logging:
