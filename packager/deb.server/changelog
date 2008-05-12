@@ -1,3 +1,9 @@
+remuco-server (0.7.1u-1) hardy; urgency=low
+
+  * Faked new upstream release (dodge a Launchpad PPA issue).
+
+ -- Oben Sonne <obensonne@googlemail.com>  Tue, 12 May 2008 22:10:12 +0200
+
 remuco-server (0.7.1-1) hardy; urgency=low
 
   * New upstream release.
