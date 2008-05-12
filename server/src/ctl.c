@@ -1,4 +1,5 @@
 #include "dbus.h"
+#include "common.h"
 #include "server-glue-c.h"
 #include "shell-glue-c.h"
 
@@ -13,12 +14,14 @@
 	"the server is printed."
 
 
+static gboolean	version = FALSE; 
 static gboolean	stop = FALSE; 
 static gboolean start = FALSE;
 static gchar	*proxy = NULL;
 
 static const GOptionEntry entries[] = 
 {
+  { "version", 'v', 0, G_OPTION_ARG_NONE, &version, "show version", NULL },
   { "stop", 'o', 0, G_OPTION_ARG_NONE, &stop, "stop the server", NULL },
   { "start", 'a', 0, G_OPTION_ARG_NONE, &start, "start the server", NULL },
   { "stop-proxy", 'p', 0, G_OPTION_ARG_STRING, &proxy, "stop player proxy NAME", "NAME" },
@@ -307,8 +310,6 @@ main(int argc, char **argv) {
 	GOptionContext		*context;
 	gboolean			ok;
 	
-	g_type_init();
-	
 	////////// parse command line options //////////
 	
 	context = g_option_context_new ("- Remuco server control");
@@ -326,11 +327,18 @@ main(int argc, char **argv) {
 		return 1;
 	}
 	
+	if (version) {
+		g_print("Remuco %s\n", REM_VERSION);
+		return 0;
+	}
+	
 	if ((stop && start) || (stop && proxy) || (start && proxy)) {
 		g_printerr("Only one control at the same time is possible.\n");
 		return 1;
 	}
 
+	g_type_init();
+	
 	////////// server running ? //////////
 	
 	ok = check_running();

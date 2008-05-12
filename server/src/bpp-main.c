@@ -15,6 +15,9 @@ static RemBasicProxy	*bpp;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#define OPTION_DESC_NAME \
+	"name of the BPP file to use (without suffix and path, e.g. just 'Foo')"
+
 #define OPTION_DESC_FORCE \
 	"force manual start"
 
@@ -22,17 +25,20 @@ static RemBasicProxy	*bpp;
 	"log to stdout/err"
 
 #define HELP_SUMMARY \
-	"Basic player proxies are intended to be started automatically by the " \
-	"server. However, for debugging purposes it might be useful to start a " \
-	"basic player proxy  manuallly. To do so, use the option --force.\n" \
-	"PLAYER_NAME specifies the .bpp file to use. For instance 'Totem' would " \
-	"use the file 'Totem.bpp' (usually placed in ~/.config/remuco)."
+	 "remuco-bpp is a program that reads Remuco basic player proxy (BPP) " \
+	 "files and acts as a Remuco player proxy for the corresponding media " \
+	 "player. Do not run this program directly, unless you are debugging " \
+	 "(in that case use option '--force'). " \
+	 "The Remuco server automatically starts this program for every BPP file " \
+	 "it finds. BPP files usually are located in ~/.config/remuco.\n"
 
 static gboolean		force = FALSE;
 static gboolean		log_here = FALSE;
+static gchar		*name = NULL;
 
 static const GOptionEntry option_entries[] = 
 {
+  { "name", 'n', 0, G_OPTION_ARG_STRING, &name, OPTION_DESC_NAME, "NAME" },
   { "force", 'f', 0, G_OPTION_ARG_NONE, &force, OPTION_DESC_FORCE, NULL },
   { "log-here", 'l', 0, G_OPTION_ARG_NONE, &log_here, OPTION_DESC_LOG_HERE, NULL },
   { NULL }
@@ -99,7 +105,6 @@ main (int argc, char *argv[])
 	GError				*err;
 	GOptionContext		*context;
 	gboolean			started_by_bppl, ok;
-	const gchar			*name;
 	struct sigaction	siga;
 	gchar				*help;
 	DBusGConnection		*dbus_conn;
@@ -108,7 +113,7 @@ main (int argc, char *argv[])
 
 	////////// handle command line options //////////
 	
-	context = g_option_context_new("PLAYER_NAME");
+	context = g_option_context_new("- Remuco basic player proxy");
 	g_option_context_set_summary(context, HELP_SUMMARY);
 	g_option_context_add_main_entries (context, option_entries, NULL);
 	
@@ -123,7 +128,7 @@ main (int argc, char *argv[])
 
 	started_by_bppl = (gboolean) g_getenv(REM_ENV_BPP_LAUNCHER);
 
-	if ((!started_by_bppl && !force) || (argc < 2 || !argv[1])) {
+	if ((!started_by_bppl && !force) || (!name)) {
 		
 		help = g_option_context_get_help(context, TRUE, NULL);
 		
@@ -136,8 +141,6 @@ main (int argc, char *argv[])
 	
 	g_option_context_free(context);
 
-	name = argv[1];
-	
 	////////// set up logging //////////
 	
 	err = NULL;

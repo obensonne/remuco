@@ -19,7 +19,7 @@
 
 struct _RemBasicProxyLauncher {
 	
-	gchar			*argv[3];
+	gchar			*argv[4];
 	
 	GHashTable		*proxies;
 	
@@ -111,7 +111,7 @@ bpp_launch(gpointer key, gpointer value, gpointer data)
 
 	LOG_DEBUG("starting BPP for %s", proxy->name);
 	
-	proxy->launcher->argv[1] = proxy->name;
+	proxy->launcher->argv[2] = proxy->name;
 	err = NULL;
 	g_spawn_async(NULL, proxy->launcher->argv, NULL,
 				  G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD |
@@ -276,8 +276,9 @@ rem_bppl_up(void)
 											  (GDestroyNotify) &bpp_destroy);
 	
 	launcher->argv[0] = "remuco-bpp";
-	launcher->argv[1] = NULL; // bpp file goes here
-	launcher->argv[2] = NULL;
+	launcher->argv[1] = "-n";
+	launcher->argv[2] = NULL; // bpp file goes here
+	launcher->argv[3] = NULL;
 	
 	g_setenv(REM_ENV_BPP_LAUNCHER, "x", FALSE);
 
