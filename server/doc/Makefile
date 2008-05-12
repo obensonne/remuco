@@ -26,10 +26,11 @@ all:
 
 install: all
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/man/man1
-	$(INSTALL_DAT) remuco.1 $(DESTDIR)$(PREFIX)/share/man/man1
+	$(INSTALL_DAT) remuco.1 remuco-bpp.1 remuco-server.1 \
+		$(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco.1
-	ln -sf remuco.1.gz $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1.gz
-	ln -sf remuco.1.gz $(DESTDIR)$(PREFIX)/share/man/man1/remuco-bpp.1.gz
+	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco-bpp.1
+	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	cp -r bpp-examples $(DESTDIR)$(PREFIX)/share/doc/remuco-server
 	$(INSTALL_DAT) COPYING README README.html Server.conf.example changelog \
