@@ -1,14 +1,14 @@
-Source: remuco-rhythmbox
+Source: remuco-client
 Section: sound
 Priority: extra
 Maintainer: Oben Sonne <obensonne@googlemail.com>
-Build-Depends: debhelper (>= 5), python (>= 2.5)
+Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.3
 
-Package: remuco-rhythmbox
+Package: remuco-client
 Architecture: all
-Depends: remuco-server (>= 0.7.1), rhythmbox (>= 0.11.5), python (>= 2.5), python-dbus (>= 0.82.4), python-gobject (>= 2.14.1)
-Description: Remuco player proxy for Rhythmbox
+Depends: remuco-server (>= 0.7.0)
+Description: Remuco client
  Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
  Remuco you can remotely control your favorite media player - amongst others you
  can switch to the next, previous or any other media within the current
@@ -16,4 +16,5 @@ Description: Remuco player proxy for Rhythmbox
  media and adjust volume. On the mobile (i.e. the remote control) it displays
  information about the current media, including cover art.
  .
- This package contains the Rhythmbox player proxy to use Remuco with Rhythmbox.
+ This package contains client. It still must be installed on a mobile device.
+ See the README for details.

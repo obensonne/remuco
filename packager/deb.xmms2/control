@@ -6,9 +6,9 @@ Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.3
 
 Package: remuco-xmms2
-Architecture: any
-Depends: ${shlibs:Depends}, remuco-server (>= 0.7), python, python-xmmsclient (>= 0.2DrJekyll), python-dbus
-Description: Remuco server
+Architecture: all
+Depends: remuco-server (>= 0.7.1), python (>= 2.5), python-xmmsclient (>= 0.2DrJekyll), python-dbus (>= 0.82.4), python-gobject (>= 2.14.1)
+Description: Remuco player proxy for XMMS2
  Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
  Remuco you can remotely control your favorite media player - amongst others you
  can switch to the next, previous or any other media within the current
@@ -16,4 +16,7 @@ Description: Remuco server
  media and adjust volume. On the mobile (i.e. the remote control) it displays
  information about the current media, including cover art.
  .
- This package contains the XMMS2 player proxy to use Remuco with XMMS2.
+ This package contains the XMMS2 player proxy to use Remuco with XMMS2. It
+ contains the player proxy as an executable. To let the proxy get started
+ automatically by XMMS2, it must be placed or linked to in users' XMMS2 startup
+ script directory - for details see the README.
