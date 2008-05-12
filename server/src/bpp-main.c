@@ -16,13 +16,13 @@ static RemBasicProxy	*bpp;
 ///////////////////////////////////////////////////////////////////////////////
 
 #define OPTION_DESC_NAME \
-	"name of the BPP file to use (without suffix and path, e.g. just 'Foo')"
+	"Name of the BPP file to use (without suffix and path, e.g. just 'Foo')"
 
 #define OPTION_DESC_FORCE \
-	"force manual start"
+	"Force manual start"
 
 #define OPTION_DESC_LOG_HERE \
-	"log to stdout/err"
+	"Log to stdout/err"
 
 #define HELP_SUMMARY \
 	 "remuco-bpp is a program that reads Remuco basic player proxy (BPP) " \

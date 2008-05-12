@@ -21,10 +21,10 @@ static gchar	*proxy = NULL;
 
 static const GOptionEntry entries[] = 
 {
-  { "version", 'v', 0, G_OPTION_ARG_NONE, &version, "show version", NULL },
-  { "stop", 'o', 0, G_OPTION_ARG_NONE, &stop, "stop the server", NULL },
-  { "start", 'a', 0, G_OPTION_ARG_NONE, &start, "start the server", NULL },
-  { "stop-proxy", 'p', 0, G_OPTION_ARG_STRING, &proxy, "stop player proxy NAME", "NAME" },
+  { "version", 'v', 0, G_OPTION_ARG_NONE, &version, "Show version", NULL },
+  { "stop", 'o', 0, G_OPTION_ARG_NONE, &stop, "Stop the server", NULL },
+  { "start", 'a', 0, G_OPTION_ARG_NONE, &start, "Start the server", NULL },
+  { "stop-proxy", 'p', 0, G_OPTION_ARG_STRING, &proxy, "Stop player proxy NAME", "NAME" },
   { NULL }
 };
 

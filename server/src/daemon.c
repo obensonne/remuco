@@ -16,10 +16,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #define OPTION_DESC_FORCE \
-	"force manual start"
+	"Force manual start"
 
 #define OPTION_DESC_LOG_HERE \
-	"log to stdout/err"
+	"Log to stdout/err"
 
 #define HELP_SUMMARY \
 	"The server daemon is intended to be started automatically by player " \
