@@ -26,7 +26,11 @@ mkdir build
 
 svn co $URL build/svn-co || die
 
-make -C build/svn-co dist || die
+if [ "$1" = "client" ] ; then
+	ant -f build/svn-co/build.xml dist.bin || die
+else
+	make -C build/svn-co dist || die
+fi
 
 cp build/svn-co/dist/$PKG.tar.gz build/  || die
 
@@ -34,7 +38,7 @@ tar zxf build/$PKG.tar.gz -C build || die
 
 mv build/$PKG.tar.gz build/$PKG_DEB.tar.gz
 
-cp -r deb.server build/$PKG/debian
+cp -r deb.$1 build/$PKG/debian
 
 rm -rf build/$PKG/debian/.svn
 
