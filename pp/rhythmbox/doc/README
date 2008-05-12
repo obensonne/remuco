@@ -19,10 +19,11 @@ Table of Contents
     3.1. System
     3.2. User
 
-4. Troubleshooting
+4. Usage
+5. Troubleshooting
 
-    4.1. General
-    4.2. Rhythmbox
+    5.1. General
+    5.2. Rhythmbox
 
 A. General Information
 
@@ -74,14 +75,22 @@ Note You can adjust the install destination by setting the environment variable
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4. Troubleshooting
+4. Usage
+
+ The Rhythmbox player proxy gets started automatically by Rhythmbox. The player
+proxy then automatically starts the Remuco server. So actually you do not have
+to do anything.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. Troubleshooting
 
  To track down errors, please try the steps below. If this does not solve your
 problem, come to the help forum.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4.1. General
+5.1. General
 
  If something fails, it is a good idea to set Remuco into debug mode. This is
 done by creating the file ~/.config/remuco/debug, for instance:
@@ -90,9 +99,9 @@ done by creating the file ~/.config/remuco/debug, for instance:
 
  This tells the server and all player proxies to enable debug output. The
 server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
-proxies (e.g. Amarok, MPD, Totem) go to ~/.cache/remuco/PLAYER.log where PLAYER
-means the basic player proxy's player name. Log sinks of full player proxies
-(e.g. Rhythmbox, XMMS2) are proxy specific.
+proxies (e.g. Amarok, MPD, Totem) goes to ~/.cache/remuco/PLAYER.log where
+PLAYER means the basic player proxy's player name. Log sinks of full player
+proxies (e.g. Rhythmbox, XMMS2) are proxy specific.
 
  Inspect the relevant log files to detect what is wrong.
 
@@ -101,7 +110,7 @@ Note Don't forget to remove ~/.config/remuco/debug once you don't need the
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4.2. Rhythmbox
+5.2. Rhythmbox
 
  To debug the Rhythmbox player proxy, start Rhythmbox from the command line
 with enabled debug out, for instance:
