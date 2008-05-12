@@ -6,6 +6,9 @@
 	* added 'bye' function to pp dbus interface
 	* bumped server pp protocol version to 2
 	* remuco-bpp checks if there already is a proxy for the given player
+	* server now has a second interface for control tasks (Shell)
+	* server must explicitly started via shell interface
+	* new executable 'remuco' for server control
 
 0.7.0	Oben Sonne <obensonne@googlemail.com>
 
