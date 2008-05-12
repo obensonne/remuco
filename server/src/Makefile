@@ -71,6 +71,8 @@ install: all dbus-install
 	$(INSTALL_EXE) remuco-server remuco-bpp remuco $(DESTDIR)$(PREFIX)/bin
 
 uninstall: dbus-uninstall
+	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco
+	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco-bpp
 	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco-server
 
 clean: dbus-clean
