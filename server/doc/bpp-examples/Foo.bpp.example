@@ -1,3 +1,7 @@
+# This basic player proxy (BPP) file describes the various options of a BPP
+# file. Together with already exiting BPP files you can use it as a starting
+# point to write your own BPP file. 
+
 [config]
 
 # The shell to use.
