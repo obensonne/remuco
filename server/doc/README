@@ -79,9 +79,9 @@ done by creating the file ~/.config/remuco/debug, for instance:
 
  This tells the server and all player proxies to enable debug output. The
 server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
-proxies (e.g. Amarok, MPD, Totem) go to ~/.cache/remuco/PLAYER.log where PLAYER
-means the basic player proxy's player name. Log sinks of full player proxies
-(e.g. Rhythmbox, XMMS2) are proxy specific.
+proxies (e.g. Amarok, MPD, Totem) goes to ~/.cache/remuco/PLAYER.log where
+PLAYER means the basic player proxy's player name. Log sinks of full player
+proxies (e.g. Rhythmbox, XMMS2) are proxy specific.
 
  Inspect the relevant log files to detect what is wrong.
 
