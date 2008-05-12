@@ -236,11 +236,10 @@ class PP(dbus.service.Object):
         
         bus = dbus.SessionBus()
         
-        shell_proxy = bus.get_object(DBUS_SHELL_SERVICE, DBUS_SHELL_PATH)
-        
-        rem_shell = dbus.Interface(shell_proxy, DBUS_SHELL_IFACE)
         
         try:
+            shell_proxy = bus.get_object(DBUS_SHELL_SERVICE, DBUS_SHELL_PATH)
+            rem_shell = dbus.Interface(shell_proxy, DBUS_SHELL_IFACE)
             rem_shell.Start(SERVER_PP_PROTO_VERSION)
         except DBusException, e:
             if e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
@@ -255,12 +254,10 @@ class PP(dbus.service.Object):
                 )
             return False
         
-        server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH,
-                                      follow_name_owner_changes=True)
-        
-        server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
         
         try:
+            server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH)
+            server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
             server.Hello(PLAYER, 0, RATING_MAX)
         except DBusException, e:
             rb.error_dialog(
