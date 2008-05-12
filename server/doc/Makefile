@@ -28,6 +28,9 @@ install: all
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/man/man1
 	$(INSTALL_DAT) remuco.1 remuco-bpp.1 remuco-server.1 \
 		$(DESTDIR)$(PREFIX)/share/man/man1
+	sed -i $(DESTDIR)$(PREFIX)/share/man/man1/remuco.1 -e "s,PREFIX,$(PREFIX),"
+	sed -i $(DESTDIR)$(PREFIX)/share/man/man1/remuco-bpp.1 -e "s,PREFIX,$(PREFIX),"
+	sed -i $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1 -e "s,PREFIX,$(PREFIX),"
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco.1
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco-bpp.1
 	gzip -f9 $(DESTDIR)$(PREFIX)/share/man/man1/remuco-server.1
