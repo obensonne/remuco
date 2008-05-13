@@ -15,8 +15,9 @@
 
 
 static gboolean	version = FALSE; 
-static gboolean	stop = FALSE; 
+static gboolean	stop = FALSE;
 static gboolean start = FALSE;
+static gboolean restart = FALSE;
 static gchar	*proxy = NULL;
 
 static const GOptionEntry entries[] = 
@@ -24,6 +25,7 @@ static const GOptionEntry entries[] =
   { "version", 'v', 0, G_OPTION_ARG_NONE, &version, "Show version", NULL },
   { "stop", 'o', 0, G_OPTION_ARG_NONE, &stop, "Stop the server", NULL },
   { "start", 'a', 0, G_OPTION_ARG_NONE, &start, "Start the server", NULL },
+  { "restart", 'r', 0, G_OPTION_ARG_NONE, &restart, "Restart the server", NULL },
   { "stop-proxy", 'p', 0, G_OPTION_ARG_STRING, &proxy, "Stop player proxy NAME", "NAME" },
   { NULL }
 };
@@ -43,6 +45,19 @@ static DBusGConnection	*dbus_conn;
 // private functions
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+static gboolean
+check_options()
+{
+	if ((stop && start) || (stop && restart) || (stop && proxy) ||
+		(start && restart) || (start && proxy) || 
+		(restart && proxy)) {
+		
+		g_printerr("Only one control at the same time is possible.\n");
+		return FALSE;
+	}
+	
+}
 
 static gboolean
 check_running()
@@ -111,6 +126,8 @@ server_stop()
 		return TRUE;			
 	}
 	
+	g_assert(dbus_conn);
+
 	dbus_proxy = rem_dbus_proxy(dbus_conn, "Shell");
 	
 	err = NULL;
@@ -142,6 +159,8 @@ server_start()
 		return TRUE;			
 	}
 	
+	g_assert(dbus_conn);
+
 	dbus_proxy = rem_dbus_proxy(dbus_conn, "Shell");
 	
 	err = NULL;
@@ -175,6 +194,8 @@ proxy_stop()
 		return TRUE;			
 	}
 	
+	g_assert(dbus_conn);
+
 	dbus_proxy = rem_dbus_proxy(dbus_conn, "Shell");
 	
 	////////// get a list of proxies to check if 'proxy' is valid //////////
@@ -235,6 +256,8 @@ print_status()
 	guint			len, u;
 	GError			*err;
 
+	g_assert(dbus_conn);
+	
 	////////// running status //////////
 	
 	if (!running) {
@@ -358,6 +381,19 @@ main(int argc, char **argv) {
 	} else if (proxy) {
 		
 		ok = proxy_stop();
+
+	} else if (restart) {
+		
+		ok = TRUE;
+		if (running) {
+			ok = server_stop();
+			running = FALSE;
+			if (ok)
+				g_usleep(3000000);
+		};
+		if (ok) {
+			ok = server_start();
+		}
 
 	} else {
 		
