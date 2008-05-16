@@ -49,7 +49,7 @@ OBJ_FILES_BPP := $(subst .c,.o,$(SRC_FILES_BPP))
 #
 ##############################################################################
 
-all: remuco-server remuco-bpp remuco
+all: stamp-build-requirements remuco-server remuco-bpp remuco
 
 install: all dbus-install
 	$(INSTALL_DIR) $(DESTDIR)$(BIN_DIR)
@@ -73,7 +73,7 @@ clean: dbus-clean
 #
 ##############################################################################
 
-%.o: %.c $(HDR_FILES) stamp-build-requirements
+%.o: %.c $(HDR_FILES)
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 remuco: shell-glue-c.h server-glue-c.h $(OBJ_FILES_CTL)
