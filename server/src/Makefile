@@ -1,25 +1,10 @@
 ###############################################################################
 #
-# Install Configuraion
+# Configuraion
 #
 ###############################################################################
 
-PREFIX ?= /usr
-DEBUG ?= yes
-
-###############################################################################
-#
-# Tools
-#
-###############################################################################
-
-INSTALL := install
-INSTALL_DAT := $(INSTALL) -m 644
-INSTALL_EXE := $(INSTALL) -m 755
-INSTALL_DIR := $(INSTALL) -m 755 -d
-ifneq "$(DEBUG)" "yes"
-INSTALL_EXE += -s
-endif
+include ../Makefile.inc
 
 ###############################################################################
 #
@@ -27,15 +12,16 @@ endif
 #
 ###############################################################################
 
-PKG_CONFIG_REQ_SRV := glib-2.0 dbus-glib-1 bluez Wand
-PKG_CONFIG_REQ_CTL := glib-2.0 dbus-glib-1
-PKG_CONFIG_REQ_BPP := glib-2.0 dbus-glib-1
-PKG_CONFIG_REQ_ALL := glib-2.0 dbus-glib-1 bluez Wand
+# pkg-config requirments (check below)
+PKG_DEP_SRV := glib-2.0 dbus-glib-1 bluez Wand
+PKG_DEP_CTL := glib-2.0 dbus-glib-1
+PKG_DEP_BPP := glib-2.0 dbus-glib-1
+PKG_DEP_ALL := glib-2.0 dbus-glib-1 bluez Wand
 
-CFLAGS := $(shell pkg-config --cflags $(PKG_CONFIG_REQ_ALL) 2>/dev/null)
-LFLAGS_SRV := $(shell pkg-config --libs $(PKG_CONFIG_REQ_SRV) 2>/dev/null)
-LFLAGS_CTL := $(shell pkg-config --libs $(PKG_CONFIG_REQ_CTL) 2>/dev/null)
-LFLAGS_BPP := $(shell pkg-config --libs $(PKG_CONFIG_REQ_BPP) 2>/dev/null)
+CFLAGS := $(shell $(PKG_CONFIG) --cflags $(PKG_DEP_ALL))
+LFLAGS_SRV := $(shell $(PKG_CONFIG) --libs $(PKG_DEP_SRV))
+LFLAGS_CTL := $(shell $(PKG_CONFIG) --libs $(PKG_DEP_CTL))
+LFLAGS_BPP := $(shell $(PKG_CONFIG) --libs $(PKG_DEP_BPP))
 
 ifeq "$(DEBUG)" "yes"
 CFLAGS += -O0 -g
@@ -44,18 +30,17 @@ CFLAGS += -O2
 #CFLAGS += -DG_DISABLE_ASSERT
 endif
 
-HDR_FILES = $(shell find -maxdepth 1 -type f -name "*.h")
+HDR_FILES := $(shell find -maxdepth 1 -type f -name "*.h")
+HDR_FILES := $(subst ./,,$(HDR_FILES))
 
-SRC_FILES_SRV := $(shell find -maxdepth 1 -type f -name "*.c")
-SRC_FILES_SRV := $(subst ./bpp.c,,$(SRC_FILES_SRV))
-SRC_FILES_SRV := $(subst ./bpp-main.c,,$(SRC_FILES_SRV))
-SRC_FILES_SRV := $(subst ./ctl.c,,$(SRC_FILES_SRV))
+SRC_FILES_SRV := bppl.c bt.c config.c daemon.c dbus.c img.c ip.c log.c net.c \
+				 serial.c server.c shell.c util.c
 OBJ_FILES_SRV := $(subst .c,.o,$(SRC_FILES_SRV))
 
 SRC_FILES_CTL := ctl.c dbus.c
 OBJ_FILES_CTL := $(subst .c,.o,$(SRC_FILES_CTL))
 
-SRC_FILES_BPP := bpp.c bpp-main.c dbus.c util.c config.c log.c
+SRC_FILES_BPP := bpp.c bpp-main.c dbus.c config.c log.c util.c
 OBJ_FILES_BPP := $(subst .c,.o,$(SRC_FILES_BPP))
 
 ###############################################################################
@@ -64,16 +49,16 @@ OBJ_FILES_BPP := $(subst .c,.o,$(SRC_FILES_BPP))
 #
 ##############################################################################
 
-all: stamp-build-requirements remuco-server remuco-bpp remuco
+all: remuco-server remuco-bpp remuco
 
 install: all dbus-install
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
-	$(INSTALL_EXE) remuco-server remuco-bpp remuco $(DESTDIR)$(PREFIX)/bin
+	$(INSTALL_DIR) $(DESTDIR)$(BIN_DIR)
+	$(INSTALL_EXE) remuco-server remuco-bpp remuco $(DESTDIR)$(BIN_DIR)
 
 uninstall: dbus-uninstall
-	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco
-	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco-bpp
-	rm  -f $(DESTDIR)$(PREFIX)/bin/remuco-server
+	rm -f $(DESTDIR)$(BIN_DIR)/remuco
+	rm -f $(DESTDIR)$(BIN_DIR)/remuco-bpp
+	rm -f $(DESTDIR)$(BIN_DIR)/remuco-server
 
 clean: dbus-clean
 	find -type f -name "*.o" | xargs rm -f
@@ -88,7 +73,7 @@ clean: dbus-clean
 #
 ##############################################################################
 
-%.o: %.c $(HDR_FILES)
+%.o: %.c $(HDR_FILES) stamp-build-requirements
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 remuco: shell-glue-c.h server-glue-c.h $(OBJ_FILES_CTL)
@@ -107,8 +92,11 @@ remuco-bpp: pp-glue-s.h server-glue-c.h $(OBJ_FILES_BPP)
 ##############################################################################
 
 DBUS_SERVICE_NAME := net.sf.remuco.Shell
+DBUS_SERVICE_DIR := $(shell $(PKG_CONFIG) dbus-1 \
+								--variable=session_bus_services_dir 2>/dev/null)
 
-DBUS_SERVICE_DIR := $(shell pkg-config dbus-1 --variable=session_bus_services_dir)
+# break if DBUS_SERVICE_DIR is not set
+$(if $(strip $(DBUS_SERVICE_DIR)),,$(error variable session_bus_services_dir in dbus-1 is not set))
 
 dbus-install:
 	sed -e "s,PREFIX,$(PREFIX)," -e "s,NAME,$(DBUS_SERVICE_NAME)," \
@@ -119,6 +107,11 @@ dbus-install:
 
 dbus-uninstall:
 	rm -f $(DESTDIR)$(DBUS_SERVICE_DIR)/$(DBUS_SERVICE_NAME).service
+
+dbus-clean:
+	rm -f $(DBUS_SERVICE_NAME).service
+
+# Glue Headers #
 
 server-glue-s.h: server.xml
 	dbus-binding-tool --mode=glib-server --prefix=rem_server \
@@ -145,9 +138,6 @@ pp-glue-s.h: pp.xml
 pp-glue-c.h: pp.xml
 	dbus-binding-tool --mode=glib-client pp.xml > pp-glue-c.h
 
-dbus-clean:
-	rm -f $(DBUS_SERVICE_NAME).service
-
 ###############################################################################
 #
 # Check Requirements
@@ -159,17 +149,13 @@ dbus-clean:
 stamp-build-requirements:
 	@echo
 	@echo "Build requirements:"
-	@for PKGC in $(PKG_CONFIG_REQ_ALL); do \
-		echo -n "Checking for $$PKGC .. "; \
-		if (pkg-config --exists $$PKGC > /dev/null) ; then \
-			echo "ok"; \
-		else \
-			echo "missing!" ; \
-			echo "It seems the dev- or header-package of $$PKGC is not installed." ; \
-			echo "At least I could not find the pkg-config file of $$PKGC."; \
-			exit 1; \
-		fi; \
-	done
+	$(call tool-check,dbus-binding-tool,--version)
+	$(call pkg-config-check,glib-2.0,2.16)
+	$(call pkg-config-check,dbus-1,0)
+	$(call pkg-config-check,dbus-glib-1,0.74)
+	$(call pkg-config-check,bluez,3.29)
+	$(call pkg-config-check,Wand,6.3.7)
+	$(call pkg-config-check-var,dbus-1,session_bus_services_dir)
 	@echo
 	touch stamp-build-requirements
 
@@ -274,3 +260,41 @@ massifi-bpp: all $(REM_CONFIG_DIR)/debug
 		--alloc-fn=g_slice_alloc \
 		--alloc-fn=g_slice_alloc0 \
 		./remuco-bpp -fl $(BPP)
+
+###############################################################################
+#
+# Functions
+#
+###############################################################################
+
+# $(call tool-check,command,param)
+define tool-check
+	@echo -n "Checking for tool $1 .. "
+	@$1 $2 > /dev/null 2>&1 \
+		|| { \
+			echo "missing" ; \
+  			false; \
+  			} \
+  		&& { \
+  			echo "ok"; \
+  			}
+endef
+
+# $(call pkg-config-check,module,version)
+define pkg-config-check
+	@echo -n "Checking for $1 (>= $2) .. "
+	@$(PKG_CONFIG) --exists $1 > /dev/null 2>&1 \
+		|| { \
+			echo "missing (need the development files of $1)" ; \
+  			false; \
+  			}
+	@$(PKG_CONFIG) --atleast-version=$2 $1 > /dev/null 2>&1 \
+		|| { \
+			HAVE_VERSION=`$(PKG_CONFIG) --modversion $1` ; \
+			echo "insufficient version (you have $$HAVE_VERSION)" ; \
+  			false; \
+  			} \
+  		&& { \
+  			echo "ok"; \
+  			}
+endef

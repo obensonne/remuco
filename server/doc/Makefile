@@ -1,23 +1,14 @@
 ###############################################################################
 #
-# Install Configuraion
+# Configuraion
 #
 ###############################################################################
 
-PREFIX ?= /usr
+include ../Makefile.inc
 
-DOC_DIR ?= $(PREFIX)/share/doc/remuco-server
-MAN_DIR ?= $(PREFIX)/share/man
-
-###############################################################################
-#
-# Tools
-#
-###############################################################################
-
-INSTALL := install
-INSTALL_DAT := $(INSTALL) -m 644
-INSTALL_DIR := $(INSTALL) -m 755 -d
+MAN_1_FILES 	:= remuco.1 remuco-bpp.1 remuco-server.1
+DOC_FILES		:= COPYING README README.html Server.conf.example changelog THANKS
+DOC_FILES_GZ	:= COPYING README changelog THANKS
 
 ###############################################################################
 #
@@ -28,27 +19,29 @@ INSTALL_DIR := $(INSTALL) -m 755 -d
 all: 
 
 install: all
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/man/man1
-	$(INSTALL_DAT) remuco.1 remuco-bpp.1 remuco-server.1 \
-		$(DESTDIR)$(MAN_DIR)/man1
-	sed -i $(DESTDIR)$(MAN_DIR)/man1/remuco.1 -e "s,DOC_DIR,$(DOC_DIR),"
-	gzip -f9 $(DESTDIR)$(MAN_DIR)/man1/remuco.1
-	gzip -f9 $(DESTDIR)$(MAN_DIR)/man1/remuco-bpp.1
-	gzip -f9 $(DESTDIR)$(MAN_DIR)/man1/remuco-server.1
-	$(INSTALL_DIR) $(DESTDIR)$(DOC_DIR)
-	cp -r bpp-examples $(DESTDIR)$(DOC_DIR)
-	$(INSTALL_DAT) COPYING README README.html Server.conf.example changelog \
-		THANKS $(DESTDIR)$(DOC_DIR)
-	gzip -f9 $(DESTDIR)$(DOC_DIR)/COPYING
-	gzip -f9 $(DESTDIR)$(DOC_DIR)/changelog
-	gzip -f9 $(DESTDIR)$(DOC_DIR)/README
-	gzip -f9 $(DESTDIR)$(DOC_DIR)/THANKS
+	# man pages
+	$(INSTALL_DIR) $(DESTDIR)$(MAN_DIR)/man1
+	$(INSTALL_DAT) $(MAN_1_FILES) $(DESTDIR)$(MAN_DIR)/man1
+	@for MAN in $(MAN_1_FILES); do \
+		sed -i $(DESTDIR)$(MAN_DIR)/man1/$$MAN -e "s,DOC_DIR,$(DOC_DIR_PKG)," ; \
+		$(GZIP) $(DESTDIR)$(MAN_DIR)/man1/$$MAN ; \
+	done
+	# pkg doc
+	$(INSTALL_DIR) $(DESTDIR)$(DOC_DIR_PKG)
+	$(INSTALL_DIR) $(DESTDIR)$(DOC_DIR_PKG)/bpp-examples
+	$(INSTALL_DAT) bpp-examples/*.example $(DESTDIR)$(DOC_DIR_PKG)/bpp-examples
+	$(INSTALL_DAT) $(DOC_FILES) $(DESTDIR)$(DOC_DIR_PKG)
+	@for DOC in $(DOC_FILES_GZ); do \
+		$(GZIP) $(DESTDIR)$(DOC_DIR_PKG)/$$DOC ; \
+	done
 	
 uninstall:
-	rm -rf $(DESTDIR)$(DOC_DIR)
-	rm -f $(DESTDIR)$(MAN_DIR)/man1/remuco.1.gz
-	rm -f $(DESTDIR)$(MAN_DIR)/man1/remuco-server.1.gz
-	rm -f $(DESTDIR)$(MAN_DIR)/man1/remuco-bpp.1.gz
+	# man pages
+	@for MAN in $(MAN_1_FILES); do \
+		rm -f $(DESTDIR)$(MAN_DIR)/man1/$$MAN.gz ; \
+	done
+	# pkg doc
+	rm -rf $(DESTDIR)$(DOC_DIR_PKG)
 
 clean:
 

@@ -4,18 +4,14 @@
 #
 ###############################################################################
 
-PREFIX ?= /usr
-DEBUG := no
-
-VERSION := 0.7.1
-PKG := remuco-server-$(VERSION)
+include Makefile.inc
 
 all: check-pkg-config
-	DEBUG=$(DEBUG) make -C src all
+	make -C src all
 	make -C doc all
 
 install: check-pkg-config
-	DEBUG=$(DEBUG) make -C src install
+	make -C src install
 	make -C doc install
 
 uninstall:
@@ -23,18 +19,19 @@ uninstall:
 	make -C doc uninstall
 	
 clean:
+	$(call pkg-config-check,glib-2.0,2.14)
 	make -C src clean
 	make -C doc clean
 	rm -rf build
 	rm -rf dist
 	
 dist: clean
-	mkdir -p build/$(PKG)
-	cp -r Makefile src doc build/$(PKG)
-	find build -type d -name ".svn" | xargs rm -rf    
-	mkdir dist
-	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
+	$(MKDIR) build/$(PKG_FULL)
+	$(CP) -r Makefile src doc build/$(PKG_FULL)
+	$(FIND) build -type d -name ".svn" | xargs rm -rf    
+	$(MKDIR) dist
+	$(TAR) zcf dist/$(PKG_FULL).tar.gz -C build $(PKG_FULL)
 
 check-pkg-config:
-	@pkg-config --version > /dev/null 2>&1 || \
-		{ echo "missing pkg-config, please install pkg-config"; false; }
+	@$(PKG_CONFIG) --version > /dev/null 2>&1 || \
+		{ echo "missing $(PKG_CONFIG)"; false; }
