@@ -61,9 +61,8 @@ rem_dbus_connect(GError **err)
 {
 	DBusGConnection *conn;
 	
-	err = NULL;
 	conn = dbus_g_bus_get(DBUS_BUS_SESSION, err);
-	
+
 	g_assert(conn || !err || *err);
 	
 	return conn;
