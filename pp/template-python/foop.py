@@ -18,16 +18,17 @@ import traceback
 
 ###############################################################################
 
+# --- ADJUST ---
 PLAYER = "Foop"
 
 ###############################################################################
 #
-# Constants related to XMMS2
+# Constants related to Foop
 #
 ###############################################################################
 
 # --- ADJUST ---
-# We assume in Foop it is possible to rate songs with a mximum rating of 5.
+# We assume in Foop it is possible to rate songs with a maximum rating of 5.
 # If your player does not support rating, set this to 0. 
 RATING_MAX = 5
 
@@ -141,7 +142,7 @@ def log_debug(msg):
 
 def log_msg(msg):
     print(msg)
-    
+
 def log_exc(msg):
     print(msg)
     print("------------------ EXC ------------------")
@@ -165,15 +166,15 @@ class PP(dbus.service.Object):
         
         # The init functions prepares the object to be exportable via D-Bus.
         # Further it initializes some variables we will use later.
-
+        
         ###### init dbus ######
-
+        
         DBusGMainLoop(set_as_default=True)
-
+        
         dbus.service.Object.__init__(self, None, None)
-
+        
         ###### init vars ######
-
+        
         # These variables describe the current state of Foop.
         self.__state_playback = PLAYBACK_STOP
         self.__state_volume = 0
@@ -181,7 +182,7 @@ class PP(dbus.service.Object):
         self.__state_shuffle = False
         self.__state_position = 0
         self.__state_queue = False
-         
+        
         # These variables describe the plob currently played by Foop.
         self.__plob_id = None
         self.__plob_meta = None
@@ -196,11 +197,6 @@ class PP(dbus.service.Object):
         self.__queue_ids = None
         self.__queue_names = None
 
-        # These flags will be explained later some methods below.
-        self.__fast_state_check_triggered = False
-        self.__fast_plob_check_triggered = False
-        self.__fast_playlist_check_triggered = False
-        
         # --- ADJUST ---
         # You may want to add further initializations needed for your player.
 
@@ -610,7 +606,7 @@ class PP(dbus.service.Object):
         log_msg("go ..")
 
         self.__ml.run() # blocks until self.__ml.quit() is called somewhere else
-        
+            
         log_msg("shutting down")
         
         # Shutting down -> do some clean up
@@ -631,6 +627,13 @@ class PP(dbus.service.Object):
 
         return True
     
+    def stop(self):
+        
+        # This function is called in response to a kill or interrupt signal.
+        
+        if self.__ml != None:
+            self.__ml.quit()
+        
     ###########################################################################
 
     # The following two functions are used to handle a reply when this proxy
@@ -656,25 +659,24 @@ class PP(dbus.service.Object):
 #
 ###############################################################################
 
-pp_global = None
+pp = None
 
 def sighandler(signum, frame):
     
-    global pp_global
+    global pp
     
     log_msg("received signal %i" % signum)
     
-    if pp_global != None:
-        pp_global.down()
+    if pp != None:
+        pp.stop()
+
 
 if __name__ == "__main__":
     
     signal.signal(signal.SIGINT, sighandler)
     signal.signal(signal.SIGTERM, sighandler)
-
-    pp = PP()
     
-    pp_global = pp
+    pp = PP()
     
     ok = pp.run()
     
@@ -682,5 +684,3 @@ if __name__ == "__main__":
         log_msg("Remuco Foop failed")
     else:
         log_msg("Remuco Foop is down")
-
-    
