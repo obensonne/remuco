@@ -173,30 +173,6 @@ class PP(dbus.service.Object):
         
         dbus.service.Object.__init__(self, None, None)
         
-        ###### init vars ######
-        
-        # These variables describe the current state of Foop.
-        self.__state_playback = PLAYBACK_STOP
-        self.__state_volume = 0
-        self.__state_repeat = False
-        self.__state_shuffle = False
-        self.__state_position = 0
-        self.__state_queue = False
-        
-        # These variables describe the plob currently played by Foop.
-        self.__plob_id = None
-        self.__plob_meta = None
-        
-        # These variables are used to hold the IDs and names of the plobs
-        # contained in Foop's currently active playlist.
-        self.__playlist_ids = None
-        self.__playlist_names = None
-        
-        # These variables are used to hold the IDs and names of the plobs
-        # contained in Foop's queue.
-        self.__queue_ids = None
-        self.__queue_names = None
-
         # --- ADJUST ---
         # You may want to add further initializations needed for your player.
 
@@ -417,8 +393,6 @@ class PP(dbus.service.Object):
         # intervals. Its purpose is to check for changes in Foop and forward
         # new sate information about Foop to the server.
         
-        change = False
-        
         # --- ADJUST ---
         # Get up-to-date information about Foop's playback state, volume,
         # repeat mode, shuffle mode, current song position and queue mode.
@@ -432,78 +406,38 @@ class PP(dbus.service.Object):
         st_position = 2 # position of current song in playlist/queue
         st_queue = False # currently playing form queue?
 
-        # Check if values have changed:
+        # --- ADJUST ---
+        # Check if values have changed. If yes, forward them to the server:
         
-        if self.__state_playback != st_playback:
-            change = True 
-            self.__state_playback = st_playback
+        log_debug("sync state")
+        self.__server.UpdateState(PLAYER,
+            st_playback, st_volume, st_repeat, st_shuffle, st_position, st_queue,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
+        # More information about this server method at:
+        # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdateState
 
-        if self.__state_volume != st_volume:
-            change = True 
-            self.__state_volume = st_volume
-            
-        if self.__state_repeat != st_repeat:
-            change = True 
-            self.__state_repeat = st_repeat
-            
-        if self.__state_shuffle != st_shuffle:
-            change = True 
-            self.__state_shuffle = st_shuffle
-            
-        if self.__state_position != st_position:
-            change = True 
-            self.__state_position = st_position
-            
-        if self.__state_queue != st_queue:
-            change = True 
-            self.__state_queue = st_queue
-        
-        # If there is a change, forward new data to the server:
-        
-        if change:
-            log_debug("sync state")
-            self.__server.UpdateState(PLAYER,
-                self.__state_playback, self.__state_volume,
-                self.__state_repeat, self.__state_shuffle,
-                self.__state_position, self.__state_queue,
-                reply_handler = self.__server_reply_normal,
-                error_handler = self.__server_reply_error)
-            # More information about this server method at:
-            # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdateState
-
-        #----------------------------------------------------------------------
-        
-        change = False
-        
         # --- ADJUST ---
         # Get up-to-date information about Foop's currently played plob.
         
         # Example: get some dummy data from Foop:
         
-        plob_id = "123"
+        plob_id = "123" # ID of current plob
+        plob_img = "" # path to an image file related to the plob
+        plob_meta = { PLOB_META_ARTIST : "Frank Foo",
+                      PLOB_META_TITLE : "Sing a Song",
+                      PLOB_META_ALBUM : "Universal Album" }
         
-        if self.__plob_id != plob_id:
-            change = True
-            self.__plob_id = plob_id 
-            plob_img = "" # this may be a path to an image file
-            plob_meta = { PLOB_META_ARTIST : "Frank Foo",
-                          PLOB_META_TITLE : "Sing a Song",
-                          PLOB_META_ALBUM : "Universal Album" }
-        
-        # If there is a change, forward new data to the server:
+        # --- ADJUST ---
+        # If plob has changed, forward new data to the server:
 
-        if change:
-            log_debug("sync plob")
-            self.__server.UpdatePlob(PLAYER,
-                plob_id, plob_img, plob_meta,
-                reply_handler = self.__server_reply_normal,
-                error_handler = self.__server_reply_error)
-            # More information about this server method at:
-            # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdatePlob
-
-        #----------------------------------------------------------------------
-
-        change = False
+        log_debug("sync plob")
+        self.__server.UpdatePlob(PLAYER,
+            plob_id, plob_img, plob_meta,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
+        # More information about this server method at:
+        # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdatePlob
 
         # --- ADJUST ---
         # Get up-to-date information about Foop's playlist.
@@ -513,21 +447,16 @@ class PP(dbus.service.Object):
         playlist_ids = [ "Song1", "Song2" ]
         playlist_names = [ "Paul - Paul's Song", "Barfoo - Foobar" ]
         
-        if self.__playlist_ids != playlist_ids:
-            change = True
-            self.__playlist_ids = playlist_ids
-            self.__playlist_names = playlist_names 
-        
-        # If there is a change, forward new data to the server:
+        # --- ADJUST ---
+        # If playlist has changed, forward new data to the server:
 
-        if change:
-            log_debug("sync playlist")
-            self.__server.UpdatePlaylist(PLAYER,
-                playlist_ids, playlist_names,
-                reply_handler = self.__server_reply_normal,
-                error_handler = self.__server_reply_error)
-            # More information about this server method at:
-            # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdatePlaylist
+        log_debug("sync playlist")
+        self.__server.UpdatePlaylist(PLAYER,
+            playlist_ids, playlist_names,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
+        # More information about this server method at:
+        # http://remuco.sf.net/index.php/Server_-_Player_Proxy_-_Protocol#UpdatePlaylist
         
         # --- ADJUST ---
         # Handle the queue similar to the playlist.
