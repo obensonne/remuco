@@ -733,18 +733,12 @@ class PP(dbus.service.Object):
         if not server:
             return False
         
-        # TODO: make async calls
-        
-        try:
-            server.UpdateState(PLAYER,
-                self.__state_playback, self.__state_volume,
-                self.__state_repeat, self.__state_shuffle,
-                self.__state_position, self.__state_queue)
-        except DBusException, e:
-            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
-                log_msg("no reply from server (probably busy)")
-            else:
-                self.__suicide("Failed to talk to server (%s)" % str(e.message))
+        server.UpdateState(PLAYER,
+            self.__state_playback, self.__state_volume,
+            self.__state_repeat, self.__state_shuffle,
+            self.__state_position, self.__state_queue,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
             
         return False
 
@@ -790,13 +784,9 @@ class PP(dbus.service.Object):
             img_file = ""
             meta = {}
 
-        try:
-            server.UpdatePlob(PLAYER, id, img_file, meta)
-        except DBusException, e:
-            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
-                log_msg("no reply from server (probably busy)")
-            else:
-                self.__suicide("Failed to talk to server (%s)" % str(e.message))
+        server.UpdatePlob(PLAYER, id, img_file, meta,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
         
         return False
 
@@ -817,13 +807,9 @@ class PP(dbus.service.Object):
 
         ids, names = self.__get_ploblist_from_qmodel(self.__playlist_qm)
         
-        try:
-            server.UpdatePlaylist(PLAYER, ids, names)
-        except DBusException, e:
-            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
-                log_msg("no reply from server (probably busy)")
-            else:
-                self.__suicide("Failed to talk to server (%s)" % str(e.message))
+        server.UpdatePlaylist(PLAYER, ids, names,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
 
         return False
 
@@ -844,13 +830,9 @@ class PP(dbus.service.Object):
 
         ids, names = self.__get_ploblist_from_qmodel(self.__queue_qm)
         
-        try:
-            server.UpdateQueue(PLAYER, ids, names)
-        except DBusException, e:
-            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
-                log_msg("no reply from server (probably busy)")
-            else:
-                self.__suicide("Failed to talk to server (%s)" % str(e.message))
+        server.UpdateQueue(PLAYER, ids, names,
+            reply_handler = self.__server_reply_normal,
+            error_handler = self.__server_reply_error)
 
         return False
 
@@ -1127,6 +1109,28 @@ class PP(dbus.service.Object):
             self.__cb_id_ml_sync_queue = gobject.idle_add(
                         self.ml_sync_queue, priority = gobject.PRIORITY_LOW)
     
+
+    ###########################################################################
+    # Remuco server reply methods
+    ###########################################################################
+
+    def __server_reply_normal(self):
+        # nothing to do - all called server methods return nothing
+        pass
+    
+    def __server_reply_error(self, e):
+        # 'e' is an instance of DBusException
+        if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+            log_msg("no reply from Remuco server (probably busy)")
+            return True
+        elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+            log_msg("server is down")
+            self.__suicide()
+            return False
+        else:
+            log_exc("failed to talk to Remuco server")
+            self.__suicide("Failed to talk to server (%s)" % str(e.message))
+            return False
 
 if __name__ == "__main__":
     
