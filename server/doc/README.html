@@ -32,14 +32,15 @@ CLASS="abstract"
 NAME="AEN5"
 ></A
 ><P
->&#13;            Remuco is a Bluetooth/WLAN remote control system for Linux media
-            players. With Remuco you can remotely control your favorite
-            media player - amongst others you can switch to the next,
-            previous or any other media within the current playlist,
-            browse your media library and activate other playlists, rate
-            your media and adjust volume. On the mobile (i.e. the remote
-            control) it displays information about the current media,
-            including cover art. Visit
+>&#13;            Remuco is a duplex remote control system for Linux media
+            players and mobile devices equipped with Bluetooth or WiFi.
+            With Remuco you can remotely control your favorite media
+            player - amongst others you can switch to the next, previous
+            or any other media within the current playlist, browse your
+            media library and activate other playlists, rate your media
+            and adjust volume. On the mobile (the remote control) it
+            displays information about the current media, including
+            cover art. Visit
             <A
 HREF="http://remuco.sourceforge.net"
 TARGET="_top"
@@ -68,35 +69,30 @@ HREF="#AEN8"
 ><DT
 >2. <A
 HREF="#AEN11"
->Building</A
+>Building and Installation</A
 ></DT
 ><DT
 >3. <A
-HREF="#AEN17"
->Installation</A
-></DT
-><DT
->4. <A
-HREF="#AEN26"
+HREF="#AEN22"
 >Usage</A
 ></DT
 ><DT
->5. <A
-HREF="#AEN29"
+>4. <A
+HREF="#AEN25"
 >Troubleshooting</A
 ></DT
 ><DD
 ><DL
 ><DT
->5.1. <A
-HREF="#AEN32"
+>4.1. <A
+HREF="#AEN28"
 >General</A
 ></DT
 ></DL
 ></DD
 ><DT
 >A. <A
-HREF="#AEN46"
+HREF="#AEN44"
 >General Information</A
 ></DT
 ><DD
@@ -136,7 +132,7 @@ CLASS="section"
 CLASS="section"
 ><A
 NAME="AEN11"
->2. Building</A
+>2. Building and Installation</A
 ></H2
 ><P
 >&#13;            To build the server, run:
@@ -151,17 +147,8 @@ CLASS="command"
 >&#13;        	This also checks build requirements and tells you what is
         	needed if something is missing.
         </P
-></DIV
-><DIV
-CLASS="section"
-><HR><H2
-CLASS="section"
-><A
-NAME="AEN17"
->3. Installation</A
-></H2
 ><P
->&#13;        	To install the server, run (as root, if needed):
+>&#13;        	To install the server, run (as root):
         </P
 ><P
 >&#13;            <B
@@ -170,17 +157,11 @@ CLASS="command"
 >
         </P
 ><P
->&#13;        	This installs the server below <TT
+>&#13;            To adjust the build and installation process (e.g. changed install
+            destination) edit the file <TT
 CLASS="filename"
->/usr</TT
+>Makefile.inc</TT
 >.
-            For an alternative installation prefix run (for instance): 
-        </P
-><P
->&#13;            <B
-CLASS="command"
->$ PREFIX=/usr/local make install</B
->
         </P
 ></DIV
 ><DIV
@@ -188,8 +169,8 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN26"
->4. Usage</A
+NAME="AEN22"
+>3. Usage</A
 ></H2
 ><P
 >&#13;            Usage information can be found in the manual page (remuco).
@@ -200,8 +181,8 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN29"
->5. Troubleshooting</A
+NAME="AEN25"
+>4. Troubleshooting</A
 ></H2
 ><P
 >&#13;		To track down errors, please try the steps below. If this does not
@@ -212,31 +193,39 @@ CLASS="section"
 ><HR><H3
 CLASS="section"
 ><A
-NAME="AEN32"
->5.1. General</A
+NAME="AEN28"
+>4.1. General</A
 ></H3
 ><P
 >&#13;            If something fails, it is a good idea to set Remuco into debug
-            mode. This is done by creating the file
-            <TT
-CLASS="filename"
->~/.config/remuco/debug</TT
->, for instance:
+            mode. You can toggle the debug mode for the server and all player
+            proxies with the tool remuco using option --debug. Running
         </P
 ><P
 >&#13;        	<B
 CLASS="command"
->$ touch ~/.config/remuco/debug </B
+>$ remuco </B
 >
         </P
 ><P
->&#13;        	This tells the server and all player proxies to enable
-        	debug output. The server log can be found in
+>&#13;            tells you if debug mode is on or off. Running
+        </P
+><P
+>&#13;        	<B
+CLASS="command"
+>$ remuco --debug </B
+>
+        </P
+><P
+>&#13;            switches between enabled and disabled debug mode.
+        </P
+><P
+>&#13;        	The server log can be found in
         	<TT
 CLASS="filename"
 >~/.cache/remuco/Server.log</TT
 >. Logging of basic
-            player proxies (e.g. Amarok, MPD, Totem) goes to
+            player proxies (e.g. Amarok, Banshee, MPD, Totem) goes to
             <TT
 CLASS="filename"
 >~/.cache/remuco/PLAYER.log</TT
@@ -272,12 +261,9 @@ ALT="Note"></TD
 ALIGN="LEFT"
 VALIGN="TOP"
 ><P
->&#13;				Don't forget to remove
-				<TT
-CLASS="filename"
->~/.config/remuco/debug</TT
->
-				once you don't need the debug output anymore.
+>&#13;				Don't forget to disable debug mode once you do not need it
+                anymore - otherwise you might get quite big log files when
+                running Remuco for several hours.
 	        </P
 ></TD
 ></TR
@@ -290,7 +276,7 @@ CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN46"
+NAME="AEN44"
 >A. General Information</A
 ></H1
 ><P
@@ -333,6 +319,15 @@ TARGET="_top"
 HREF="https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318"
 TARGET="_top"
 >https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318</A
+>
+        </P
+><P
+>&#13;            If you need help on development issues, mainly concerning player
+            proxy development, visit the developer forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568228"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568228</A
 >
         </P
 ><P

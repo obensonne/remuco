@@ -1,24 +1,23 @@
 Remuco Server 0.7.1
 
- Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
-Remuco you can remotely control your favorite media player - amongst others you
-can switch to the next, previous or any other media within the current
-playlist, browse your media library and activate other playlists, rate your
-media and adjust volume. On the mobile (i.e. the remote control) it displays
-information about the current media, including cover art. Visit http://
-remuco.sourceforge.net for a complete feature list, screenshots and a list of
-supported media players.
+ Remuco is a duplex remote control system for Linux media players and mobile
+devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
+your favorite media player - amongst others you can switch to the next,
+previous or any other media within the current playlist, browse your media
+library and activate other playlists, rate your media and adjust volume. On the
+mobile (the remote control) it displays information about the current media,
+including cover art. Visit http://remuco.sourceforge.net for a complete feature
+list, screenshots and a list of supported media players.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Table of Contents
 1. Introduction
-2. Building
-3. Installation
-4. Usage
-5. Troubleshooting
+2. Building and Installation
+3. Usage
+4. Troubleshooting
 
-    5.1. General
+    4.1. General
 
 A. General Information
 
@@ -33,7 +32,7 @@ player proxies) and Remuco clients.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. Building
+2. Building and Installation
 
  To build the server, run:
 
@@ -42,51 +41,52 @@ player proxies) and Remuco clients.
  This also checks build requirements and tells you what is needed if something
 is missing.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-3. Installation
-
- To install the server, run (as root, if needed):
+ To install the server, run (as root):
 
  $ make install
 
- This installs the server below /usr. For an alternative installation prefix
-run (for instance):
-
- $ PREFIX=/usr/local make install
+ To adjust the build and installation process (e.g. changed install
+destination) edit the file Makefile.inc.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4. Usage
+3. Usage
 
  Usage information can be found in the manual page (remuco).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. Troubleshooting
+4. Troubleshooting
 
  To track down errors, please try the steps below. If this does not solve your
 problem, come to the help forum.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5.1. General
+4.1. General
 
- If something fails, it is a good idea to set Remuco into debug mode. This is
-done by creating the file ~/.config/remuco/debug, for instance:
+ If something fails, it is a good idea to set Remuco into debug mode. You can
+toggle the debug mode for the server and all player proxies with the tool
+remuco using option --debug. Running
 
- $ touch ~/.config/remuco/debug
+ $ remuco
 
- This tells the server and all player proxies to enable debug output. The
-server log can be found in ~/.cache/remuco/Server.log. Logging of basic player
-proxies (e.g. Amarok, MPD, Totem) goes to ~/.cache/remuco/PLAYER.log where
-PLAYER means the basic player proxy's player name. Log sinks of full player
-proxies (e.g. Rhythmbox, XMMS2) are proxy specific.
+ tells you if debug mode is on or off. Running
+
+ $ remuco --debug
+
+ switches between enabled and disabled debug mode.
+
+ The server log can be found in ~/.cache/remuco/Server.log. Logging of basic
+player proxies (e.g. Amarok, Banshee, MPD, Totem) goes to ~/.cache/remuco/
+PLAYER.log where PLAYER means the basic player proxy's player name. Log sinks
+of full player proxies (e.g. Rhythmbox, XMMS2) are proxy specific.
 
  Inspect the relevant log files to detect what is wrong.
 
-Note Don't forget to remove ~/.config/remuco/debug once you don't need the
-     debug output anymore.
+Note Don't forget to disable debug mode once you do not need it anymore -
+     otherwise you might get quite big log files when running Remuco for
+     several hours.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -107,6 +107,10 @@ group_id=166515&atid=839315
 
  If you miss a nice feature, take a look at the feature request tracker: https:
 //sourceforge.net/tracker/?group_id=166515&atid=839318
+
+ If you need help on development issues, mainly concerning player proxy
+development, visit the developer forum: https://sourceforge.net/forum/
+forum.php?forum_id=568228
 
  For all other things to talk about, use the discussion forum: https://
 sourceforge.net/forum/forum.php?forum_id=568226
