@@ -1,0 +1,836 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+###############################################################################
+#
+# Imports
+#
+###############################################################################
+
+from dbus.exceptions import DBusException
+from dbus.mainloop.glib import DBusGMainLoop
+import dbus
+import dbus.service
+import gobject
+import os
+import signal
+import traceback
+
+###############################################################################
+
+PLAYER = "Amarok2"
+
+###############################################################################
+#
+# Constants related to XMMS2
+#
+###############################################################################
+
+RATING_MAX = 10
+
+###############################################################################
+#
+# Constants defined by Remuco Server-PP protocol
+#
+###############################################################################
+
+SERVER_PP_PROTO_VERSION = 2
+
+# dbus constants
+
+DBUS_SHELL_SERVICE = "net.sf.remuco.Shell"
+DBUS_SHELL_PATH = "/net/sf/remuco/Shell"
+DBUS_SHELL_IFACE = "net.sf.remuco.Shell"
+
+DBUS_SERVER_SERVICE = "net.sf.remuco.Server"
+DBUS_SERVER_PATH = "/net/sf/remuco/Server"
+DBUS_SERVER_IFACE = "net.sf.remuco.Server"
+
+DBUS_PP_SERVICE = "net.sf.remuco.%s" % PLAYER
+DBUS_PP_PATH = "/net/sf/remuco/%s" % PLAYER
+DBUS_PP_IFACE = "net.sf.remuco.%s" % PLAYER
+
+DBUS_AMAROK_SERVICE = "org.kde.amarok"
+
+DBUS_AMAROK_PATH_PLAYER = "/Player"
+DBUS_AMAROK_IFACE_PLAYER = "org.kde.Amarok.Player"
+
+DBUS_AMAROK_PATH_PLAYLIST = "/Playlist"
+DBUS_AMAROK_IFACE_PLAYLIST = "org.kde.Amarok.Playlist"
+
+DBUS_AMAROK_PATH_PLAYLISTBROWSER = "/PlaylistBrowser"
+DBUS_AMAROK_IFACE_PLAYLISTBROWSER = "org.kde.Amarok.PlaylistBrowser"
+
+# dbus errors
+
+DBUS_ERR_NO_SERVICE = "org.freedesktop.DBus.Error.ServiceUnknown"
+DBUS_ERR_NO_REPLY = "org.freedesktop.DBus.Error.NoReply"
+
+# well known ploblist ids
+
+PLAYLIST_ID = "__PLAYLIST__"
+QUEUE_ID = "__QUEUE__"
+
+# playback state codes
+
+PLAYBACK_STOP = 0
+PLAYBACK_PAUSE = 1
+PLAYBACK_PLAY = 2
+
+# keys for plob meta information
+
+PLOB_META_ALBUM = "album"
+PLOB_META_ARTIST = "artist"
+PLOB_META_BITRATE = "bitrate"
+PLOB_META_COMMENT = "comment"
+PLOB_META_GENRE = "genre"
+PLOB_META_LENGTH = "length"
+PLOB_META_TITLE = "title"
+PLOB_META_TRACK = "track"
+PLOB_META_YEAR = "year"
+PLOB_META_RATING = "rating"
+PLOB_META_TAGS = "tags"
+PLOB_META_TYPE = "type"
+PLOB_META_TYPE_AUDIO = "audio"
+PLOB_META_TYPE_VIDEO = "video"
+PLOB_META_TYPE_OTHER = "other"
+
+# control command codes
+CTL_IGNORE = 0
+CTL_PLAYPAUSE = 1
+CTL_STOP = 2
+CTL_NEXT = 3
+CTL_PREV = 4
+CTL_JUMP = 5
+CTL_SEEK_FWD = 6
+CTL_SEEK_BWD = 7
+CTL_VOLUME = 8
+CTL_RATE = 9
+CTL_PLAYNEXT = 10
+CTL_SETTAGS = 12
+CTL_REPEAT = 13
+CTL_SHUFFLE = 14
+
+###############################################################################
+#
+# Misc initializations
+#
+###############################################################################
+
+_home_dir = os.getenv("HOME", "/var/tmp")
+_config_dir = os.getenv("XDG_CONFIG_HOME", "%s/.config" % _home_dir)
+
+_log_debug_file = "%s/remuco/debug" % _config_dir # indicates log level
+
+if os.path.isfile(_log_debug_file):
+    print("debug log is enabled")
+    LOG_DEBUG = True
+else:
+    print("debug log is disabled")
+    LOG_DEBUG = False
+
+###############################################################################
+#
+# Logging
+#
+###############################################################################
+
+def log_debug(msg):
+    if LOG_DEBUG:
+        print(msg)
+
+def log_msg(msg):
+    print(msg)
+    
+def log_exc(msg):
+    print(msg)
+    print("------------------ EXC ------------------")
+    traceback.print_exc()
+    print("-----------------------------------------")
+
+###############################################################################
+#
+# Player proxy object (provides Remuco PP DBus interface)
+#
+###############################################################################
+
+class PP(dbus.service.Object):
+
+    ###########################################################################
+    # Constructor
+    ###########################################################################
+
+    def __init__(self):
+        
+        ###### init dbus ######
+
+        DBusGMainLoop(set_as_default=True)
+
+        dbus.service.Object.__init__(self, None, None)
+
+    def up(self):
+        
+        self.__state_playback = PLAYBACK_STOP
+        self.__state_volume = 0
+        self.__state_repeat = False
+        self.__state_shuffle = False
+        self.__state_position = 0
+         
+        self.__plob_id_int = None # id as integer
+        self.__plob_id = None # id as string
+        self.__plob_meta = None
+        self.__playlist_ids_int = None # ids as integers
+        self.__playlist_ids = None # ids as strings
+        self.__playlist_names = None
+        
+        # used for quick change checks after a control
+        self.__fast_state_check_triggered = False
+        self.__fast_plob_check_triggered = False
+        self.__fast_playlist_check_triggered = False
+        
+        ###### set up dbus ######
+
+        bus = dbus.SessionBus()
+
+        ###### connect to amarok ######
+        
+        try:
+            amarok_player_proxy = bus.get_object(DBUS_AMAROK_SERVICE, DBUS_AMAROK_PATH_PLAYER)
+            amarok_player = dbus.Interface(amarok_player_proxy, DBUS_AMAROK_IFACE_PLAYER)
+            amarok_player.version()
+            amarok_playlist_proxy = bus.get_object(DBUS_AMAROK_SERVICE, DBUS_AMAROK_PATH_PLAYLIST)
+            amarok_playlist = dbus.Interface(amarok_playlist_proxy, DBUS_AMAROK_IFACE_PLAYLIST)
+            amarok_playlistbrowser_proxy = bus.get_object(DBUS_AMAROK_SERVICE, DBUS_AMAROK_PATH_PLAYLISTBROWSER)
+            amarok_playlistbrowser = dbus.Interface(amarok_playlistbrowser_proxy, DBUS_AMAROK_IFACE_PLAYLISTBROWSER)
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Amarok (probably busy)")
+            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+                log_debug("Amarok not running")
+            else:
+                log_exc("failed to connect to Amarok player")
+                return False
+        
+        ###### connect to server ######
+        
+        try:
+            shell_proxy = bus.get_object(DBUS_SHELL_SERVICE, DBUS_SHELL_PATH)
+            shell = dbus.Interface(shell_proxy, DBUS_SHELL_IFACE)
+            shell.Start(SERVER_PP_PROTO_VERSION)
+        except DBusException, e:
+            log_exc("failed to connect to Remuco server")
+            return False
+
+        try:
+            server_proxy = bus.get_object(DBUS_SERVER_SERVICE, DBUS_SERVER_PATH)
+            server = dbus.Interface(server_proxy, DBUS_SERVER_IFACE)
+            server.Hello(PLAYER, 0, RATING_MAX)
+        except DBusException, e:
+            log_exc("failed to say hello to Remuco server")
+            return False
+        
+        self.__amarok_player = amarok_player
+        self.__amarok_playlist = amarok_playlist
+        self.__amarok_playlistbrowser = amarok_playlistbrowser
+        self.__server = server
+        
+        dbus.service.Object.add_to_connection(self, bus, DBUS_PP_PATH)
+
+        dbus_service_name = dbus.service.BusName(DBUS_PP_SERVICE, bus)
+        
+        ###### setup main loop ######
+
+        self.__ml = gobject.MainLoop()
+        
+        gobject.timeout_add(3000, self.check_state)
+        gobject.timeout_add(3000, self.check_plob)
+        gobject.timeout_add(10000, self.check_playlist)
+        
+        gobject.idle_add(self.check_state_once)
+        gobject.idle_add(self.check_plob_once)
+        gobject.idle_add(self.check_playlist_once)
+
+        log_msg("go ..")
+
+        self.__ml.run()
+        
+        log_msg("shutting down")
+        
+        ###### shut down / clean up ######
+
+        try:
+            server.Bye(PLAYER)
+        except DBusException:
+            pass
+
+        try:
+            dbus.service.Object.remove_from_connection(self, path=DBUS_PP_PATH)
+        except LookupError:
+            pass
+
+        dbus_service_name = None
+
+        return True
+    
+    def down(self):
+        
+        ml = self.__ml
+        
+        if not ml:
+            return
+        
+        self.__ml = None
+        
+        ml.quit()
+
+    ###########################################################################
+    # Remuco PP interface
+    ###########################################################################
+        
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='uis', out_signature='')
+    def Control(self, command, paramI, paramS):
+        
+        log_debug("called Control(%u, %i, %s)" % (command, paramI, paramS))
+
+        if not self.__check_amarok_connection():
+            return
+        
+        do_check_state = False
+        do_check_plob = False
+        do_check_playlist = False
+
+        try:
+        
+            if command == CTL_STOP:
+                
+                self.__amrok_player.stop()
+                
+            elif command == CTL_PLAYPAUSE: ####################################
+                
+                do_check_state = True
+    
+                self.__amrok_player.playPause()
+                
+            elif command == CTL_NEXT: #########################################
+                
+                do_check_state = True
+                do_check_plob = True
+                
+                self.__amrok_player.next()
+                            
+            elif command == CTL_PREV: #########################################
+                
+                do_check_state = True
+                do_check_plob = True
+    
+                self.__amrok_player.prev()
+                
+            elif command == CTL_SEEK_FWD: #####################################
+                
+                self.__amrok_player.seekRelative(5)
+                
+            elif command == CTL_SEEK_BWD: #####################################
+                
+                self.__amrok_player.seekRelative(-5)
+                
+            elif command == CTL_VOLUME: #######################################
+                
+                self.__amrok_player.setVolume(paramI)
+                
+            elif command == CTL_JUMP: #########################################
+                
+                do_check_state = True
+                do_check_plob = True
+                
+                if paramS != PLAYLIST_ID:
+                    do_check_playlist = True
+                    self.__amrok_playlistbrowser.loadPlaylist(paramS)
+                        
+                self.__amrok_playlist.playByIndex(paramI)
+    
+            elif command == CTL_RATE: #########################################
+                
+                #self.__amrok_player.setRating(paramI)
+                log_msg("rating does not work yet")
+                
+            elif command == CTL_SHUFFLE: ######################################
+                
+                self.__amrok_player.enableRandomMode(not self.__state_shuffle)
+                
+            elif command == CTL_REPEAT: #######################################
+                
+                self.__amrok_player.enableRepeatPlaylist(not self.__state_repeat)
+                
+            elif command == CTL_IGNORE: #######################################
+                
+                pass
+    
+            else: #################################################################
+                
+                log_msg("command %d not supported", cmd)
+
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Amarok (probably busy)")
+                return True
+            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+                log_debug("Amarok not running")
+                self.down()
+                return False
+            else:
+                log_exc("failed to talk to Amarok")
+                self.down()
+                return False
+            
+        # some controls changes state and plob, so check them right now instead
+        # of waiting for the next check timeout
+            
+        if do_check_state and not self.__fast_state_check_triggered:
+            gobject.idle_add(self.check_state_once)
+            self.__fast_state_check_triggered = True
+        
+        if do_check_plob and not self.__fast_plob_check_triggered:
+            # idle would be too fast, so here a small timeout:
+            gobject.timeout_add(250, self.check_plob_once)
+            self.__fast_plob_check_triggered = True
+        
+        if do_check_playlist and not self.__fast_playlist_check_triggered:
+            # idle would be too fast, so here a small timeout:
+            gobject.timeout_add(250, self.check_playlist_once)
+            self.__fast_playlist_check_triggered = True
+        
+
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='s', out_signature='a{ss}')
+    def RequestPlob(self, id):
+        
+        log_debug("called RequestPlob(%s)" % id)   
+             
+        if not self.__check_amarok_connection():
+            return {}
+        
+        try:
+            id_int = int(id)
+        except ValueError:
+            return { PLOB_META_TITLE : "Unknown" }
+        
+        x, xx, meta = self.__get_plob(id_int)
+        
+        return meta 
+
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='s', out_signature='asasasas')
+    def RequestPloblist(self, id):
+        
+        log_debug("called RequestPloblist(%s)" % id)
+        
+        nested_ids = []
+        nested_names = []
+        ids = []
+        names = []
+
+        if not self.__check_amarok_connection():
+            return nested_ids, nested_names, ids, names
+        
+        if not id or id == "":
+            
+            result = self.__xmms.playlist_list()
+            result.wait()
+            if result.iserror():
+                log_msg("failed to get playlists (%s)" % result.get_error())
+            
+            lib = result.value()
+            
+            for pl in lib:
+                if pl != "_active":
+                    log_debug("append %s" % pl)
+                    pl_uc = unicode(pl)
+                    nested_ids.append(pl_uc)
+                    nested_names.append(pl_uc)
+        
+        else:
+            
+            ids.append("__XXX__")
+            names.append("Play this list to see its content :)")
+            
+        return nested_ids, nested_names, ids, names
+            
+    @dbus.service.method(dbus_interface=DBUS_PP_IFACE,
+                         in_signature='', out_signature='')
+    def Bye(self):
+        log_msg("server said bye")
+        self.down()
+
+    ###########################################################################
+    # Synchronization with XMMS2 server
+    ###########################################################################
+
+    def check_state(self):
+        
+        if not self.__check_amarok_connection():
+            return False
+        
+        log_debug("check state")
+        
+        change = False
+
+        try:
+            
+            ###### playback ######
+    
+            url = self.__amarok_player.encodedURL()
+            playing = self.__amarok_player.isPlaying()
+            if plaiyng:
+                playback = PLAYBACK_PLAY
+            elif url != None:
+                playback = PLAYBACK_PAUSE
+            else:
+                playback = PLAYBACK_STOP
+                
+            change |= playback != self.__state_playback
+                
+            ###### volume ######
+            
+            volume = self.__amarok_player.encodedURL()
+            
+            change |= volume != self.__state_volume
+            
+            ###### position ######
+            
+            position = self.__amarok_playlist.getActiveIndex()
+            if position < 0:
+                position = 0
+            
+            change |= position != self.__state_position
+        
+            ###### repeat and shuffle ######
+            
+            repeat = self.__amarok_player.repeatPlaylistStatus()
+            
+            change |= repeat != self.__state_repeat
+        
+            shuffle = self.__amarok_player.randomModeStatus()
+            
+            change |= repeat != self.__state_shuffle
+        
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Amarok (probably busy)")
+                return True
+            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+                log_debug("Amarok not running")
+                self.down()
+                return False
+            else:
+                log_exc("failed to talk to Amarok")
+                self.down()
+                return False
+            
+        ###### update ######
+            
+        if change:
+            
+            self.__state_playback = playback
+            self.__state_volume = volume
+            self.__state_repeat = repeat
+            self.__state_shuffle = shuffle
+            self.__state_position = position
+            
+            self.__sync_state()
+        
+        return True
+
+    def check_plob(self):
+        
+        if not self.__check_amarok_connection():
+            return False
+        
+        log_debug("check plob")
+        
+        try:
+            url = self.__amarok_player.encodedURL()
+            
+            if url != None and len(url) > 0:
+            
+                meta = {PLOB_META_ARTIST : self.__amarok_player.artist(),
+                        PLOB_META_TITLE : self.__amarok_player.title(),
+                        PLOB_META_RATING : self.__amarok_player.rating(),
+                        PLOB_META_GENRE : self.__amarok_player.genre(),
+                        PLOB_META_YEAR : self.__amarok_player.year(),
+                        PLOB_META_COMMENT : self.__amarok_player.comment(),
+                        PLOB_META_ALBUM : self.__amarok_player.album(),
+                        PLOB_META_BITRATE : self.__amarok_player.bitrate(),
+                        PLOB_META_TRACK : self.__amarok_player.track(),
+                        PLOB_META_LENGTH : self.__amarok_player.trackTotalTime(),
+                        }
+                
+            else:
+                url = ""
+                meta = {}
+        
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Amarok (probably busy)")
+                return True
+            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+                log_debug("Amarok not running")
+                self.down()
+                return False
+            else:
+                log_exc("failed to talk to Amarok")
+                self.down()
+                return False
+        
+        if url == self.__plob_url:
+            return True
+        
+        self.__plob_url = url
+        
+        self.__plob_meta = meta
+        
+        self.__sync_plob()
+        
+        return True
+    
+    def check_playlist(self):
+        
+        if not self.__check_amarok_connection():
+            return False
+        
+        log_debug("check playlist")
+
+        result = self.__xmms.playlist_list_entries()
+        result.wait()        
+        
+        if result.iserror():
+            log_debug("failed to get playlist (%s)" % result.get_error())
+            ids = []
+        else:
+            ids = result.value()
+        
+        if ids == self.__playlist_ids_int:
+            return True
+
+        self.__playlist_ids_int = ids
+        self.__playlist_ids = []
+        self.__playlist_names = []
+
+        for id in ids:
+            self.__playlist_ids.append(unicode(id))
+            name = self.__get_plob_short_name(id)
+            self.__playlist_names.append(name)
+
+        self.__sync_playlist()
+
+        return True
+    
+    def check_state_once(self):
+        self.__fast_state_check_triggered = False        
+        self.check_state()
+        return False
+
+    def check_plob_once(self):
+        self.__fast_plob_check_triggered = False        
+        self.check_plob()
+        return False
+
+    def check_playlist_once(self):
+        self.check_playlist()
+        return False
+    
+    ###########################################################################
+    # Synchronization with Remuco server
+    ###########################################################################
+
+    def __sync_state(self):
+        """MainLoop callback to periodically sync player state with server."""
+        
+        if not self.__ml:
+            return
+        
+        log_debug("sync state")
+        
+        try:
+            self.__server.UpdateState(PLAYER,
+                self.__state_playback, self.__state_volume,
+                self.__state_repeat, self.__state_shuffle,
+                self.__state_position, False)
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Remuco server (probably busy)")
+            else:
+                log_exc("failed to talk to Remuco server")
+                self.down()
+        
+    def __sync_plob(self):
+        """MainLoop callback to periodically sync player state with server."""
+        
+        if not self.__ml:
+            return
+        
+        log_debug("sync plob")
+
+        try:
+            self.__server.UpdatePlob(PLAYER,
+                self.__plob_id, self.__plob_img, self.__plob_meta)
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Remuco server (probably busy)")
+            else:
+                log_exc("failed to talk to Remuco server")
+                self.down()
+
+    def __sync_playlist(self):
+        
+        if not self.__ml:
+            return
+        
+        log_debug("sync playlist")
+
+        try:
+            self.__server.UpdatePlaylist(PLAYER,
+                self.__playlist_ids, self.__playlist_names)
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Remuco server (probably busy)")
+            else:
+                log_exc("failed to talk to Remuco server")
+                self.down()
+        
+    ###########################################################################
+    # Misc
+    ###########################################################################
+
+    def __check_amarok_connection(self):
+        """Check the connection to Amarok.
+        
+        The check is done by requesting the Amarok version.
+        """
+
+        try:
+            self.__amarok_player.version()
+        except DBusException, e:
+            if e.get_dbus_name() == DBUS_ERR_NO_REPLY:
+                log_msg("no reply from Amarok (probably busy)")
+                return True
+            elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
+                log_debug("Amarok not running")
+                return False
+            else:
+                log_exc("failed to talk to Amarok")
+                self.down()
+                return False
+        
+        return True
+
+    def __get_plob(self, id):
+        
+        query = "SELECT album, artist, bitrate, comment, genre, length, title, track, year FROM tags WHERE url = \"%s\"" % url
+
+        def get_meta(key):
+            try:
+                val = minfo[key]
+            except KeyError:
+                return ""
+            if key == "duration":
+                val = val / 1000
+            return unicode(val)
+        
+        if id == 0:
+            return "", "", {}
+        
+        result = self.__xmms.medialib_get_info(id)
+        result.wait()
+        
+        meta = {}
+        minfo = {}
+        
+        if result.iserror():
+            log_msg("xmms2 gives error for plob id %d (%s)" %
+                    (id, result.get_error()))
+            meta[PLOB_META_TITLE] = "Unknown"
+        else:
+            minfo = result.value()
+            meta[PLOB_META_ARTIST] = get_meta("artist")
+            meta[PLOB_META_ALBUM] = get_meta("album")
+            meta[PLOB_META_TITLE] = get_meta("title")
+            meta[PLOB_META_GENRE] = get_meta("genre")
+            meta[PLOB_META_COMMENT] = get_meta("comment")
+            meta[PLOB_META_LENGTH] = get_meta("duration")
+            meta[PLOB_META_BITRATE] = get_meta("bitrate")
+            meta[PLOB_META_TRACK] = get_meta("tracknr")
+            meta[PLOB_META_RATING] = get_meta("rating")
+        
+        img = get_meta(MINFO_KEY_ART)
+        if img != "":
+            img = "%s/%s" % (BIN_DATA_DIR, img)
+        
+        return unicode(id), img, meta
+
+    def __get_plob_short_name(self, id):
+        
+        result = self.__xmms.medialib_get_info(id)
+        result.wait()
+
+        if result.iserror():
+            log_msg("xmms2 gives error for plob id %d (%s)" %
+                    (id, result.get_error()))
+            return "Unknown"
+        
+        minfo = result.value()
+        
+        try:
+            artist = unicode(minfo["artist"])
+        except KeyError:
+            artist = None
+        try:
+            title = unicode(minfo["title"])
+        except KeyError:
+            title = None
+        
+        if artist != None and artist != "" and title != None and title != "":
+            name = "%s - %s" % (artist, title)
+        elif artist != None and artist != "":
+            name = artist
+        elif title != None and title != "":
+            name = title
+        else:
+            name = "Unknown"
+        
+        return name
+
+###############################################################################
+#
+# Main
+#
+###############################################################################
+
+pp_global = None
+
+def sighandler(signum, frame):
+    
+    global pp_global
+    
+    log_msg("received signal %i" % signum)
+    
+    if pp_global != None:
+        pp_global.down()
+
+if __name__ == "__main__":
+    
+    signal.signal(signal.SIGINT, sighandler)
+    signal.signal(signal.SIGTERM, sighandler)
+
+    pp = PP()
+    
+    pp_global = pp
+    
+    ok = pp.up()
+    
+    if not ok:
+        log_msg("Remuco XMMS2 failed")
+    else:
+        log_msg("Remuco XMMS2 is down")
+
+    
