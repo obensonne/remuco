@@ -1,13 +1,13 @@
 Remuco Client 0.7
 
- Remuco is a Bluetooth/WLAN remote control system for Linux media players. With
-Remuco you can remotely control your favorite media player - amongst others you
-can switch to the next, previous or any other media within the current
-playlist, browse your media library and activate other playlists, rate your
-media and adjust volume. On the mobile (i.e. the remote control) it displays
-information about the current media, including cover art. Visit http://
-remuco.sourceforge.net for a complete feature list, screenshots and a list of
-supported media players.
+ Remuco is a duplex remote control system for Linux media players and mobile
+devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
+your favorite media player - amongst others you can switch to the next,
+previous or any other media within the current playlist, browse your media
+library and activate other playlists, rate your media and adjust volume. On the
+mobile (the remote control) it displays information about the current media,
+including cover art. Visit http://remuco.sourceforge.net for a complete feature
+list, screenshots and a list of supported media players.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -25,7 +25,7 @@ A. General Information
 1. Introduction
 
  This documentation is about the Remuco client, an application running on a
-mobile device with J2ME and Bluetooth (JSR 82) or WLAN support. The client
+mobile device with J2ME and Bluetooth (JSR 82) or WiFi support. The client
 communicates with the Remuco server to remotely control media players.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -51,7 +51,7 @@ directory dist). How to install is device dependent - please consult the
 documentation of your mobile device.
 
  Once the client is installed on your phone, consider to set permissions so
-that Remuco is allowed to use Bluetooth/WLAN. This releases you from always
+that Remuco is allowed to use Bluetooth or WiFi. This releases you from always
 acknowledging a connection to the server (of course you need to trust Remuco :)
 )
 
@@ -89,6 +89,10 @@ group_id=166515&atid=839315
 
  If you miss a nice feature, take a look at the feature request tracker: https:
 //sourceforge.net/tracker/?group_id=166515&atid=839318
+
+ If you need help on development issues, mainly concerning player proxy
+development, visit the developer forum: https://sourceforge.net/forum/
+forum.php?forum_id=568228
 
  For all other things to talk about, use the discussion forum: https://
 sourceforge.net/forum/forum.php?forum_id=568226
