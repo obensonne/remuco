@@ -32,14 +32,15 @@ CLASS="abstract"
 NAME="AEN5"
 ></A
 ><P
->&#13;            Remuco is a Bluetooth/WLAN remote control system for Linux media
-            players. With Remuco you can remotely control your favorite
-            media player - amongst others you can switch to the next,
-            previous or any other media within the current playlist,
-            browse your media library and activate other playlists, rate
-            your media and adjust volume. On the mobile (i.e. the remote
-            control) it displays information about the current media,
-            including cover art. Visit
+>&#13;            Remuco is a duplex remote control system for Linux media
+            players and mobile devices equipped with Bluetooth or WiFi.
+            With Remuco you can remotely control your favorite media
+            player - amongst others you can switch to the next, previous
+            or any other media within the current playlist, browse your
+            media library and activate other playlists, rate your media
+            and adjust volume. On the mobile (the remote control) it
+            displays information about the current media, including
+            cover art. Visit
             <A
 HREF="http://remuco.sourceforge.net"
 TARGET="_top"
@@ -103,14 +104,14 @@ HREF="#AEN41"
 ></DT
 ><DT
 >4.2. <A
-HREF="#AEN55"
+HREF="#AEN57"
 >XMMS2</A
 ></DT
 ></DL
 ></DD
 ><DT
 >A. <A
-HREF="#AEN67"
+HREF="#AEN69"
 >General Information</A
 ></DT
 ><DD
@@ -122,7 +123,7 @@ HREF="#feedback"
 ></DT
 ><DT
 >A.2. <A
-HREF="#AEN81"
+HREF="#AEN85"
 >Source Code Access</A
 ></DT
 ></DL
@@ -290,26 +291,34 @@ NAME="AEN41"
 ></H3
 ><P
 >&#13;            If something fails, it is a good idea to set Remuco into debug
-            mode. This is done by creating the file
-            <TT
-CLASS="filename"
->~/.config/remuco/debug</TT
->, for instance:
+            mode. You can toggle the debug mode for the server and all player
+            proxies with the tool remuco using option --debug. Running
         </P
 ><P
 >&#13;        	<B
 CLASS="command"
->$ touch ~/.config/remuco/debug </B
+>$ remuco </B
 >
         </P
 ><P
->&#13;        	This tells the server and all player proxies to enable
-        	debug output. The server log can be found in
+>&#13;            tells you if debug mode is on or off. Running
+        </P
+><P
+>&#13;        	<B
+CLASS="command"
+>$ remuco --debug </B
+>
+        </P
+><P
+>&#13;            switches between enabled and disabled debug mode.
+        </P
+><P
+>&#13;        	The server log can be found in
         	<TT
 CLASS="filename"
 >~/.cache/remuco/Server.log</TT
 >. Logging of basic
-            player proxies (e.g. Amarok, MPD, Totem) goes to
+            player proxies (e.g. Amarok, Banshee, MPD, Totem) goes to
             <TT
 CLASS="filename"
 >~/.cache/remuco/PLAYER.log</TT
@@ -345,12 +354,9 @@ ALT="Note"></TD
 ALIGN="LEFT"
 VALIGN="TOP"
 ><P
->&#13;				Don't forget to remove
-				<TT
-CLASS="filename"
->~/.config/remuco/debug</TT
->
-				once you don't need the debug output anymore.
+>&#13;				Don't forget to disable debug mode once you do not need it
+                anymore - otherwise you might get quite big log files when
+                running Remuco for several hours.
 	        </P
 ></TD
 ></TR
@@ -362,7 +368,7 @@ CLASS="section"
 ><HR><H3
 CLASS="section"
 ><A
-NAME="AEN55"
+NAME="AEN57"
 >4.2. XMMS2</A
 ></H3
 ><P
@@ -403,7 +409,7 @@ CLASS="appendix"
 ><HR><H1
 CLASS="appendix"
 ><A
-NAME="AEN67"
+NAME="AEN69"
 >A. General Information</A
 ></H1
 ><P
@@ -449,6 +455,15 @@ TARGET="_top"
 >
         </P
 ><P
+>&#13;            If you need help on development issues, mainly concerning player
+            proxy development, visit the developer forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568228"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568228</A
+>
+        </P
+><P
 >&#13;            For all other things to talk about, use the discussion
             forum:
             <A
@@ -463,7 +478,7 @@ CLASS="section"
 ><HR><H2
 CLASS="section"
 ><A
-NAME="AEN81"
+NAME="AEN85"
 >A.2. Source Code Access</A
 ></H2
 ><P
@@ -504,7 +519,7 @@ CLASS="QUOTE"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN91"
+NAME="AEN95"
 ></A
 ><P
 ><B
@@ -527,7 +542,7 @@ CLASS="command"
 ><DIV
 CLASS="example"
 ><A
-NAME="AEN96"
+NAME="AEN100"
 ></A
 ><P
 ><B
