@@ -23,7 +23,7 @@ remuco \- Remuco server control
 .br
 .SH DESCRIPTION
 .B remuco
-is a program control the Remuco server. Use it to start or stop the server or to get status information about the server.
+is a program to control the Remuco server. Use it to start or stop the server or to get status information about the server.
 .SH OPTIONS
 This program follows the usual GNU command line syntax, with long
 options starting with two dashes (`-').
@@ -41,8 +41,14 @@ Stop the server
 .B \-a, \-\-start
 Start the server (if not running already)
 .TP
+.B \-r, \-\-restart
+Restart the server
+.TP
 .B \-p, \-\-stop-proxy=\fINAME\fP
 Stop the player proxy \fINAME\fP
+.TP
+.B \-d, \-\-debug
+Toggle debug mode. Also effects player proxies. Becomes effective on next server start.
 .SH FILES
 .IP \(bu 2 
 .I $XDG_CACHE_HOME/remuco/Server.log
@@ -56,7 +62,7 @@ Stop the player proxy \fINAME\fP
 \- log file of player proxy \fINAME\fR (not used by all player proxies)
 .IP \(bu 2 
 .I $XDG_CONFIG_HOME/remuco/debug
-\- debug flag (if this file is present, server and player proxies log in debug mode)
+\- debug flag (if this file is present, server and player proxies log in debug mode) - the presence of this file can be controlled with option \fI-d\fR
 .P
 .IP \(bu 2 
 .I $XDG_CONFIG_HOME/remuco/*.bpp
@@ -64,8 +70,12 @@ Stop the player proxy \fINAME\fP
 .P
 Note: $XDG_CACHE_HOME and $XDG_CONFIG_HOME usually expand to ~/.cache and ~/.config
 (see http://standards.freedesktop.org/basedir-spec/).
+.SH TROUBLESHOOTING
+See \fIDOC_DIR/README\fP.
 .SH BUGS
-Remuco bug tracker: https://sourceforge.net/tracker/?group_id=166515&atid=839315
+See \fIDOC_DIR/README\fP.
+.SH SUPPORT
+See \fIDOC_DIR/README\fP.
 .SH SEE ALSO
 .IP \(bu 2 
 .BR remuco-server (1),
