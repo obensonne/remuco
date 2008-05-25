@@ -1,3 +1,11 @@
+0.7.2	Oben Sonne <obensonne@googlemail.com>
+
+	* enhanced server control tool 'remuco'
+	* fixed a bug which prevented correct detection of a D-Bus issue
+	* small changes in build process (check versions of dependencies,
+	  centralized build and install configuration in Makefile.inc)
+	* added example BPP file for Banshee
+
 0.7.1	Oben Sonne <obensonne@googlemail.com>
 
 	* mostly internal changes
