@@ -92,7 +92,7 @@ remuco-bpp: pp-glue-s.h server-glue-c.h $(OBJ_FILES_BPP)
 ##############################################################################
 
 DBUS_SERVICE_NAME := net.sf.remuco.Shell
-DBUS_SERVICE_DIR := $(shell $(PKG_CONFIG) dbus-1 \
+DBUS_SERVICE_DIR ?= $(shell $(PKG_CONFIG) dbus-1 \
 								--variable=session_bus_services_dir 2>/dev/null)
 
 # break if DBUS_SERVICE_DIR is not set
