@@ -2,7 +2,7 @@ Source: remuco-rhythmbox
 Section: sound
 Priority: extra
 Maintainer: Oben Sonne <obensonne@googlemail.com>
-Build-Depends: debhelper (>= 5), python (>= 2.5)
+Build-Depends: debhelper (>= 5), python-central (>= 0.6.5)
 Standards-Version: 3.7.3
 
 Package: remuco-rhythmbox
