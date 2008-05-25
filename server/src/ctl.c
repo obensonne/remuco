@@ -1,3 +1,5 @@
+#include <glib/gstdio.h>
+
 #include "dbus.h"
 #include "common.h"
 #include "server-glue-c.h"
@@ -13,12 +15,12 @@
 	"Tool to control the Remuco server. If no arguments are given, status of " \
 	"the server is printed."
 
-
 static gboolean	version = FALSE; 
 static gboolean	stop = FALSE;
 static gboolean start = FALSE;
 static gboolean restart = FALSE;
 static gchar	*proxy = NULL;
+static gboolean	toggle_debug = FALSE;
 
 static const GOptionEntry entries[] = 
 {
@@ -27,6 +29,7 @@ static const GOptionEntry entries[] =
   { "start", 'a', 0, G_OPTION_ARG_NONE, &start, "Start the server", NULL },
   { "restart", 'r', 0, G_OPTION_ARG_NONE, &restart, "Restart the server", NULL },
   { "stop-proxy", 'p', 0, G_OPTION_ARG_STRING, &proxy, "Stop player proxy NAME", "NAME" },
+  { "toogle-debug", 'd', 0, G_OPTION_ARG_NONE, &toggle_debug, "Toggle debug mode", NULL },
   { NULL }
 };
 
@@ -46,19 +49,13 @@ static DBusGConnection	*dbus_conn;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static gboolean
-check_options()
-{
-	if ((stop && start) || (stop && restart) || (stop && proxy) ||
-		(start && restart) || (start && proxy) || 
-		(restart && proxy)) {
-		
-		g_printerr("Only one control at the same time is possible.\n");
-		return FALSE;
-	}
-	
-}
-
+/**
+ * Check if the server is running. The running state is stored in the global
+ * variable 'running'.
+ * 
+ * @return
+ * 		FALSE if an error occured, TRUE otherwise
+ */
 static gboolean
 check_running()
 {
@@ -249,11 +246,54 @@ proxy_stop()
 }
 
 static gboolean
+toggle_debug_mode()
+{
+	gchar		*file;
+	gboolean	debug;
+	gint		ret;
+	
+	file = g_build_filename(g_get_user_config_dir(), "remuco", "debug", NULL);
+
+	debug = g_file_test(file, G_FILE_TEST_IS_REGULAR);
+	
+	if (debug) {
+		
+		ret = g_remove(file);
+		if (ret < 0) {
+			g_printerr("Failed to delete debug flag file '%s' (%s).\n",
+					   file, g_strerror(errno));
+			g_free(file);	
+			return FALSE;
+		}
+		g_print("Disabled debug mode "
+				"(becomes effective on next server start).\n");
+		
+	} else {
+		
+		ret = g_creat(file, S_IRUSR | S_IWUSR | S_IRWXG | S_IROTH);
+		if (ret < 0) {
+			g_printerr("Failed to create debug flag file '%s' (%s).\n",
+					   file, g_strerror(errno));
+			g_free(file);	
+			return FALSE;
+		}
+		g_print("Enabled debug mode "
+				"(becomes effective on next server start).\n");
+	}
+
+	g_free(file);
+	
+	return TRUE;
+}
+
+static gboolean
 print_status()
 {
 	DBusGProxy		*dbus_proxy;
 	gchar			**proxies, **clients;
 	guint			len, u;
+	gchar			*file;
+	gboolean		debug;	
 	GError			*err;
 
 	g_assert(dbus_conn);
@@ -262,11 +302,24 @@ print_status()
 	
 	if (!running) {
 		g_print("Server is not running.\n");
-		return TRUE;
+	} else {
+		g_print("Server is running.\n");
 	}
 	
-	g_print("Server is running.\n");
+	////////// debug status //////////
 
+	file = g_build_filename(g_get_user_config_dir(), "remuco", "debug", NULL);
+
+	debug = g_file_test(file, G_FILE_TEST_IS_REGULAR);
+	
+	g_print("Debug mode is %s.\n", debug ? "enabled" : "disabled");
+	
+	g_free(file);
+
+	if (!running) {
+		return 0;
+	}
+	
 	////////// player proxies //////////
 	
 	dbus_proxy = rem_dbus_proxy(dbus_conn, "Shell");
@@ -335,6 +388,11 @@ main(int argc, char **argv) {
 	
 	////////// parse command line options //////////
 	
+	if (argc > 2) {
+		g_printerr("Only one option at a time is possible.\n");
+		return 1;
+	}
+	
 	context = g_option_context_new ("- Remuco server control");
 	g_option_context_set_summary(context, HELP_SUMMARY);
 	g_option_context_add_main_entries (context, entries, NULL);
@@ -355,11 +413,6 @@ main(int argc, char **argv) {
 		return 0;
 	}
 	
-	if ((stop && start) || (stop && proxy) || (start && proxy)) {
-		g_printerr("Only one control at the same time is possible.\n");
-		return 1;
-	}
-
 	g_type_init();
 	
 	////////// server running ? //////////
@@ -370,7 +423,11 @@ main(int argc, char **argv) {
 	
 	////////// do what we have to do //////////
 	
-	if (stop) {	
+	if (toggle_debug) {
+		
+		ok = toggle_debug_mode();
+		
+	} else if (stop) {
 		
 		ok = server_stop();
 		
