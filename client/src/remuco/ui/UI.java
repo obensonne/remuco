@@ -483,7 +483,7 @@ public final class UI implements CommandListener, IKeyListener, IStateListener,
 			Log.ln("[UI] rxed server down");
 			disconnect();
 			alertDisconnect.setTitle("Server Down");
-			alertDisconnect.setString("The Remuco server has shut down.");
+			alertDisconnect.setString("The Remuco server said bye.");
 			display.setCurrent(alertDisconnect, screenDeviceSelector);
 
 			break;
