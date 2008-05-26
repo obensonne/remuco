@@ -125,7 +125,6 @@ public final class LibraryScreen extends List implements CommandListener,
 			if (getImage(i) == iconPloblist) { // show ploblist
 
 				player.reqPloblist(pl.getNestedID(i), new PlobList(), this);
-				parent.commandAction(UI.CMD_BACK, this);
 
 			} else { // show plobinfo
 
