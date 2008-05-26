@@ -14,11 +14,10 @@ import javax.microedition.lcdui.TextField;
 
 import remuco.Config;
 import remuco.UserException;
+import remuco.comm.BluetoothScanner;
 import remuco.comm.Communicator;
-import remuco.comm.Scanner;
 import remuco.comm.IScanResultListener;
 import remuco.ui.UI;
-import remuco.util.Log;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanResultListener {
@@ -47,7 +46,7 @@ public final class DeviceSelectorScreen extends List implements
 	 */
 	private String[] devices;
 
-	private final Scanner df;
+	private final BluetoothScanner bluetoothScanner;
 
 	private final Display display;
 
@@ -75,9 +74,9 @@ public final class DeviceSelectorScreen extends List implements
 		this.display = display;
 
 		if (haveBluetooth) {
-			df = new Scanner();
+			bluetoothScanner = new BluetoothScanner();
 		} else {
-			df = null;
+			bluetoothScanner = null;
 		}
 
 		alertScanProblem = new Alert("");
@@ -164,7 +163,7 @@ public final class DeviceSelectorScreen extends List implements
 			ws.setMessage("Scanning");
 
 			try {
-				df.startScan(this);
+				bluetoothScanner.startScan(this);
 				display.setCurrent(ws);
 			} catch (UserException e) {
 				alertScanProblem.setTitle("Scan Error");
@@ -176,7 +175,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		} else if (c == WaitingScreen.CMD_CANCEL) { // cancel scan
 
-			df.cancelScan();
+			bluetoothScanner.cancelScan();
 
 			display.setCurrent(this);
 

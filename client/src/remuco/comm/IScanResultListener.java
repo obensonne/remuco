@@ -1,7 +1,7 @@
 package remuco.comm;
 
 /**
- * Interface for classes searching devices using the {@link Scanner}.
+ * Interface for classes searching devices using the {@link BluetoothScanner}.
  * 
  * @author Christian Buennig
  * 
@@ -21,7 +21,7 @@ public interface IScanResultListener {
 	 * @param devices
 	 *            the found devices
 	 * 
-	 * @see Scanner#startScan(IDeviceSearcher)
+	 * @see BluetoothScanner#startScan(IDeviceSearcher)
 	 */
 	public void scanFinished(String[] devices);
 

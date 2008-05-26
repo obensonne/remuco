@@ -14,7 +14,7 @@ import javax.bluetooth.ServiceRecord;
 import remuco.UserException;
 import remuco.util.Log;
 
-public final class Scanner implements DiscoveryListener {
+public final class BluetoothScanner implements DiscoveryListener {
 
 	private DiscoveryAgent agent;
 
