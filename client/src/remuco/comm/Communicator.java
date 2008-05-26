@@ -75,7 +75,7 @@ public final class Communicator implements Runnable, IMessageSender {
 		Log.ln("[CM] going down");
 
 		interrupted = true;
-		
+
 		if (conn != null)
 			conn.down();
 
@@ -195,6 +195,16 @@ public final class Communicator implements Runnable, IMessageSender {
 		conn.send(m); // errors on 'net' will be detected and handled by
 		// receiveMessages()
 
+	}
+
+	public static boolean haveBluetooth() {
+
+		try {
+			Class.forName("javax.bluetooth.LocalDevice");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

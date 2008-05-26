@@ -14,9 +14,11 @@ import javax.microedition.lcdui.TextField;
 
 import remuco.Config;
 import remuco.UserException;
+import remuco.comm.Communicator;
 import remuco.comm.Scanner;
 import remuco.comm.IScanResultListener;
 import remuco.ui.UI;
+import remuco.util.Log;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanResultListener {
@@ -62,12 +64,21 @@ public final class DeviceSelectorScreen extends List implements
 	private final TextField textfieldHost;
 
 	public DeviceSelectorScreen(CommandListener parent, Display display) {
+
 		super("Connector", IMPLICIT);
+
+		boolean haveBluetooth;
+
+		haveBluetooth = Communicator.haveBluetooth();
 
 		this.parent = parent;
 		this.display = display;
 
-		df = new Scanner();
+		if (haveBluetooth) {
+			df = new Scanner();
+		} else {
+			df = null;
+		}
 
 		alertScanProblem = new Alert("");
 		alertScanProblem.setType(AlertType.ERROR);
@@ -86,13 +97,16 @@ public final class DeviceSelectorScreen extends List implements
 		textfieldHost = new TextField("Host", "192.168.0.26", 256,
 				TextField.NON_PREDICTIVE);
 		formHost.append(textfieldHost);
-		formHost.append("Bluetooth:\n");
-		formHost.append("Enter a Bluetooth hardware address in the format "
-				+ "001122AABBFF.\n");
-		formHost.append("WLAN:\n");
+
+		if (haveBluetooth) {
+			formHost.append("Bluetooth:\n");
+			formHost.append("Enter a Bluetooth hardware address in the format "
+					+ "001122AABBFF.\n");
+			formHost.append("WiFi:\n");
+		}
+
 		formHost.append("Enter an IP address or a host name, optionally "
-				+ "append a colon and a port number (e.g. '192.168.4.5:3452'"
-				+ " or 'my.host.name:36542').");
+				+ "with port number (e.g. '192.168.4.5:3452').");
 		formHost.addCommand(UI.CMD_BACK);
 		formHost.addCommand(UI.CMD_OK);
 		formHost.setCommandListener(this);
@@ -102,9 +116,18 @@ public final class DeviceSelectorScreen extends List implements
 
 		alertWelcome = new Alert("Remuco");
 		alertWelcome.setType(AlertType.INFO);
-		alertWelcome.setString("Currently there are no known server devices. "
-				+ "On the next screen, do a scan for (Bluetooth) "
-				+ "devices or add a (Bluetooth/WLAN) device manually.");
+		if (haveBluetooth) {
+			alertWelcome.setString("On the next screen, choose menu entry '"
+					+ CMD_SCAN.getLabel() + "' to do a Bluetooth "
+					+ "scan or choose '" + CMD_ADD_DEVICE.getLabel()
+					+ "' to enter the IP address or hostname of the "
+					+ "computer running the server.");
+		} else {
+			alertWelcome.setString("On the next screen, choose the menu entry "
+					+ "'" + CMD_ADD_DEVICE.getLabel()
+					+ "' to add the IP address "
+					+ "or hostname of the computer running the server.");
+		}
 		alertWelcome.setTimeout(Alert.FOREVER);
 
 		ws = new WaitingScreen();
@@ -112,7 +135,10 @@ public final class DeviceSelectorScreen extends List implements
 
 		devices = new String[0];
 
-		addCommand(CMD_SCAN);
+		if (haveBluetooth) {
+			addCommand(CMD_SCAN);
+		}
+
 		addCommand(CMD_ADD_DEVICE);
 
 		setCommandListener(this);

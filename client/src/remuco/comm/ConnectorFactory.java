@@ -18,7 +18,7 @@ public final class ConnectorFactory {
 	public static IConnector createConnector(String device)
 			throws UserException {
 
-		if (isBluetoothAddress(device))
+		if (Communicator.haveBluetooth() && isBluetoothAddress(device))
 			return new BluetoothConnector(device);
 
 		if (isIPv4Address(device))
@@ -27,7 +27,7 @@ public final class ConnectorFactory {
 		if (device == null || device.length() == 0)
 			throw new IllegalArgumentException("invalid device address");
 
-		// if here, we assume it is an IP host name
+		// if here, we assume it is a _host_ name
 
 		return new IPConnector(device);
 
