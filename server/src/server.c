@@ -291,13 +291,6 @@ pp_reply_request_plob(DBusGProxy *dbus_proxy, GHashTable *meta, GError *err,
 		return;
 	}
 	
-	if (!req->client_chan) { // this was just a ping
-		LOG_INFO("pong from %s", req->player);
-		if (meta) g_hash_table_destroy(meta);
-		proxy_request_destroy(req);
-		return;
-	}
-	
 	////////// check if client and pp are still present //////////
 	
 	client = g_hash_table_lookup(req->server->priv->cht, req->client_chan);
@@ -1098,11 +1091,13 @@ pp_ping(RemServer *server)
 	if (server->priv->stopping)
 		return FALSE;
 	
+	g_assert(server->priv->pht);
+	
 	l = g_hash_table_get_values(server->priv->pht);
 	
 	if (!l) {
 		LOG_INFO("there are no player proxies -> going down");
-		rem_server_down(server);
+		stop(server);
 		return FALSE;
 	}
 	
@@ -1285,7 +1280,7 @@ io_server(GIOChannel *chan, GIOCondition cond, RemServer *server)
 		
 		LOG_ERROR("error on server socket");
 		
-		rem_server_down(server);
+		stop(server);
 		
 		return FALSE;
 		
@@ -1704,7 +1699,7 @@ rem_server_up(RemServer *server)
 	if (!priv->config->enable_bpps || !rem_bppl_bpp_count(priv->bppl)) {
 		// if we do not use BPPs, shut down automatically once there are no
 		// more player proxies
-		g_timeout_add(30000, (GSourceFunc) &pp_ping, priv);
+		g_timeout_add(30000, (GSourceFunc) &pp_ping, server);
 	}
 	
 	////////// misc initializations //////////
