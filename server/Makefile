@@ -26,7 +26,7 @@ clean:
 	
 dist: clean
 	mkdir -p build/$(PKG_FULL)
-	cp -r Makefile src doc build/$(PKG_FULL)
+	cp -r Makefile Makefile.inc src doc build/$(PKG_FULL)
 	find build -type d -name ".svn" | xargs rm -rf    
 	mkdir dist
 	tar zcf dist/$(PKG_FULL).tar.gz -C build $(PKG_FULL)
