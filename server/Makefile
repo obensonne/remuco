@@ -19,18 +19,17 @@ uninstall:
 	make -C doc uninstall
 	
 clean:
-	$(call pkg-config-check,glib-2.0,2.14)
 	make -C src clean
 	make -C doc clean
 	rm -rf build
 	rm -rf dist
 	
 dist: clean
-	$(MKDIR) build/$(PKG_FULL)
-	$(CP) -r Makefile src doc build/$(PKG_FULL)
-	$(FIND) build -type d -name ".svn" | xargs rm -rf    
-	$(MKDIR) dist
-	$(TAR) zcf dist/$(PKG_FULL).tar.gz -C build $(PKG_FULL)
+	mkdir -p build/$(PKG_FULL)
+	cp -r Makefile src doc build/$(PKG_FULL)
+	find build -type d -name ".svn" | xargs rm -rf    
+	mkdir dist
+	tar zcf dist/$(PKG_FULL).tar.gz -C build $(PKG_FULL)
 
 check-pkg-config:
 	@$(PKG_CONFIG) --version > /dev/null 2>&1 || \
