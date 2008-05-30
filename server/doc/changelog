@@ -2,6 +2,8 @@
 
 	* enhanced server control tool 'remuco'
 	* fixed a bug which prevented correct detection of a D-Bus issue
+	* fixed bug #1979166 (server crash when no BPPs are present)
+	* fixed incomplete automatic shutdown
 	* small changes in build process (check versions of dependencies,
 	  centralized build and install configuration in Makefile.inc)
 	* added example BPP file for Banshee
