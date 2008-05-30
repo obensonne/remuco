@@ -1125,7 +1125,7 @@ class PP(dbus.service.Object):
             return True
         elif e.get_dbus_name() == DBUS_ERR_NO_SERVICE:
             log_msg("server is down")
-            self.__suicide()
+            self.__suicide(None)
             return False
         else:
             log_exc("failed to talk to Remuco server")
