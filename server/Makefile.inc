@@ -5,7 +5,7 @@
 ###############################################################################
 
 PKG_NAME := remuco-server
-PKG_VERSION := 0.7.1
+PKG_VERSION := 0.7.2
 PKG_FULL := $(PKG_NAME)-$(PKG_VERSION)
 
 PREFIX := /usr
