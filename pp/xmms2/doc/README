@@ -1,4 +1,4 @@
-Remuco Client 0.7.1
+Remuco XMMS2 0.7.2
 
  Remuco is a duplex remote control system for Linux media players and mobile
 devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
@@ -13,16 +13,17 @@ list, screenshots and a list of supported media players.
 
 Table of Contents
 1. Introduction
-2. Installation
+2. Requirements
+3. Installation
 
-    2.1. System
-    2.2. User
+    3.1. System
+    3.2. User
 
-3. Usage
-4. Troubleshooting
+4. Usage
+5. Troubleshooting
 
-    4.1. General
-    4.2. XMMS2
+    5.1. General
+    5.2. XMMS2
 
 A. General Information
 
@@ -36,9 +37,19 @@ script (which can be started automatically by the XMMS2 daemon).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. Installation
+2. Requirements
 
-2.1. System
+  •  Remuco server >= 0.7.1
+
+  •  XMMS2 Python bindings >= 0.2DrJekyll
+
+  •  Python DBUS bindings (python-dbus)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. Installation
+
+3.1. System
 
  For system wide installation run (as root):
 
@@ -55,7 +66,7 @@ Note You can adjust the install destination by setting the environment variable
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2.2. User
+3.2. User
 
  For user specific installation, run:
 
@@ -67,7 +78,7 @@ Note You can adjust the install destination by setting the environment variable
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. Usage
+4. Usage
 
  If you've installed the XMMS2 player proxy into the XMMS2 startup script
 directory (as described above), then it gets started automatically by XMMS2.
@@ -76,14 +87,14 @@ do not have to do anything.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4. Troubleshooting
+5. Troubleshooting
 
  To track down errors, please try the steps below. If this does not solve your
 problem, come to the help forum.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4.1. General
+5.1. General
 
  If something fails, it is a good idea to set Remuco into debug mode. You can
 toggle the debug mode for the server and all player proxies with the tool
@@ -110,7 +121,7 @@ Note Don't forget to disable debug mode once you do not need it anymore -
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4.2. XMMS2
+5.2. XMMS2
 
  To debug the XMMS2 player proxy, remove it from the XMMS2 startup script
 directory and start it manually (when XMMS2 is running) to see its logging:
