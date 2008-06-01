@@ -71,7 +71,7 @@
     <property name="midlet.jad" value="${midlet.name.lc}.jad"/>
     <property name="midlet.class" value="remuco.Remuco"/>
     <property name="midlet.icon" value="logo.png"/>
-    <property name="midlet.version" value="0.7.0"/>
+    <property name="midlet.version" value="0.7.1"/>
     <property name="midlet.vendor" value="remuco.sf.net"/>
     <property name="midlet.data-size" value="2048"/>
     
