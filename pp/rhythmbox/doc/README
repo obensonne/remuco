@@ -1,4 +1,4 @@
-Remuco Client 0.7.1
+Remuco Rhythmbox 0.7.3
 
  Remuco is a duplex remote control system for Linux media players and mobile
 devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
@@ -39,7 +39,9 @@ a plugin for Rhythmbox.
 
 2. Requirements
 
-  •  Ryhthmbox >= 0.11.5
+  •  Remuco server >= 0.7.1
+
+  •  Rhythmbox >= 0.11.5
 
   •  Python DBUS bindings (python-dbus)
 
