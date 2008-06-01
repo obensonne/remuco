@@ -99,7 +99,7 @@ public final class BluetoothScanner implements DiscoveryListener {
 	}
 
 	/**
-	 * Starts a scan for nearby devices and returns immediately. When scan if
+	 * Starts a scan for nearby devices and returns immediately. When scan is
 	 * finished <code>listener</code> gets notified.
 	 * 
 	 * @param listener
