@@ -12,7 +12,7 @@
 
 #include "log.h"
 
-#define REM_VERSION					"0.7.1"
+#define REM_VERSION					"0.7.3"
 
 G_BEGIN_DECLS
 
