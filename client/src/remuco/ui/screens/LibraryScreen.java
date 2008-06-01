@@ -1,7 +1,6 @@
 package remuco.ui.screens;
 
 import java.io.IOException;
-import java.util.EmptyStackException;
 import java.util.Stack;
 
 import javax.microedition.lcdui.Command;
@@ -28,17 +27,21 @@ public final class LibraryScreen extends List implements CommandListener,
 	private static final Command CMD_SHOW = new Command("Show", Command.ITEM,
 			10);
 
+	private boolean browsingDown;
+
 	private final Display display;
 
 	private final Image iconPlob, iconPloblist;
 
+	private final Stack idStack;
+
 	private final CommandListener parent;
+
+	private PlobList pl;
 
 	private final Player player;
 
 	private final Plob plob;
-
-	private final Stack ploblistHistory;
 
 	private final PlobInfoScreen screenPlobInfo;
 
@@ -60,6 +63,8 @@ public final class LibraryScreen extends List implements CommandListener,
 
 		setCommandListener(this);
 
+		idStack = new Stack();
+		
 		plob = new Plob();
 
 		screenPlobInfo = new PlobInfoScreen();
@@ -69,8 +74,6 @@ public final class LibraryScreen extends List implements CommandListener,
 		screenWaiting = new WaitingScreen();
 		screenWaiting.setTitle("Updating");
 		screenWaiting.setCommandListener(this);
-
-		ploblistHistory = new Stack();
 
 		try {
 			icon = Image.createImage("/plob.png");
@@ -94,17 +97,16 @@ public final class LibraryScreen extends List implements CommandListener,
 
 	}
 
+	private void cleanUp() {
+
+		pl = null;
+		idStack.removeAllElements();
+	}
+
 	public void commandAction(Command c, Displayable d) {
 
 		int i;
-		PlobList pl;
-
-		try {
-			pl = (PlobList) ploblistHistory.peek();
-		} catch (EmptyStackException e) {
-			parent.commandAction(UI.CMD_BACK, this);
-			return;
-		}
+		String id;
 
 		if (c == CMD_PLAY) {
 
@@ -116,6 +118,7 @@ public final class LibraryScreen extends List implements CommandListener,
 				player.ctrlJump(pl.getID(), i);
 			}
 
+			cleanUp();
 			parent.commandAction(UI.CMD_BACK, this);
 
 		} else if (c == CMD_SHOW) {
@@ -124,11 +127,13 @@ public final class LibraryScreen extends List implements CommandListener,
 
 			if (getImage(i) == iconPloblist) { // show ploblist
 
+				browsingDown = true;
 				player.reqPloblist(pl.getNestedID(i), new PlobList(), this);
 
 			} else { // show plobinfo
 
 				player.reqPlob(pl.getPlobID(i), plob, this);
+
 			}
 
 			display.setCurrent(screenWaiting);
@@ -139,23 +144,34 @@ public final class LibraryScreen extends List implements CommandListener,
 
 		} else if (c == UI.CMD_BACK && d == this) {
 
-			ploblistHistory.pop(); // empty stack exc. caught by peek above
+			if (idStack.size() <= 1) {
 
-			if (ploblistHistory.isEmpty()) {
-
+				cleanUp();
 				parent.commandAction(UI.CMD_BACK, this);
 
 			} else {
 
-				// TODO: need another thread to display a waiting screen
-				updateList();
+				browsingDown = false;
+				id = (String) idStack.elementAt(idStack.size() - 2);
+				player.reqPloblist(id, new PlobList(), this);
+				display.setCurrent(screenWaiting);
+
 			}
+
 
 		} else if (c == WaitingScreen.CMD_CANCEL) { // canceled a ploblist/plob
 			// request
 
-			// if we have not yet a ploblist, we won't be here .. see peek above
-			display.setCurrent(this);
+			if (idStack.isEmpty()) { // no ploblist shown yet
+
+				cleanUp();
+				parent.commandAction(UI.CMD_BACK, this);
+
+			} else {
+
+				display.setCurrent(this);
+
+			}
 
 		} else {
 
@@ -180,7 +196,13 @@ public final class LibraryScreen extends List implements CommandListener,
 			// user has canceled ploblist request
 			return;
 
-		ploblistHistory.push(pl);
+		if (browsingDown) {
+			idStack.push(pl.getID());
+		} else {
+			idStack.pop();
+		}
+
+		this.pl = pl;
 
 		updateList();
 
@@ -189,11 +211,12 @@ public final class LibraryScreen extends List implements CommandListener,
 
 	public void showYourself() {
 
-		ploblistHistory.removeAllElements();
+		cleanUp();
 
-		display.setCurrent(screenWaiting);
-
+		browsingDown = true;
 		player.reqPloblist(null, new PlobList(), this);
+		
+		display.setCurrent(screenWaiting);
 	}
 
 	private void updateList() {
@@ -201,10 +224,6 @@ public final class LibraryScreen extends List implements CommandListener,
 		int len_nested, len;
 
 		deleteAll();
-
-		PlobList pl;
-
-		pl = (PlobList) ploblistHistory.peek();
 
 		setTitle(pl.getName());
 
