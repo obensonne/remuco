@@ -1,3 +1,7 @@
+0.7.3	Oben Sonne <obensonne@googlemail.com>
+
+	* fixed a minor client disconnect bug (tried to ping disconnected clients)
+
 0.7.2	Oben Sonne <obensonne@googlemail.com>
 
 	* enhanced server control tool 'remuco'
