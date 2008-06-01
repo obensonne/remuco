@@ -1024,7 +1024,8 @@ client_remove(Client *client)
 	
 	LOG_INFO("disconnect client %s", client->net->addr);
 	
-	g_source_remove_by_user_data(client);
+	// remove all main loop callback functions related to 'client'
+	while(g_source_remove_by_user_data(client));
 
 	if (client->net)
 		rem_net_bye(client->net);
