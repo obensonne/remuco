@@ -1166,7 +1166,8 @@ pp_remove(Proxy *pp)
 	if (pp->ploblists)
 		g_hash_table_destroy(pp->ploblists);
 	
-	g_source_remove_by_user_data(pp);
+	// remove all main loop callback functions related to 'pp'
+	while(g_source_remove_by_user_data(pp));
 	
 	////////// trigger player list sync with the clients //////////
 	
