@@ -6,10 +6,9 @@ MicroEdition-Profile: MIDP-2.0
 MIDlet-1: Remuco,logo.png,remuco.Remuco
 MIDlet-Name: Remuco
 MIDlet-Vendor: remuco.sf.net
-MIDlet-Version: 0.7.0
+MIDlet-Version: 0.7.1
 MIDlet-Data-Size: 2048
-MIDlet-Permissions: javax.microedition.io.Connector.bluetooth.client
 Remuco-themes: Korama,Vilanco
 MIDlet-Jar-URL: remuco.jar
-MIDlet-Jar-Size: 169700
+MIDlet-Jar-Size: 170192
 
