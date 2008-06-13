@@ -1,7 +1,9 @@
 0.7.1	Oben Sonne <obensonne@googlemail.com>
 
-	* detect if Bluetooth API is available
-	* if not available, disable all Bluetooth elements
+	* fixed #1992418 (playlist update crash when playlist short or empty)
+	* enhanced library browser's list management
+	* detect if Bluetooth API is available (if not available, disable all
+	  Bluetooth elements
 
 0.7.0	Oben Sonne <obensonne@googlemail.com>
 
