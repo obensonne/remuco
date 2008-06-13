@@ -13,6 +13,7 @@ import remuco.player.Player;
 import remuco.player.Plob;
 import remuco.player.PlobList;
 import remuco.ui.UI;
+import remuco.util.Tools;
 
 /**
  * Screen to display the playlist or queue.
@@ -156,10 +157,11 @@ public final class PlaylistScreen extends List implements CommandListener,
 		if (isShown()) {
 			screenWaiting.setCancable(false);
 			display.setCurrent(screenWaiting);
+			Tools.sleep(200); // give screen change some time (see #1992418)
 			updateList();
 			display.setCurrent(this);
 		} else {
-			updateList();			
+			updateList();
 		}
 	}
 
@@ -167,10 +169,11 @@ public final class PlaylistScreen extends List implements CommandListener,
 		if (isShown()) {
 			screenWaiting.setCancable(false);
 			display.setCurrent(screenWaiting);
+			Tools.sleep(200); // give screen change some time (see #1992418)
 			updateList();
 			display.setCurrent(this);
 		} else {
-			updateList();			
+			updateList();
 		}
 	}
 
