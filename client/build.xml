@@ -188,7 +188,7 @@
             <attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
             <attribute name="MIDlet-Version" value="${midlet.version}" />
             <attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
-            <attribute name="MIDlet-Permissions" value="javax.microedition.io.Connector.bluetooth.client" />
+            <!--attribute name="MIDlet-Permissions" value="javax.microedition.io.Connector.bluetooth.client" / -->
             <attribute name="Remuco-themes" value="${themes}" />
         </manifest>
     </target>
