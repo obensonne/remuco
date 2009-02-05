@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Remuco Client 0.7.1</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"></HEAD
+><BODY
+CLASS="article"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN1"
+>Remuco Client 0.7.1</A
+></H1
+><DIV
+><DIV
+CLASS="abstract"
+><P
+></P
+><A
+NAME="AEN5"
+></A
+><P
+>&#13;            Remuco is a duplex remote control system for Linux media
+            players and mobile devices equipped with Bluetooth or WiFi.
+            With Remuco you can remotely control your favorite media
+            player - amongst others you can switch to the next, previous
+            or any other media within the current playlist, browse your
+            media library and activate other playlists, rate your media
+            and adjust volume. On the mobile (the remote control) it
+            displays information about the current media, including
+            cover art. Visit
+            <A
+HREF="http://remuco.sourceforge.net"
+TARGET="_top"
+>http://remuco.sourceforge.net</A
+>
+            for a complete feature list, screenshots and a list of
+            supported media players.
+        </P
+><P
+></P
+></DIV
+></DIV
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>1. <A
+HREF="#AEN8"
+>Introduction</A
+></DT
+><DT
+>2. <A
+HREF="#AEN11"
+>Building</A
+></DT
+><DT
+>3. <A
+HREF="#AEN20"
+>Installation</A
+></DT
+><DT
+>4. <A
+HREF="#AEN27"
+>Usage</A
+></DT
+><DT
+>5. <A
+HREF="#AEN31"
+>Creating New Themes</A
+></DT
+><DT
+>A. <A
+HREF="#AEN34"
+>General Information</A
+></DT
+><DD
+><DL
+><DT
+>A.1. <A
+HREF="#feedback"
+>Feedback, Help, Bugs, Discussion etc.</A
+></DT
+><DT
+>A.2. <A
+HREF="#AEN50"
+>Source Code Access</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="AEN8"
+>1. Introduction</A
+></H2
+><P
+>&#13;            This documentation is about the Remuco client, an
+            application running on a mobile device with J2ME and
+            Bluetooth (JSR 82) or WiFi support. The client communicates
+            with the Remuco server to remotely control media players.
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN11"
+>2. Building</A
+></H2
+><P
+>&#13;            You can skip this step if you've downloaded the binary package.
+        </P
+><P
+>&#13;            The client uses the Ant build system
+            (<A
+HREF="http://ant.apache.org"
+TARGET="_top"
+>http://ant.apache.org</A
+>)
+            and Sun's Wireless Toolkit
+            (<A
+HREF="http://java.sun.com/products/sjwtoolkit"
+TARGET="_top"
+>http://java.sun.com/products/sjwtoolkit</A
+>),
+            both must be installed on your system. To build the client, edit
+            the file <TT
+CLASS="filename"
+>build.properties</TT
+>
+            and adjust it to your situation. Then run:
+        </P
+><P
+>&#13;            <B
+CLASS="command"
+>$ ant dist.jar</B
+>
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN20"
+>3. Installation</A
+></H2
+><P
+>&#13;            Install the file <TT
+CLASS="filename"
+>remuco.jar</TT
+> and (optionally)
+            the file <TT
+CLASS="filename"
+>remuco.jad</TT
+>
+            on your mobile device (if you build on your own
+            in the step above: the files are in the directory
+            <TT
+CLASS="filename"
+>dist</TT
+>). How to install is device dependent - please
+            consult the documentation of your mobile device.
+        </P
+><P
+>&#13;            Once the client is installed on your phone, consider to set
+            permissions so that Remuco is allowed to use
+            Bluetooth or WiFi. This releases you from always acknowledging
+            a connection to the server (of course you need to trust
+            Remuco :) )
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN27"
+>4. Usage</A
+></H2
+><P
+>&#13;            Play around with the keys and the entries in the menus, I
+            think that's the best way to get familiar with the client.
+            However, you can find more detailed information about client usage
+            on the Remuco website <A
+HREF="http://remuco.sourceforge.net"
+TARGET="_top"
+>http://remuco.sourceforge.net</A
+>.
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN31"
+>5. Creating New Themes</A
+></H2
+><P
+>&#13;            TODO
+        </P
+></DIV
+><DIV
+CLASS="appendix"
+><HR><H1
+CLASS="appendix"
+><A
+NAME="AEN34"
+>A. General Information</A
+></H1
+><P
+>&#13;        The Remuco project is hosted on SourceForge at
+        <A
+HREF="http://remuco.sourceforge.net"
+TARGET="_top"
+>http://remuco.sourceforge.net</A
+>.
+        It is licensed under the GPLv2 or any newer version.
+    </P
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="feedback"
+>A.1. Feedback, Help, Bugs, Discussion etc.</A
+></H2
+><P
+>&#13;            You can get support and help at the help forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568227"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568227</A
+>
+        </P
+><P
+>&#13;            To file bugs please visit the bug tracker:
+            <A
+HREF="https://sourceforge.net/tracker/?group_id=166515&#38;atid=839315"
+TARGET="_top"
+>https://sourceforge.net/tracker/?group_id=166515&#38;atid=839315</A
+>
+        </P
+><P
+>&#13;            If you miss a nice feature, take a look at the feature
+            request tracker:
+            <A
+HREF="https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318"
+TARGET="_top"
+>https://sourceforge.net/tracker/?group_id=166515&#38;atid=839318</A
+>
+        </P
+><P
+>&#13;            If you need help on development issues, mainly concerning player
+            proxy development, visit the developer forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568228"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568228</A
+>
+        </P
+><P
+>&#13;            For all other things to talk about, use the discussion
+            forum:
+            <A
+HREF="https://sourceforge.net/forum/forum.php?forum_id=568226"
+TARGET="_top"
+>https://sourceforge.net/forum/forum.php?forum_id=568226</A
+>
+        </P
+></DIV
+><DIV
+CLASS="section"
+><HR><H2
+CLASS="section"
+><A
+NAME="AEN50"
+>A.2. Source Code Access</A
+></H2
+><P
+>&#13;            You can get the source code via SVN. The SVN root is:
+            <A
+HREF="https://remuco.svn.sourceforge.net/svnroot/remuco"
+TARGET="_top"
+>https://remuco.svn.sourceforge.net/svnroot/remuco</A
+>
+        </P
+><P
+>&#13;            To browse the SVN repository visit:
+            <A
+HREF="http://remuco.svn.sourceforge.net/viewvc/remuco"
+TARGET="_top"
+>http://remuco.svn.sourceforge.net/viewvc/remuco</A
+>
+        </P
+><P
+>&#13;            The most current code is located in
+            <SPAN
+CLASS="QUOTE"
+>"trunk"</SPAN
+>.
+            Note that this code is not always stable or in a working
+            state. The sources of specific releases are located in
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            -- getting code from
+            <SPAN
+CLASS="QUOTE"
+>"tags"</SPAN
+>
+            ensures to have working code.
+        </P
+><DIV
+CLASS="example"
+><A
+NAME="AEN60"
+></A
+><P
+><B
+>Example A-1. 
+                Check out the current development version of the server
+                into the directory
+                <TT
+CLASS="filename"
+>remuco-server-trunk</TT
+>:
+            </B
+></P
+><P
+>&#13;                <B
+CLASS="command"
+>$ svn co &#60;SVN-ROOT&#62;/trunk/server remuco-server-trunk</B
+>
+            </P
+></DIV
+><DIV
+CLASS="example"
+><A
+NAME="AEN65"
+></A
+><P
+><B
+>Example A-2. 
+                Check out the client source from release 0.7.0 into the
+                directory <TT
+CLASS="filename"
+>remuco-client-0.7.0</TT
+>:
+            </B
+></P
+><P
+>&#13;                <B
+CLASS="command"
+>$ svn co &#60;SVN-ROOT&#62;/tags/client-0.7.0 remuco-client-0.7.0</B
+>
+            </P
+></DIV
+></DIV
+></DIV
+></DIV
+></BODY
+></HTML
+>

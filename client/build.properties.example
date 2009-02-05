@@ -1,0 +1,72 @@
+# =============================================================================
+# Tools
+# =============================================================================
+
+# Home of WTK.
+# Download: http://java.sun.com/products/sjwtoolkit/
+wtk.home=${user.home}/opt/java/wtk-2.5.2
+
+# If you use MicroEmu for emulation, set its JAR file here.
+# Download: http://www.microemu.org/
+microemu.jar=${user.home}/opt/microemulator-2.0.3/microemulator.jar
+
+# If you use ProGuard for preverification, set its JAR file here.
+# Download: http://proguard.sourceforge.net/
+proguard.jar=${user.home}/opt/java/proguard4.2/lib/proguard.jar
+
+# =============================================================================
+# Configurations for target 'dist'
+# =============================================================================
+
+# The preverifier to use.
+#dist.preverifier=wtk
+dist.preverifier=proguard
+
+# Whether to include debug symbols in the byte code or not.
+dist.debug=no
+#dist.debug=yes
+
+# Whether to optimize and obfuscate the byte code when using ProGuard.
+# Setting this to 'yes' produces smaller and optimized binaries, but may produce
+# errors on some devices.
+dist.proguard.optimize=yes
+#dist.proguard.optimize=no
+
+# Target 'dist' also produces a chary client binary which includes debug symbols
+# and is not optimized. Set the preverifier to use for that binary here.
+dist.chary.preverifier=wtk
+#dist.chary.preverifier=proguard
+
+# =============================================================================
+# Configurations for target 'run'
+# =============================================================================
+
+# The emulator to use.
+run.emulator=wtk
+#run.emulator=microemu
+
+# The preverifier to use.
+run.preverifier=wtk
+#run.preverifier=proguard
+
+# Whether to include debug symbols in the byte code or not.
+#run.debug=no
+run.debug=yes
+
+# Whether to optimize and obfuscate the byte code when using ProGuard.
+# Setting this to 'yes' produces smaller and optimized binaries, but may produce
+# errors in some emulators.
+#run.proguard.optimize=yes
+run.proguard.optimize=no
+
+# Device to use when emulating with WTK.
+run.emulator.wtk.device=DefaultColorPhone
+#run.emulator.device=DefaultGrayPhone
+#run.emulator.device=MediaControlSkin
+#run.emulator.device=QwertyDevice
+
+# Security domain to use when emulating with WTK.
+#run.emulator.domain=untrusted
+#run.emulator.domain=trusted
+#run.emulator.domain=minimum
+emulation.wtk.domain=maximum

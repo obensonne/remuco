@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Created-By: 10.0-b22 (Sun Microsystems Inc.)
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+MIDlet-1: Remuco,logo.png,remuco.Remuco
+MIDlet-Name: Remuco
+MIDlet-Vendor: remuco.sf.net
+MIDlet-Version: 0.7.1
+MIDlet-Data-Size: 2048
+Remuco-themes: Korama,Vilanco
+MIDlet-Jar-URL: remuco.jar
+MIDlet-Jar-Size: 170243
+
