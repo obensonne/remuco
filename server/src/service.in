@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=NAME
-Exec=PREFIX/bin/remuco-server
