@@ -12,10 +12,10 @@ Some notes on logging:
 Remuco uses the module 'logging' for all its logging messages. By default
 logging is configured to log into a player specific log file (usually
 ~/.cache/remuco/PLAYER/log). The log level is defined in the player specific
-configuration file (usually ~/.config/remuco/conf).
+configuration file (usually ~/.config/remuco/PLAYER/conf).
 
 To use the remuco logging system within a player adapter, import the module
-'log' and us the function log.debug(), log.info(), log.warning() and
+'log' and use the function log.debug(), log.info(), log.warning() and
 log.error(). Then all messages of the player adapter will be written into the
 same file which is used for internal remuco logging messages.
 
@@ -156,6 +156,8 @@ class Player:
         
         self.__config.set_custom("dummy", "ymmud") # force a config save
         
+        serial.Bin.HOST_ENCODING = self.__config.get_encoding()
+        
         if self.__config.get_bluetooth():
             self.__server_bluetooth = net.BluetoothServer(self.__clients,
                     self.__player_info, self.__handle_message_from_client)
@@ -167,7 +169,7 @@ class Player:
                     self.__player_info, self.__handle_message_from_client)        
         else:
             self.__server_wifi = None
-        
+            
         self.__sync_trigger_ids = {}
         
         self.__shutting_down = False
@@ -634,7 +636,7 @@ class Player:
         
         if msg is None: return
         
-        log.debug("send new %s to clients now" % calling_sync_fn.func_name[7:])
+        log.debug("broadcast new %s to clients" % calling_sync_fn.func_name[7:])
         
         for c in self.__clients: c.send(msg)
         
@@ -663,7 +665,7 @@ class Player:
     
         control = Control()
         
-        ok = serial.unpack(control, bytes)    
+        ok = serial.unpack(control, bindata)    
         if not ok: return
         
         cmd = control.get_cmd()
@@ -674,6 +676,8 @@ class Player:
             return
         elif cmd == command.CMD_PLAYPAUSE:
             self.toggle_play_pause()
+        elif cmd == command.CMD_VOLUME:
+            self.set_volume(param_i)
         elif cmd == command.CMD_NEXT:
             self.play_next()
         elif cmd == command.CMD_PREV:
@@ -695,14 +699,13 @@ class Player:
         elif cmd == command.CMD_SEEK_FWD:
             self.seek_backward()
         elif cmd == command.CMD_SHUTDOWN:
-            self.down()
             self.__shutdown_system()
 
     def __handle_message_request_plob(self, bindata, client):
     
         ss = SerialString()
         
-        ok = serial.unpack(ss, bytes)
+        ok = serial.unpack(ss, bindata)
         if not ok: return
         
         self.request_plob(ss.get(), client)
@@ -711,7 +714,7 @@ class Player:
 
         ss = SerialString()
         
-        ok = serial.unpack(ss, bytes)
+        ok = serial.unpack(ss, bindata)
         if not ok: return
         
         self.request_playlist(ss.get(), client)
@@ -754,4 +757,7 @@ class Player:
                 subprocess.Popen(shutdown_cmd, shell=True)
             except OSError, e:
                 log.warning("failed to run shutdown command (%s)", e)
+                return
+            self.down()
+
     
