@@ -1,0 +1,15 @@
+Remuco - Linux remote media player control
+
+===============================================================================
+
+Installation and usage ........................................................
+
+To install, run:
+
+$ ./install.sh <PLAYER>
+
+Replace <PLAYER> with a player of your choice, e.g. fooplay or rhythmbox.
+
+===============================================================================
+
+More information: visit http://remuco.sf.net
