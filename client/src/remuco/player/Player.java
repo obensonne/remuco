@@ -26,28 +26,18 @@ public final class Player {
 	public final PlayerInfo info;
 
 	/** Do not alter outside {@link Player}! */
-	public final PlobList playlist;
-
-	/** Do not alter outside {@link Player}! */
 	public final Plob plob;
-
-	/** Do not alter outside {@link Player}! */
-	public final PlobList queue;
 
 	/** Do not alter outside {@link Player}! */
 	public final State state;
 
 	private final Connection conn;
 
-	private IPlaylistListener playlistListener;
-
 	private IPlobListener plobListener;
 
 	private IPloblistRequestor ploblistRequestor;
 
 	private IPlobRequestor plobRequestor;
-
-	private IQueueListener queueListener;
 
 	private IStateListener stateListener;
 
@@ -66,9 +56,6 @@ public final class Player {
 
 		state = new State();
 		plob = new Plob();
-
-		playlist = new PlobList();
-		queue = new PlobList();
 
 		plobRequestor = null;
 		ploblistRequestor = null;
@@ -193,26 +180,7 @@ public final class Player {
 			}
 
 			break;
-		case Message.ID_SYN_PLAYLIST:
-
-			Serial.in(playlist, m.bytes);
-
-			if (playlistListener != null) {
-				playlistListener.playlistChanged();
-			}
-
-			break;
-
-		case Message.ID_SYN_QUEUE:
-
-			Serial.in(queue, m.bytes);
-
-			if (queueListener != null) {
-				queueListener.queueChanged();
-			}
-
-			break;
-
+			
 		case Message.ID_SYN_STATE:
 
 			Serial.in(state, m.bytes);
@@ -272,22 +240,6 @@ public final class Player {
 	public void registerCurrentPlobListener(IPlobListener cpl) {
 
 		plobListener = cpl;
-	}
-
-	/**
-	 * Registers <code>pll</code> to get notified when the playlist has changed.
-	 */
-	public void registerPlaylistListener(IPlaylistListener pll) {
-
-		playlistListener = pll;
-	}
-
-	/**
-	 * Registers <code>ql</code> to get notified when the queue has changed.
-	 */
-	public void registerQueueListener(IQueueListener ql) {
-
-		queueListener = ql;
 	}
 
 	/**
