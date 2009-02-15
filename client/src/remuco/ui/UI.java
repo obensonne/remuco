@@ -254,6 +254,8 @@ public final class UI implements CommandListener, IConnectionListener,
 		if (type.equals(Config.DEVICE_TYPE_BLUETOOTH)) {
 
 			if (serviceFinderBluetooth == null) {
+				// this may happen in emulator, when switching on/off bluetooth
+				// support between two runs
 				Log.bug("Feb 3, 2009.12:54:53 AM");
 				return;
 			}
