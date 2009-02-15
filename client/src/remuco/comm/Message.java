@@ -16,12 +16,8 @@ public final class Message {
 	public static final int ID_IFS_PINFO = 2;
 	public static final int ID_SYN_STATE = 3;
 	public static final int ID_SYN_PLOB = 4;
-	/** CAP = currently active plob */
-	public static final int ID_SYN_PLAYLIST = 5;
-	public static final int ID_SYN_QUEUE = 6;
 	public static final int ID_IFS_SRVDOWN = 7;
 	public static final int ID_IFC_CINFO = 8;
-	public static final int ID_SEL_PLAYER = 9;
 	public static final int ID_CTL = 10;
 	public static final int ID_REQ_PLOB = 11;
 	public static final int ID_REQ_PLOBLIST = 12;
