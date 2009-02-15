@@ -8,15 +8,14 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
 import remuco.Config;
 import remuco.UserException;
 import remuco.comm.BluetoothFactory;
-import remuco.comm.IScanListener;
 import remuco.comm.IDeviceSelectionListener;
+import remuco.comm.IScanListener;
 import remuco.comm.IScanner;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
@@ -306,15 +305,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		if (devices.length == 0) {
 			if (BluetoothFactory.BLUETOOTH) {
-				final UserException ue = new UserException("a", "b");
-				final Alert alert = new Alert(ue.getError(), ue.getDetails(),
-						Theme.ALERT_ICON_WIFI, AlertType.INFO);
-				alert.setTimeout(Alert.FOREVER);
-				final Gauge g = new Gauge(null, false, Gauge.INDEFINITE,
-						Gauge.CONTINUOUS_RUNNING);
-				// g.setLayout(Gauge.LAYOUT_DEFAULT);
-				alert.setIndicator(g);
-				display.setCurrent(alert, screenDeviceTypeSelection);
+				display.setCurrent(screenDeviceTypeSelection);
 			} else {
 				final Alert alert = new Alert("No Bluetooth",
 						"Bluetooth is not available. "
