@@ -43,8 +43,6 @@ public final class Plob implements ISerializable {
 
 	public static final String META_GENRE = "genre";
 
-	public static final String META_ID = "__id__";
-
 	public static final String META_LENGTH = "length";
 
 	public static final String META_TAGS = "tags";
@@ -60,8 +58,6 @@ public final class Plob implements ISerializable {
 	public static final int TYPE_OTHER = 3;
 
 	public static final int TYPE_VIDEO = 2;
-
-	// META_ART = "__art__" is not needed by the client;
 
 	private static final String META_RATING = "rating";
 
@@ -79,44 +75,48 @@ public final class Plob implements ISerializable {
 
 	private final Hashtable meta;
 
+	private String id = ID_NONE;
+
 	/**
 	 * Create a new plob with ID {@link #ID_NONE} and title
 	 * {@link #META_TITLE_VALUE_NONE}.
 	 * <p>
 	 * Whenever this plob gets updated as a result of deserialization (see
-	 * {@link #atomsHasBeenUpdated()}) and there are no meta tags after
-	 * deserialization, ID and title get set to the values above again.
+	 * {@link #atomsHasBeenUpdated()}), ID and title get set to the values above
+	 * fi they are missing in the deserialized data.
 	 */
 	public Plob() {
 
-		atoms = new SerialAtom[2];
-		atoms[0] = new SerialAtom(SerialAtom.TYPE_AS);
-		atoms[1] = new SerialAtom(SerialAtom.TYPE_AY);
+		atoms = new SerialAtom[3];
+		atoms[0] = new SerialAtom(SerialAtom.TYPE_S);
+		atoms[1] = new SerialAtom(SerialAtom.TYPE_AS);
+		atoms[2] = new SerialAtom(SerialAtom.TYPE_AY);
 
 		meta = new Hashtable(10);
 
-		setMeta(META_ID, ID_NONE);
 		setMeta(META_TITLE, META_TITLE_VALUE_NONE);
 	}
 
 	public void atomsHasBeenUpdated() {
 
-		final int meta_num = atoms[0].as.length / 2;
+		id = atoms[0].s;
+
+		final int meta_num = atoms[1].as.length / 2;
 
 		meta.clear();
 		for (int i = 0; i < meta_num; i++) {
 
-			meta.put(atoms[0].as[2 * i], atoms[0].as[2 * i + 1]);
+			meta.put(atoms[1].as[2 * i], atoms[1].as[2 * i + 1]);
 
 		}
 		if (meta_num == 0) {
-			setMeta(META_ID, ID_NONE);
+			id = ID_NONE;
 			setMeta(META_TITLE, META_TITLE_VALUE_NONE);
 		}
 
-		if (atoms[1].ay.length > 0)
+		if (atoms[2].ay.length > 0)
 			try {
-				img = Image.createImage(atoms[1].ay, 0, atoms[1].ay.length);
+				img = Image.createImage(atoms[2].ay, 0, atoms[2].ay.length);
 			} catch (Exception e) {
 				Log.ln("[PLOB] creating image failed", e);
 				img = null;
@@ -135,8 +135,6 @@ public final class Plob implements ISerializable {
 	 * @return the ID or {@link #ID_ANY} if ID is missing
 	 */
 	public String getId() {
-
-		final String id = getMeta(META_ID);
 
 		return id != null ? id : ID_ANY;
 	}
