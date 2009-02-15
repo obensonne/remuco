@@ -37,7 +37,7 @@ public final class SliderScreeny extends Screeny {
 
 		int w, h;
 
-		if (!player.isVolumeKnown()) {
+		if (!player.supportsVolumeStatus()) {
 			setImage(INVISIBLE);
 			return;
 		}

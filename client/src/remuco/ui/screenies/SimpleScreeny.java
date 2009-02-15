@@ -141,7 +141,7 @@ public final class SimpleScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		if (type == TYPE_PLAYBACK && !player.isPlaybackKnown()) {
+		if (type == TYPE_PLAYBACK && !player.supportsPlaybackStatus()) {
 			setImage(INVISIBLE);
 			return;
 		}
