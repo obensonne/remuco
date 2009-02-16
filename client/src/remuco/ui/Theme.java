@@ -42,7 +42,7 @@ public final class Theme {
 
 	/** Alert icon */
 	public static final Image ALERT_ICON_BLUETOOTH, ALERT_ICON_WIFI,
-			ALERT_ICON_CONNECTING;
+			ALERT_ICON_CONNECTING, ALERT_ICON_REFRESH;
 
 	/** List icon */
 	public static Image LIST_ICON_BLUETOOTH, LIST_ICON_WIFI, LIST_ICON_PLOB,
@@ -106,6 +106,7 @@ public final class Theme {
 		ALERT_ICON_BLUETOOTH = loadImage("/bluetooth_48.png", 48);
 		ALERT_ICON_WIFI = loadImage("/wifi_48.png", 48);
 		ALERT_ICON_CONNECTING = loadImage("/connecting_48.png", 48);
+		ALERT_ICON_REFRESH = loadImage("/refresh_48.png", 48);
 
 		// //// create fall back image for missing theme images //////
 
