@@ -65,92 +65,51 @@ class PlayerState(serial.Serializable):
     def set_queue(self, queue):
         self.__queue = queue
     
-class Playlist(serial.Serializable):
+class Library(serial.Serializable):
     
+    PATH_QUEUE = ["__QUEUE__"];
+    PATH_PLAYLIST = ["__PLAYLIST__"];
     MAX_LEN = 100
     
     def __eq__(self, other):
         
         if other is None: return False
         
-        if not isinstance(other, Playlist): return False
+        if not isinstance(other, Library): return False
         
         try:
-            if other.__id != self.__id: return False
-            if other.__nested_ids != self.__nested_ids: return False
-            if other.__nested_names != self.__nested_names: return False
-            if other.__ids != self.__ids: return False
-            if other.__names != self.__names: return False
+            if other.__path != self.__path: return False
+            if other.__nested != self.__nested: return False
+            if other.__plob_ids != self.__plob_ids: return False
+            if other.__plob_names != self.__plob_names: return False
         except AttributeError:
             return False
         
         return True
 
-    def __init__(self, id, nested_ids, nested_names, ids, names):
+    def __init__(self, path, nested, plob_ids, plob_names):
         
-        self.__id = id
-        self.__nested_ids = nested_ids
-        self.__nested_names = nested_names
-        self.__ids = ids
-        self.__names = names
+        self.__path = path
+        self.__nested = nested
+        self.__plob_ids = plob_ids
+        self.__plob_names = plob_names
         
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AS,
-                serial.TYPE_AS, serial.TYPE_AS)
+        return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS)
         
     def get_data(self):
-        ml = Playlist.MAX_LEN
-        return (self.__id, self.__nested_ids[:ml], self.__nested_names[:ml],
-                self.__ids[:ml], self.__names[:ml])
+        ml = Library.MAX_LEN
+        return (self.__path, self.__nested[:ml], self.__plob_ids[:ml],
+                self.__plob_names[:ml])
         
     def set_data(self, data):
-        self.__id, self.__nested_ids, self.__nested_names, \
-                self.__ids, self.__names = data
+        self.__path, self.__nested, self.__plob_ids, self.__plob_names = data
 
-class SimplePlaylist(serial.Serializable):
-    
-    MAX_LEN = 100
-
-    def __init__(self):
-        
-        self.__ids = []
-        self.__names = []
-        
-    def __eq__(self, other):
-        
-        if other is None: return False
-        
-        if not isinstance(other, SimplePlaylist): return False
-        
-        try:
-            if other.__ids != self.__ids: return False
-            if other.__names != self.__names: return False
-        except AttributeError:
-            return False
-        
-        return True
-
-    def get_fmt(self):
-        return (serial.TYPE_AS, serial.TYPE_AS)
-        
-    def get_data(self):
-        ml = SimplePlaylist.MAX_LEN
-        return (self.__ids[:ml], self.__names[:ml])
-        
-    def set_data(self, data):
-        self.__ids, self.__names = data
-
-    def set_ids(self, ids):
-        self.__ids = ids
-        
-    def set_names(self, names):        
-        self.__names = names
-        
 class Plob(serial.Serializable):
     
     def __init__(self):
         
-        self.__id = None
+        self.__path = None
         self.__info = None
         self.__img_data = None
         
@@ -161,7 +120,7 @@ class Plob(serial.Serializable):
         if not isinstance(other, Plob): return False
         
         try:
-            if other.__id != self.__id: return False
+            if other.__id != self.__path: return False
             #if other.__img != self.__img: return False
             if other.__info != self.__info: return False
         except AttributeError:
@@ -173,13 +132,13 @@ class Plob(serial.Serializable):
         return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AY)
         
     def get_data(self):
-        return (self.__id, self.__info, self.__img_data)
+        return (self.__path, self.__info, self.__img_data)
         
     def set_data(self, data):
-        self.__id, self.__info, self.__img_data = data
+        self.__path, self.__info, self.__img_data = data
     
     def set_id(self, id):
-        self.__id = id
+        self.__path = id
     
     def set_img(self, img):
         
@@ -295,6 +254,15 @@ class SerialString(serial.Serializable):
         return self.__s
     
 class PlayerInfo(serial.Serializable):
+    
+    FEATURE_PLAYLIST = 1 << 0
+    FEATURE_QUEUE = 1 << 1
+    FEATURE_LIBRARY = 1 << 2
+    FEATURE_TAGS = 1 << 3
+    FEATURE_PLOBINFO = 1 << 4
+    FEATURE_JUMP_PLAYLIST = 1 << 5
+    FEATURE_JUMP_QUEUE = 1 << 6
+    FEATURE_LOAD_PLAYLIST = 1 << 7
     
     def __init__(self, name, flags, rating_max):
         

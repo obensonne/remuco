@@ -34,7 +34,7 @@ import config
 import serial
 import net
 
-from data import PlayerState, Playlist, Control, SimplePlaylist, Plob, \
+from data import PlayerState, Library, Control, Plob, \
                  SerialString, PlayerInfo
 
 #===============================================================================
@@ -63,15 +63,13 @@ INFO_TYPE_AUDIO = 1
 INFO_TYPE_VIDEO = 2
 INFO_TYPE_OTHER = 3
 
-PLID_PLAYLIST = "__PLAYLIST__";
-PLID_QUEUE = "__QUEUE__";
 
 #===============================================================================
 # player class
 #===============================================================================
 
 class Player:
-
+    
     """ Class for Remuco player adapters to derive from. 
     
     Player is a class any media player adapter is supposed to derive from.
@@ -83,20 +81,19 @@ class Player:
     
     * update_play_position()
     * update_playback()
-    * update_playlist()
-    * update_queue()
-    * update_queue_mode()
     * update_repeat_mode()
     * update_shuffle_mode()
     * update_plob()
     
     * reply_plob_request()
-    * reply_list_request()
+    * reply_playlist_request()
+    * reply_queue_request()
+    * reply_library_request()
     
     The term PLOB means playable object and simply refers to a song, a video
     or whatever you can imagine as a playable object. 
 
-    The following methods should be overwritten by sub classes to implement
+    The following methods may be overwritten by sub classes to implement
     media player specific behavior:
     
     * get_rating_max()
@@ -114,10 +111,15 @@ class Player:
     
     * request_plob()
     * request_playlist()
+    * request_queue()
+    * request_library()
     
     Not all methods must be overwritten. Some even do not make sense for
     certain players, e.g. get_rating_max() only should be overwritten if the
-    media player supports rating.
+    media player supports rating. Do not overwrite methods you finally do not
+    implement because Remuco checks which methods has been overwritten and uses
+    this information to notify Remuco clients about capabilities of player
+    adapters.
     
     If a player adapter needs a cache directory, it can get one via
     get_cache_dir(). If a player adapter wants to integrate log information
@@ -141,14 +143,6 @@ class Player:
         
         self.__name = name
         
-        self.__clients = []
-        
-        self.__state = PlayerState()
-        self.__plob = Plob()
-        self.__playlist = SimplePlaylist()
-        self.__queue = SimplePlaylist()
-        self.__player_info = PlayerInfo(name, 0, self.get_rating_max())
-        
         self.__config = config.Config(self.__name)
 
         log.set_file(self.__config.get_log_file())
@@ -158,15 +152,21 @@ class Player:
         
         serial.Bin.HOST_ENCODING = self.__config.get_encoding()
         
+        self.__clients = []
+        
+        self.__state = PlayerState()
+        self.__plob = Plob()
+        self.__info = PlayerInfo(name, self.__get_flags(), self.get_rating_max())
+        
         if self.__config.get_bluetooth():
             self.__server_bluetooth = net.BluetoothServer(self.__clients,
-                    self.__player_info, self.__handle_message_from_client)
+                    self.__info, self.__handle_message_from_client)
         else:
             self.__server_bluetooth = None
 
         if self.__config.get_wifi():
             self.__server_wifi = net.WifiServer(self.__clients,
-                    self.__player_info, self.__handle_message_from_client)        
+                    self.__info, self.__handle_message_from_client)        
         else:
             self.__server_wifi = None
             
@@ -221,23 +221,39 @@ class Player:
         """
         return 0
     
-    def jump_to(self, playlist, position):
-        """ Jump to a specific position in a specific playlist.
+    def jump_in_playlist(self, position):
+        """ Jump to a specific position in the currently active playlist.
         
-        For some players it is better to say 'load a specific playlist and then
-        jump to a specific position'.
+        @param postion: the position (starting form 0) 
         
-        @param playlist: ID of the playlist to jump into (string)
-        @param position: position within the playlist to jump to (int)
-        
-        @note: playlist may be one of the well known IDs PLID_PLAYLIST and
-               PLID_QUEUE - this means a jump within the current playlist or
-               queue.
-
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        log.warning("jump_to() not yet implemented")
+        log.warning("jump_in_playlist() not yet implemented")
+        
+    def jump_in_queue(self, position):
+        """ Jump to a specific position in the queue.
+        
+        @param postion: the position (starting form 0) 
+        
+        @note: This method should be overwritten by sub classes of Player. It
+               gets called if a remote client wants to control the player.
+        """
+        log.warning("jump_in_queue() not yet implemented")
+    
+    def load_playlist(self, path):
+        """ Load a playlist.
+        
+        For some players this means 'switch to another playlist', for others
+        it means 'put the content of another playlist into the active playlist'.
+        
+        @param path: the path of the playlist to load (path is a library
+                     level as described in request_library() ) 
+        
+        @note: This method should be overwritten by sub classes of Player. It
+               gets called if a remote client wants to control the player.
+        """
+        log.warning("load_playlist() not yet implemented")
     
     def play_next(self):
         """ Play the next item. 
@@ -329,54 +345,99 @@ class Player:
         """
         log.warning("set_volume() not yet implemented")
         
-    def request_plob(self, id, client):
-        """ Request information about a specific PLOB. 
+    def request_playlist(self, client):
+        """ Request the content of the currently active playlist. 
         
-        @param id: ID of the requested PLOB (string)
-        @param client: the requesting client - use reply_plob_request()
-                       to send back the requested PLOB
+        @param client: the requesting client (needed for reply)
         
         @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client request a PLOB from the player.
-               
-        @see reply_plob_request()
+               gets called if a remote client requests a PLOB from the player.
+
+        @see: reply_playlist_request() for sending back the result
+        """
+        log.warning("request_playlist() not yet implemented")
+
+    def request_queue(self, client):
+        """ Request the content of the play queue. 
+        
+        @param client: the requesting client (needed for reply)
+        
+        @note: This method should be overwritten by sub classes of Player. It
+               gets called if a remote client requests a PLOB from the player.
+
+        @see: reply_queue_request() for sending back the result
+        """
+        log.warning("request_queue() not yet implemented")
+
+    def request_plob(self, client, id):
+        """ Request information about a specific PLOB. 
+        
+        @param client: the requesting client (needed for reply)
+        @param id: ID of the requested PLOB (string)
+        
+        @note: This method should be overwritten by sub classes of Player. It
+               gets called if a remote client requests a PLOB from the player.
+
+        @see: reply_plob_request() for sending back the result
         """
         log.warning("request_plob() not yet implemented")
         
-    def request_playlist(self, id, client):
-        """ Request contents of a specific playlist from the player's library.
+    def request_library(self, client, path):
+        """ Request contents of a specific level from the player's library.
         
-        @param id: ID of the requested playlist (string)
-        @param client: the requesting client - use reply_list_request()
-                       to send back the requested playlist
+        @param client: the requesting client (needed for reply)
+        @param path: path of the requested level (string list)
         
-        @note: The meaning of playlist here is something different than in
-               update_playlist(). The latter one means the currently active
-               playlist while this one means a playlist from the player's media
-               library.
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client request a playlist from the player.
+        @note: path is a list of strings which describes a specific level in the
+               player's playlist tree. If path is an empty list, the
+               root of the player's library, i.e. all top level playlists are
+               requested.
+
+               A player may have a library structure like this:
+
+               |- Radio
+               |- Genres
+                  |- Jazz
+                  |- ...
+               |- Dynamic
+                  |- Never played
+                  |- Played recently
+                  |- ...
+               |- Playlists
+                  |- Party
+                     |- Sue's b-day
+                     |- ...
+               |- ...
+
+               Here possibles values for path are [ "Radio" ] or
+               [ "Playlists", "Party", "Sue's b-day" ] or ...
                
-        @see reply_list_request()
+        @note: This method should be overwritten by sub classes of Player. It
+               gets called if a remote client requests a playlist from the
+               player.
+               
+        @see: reply_list_request() for sending back the result
         """
-        log.warning("request_playlist() not yet implemented")
+        log.warning("request_library() not yet implemented")
         
     #==========================================================================
     # player side synchronization
     #==========================================================================    
 
-    def update_play_position(self, position):
-        """Set the position of the current PLOB on the current playlist/queue. 
+    def update_play_position(self, position, queue=False):
+        """Set the position of the current PLOB. 
         
         This method is intended to be called by player adapters to sync player
         state with remote clients.
         
-        @param position: starting from zero
+        @param position: position of the currently player item (starting from 0)
+        @keyword queue: True if currently played item is from the queue, False
+                        if it is from the currently active playlist (default)
         
         @attention: Do not overwrite!
         """
         
+        self.__state.set_queue(mode)
         self.__state.set_position(position)
         self.__trigger_sync(self.__sync_state)
         
@@ -392,52 +453,6 @@ class Player:
         """
         
         self.__state.set_playback(playback)
-        self.__trigger_sync(self.__sync_state)
-    
-    def update_playlist(self, ids, names):
-        """Set current playlist. 
-        
-        This method is intended to be called by player adapters to sync player
-        state with remote clients.
-        
-        @param ids: list of the PLOB IDs (IDs must be strings)
-        @param names: list of the PLOB names (e.g. 'ARTIST - TITLE')
-        
-        @attention: Do not overwrite!
-        """
-        
-        self.__playlist.set_ids(ids)
-        self.__playlist.set_names(names)
-        self.__trigger_sync(self.__sync_playlist)
-    
-    def update_queue(self, ids, names):
-        """Set current queue. 
-        
-        This method is intended to be called by player adapters to sync player
-        state with remote clients.
-        
-        @param ids: list of the PLOB IDs (IDs must be strings)
-        @param names: list of the PLOB names (e.g. 'ARTIST - TITLE')
-        
-        @attention: Do not overwrite!
-        """
-        
-        self.__queue.set_ids(ids)
-        self.__queue.set_names(names)        
-        self.__trigger_sync(self.__sync_queue)
-    
-    def update_queue_mode(self, mode):
-        """Set the current queue mode 
-        
-        This method is intended to be called by player adapters to sync player
-        state with remote clients.
-        
-        @param mode: true means playing from queue, false means playlist
-
-        @attention: Do not overwrite!
-        """
-        
-        self.__state.set_queue(mode)
         self.__trigger_sync(self.__sync_state)
     
     def update_repeat_mode(self, repeat):
@@ -504,22 +519,53 @@ class Player:
         self.__state.set_volume(volume)
         self.__trigger_sync(self.__sync_state)
     
-    def reply_list_request(self, client, id, nested_ids, nested_names, ids, names):
-        """Send a reply to a playlist request back to the client.
+    def reply_playlist_request(self, client, plob_ids, plob_names):
+        """Send the reply to a playlist request back to the client.
         
         @param client: the client to reply to
-        @param id: ID of the requested playlist
-        @param nested_ids: IDs of the playlists nested within the requested playlist
-        @param nested_names: names of playlists nested within the requested playlist
-        @param ids: IDs of the PLOBs contained in the requested playlist
-        @param names: names of the PLOBs contained in the requested playlist
+        @param plob_ids: IDs of the PLOBs contained in the playlist
+        @param plob_names: names of the PLOBs contained in the playlist
         
         @see: request_playlist()        
         """ 
         
-        playlist = Playlist(id, nested_ids, nested_names, ids, names)
+        playlist = Library(Library.PATH_PLAYLIST, [], plob_ids, plob_names)
         
-        msg = net.build_message(message.MSG_ID_REQ_PLOBLIST, playlist)
+        msg = net.build_message(message.MSG_ID_REQ_LIBRARY, playlist)
+        
+        client.send(msg)
+    
+    def reply_queue_request(self, client, plob_ids, plob_names):
+        """Send the reply to a queue request back to the client.
+        
+        @param client: the client to reply to
+        @param plob_ids: IDs of the PLOBs contained in the queue
+        @param plob_names: names of the PLOBs contained in the queue
+        
+        @see: request_queue()        
+        """ 
+        
+        queue = Library(Library.PATH_QUEUE, [], plob_ids, plob_names)
+        
+        msg = net.build_message(message.MSG_ID_REQ_LIBRARY, queue)
+        
+        client.send(msg)
+    
+    def reply_library_request(self, client, path, nested, plob_ids, plob_names):
+        """Send the reply to a library request back to the client.
+        
+        @param client: the client to reply to
+        @param path: path of the requested library level (string list)
+        @param nested: nested playlists (string list)
+        @param plob_ids: IDs of the PLOBs contained in the requested library level
+        @param plob_names: names of the PLOBs contained in the requested library level
+        
+        @see: request_library()
+        """ 
+        
+        library = Library(path, nested, plob_ids, plob_names)
+        
+        msg = net.build_message(message.MSG_ID_REQ_LIBRARY, library)
         
         client.send(msg)
     
@@ -606,22 +652,6 @@ class Player:
         
         return False
     
-    def __sync_playlist(self):
-
-        msg = net.build_message(message.MSG_ID_SYN_PLAYLIST, self.__playlist)
-        
-        self.__sync(msg, self.__sync_playlist)
-        
-        return False
-    
-    def __sync_queue(self):
-
-        msg = net.build_message(message.MSG_ID_SYN_QUEUE, self.__queue)
-        
-        self.__sync(msg, self.__sync_queue)
-        
-        return False
-    
     def __sync_plob(self):
 
         msg = net.build_message(message.MSG_ID_SYN_PLOB, self.__plob)
@@ -654,9 +684,9 @@ class Player:
             
             self.__handle_message_request_plob(bindata, client)
             
-        elif id == message.MSG_ID_REQ_PLOBLIST:
+        elif id == message.MSG_ID_REQ_LIBRARY:
             
-            self.__handle_message_request_playlist(bindata, client)
+            self.__handle_message_request_list(bindata, client)
             
         else:
             log.warning("unsupported message id: %d" % id)
@@ -671,6 +701,8 @@ class Player:
         cmd = control.get_cmd()
         param_i = control.get_param_i()
         param_s = control.get_param_s()
+        if param_s is None:
+            param_s = ""
         
         if cmd == command.CMD_IGNORE:
             return
@@ -683,7 +715,7 @@ class Player:
         elif cmd == command.CMD_PREV:
             self.play_previous()
         elif cmd == command.CMD_JUMP:
-            self.jump_to(param_s, param_i)
+            self.__handle_message_control_jump(param_s.split("/"), param_i)
         elif cmd == command.CMD_RATE:
             self.rate_current(param_i)
         elif cmd == command.CMD_REPEAT:
@@ -700,6 +732,16 @@ class Player:
             self.seek_backward()
         elif cmd == command.CMD_SHUTDOWN:
             self.__shutdown_system()
+            
+    def __handle_message_control_jump(self, path, position):
+        
+        if path == Library.PATH_PLAYLIST:
+            self.jump_in_playlist(position)
+        elif path == Library.PATH_QUEUE:
+            self.jump_in_queue(position)
+        else:
+            self.load_playlist(path)
+            self.jump_in_playlist(position)
 
     def __handle_message_request_plob(self, bindata, client):
     
@@ -710,14 +752,21 @@ class Player:
         
         self.request_plob(ss.get(), client)
         
-    def __handle_message_request_playlist(self, bindata, client):
+    def __handle_message_request_list(self, bindata, client):
 
         ss = SerialString()
         
         ok = serial.unpack(ss, bindata)
         if not ok: return
         
-        self.request_playlist(ss.get(), client)
+        path = ss.get().split("/")
+        
+        if path == Library.PATH_PLAYLIST:
+            self.request_playlist(client)
+        elif path == Library.PATH_QUEUE:
+            self.request_queue(client)
+        else:
+            self.request_library(client, path)
             
     #==========================================================================
     # miscellaneous 
@@ -760,4 +809,34 @@ class Player:
                 return
             self.down()
 
-    
+    def __get_flags(self):
+        """ Check player adapter capabilities.
+        
+        Capabilities are detected by testing which methods have been overwritten
+        by the subclassing player adapter.
+        """ 
+        
+        flags = 0
+        
+        me = str(self.__get_flags.__module__)
+        
+        if str(self.request_playlist.__module__) != me:
+             flags |= PlayerInfo.FEATURE_PLAYLIST
+        if str(self.request_queue.__module__) != me:
+             flags |= PlayerInfo.FEATURE_QUEUE
+        if str(self.request_library.__module__) != me:
+             flags |= PlayerInfo.FEATURE_LIBRARY
+        if str(self.request_plob.__module__) != me:
+             flags |= PlayerInfo.FEATURE_PLOBINFO
+        if str(self.set_tags.__module__) != me:
+             flags |= PlayerInfo.FEATURE_TAGS
+        if str(self.jump_in_playlist.__module__) != me:
+             flags |= PlayerInfo.FEATURE_JUMP_PLAYLIST
+        if str(self.jump_in_queue.__module__) != me:
+             flags |= PlayerInfo.FEATURE_JUMP_QUEUE
+        if str(self.load_playlist.__module__) != me:
+             flags |= PlayerInfo.FEATURE_LOAD_PLAYLIST
+             
+        log.debug("features: %X" % flags)
+        
+        return flags
