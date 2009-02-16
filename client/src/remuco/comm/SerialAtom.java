@@ -70,7 +70,7 @@ public class SerialAtom {
 			break;
 		default:
 			
-			Log.asssertNotReached(this);
+			Log.bug("Feb 5, 2009.11:04:32 PM");
 			
 			break;
 		}
