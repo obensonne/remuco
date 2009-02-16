@@ -10,6 +10,14 @@ wtk.home=${user.home}/opt/java/wtk-2.5.2
 # Download: http://www.microemu.org/
 microemu.jar=${user.home}/opt/microemulator-2.0.3/microemulator.jar
 
+# MicroEmu can use BlueCove for bluetooth facilities (optional).
+# Download: http://bluecove.org/
+microemu.bluecove.jar=${user.home}/opt/java/bluecove/bluecove-2.1.0.jar
+
+# When using BlueCove, you need this on systems with a BlueZ stack.
+# Download: http://bluecove.org/
+microemu.bluecove-gpl.jar=${user.home}/opt/java/bluecove/bluecove-gpl-2.1.0.jar
+
 # If you use ProGuard for preverification, set its JAR file here.
 # Download: http://proguard.sourceforge.net/
 proguard.jar=${user.home}/opt/java/proguard4.2/lib/proguard.jar

@@ -273,7 +273,7 @@
 	<!-- =================== Dist ========================================= -->
 
 	<target name="dist.optimized" depends="setmode.dist.optimized,jad" />
-	
+
 	<target name="dist.chary" depends="setmode.dist.chary,jad" />
 
 	<target name="dist"
@@ -350,12 +350,16 @@
 			<arg value="-Xdevice:${run.emulator.wtk.device}" />
 			<arg value="-Xdescriptor:${midlet.jad}" />
 		</exec>
-		<antcall target="clean" />
 	</target>
 
 	<target name="run.microemu">
-		<java fork="yes" jar="${microemu.jar}">
+		<java fork="yes" classname="org.microemu.app.Main">
 			<arg value="build/jar/${midlet.jad}" />
+			<classpath>
+				<pathelement location="${microemu.jar}" />
+				<pathelement location="${microemu.bluecove.jar}" />
+				<pathelement location="${microemu.bluecove-gpl.jar}" />
+			</classpath>
 		</java>
 	</target>
 
