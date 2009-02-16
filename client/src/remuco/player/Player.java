@@ -122,11 +122,6 @@ public final class Player {
 		ctrl(Control.CMD_SHUTDOWN, 0, null);
 	}
 
-	public void ctrlStop() {
-
-		ctrl(Control.CMD_STOP, 0, null);
-	}
-
 	public void ctrlToggleRepeat() {
 
 		ctrl(Control.CMD_REPEAT, 0, null);
