@@ -15,11 +15,18 @@ public final class PlobInfoScreen extends Form {
 		super("Info");
 
 	}
+	
+	public void setPlob(String plob) {
+		
+		deleteAll();
+		this.append(plob);
+		
+	}
 
 	public void setPlob(Plob plob) {
 
 		final String lb = "\n";
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 
 		deleteAll();
 

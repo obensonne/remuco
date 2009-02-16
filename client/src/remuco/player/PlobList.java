@@ -12,11 +12,35 @@ import remuco.util.Log;
  */
 public final class PlobList implements ISerializable {
 
-	protected static final String PATH_PLAYLIST[] = new String[] { "__PLAYLIST__" };
+	/** Well known path for the currently active playlist. */
+	public static final String PATH_PLAYLIST[] = new String[] { "__PLAYLIST__" };
 
-	protected static final String PATH_QUEUE[] = new String[] { "__QUEUE__" };
+	/** Well known path for the currently active playlist as string. */
+	public static final String PATH_PLAYLIST_S = PATH_PLAYLIST[0];
+
+	/** Well known path for the queue. */
+	public static final String PATH_QUEUE[] = new String[] { "__QUEUE__" };
+
+	/** Well known path for the queue as string. */
+	public static final String PATH_QUEUE_S = PATH_QUEUE[0];
 
 	private static final String UNKNWON = "#~@X+.YO?/";
+
+	private static String pathArrayToString(String path[]) {
+
+		if (path == null || path.length == 0) {
+			return "";
+		}
+
+		final StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < path.length; i++) {
+			sb.append(path[i]).append('/');
+		}
+		sb.deleteCharAt(sb.length() - 1);
+
+		return sb.toString();
+	}
 
 	private final SerialAtom[] atoms;
 
@@ -49,9 +73,21 @@ public final class PlobList implements ISerializable {
 		return atoms;
 	}
 
+	/**
+	 * Get the name of the ploblist (which is the last element in the list's
+	 * path).
+	 * 
+	 * @return the name
+	 */
 	public String getName() {
-		if (path == null || path.length == 0) {
+		if (isLibraryRoot()) {
 			return "Library";
+		}
+		if (isPlaylist()) {
+			return "Playlist";
+		}
+		if (isQueue()) {
+			return "Queue";
 		}
 		return path[path.length - 1];
 	}
@@ -78,23 +114,44 @@ public final class PlobList implements ISerializable {
 		return plobIds != null ? plobIds.length : 0;
 	}
 
+	/**
+	 * Get the ploblist's parent list path as a slash separated list.
+	 * 
+	 * @return the parent path or <code>null</code> if this ploblist is the
+	 *         playlist, queue or library root
+	 */
+	public String getParentPath() {
+
+		if (isPlaylist() || isQueue() || isLibraryRoot()) {
+			return null;
+		}
+
+		final String parent[] = new String[path.length - 1];
+
+		for (int i = 0; i < parent.length; i++) {
+			parent[i] = path[i];
+		}
+
+		return pathArrayToString(parent);
+
+	}
+
 	/** Get the ploblist's path as slash separated list. */
 	public String getPath() {
 
 		if (pathStr == null) {
-
-			if (path == null || path.length == 0) {
-				pathStr = "";
-			}
-			final StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < path.length; i++) {
-				sb.append(path[i]).append('/');
-			}
-			sb.deleteCharAt(sb.length() - 1);
-			pathStr = sb.toString();
-			
+			pathStr = pathArrayToString(path);
 		}
 		return pathStr;
+	}
+
+	/**
+	 * Get the ploblist's path as a string array.
+	 * 
+	 * @return the path elements (never <code>null</code>)
+	 */
+	public String[] getPathElements() {
+		return path == null ? new String[0] : path;
 	}
 
 	public String getPathForNested(int i) {
@@ -136,6 +193,20 @@ public final class PlobList implements ISerializable {
 		}
 	}
 
+	public boolean isLibraryRoot() {
+		return path == null || path.length == 0;
+	}
+
+	public boolean isPlaylist() {
+		return path != null && path.length == 1
+				&& path[0].equals(PATH_PLAYLIST[0]);
+	}
+
+	public boolean isQueue() {
+		return path != null && path.length == 1
+				&& path[0].equals(PATH_QUEUE[0]);
+	}
+
 	public String toString() {
 
 		return "Ploblist: '" + getPath() + "'";
@@ -147,5 +218,4 @@ public final class PlobList implements ISerializable {
 		Log.bug("Feb 6, 2009.12:57:27 AM");
 
 	}
-
 }

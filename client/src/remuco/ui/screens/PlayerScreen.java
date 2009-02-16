@@ -21,6 +21,7 @@ import remuco.ui.Adjuster;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.Keys;
+import remuco.ui.MediaBrowser;
 import remuco.ui.Theme;
 import remuco.ui.screenies.PlobScreeny;
 import remuco.ui.screenies.Screeny;
@@ -46,7 +47,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 	private static final Command CMD_KEYS = new Command("Key Bindings",
 			Command.SCREEN, 2);
 
-	private static final Command CMD_LIBRARY = new Command("Library",
+	private static final Command CMD_MEDIA = new Command("Media",
 			Command.SCREEN, 1);
 
 	private static final Command CMD_OPTIONS = new Command("More",
@@ -73,13 +74,10 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 	/** Screen to configure key setup */
 	private final KeyConfigScreen screenKeyConfig;
 
-	/** Screen to show the remote player's library */
-	private final LibraryScreen screenLibrary;
+	/** Screen for browsing the remote player's media */
+	private final MediaBrowser mediaBrowser;
 
 	private final CommandList screenOptions;
-
-	/** Screen to show the playlist/queue */
-	private final PlaylistScreen screenPlaylist, screenQueue;
 
 	/** Screen to edit the meta information of a plob */
 	private final TagEditorScreen screenTagEditor;
@@ -125,7 +123,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		volumeAdjuster = new Adjuster(player, Adjuster.VOLUME);
 		progressAdjuster = new Adjuster(player, Adjuster.PROGRESS);
 
-		super.addCommand(CMD_LIBRARY);
+		super.addCommand(CMD_MEDIA);
 		super.addCommand(CMD_OPTIONS);
 		super.setCommandListener(this);
 
@@ -142,8 +140,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			screenThemeSelection.append(themes[i], Theme.LIST_ICON_THEMES);
 		}
 		screenThemeSelection.addCommand(CMD.BACK);
-		screenThemeSelection.addCommand(CMD.CMD_SELECT);
-		screenThemeSelection.setSelectCommand(CMD.CMD_SELECT);
+		screenThemeSelection.addCommand(CMD.SELECT);
+		screenThemeSelection.setSelectCommand(CMD.SELECT);
 		screenThemeSelection.setCommandListener(this);
 
 		screenyState = new StateScreeny(player.info);
@@ -152,19 +150,12 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenKeyConfig = new KeyConfigScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
 
-		screenPlaylist = new PlaylistScreen(this, display, player, false);
-		screenPlaylist.addCommand(CMD.BACK);
-
-		screenQueue = new PlaylistScreen(this, display, player, true);
-		screenQueue.addCommand(CMD.BACK);
-
-		screenLibrary = new LibraryScreen(this, display, player);
-		screenLibrary.addCommand(CMD.BACK);
-
 		screenTagEditor = new TagEditorScreen();
 		screenTagEditor.addCommand(CMD.BACK);
 		screenTagEditor.addCommand(CMD.OK);
 		screenTagEditor.setCommandListener(this);
+
+		mediaBrowser = new MediaBrowser(this, display, player);
 
 	}
 
@@ -195,9 +186,9 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	public void commandAction(Command c, Displayable d) {
 
-		if (c == CMD_LIBRARY) {
+		if (c == CMD_MEDIA) {
 
-			screenLibrary.showYourself();
+			mediaBrowser.showYourself();
 
 		} else if (c == CMD_OPTIONS) {
 
@@ -234,7 +225,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			display.setCurrent(screenKeyConfig);
 
-		} else if (c == CMD.CMD_SELECT && d == screenThemeSelection) { // THEMES
+		} else if (c == CMD.SELECT && d == screenThemeSelection) { // THEMES
 			// //
 
 			final String name = screenThemeSelection
@@ -267,23 +258,6 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			if (player.plob.getId().equals(pid)) {
 				player.plob.setTags(tags);
 			}
-
-			display.setCurrent(this);
-
-		} else if (c == CMD.BACK && (d == screenPlaylist || d == screenQueue)) { // PLAYLIST
-																					// //
-
-			display.setCurrent(this);
-
-		} else if (c == PlaylistScreen.CMD_PLAYLIST && d == screenQueue) {
-
-			display.setCurrent(screenPlaylist);
-
-		} else if (c == PlaylistScreen.CMD_QUEUE && d == screenPlaylist) {
-
-			display.setCurrent(screenQueue);
-
-		} else if (c == CMD.BACK && d == screenLibrary) { // LIBRARY //
 
 			display.setCurrent(this);
 
@@ -398,11 +372,6 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			player.ctrlVolumeMute();
 			break;
 
-		case Keys.ACTION_STOP:
-
-			player.ctrlStop();
-			break;
-
 		case Keys.ACTION_IMAGE:
 
 			if (player.plob.getImg() != null) {
@@ -412,15 +381,6 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 				repaint(screenyPlob.getX(), screenyPlob.getY(), screenyPlob
 						.getWidth(), screenyPlob.getHeight());
 			}
-
-			break;
-
-		case Keys.ACTION_PLAYLIST:
-
-			if (player.state.isPlayingFromQueue())
-				display.setCurrent(screenQueue);
-			else
-				display.setCurrent(screenPlaylist);
 
 			break;
 

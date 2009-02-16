@@ -61,6 +61,10 @@ public final class PloblistScreen extends List {
 		}
 	}
 
+	public PlobList getPloblist() {
+		return list;
+	}
+
 	public PloblistSelection getSelection() {
 
 		if (list == null) {
@@ -73,11 +77,10 @@ public final class PloblistScreen extends List {
 		if (index < 0) {
 			return null;
 		} else if (index < numNested) {
-			return new PloblistSelection(list.getPathForNested(index),
-					false);
+			return new PloblistSelection(list.getPathForNested(index), false);
 		} else if (index < numNested + list.getNumPlobs()) {
-			return new PloblistSelection(list
-					.getPlobID(index - numNested), true);
+			return new PloblistSelection(list.getPlobID(index - numNested),
+					true);
 		} else {
 			return null;
 		}

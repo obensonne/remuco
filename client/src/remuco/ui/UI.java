@@ -171,13 +171,18 @@ public final class UI implements CommandListener, IConnectionListener,
 
 	public void notifyConnected(Connection conn, PlayerInfo pinfo) {
 
+		Log.debug("got conn notification");
+		
 		synchronized (screenConnecting) {
 			if (screenConnecting.detachProperty() == null) {
 				// already canceled
+				Log.debug("canceled");
 				return;
 			}
 		}
 
+		Log.debug("ok");
+		
 		synchronized (screenPlayerLock) {
 
 			if (screenPlayer != null) {
@@ -186,12 +191,21 @@ public final class UI implements CommandListener, IConnectionListener,
 				screenPlayer = null;
 			}
 
-			screenPlayer = new PlayerScreen(display, conn, pinfo);
+			Log.debug("new player screen");
+
+			try {
+				screenPlayer = new PlayerScreen(display, conn, pinfo);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			screenPlayer.addCommand(CMD.BACK);
 			screenPlayer.addCommand(CMD.LOG);
 			screenPlayer.addCommand(CMD.EXIT);
 			screenPlayer.setCommandListener(this);
 
+			Log.debug("show player screen");
+			
 			display.setCurrent(screenPlayer);
 		}
 
