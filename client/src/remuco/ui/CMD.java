@@ -28,7 +28,7 @@ public class CMD {
 	 * "http://sourceforge.net/forum/forum.php?thread_id=1953173&forum_id=568227"
 	 * >in this forum post</a>.
 	 */
-	public static final Command CMD_SELECT = new Command("Select",
+	public static final Command SELECT = new Command("Select",
 			Command.ITEM, 1);
 	/**
 	 * A generic exit command. Every screen which wants to offer the user to
