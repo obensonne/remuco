@@ -47,7 +47,7 @@ public class CommandList extends List implements CommandListener {
 	 *            list title
 	 * @param select
 	 *            the command to use as the select command (if <code>null</code>
-	 *            then {@link CMD#CMD_SELECT} will be used)
+	 *            then {@link CMD#SELECT} will be used)
 	 */
 	public CommandList(String title, Command select) {
 
@@ -57,7 +57,7 @@ public class CommandList extends List implements CommandListener {
 		itemLabels = new Vector();
 		itemIcons = new Vector();
 
-		this.select = select == null ? CMD.CMD_SELECT : select;
+		this.select = select == null ? CMD.SELECT : select;
 
 		addCommand(this.select);
 		setSelectCommand(this.select);
