@@ -10,8 +10,6 @@ public final class Control implements ISerializable {
 
 	public static final int CMD_PLAYPAUSE = 1;
 
-	public static final int CMD_STOP = 2;
-
 	public static final int CMD_NEXT = 3;
 
 	public static final int CMD_PREV = 4;
