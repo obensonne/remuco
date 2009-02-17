@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/branches/0.8/server/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/branches/0.8/server/remuco/__init__.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
 &nbsp;<br>
 The&nbsp;module&nbsp;'remuco'&nbsp;is&nbsp;the&nbsp;interface&nbsp;between&nbsp;a&nbsp;media&nbsp;player&nbsp;and&nbsp;the&nbsp;Remuco<br>
@@ -70,24 +70,23 @@ The&nbsp;following&nbsp;methods&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;interact
 &nbsp;<br>
 *&nbsp;<a href="#Player-update_play_position">update_play_position</a>()<br>
 *&nbsp;<a href="#Player-update_playback">update_playback</a>()<br>
-*&nbsp;<a href="#Player-update_playlist">update_playlist</a>()<br>
-*&nbsp;<a href="#Player-update_queue">update_queue</a>()<br>
-*&nbsp;<a href="#Player-update_queue_mode">update_queue_mode</a>()<br>
 *&nbsp;<a href="#Player-update_repeat_mode">update_repeat_mode</a>()<br>
 *&nbsp;<a href="#Player-update_shuffle_mode">update_shuffle_mode</a>()<br>
 *&nbsp;<a href="#Player-update_plob">update_plob</a>()<br>
 &nbsp;<br>
 *&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()<br>
-*&nbsp;<a href="#Player-reply_list_request">reply_list_request</a>()<br>
+*&nbsp;<a href="#Player-reply_playlist_request">reply_playlist_request</a>()<br>
+*&nbsp;<a href="#Player-reply_queue_request">reply_queue_request</a>()<br>
+*&nbsp;<a href="#Player-reply_library_request">reply_library_request</a>()<br>
 &nbsp;<br>
 The&nbsp;term&nbsp;PLOB&nbsp;means&nbsp;playable&nbsp;object&nbsp;and&nbsp;simply&nbsp;refers&nbsp;to&nbsp;a&nbsp;song,&nbsp;a&nbsp;video<br>
 or&nbsp;whatever&nbsp;you&nbsp;can&nbsp;imagine&nbsp;as&nbsp;a&nbsp;playable&nbsp;object.&nbsp;<br>
 &nbsp;<br>
-The&nbsp;following&nbsp;methods&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;to&nbsp;implement<br>
+The&nbsp;following&nbsp;methods&nbsp;may&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;to&nbsp;implement<br>
 media&nbsp;player&nbsp;specific&nbsp;behavior:<br>
 &nbsp;<br>
 *&nbsp;<a href="#Player-get_rating_max">get_rating_max</a>()<br>
-*&nbsp;<a href="#Player-jump_to">jump_to</a>()<br>
+*&nbsp;jump_to()<br>
 *&nbsp;<a href="#Player-play_next">play_next</a>()<br>
 *&nbsp;<a href="#Player-play_previous">play_previous</a>()<br>
 *&nbsp;<a href="#Player-rate_current">rate_current</a>()<br>
@@ -101,10 +100,15 @@ media&nbsp;player&nbsp;specific&nbsp;behavior:<br>
 &nbsp;<br>
 *&nbsp;<a href="#Player-request_plob">request_plob</a>()<br>
 *&nbsp;<a href="#Player-request_playlist">request_playlist</a>()<br>
+*&nbsp;<a href="#Player-request_queue">request_queue</a>()<br>
+*&nbsp;<a href="#Player-request_library">request_library</a>()<br>
 &nbsp;<br>
 Not&nbsp;all&nbsp;methods&nbsp;must&nbsp;be&nbsp;overwritten.&nbsp;Some&nbsp;even&nbsp;do&nbsp;not&nbsp;make&nbsp;sense&nbsp;for<br>
 certain&nbsp;players,&nbsp;e.g.&nbsp;<a href="#Player-get_rating_max">get_rating_max</a>()&nbsp;only&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;if&nbsp;the<br>
-media&nbsp;player&nbsp;supports&nbsp;rating.<br>
+media&nbsp;player&nbsp;supports&nbsp;rating.&nbsp;Do&nbsp;not&nbsp;overwrite&nbsp;methods&nbsp;you&nbsp;finally&nbsp;do&nbsp;not<br>
+implement&nbsp;because&nbsp;Remuco&nbsp;checks&nbsp;which&nbsp;methods&nbsp;has&nbsp;been&nbsp;overwritten&nbsp;and&nbsp;uses<br>
+this&nbsp;information&nbsp;to&nbsp;notify&nbsp;Remuco&nbsp;clients&nbsp;about&nbsp;capabilities&nbsp;of&nbsp;player<br>
+adapters.<br>
 &nbsp;<br>
 If&nbsp;a&nbsp;player&nbsp;adapter&nbsp;needs&nbsp;a&nbsp;cache&nbsp;directory,&nbsp;it&nbsp;can&nbsp;get&nbsp;one&nbsp;via<br>
 <a href="#Player-get_cache_dir">get_cache_dir</a>().&nbsp;If&nbsp;a&nbsp;player&nbsp;adapter&nbsp;wants&nbsp;to&nbsp;integrate&nbsp;log&nbsp;information<br>
@@ -171,17 +175,27 @@ Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;
 @note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;if&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;player&nbsp;supports&nbsp;rating.</tt></dd></dl>
 
-<dl><dt><a name="Player-jump_to"><strong>jump_to</strong></a>(self, playlist, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;a&nbsp;specific&nbsp;playlist.<br>
+<dl><dt><a name="Player-jump_in_playlist"><strong>jump_in_playlist</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
 &nbsp;<br>
-For&nbsp;some&nbsp;players&nbsp;it&nbsp;is&nbsp;better&nbsp;to&nbsp;say&nbsp;'load&nbsp;a&nbsp;specific&nbsp;playlist&nbsp;and&nbsp;then<br>
-jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position'.<br>
+@param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
 &nbsp;<br>
-@param&nbsp;playlist:&nbsp;ID&nbsp;of&nbsp;the&nbsp;playlist&nbsp;to&nbsp;jump&nbsp;into&nbsp;(string)<br>
-@param&nbsp;position:&nbsp;position&nbsp;within&nbsp;the&nbsp;playlist&nbsp;to&nbsp;jump&nbsp;to&nbsp;(int)<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+
+<dl><dt><a name="Player-jump_in_queue"><strong>jump_in_queue</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;queue.<br>
 &nbsp;<br>
-@note:&nbsp;playlist&nbsp;may&nbsp;be&nbsp;one&nbsp;of&nbsp;the&nbsp;well&nbsp;known&nbsp;IDs&nbsp;PLID_PLAYLIST&nbsp;and<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PLID_QUEUE&nbsp;-&nbsp;this&nbsp;means&nbsp;a&nbsp;jump&nbsp;within&nbsp;the&nbsp;current&nbsp;playlist&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queue.<br>
+@param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+
+<dl><dt><a name="Player-load_playlist"><strong>load_playlist</strong></a>(self, path)</dt><dd><tt>Load&nbsp;a&nbsp;playlist.<br>
+&nbsp;<br>
+For&nbsp;some&nbsp;players&nbsp;this&nbsp;means&nbsp;'switch&nbsp;to&nbsp;another&nbsp;playlist',&nbsp;for&nbsp;others<br>
+it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist&nbsp;into&nbsp;the&nbsp;active&nbsp;playlist'.<br>
+&nbsp;<br>
+@param&nbsp;path:&nbsp;the&nbsp;path&nbsp;of&nbsp;the&nbsp;playlist&nbsp;to&nbsp;load&nbsp;(path&nbsp;is&nbsp;a&nbsp;library<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;as&nbsp;described&nbsp;in&nbsp;<a href="#Player-request_library">request_library</a>()&nbsp;)&nbsp;<br>
 &nbsp;<br>
 @note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
@@ -203,14 +217,21 @@ jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position'.<br>
 @note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-reply_list_request"><strong>reply_list_request</strong></a>(self, client, id, nested_ids, nested_names, ids, names)</dt><dd><tt>Send&nbsp;a&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="Player-reply_library_request"><strong>reply_library_request</strong></a>(self, client, path, nested, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;playlist<br>
-@param&nbsp;nested_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;playlists&nbsp;nested&nbsp;within&nbsp;the&nbsp;requested&nbsp;playlist<br>
-@param&nbsp;nested_names:&nbsp;names&nbsp;of&nbsp;playlists&nbsp;nested&nbsp;within&nbsp;the&nbsp;requested&nbsp;playlist<br>
-@param&nbsp;ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;playlist<br>
-@param&nbsp;names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;playlist<br>
+@param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level&nbsp;(string&nbsp;list)<br>
+@param&nbsp;nested:&nbsp;nested&nbsp;playlists&nbsp;(string&nbsp;list)<br>
+@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
+@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#Player-request_library">request_library</a>()</tt></dd></dl>
+
+<dl><dt><a name="Player-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+&nbsp;<br>
+@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
+@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
+@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
 &nbsp;<br>
 @see:&nbsp;<a href="#Player-request_playlist">request_playlist</a>()</tt></dd></dl>
 
@@ -222,32 +243,76 @@ jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position'.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;<a href="#Player-request_plob">request_plob</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-request_playlist"><strong>request_playlist</strong></a>(self, id, client)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;playlist&nbsp;from&nbsp;the&nbsp;player's&nbsp;library.<br>
+<dl><dt><a name="Player-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;playlist&nbsp;(string)<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;-&nbsp;use&nbsp;<a href="#Player-reply_list_request">reply_list_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;send&nbsp;back&nbsp;the&nbsp;requested&nbsp;playlist<br>
+@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
+@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
+@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
 &nbsp;<br>
-@note:&nbsp;The&nbsp;meaning&nbsp;of&nbsp;playlist&nbsp;here&nbsp;is&nbsp;something&nbsp;different&nbsp;than&nbsp;in<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Player-update_playlist">update_playlist</a>().&nbsp;The&nbsp;latter&nbsp;one&nbsp;means&nbsp;the&nbsp;currently&nbsp;active<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;playlist&nbsp;while&nbsp;this&nbsp;one&nbsp;means&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the&nbsp;player's&nbsp;media<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;library.<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;request&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the&nbsp;player.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see&nbsp;<a href="#Player-reply_list_request">reply_list_request</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#Player-request_queue">request_queue</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-request_plob"><strong>request_plob</strong></a>(self, id, client)</dt><dd><tt>Request&nbsp;information&nbsp;about&nbsp;a&nbsp;specific&nbsp;PLOB.&nbsp;<br>
+<dl><dt><a name="Player-request_library"><strong>request_library</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;library.<br>
 &nbsp;<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB&nbsp;(string)<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;-&nbsp;use&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;send&nbsp;back&nbsp;the&nbsp;requested&nbsp;PLOB<br>
+@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+@param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
+&nbsp;<br>
+@note:&nbsp;path&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;which&nbsp;describes&nbsp;a&nbsp;specific&nbsp;level&nbsp;in&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;playlist&nbsp;tree.&nbsp;If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;root&nbsp;of&nbsp;the&nbsp;player's&nbsp;library,&nbsp;i.e.&nbsp;all&nbsp;top&nbsp;level&nbsp;playlists&nbsp;are<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;requested.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;player&nbsp;may&nbsp;have&nbsp;a&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Jazz<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Dynamic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Never&nbsp;played<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Played&nbsp;recently<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Playlists<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Party<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Sue's&nbsp;b-day<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+
+<dl><dt><a name="Player-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 &nbsp;<br>
 @note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;request&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#Player-reply_playlist_request">reply_playlist_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+
+<dl><dt><a name="Player-request_plob"><strong>request_plob</strong></a>(self, client, id)</dt><dd><tt>Request&nbsp;information&nbsp;about&nbsp;a&nbsp;specific&nbsp;PLOB.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB&nbsp;(string)<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+
+<dl><dt><a name="Player-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#Player-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
 <dl><dt><a name="Player-seek_backward"><strong>seek_backward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
 &nbsp;<br>
@@ -292,12 +357,14 @@ jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position'.<br>
 @note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-update_play_position"><strong>update_play_position</strong></a>(self, position)</dt><dd><tt>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;current&nbsp;PLOB&nbsp;on&nbsp;the&nbsp;current&nbsp;playlist/queue.&nbsp;<br>
+<dl><dt><a name="Player-update_play_position"><strong>update_play_position</strong></a>(self, position, queue<font color="#909090">=False</font>)</dt><dd><tt>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;current&nbsp;PLOB.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
-@param&nbsp;position:&nbsp;starting&nbsp;from&nbsp;zero<br>
+@param&nbsp;position:&nbsp;position&nbsp;of&nbsp;the&nbsp;currently&nbsp;player&nbsp;item&nbsp;(starting&nbsp;from&nbsp;0)<br>
+@keyword&nbsp;queue:&nbsp;True&nbsp;if&nbsp;currently&nbsp;played&nbsp;item&nbsp;is&nbsp;from&nbsp;the&nbsp;queue,&nbsp;False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;it&nbsp;is&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist&nbsp;(default)<br>
 &nbsp;<br>
 @attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
 
@@ -307,16 +374,6 @@ This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;playback:&nbsp;playback&nbsp;mode&nbsp;(see&nbsp;constants)<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
-
-<dl><dt><a name="Player-update_playlist"><strong>update_playlist</strong></a>(self, ids, names)</dt><dd><tt>Set&nbsp;current&nbsp;playlist.&nbsp;<br>
-&nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
-&nbsp;<br>
-@param&nbsp;ids:&nbsp;list&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;IDs&nbsp;(IDs&nbsp;must&nbsp;be&nbsp;strings)<br>
-@param&nbsp;names:&nbsp;list&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;names&nbsp;(e.g.&nbsp;'ARTIST&nbsp;-&nbsp;TITLE')<br>
 &nbsp;<br>
 @attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
 
@@ -332,25 +389,6 @@ currently&nbsp;played&nbsp;item&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @note:&nbsp;For&nbsp;the&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;dictionary&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;constants<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starting&nbsp;with&nbsp;'INFO_'&nbsp;(e.g.&nbsp;INFO_ARTIST)&nbsp;as&nbsp;keys.&nbsp;<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
-
-<dl><dt><a name="Player-update_queue"><strong>update_queue</strong></a>(self, ids, names)</dt><dd><tt>Set&nbsp;current&nbsp;queue.&nbsp;<br>
-&nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
-&nbsp;<br>
-@param&nbsp;ids:&nbsp;list&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;IDs&nbsp;(IDs&nbsp;must&nbsp;be&nbsp;strings)<br>
-@param&nbsp;names:&nbsp;list&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;names&nbsp;(e.g.&nbsp;'ARTIST&nbsp;-&nbsp;TITLE')<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
-
-<dl><dt><a name="Player-update_queue_mode"><strong>update_queue_mode</strong></a>(self, mode)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;queue&nbsp;mode&nbsp;<br>
-&nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
-&nbsp;<br>
-@param&nbsp;mode:&nbsp;true&nbsp;means&nbsp;playing&nbsp;from&nbsp;queue,&nbsp;false&nbsp;means&nbsp;playlist<br>
 &nbsp;<br>
 @attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
 
@@ -406,7 +444,5 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 <strong>INFO_YEAR</strong> = 'year'<br>
 <strong>PLAYBACK_PAUSE</strong> = 1<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
-<strong>PLAYBACK_STOP</strong> = 0<br>
-<strong>PLID_PLAYLIST</strong> = '__PLAYLIST__'<br>
-<strong>PLID_QUEUE</strong> = '__QUEUE__'</td></tr></table>
+<strong>PLAYBACK_STOP</strong> = 0</td></tr></table>
 </body></html>
