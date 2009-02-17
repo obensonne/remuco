@@ -236,17 +236,40 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 		}
 
 		screenPloblist.setPloblist(pl);
-		
-		if (pl.isPlaylist() && !player.state.isPlayingFromQueue()) {
-			try {
-				screenPloblist.setSelectedIndex(player.state.getPosition(), true);
-			} catch (ArrayIndexOutOfBoundsException e) {
+
+		if (pl.isPlaylist()) {
+			if (!player.info.supportsJumpPlaylist()) {
+				screenPloblist.removeCommand(CMD.SELECT);
+				screenPloblist.setSelectCommand(CMD.INFO);
+			} else {
+				screenPloblist.addCommand(CMD.SELECT);
+				screenPloblist.setSelectCommand(CMD.SELECT);
 			}
-		} else if (pl.isQueue() && player.state.isPlayingFromQueue()) {
-			try {
-				screenPloblist.setSelectedIndex(player.state.getPosition(), true);
-			} catch (ArrayIndexOutOfBoundsException e) {
+			if (!player.state.isPlayingFromQueue()) {
+				try {
+					screenPloblist.setSelectedIndex(player.state.getPosition(),
+							true);
+				} catch (ArrayIndexOutOfBoundsException e) {
+				}
 			}
+		} else if (pl.isQueue()) {
+			if (!player.info.supportsJumpQueue()) {
+				screenPloblist.removeCommand(CMD.SELECT);
+				screenPloblist.setSelectCommand(CMD.INFO);
+			} else {
+				screenPloblist.addCommand(CMD.SELECT);
+				screenPloblist.setSelectCommand(CMD.SELECT);
+			}
+			if (player.state.isPlayingFromQueue()) {
+				try {
+					screenPloblist.setSelectedIndex(player.state.getPosition(),
+							true);
+				} catch (ArrayIndexOutOfBoundsException e) {
+				}
+			}
+		} else {
+			screenPloblist.addCommand(CMD.SELECT);
+			screenPloblist.setSelectCommand(CMD.SELECT);
 		}
 
 		display.setCurrent(screenPloblist);
