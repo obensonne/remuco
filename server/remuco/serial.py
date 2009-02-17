@@ -232,7 +232,7 @@ def pack(serializable):
                     "format string and data differ in length")
         return None
         
-    log.debug("data to pack: %s" % str(data))
+    #log.debug("data to pack: %s" % str(data))
 
     bin = Bin()
     
