@@ -5,6 +5,7 @@ import sys
 import traceback
 import urllib
 import urlparse
+import time
 
 import rb, rhythmdb
 
@@ -75,6 +76,7 @@ class RemucoPlugin(rb.Plugin):
         except Exception, e:
             
             print("failed to init rhythmbox player object (%s)" % e)
+            traceback.print_exc()
         
         print("remuco plugin activated")
 
@@ -86,13 +88,15 @@ class RemucoPlugin(rb.Plugin):
             self.__rem.down()
             self.__rem = None
 
+        print("deactivate Remuco plugin .. done")
 ###############################################################################
 #
 # Player Proxy
 #
 ###############################################################################
 
-
+def rblog(s):
+    print (s)
 
 class Remythm(remuco.Player):
 
@@ -104,52 +108,24 @@ class Remythm(remuco.Player):
         
         self.__cover_file = "%s/cover.png" % self.get_cache_dir()
 
+        sp = self.__shell.get_player()
+        
+        #log.set_file(None) # log to std-out
+        #log.set_functions(rblog, rblog, rblog, rblog)
+        
         ###### shortcuts to RB data ###### 
         
         self.__plob_id = None
         self.__plob_entry = None
-        self.__playlist_sc = None
-        self.__playlist_qm = None
-        self.__queue_sc = None
-        self.__queue_qm = None
+        self.__playlist_sc = sp.get_playing_source()
+        self.__queue_sc = self.__shell.props.queue_source
         
-        ###### callback IDs ###### 
-
-        self.__cb_ids_sp = ()
-        self.__cb_ids_qm_queue = ()
-        self.__cb_ids_sc_playlist = ()
-        
-        self.__cb_id_mc_update_playlist = None
-        self.__cb_id_mc_update_queue = None
-
         ###### connect to shell player signals ######
 
-        sp = self.__shell.props.shell_player
-        
         self.__cb_ids_sp = (
             sp.connect("playing_changed", self.__cb_sp_playing_changed),
             sp.connect("playing_uri_changed", self.__cb_sp_playing_uri_changed),
             sp.connect("playing-source-changed", self.__cb_sp_playlist_changed)
-        )
-
-        ###### connect to playlist signals ######
-
-        self.__cb_sp_playlist_changed(sp, sp.props.source)
-
-        ###### connect to queue signals ######
-
-        # FIXME: assuming queue source and query model is never None
-
-        sc_queue = self.__shell.props.queue_source
-        qm_queue = sc_queue.props.query_model
-        
-        self.__queue_sc = sc_queue
-        self.__queue_qm = qm_queue
-
-        self.__cb_ids_qm_queue = (
-            qm_queue.connect("row-inserted", self.__cb_qm_queue_row_inserted),
-            qm_queue.connect("row-deleted", self.__cb_qm_queue_row_deleted),
-            qm_queue.connect("rows-reordered", self.__cb_qm_queue_rows_reordered)
         )
 
         ###### periodically check for changes which have no signals ######
@@ -160,9 +136,7 @@ class Remythm(remuco.Player):
         ###### initially trigger server synchronization ######
         
         # state sync will happen by timeout
-        # playlist sync already triggered above 
         self.__cb_sp_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
-        self.__update_queue() # queue sync
         
         log.debug("Remythm() done")
 
@@ -180,33 +154,79 @@ class Remythm(remuco.Player):
         """
         return RATING_MAX
     
-    def jump_to(self, playlist, position):
-        """ Jump to a specific position in a specific playlist.
+    def jump_in_playlist(self, position):
         
-        For some players it is better to say 'load a specific playlist and then
-        jump to a specific position'.
+        self.__jump_in_plq(self.__playlist_sc, position)
         
-        @param playlist: ID of the playlist to jump into (string)
-        @param position: position within the playlist to jump to (int)
-        
-        @note: playlist may be one of the well known IDs PLID_PLAYLIST and
-               PLID_QUEUE - this means a jump within the current playlist or
-               queue.
+    def jump_in_queue(self, position):
 
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
-        self.__do_jump(playlist, position)
-    
+        self.__jump_in_plq(self.__queue_sc, position)
+
+    def __jump_in_plq(self, sc, position):
+
+        if not sc:
+            return
+        
+        qm = sc.get_entry_view().props.model
+        
+        # FIXME: assuming entry view and query model are never None
+        
+        id_to_remove_from_queue = None
+        
+        sp = self.__shell.get_player()
+
+        if sp.props.playing_from_queue:
+            id_to_remove_from_queue = self.__plob_id
+
+        found = False
+        i = 0
+        for row in qm:
+            if i == position:
+                sp.set_selected_source(sc)
+                sp.set_playing_source(sc)
+                sp.play_entry(row[0])
+                found = True
+                break
+            i += 1
+        
+        if not found:
+            sp.do_next()
+        
+        if id_to_remove_from_queue != None:
+            log.debug("remove %s from queue" % id_to_remove_from_queue)
+            self.__shell.remove_from_queue(id_to_remove_from_queue)
+
+    def load_playlist(self, path):
+        """Jump to a specific song (index) in a specific source (path)."""
+        
+        sc = self.__get_source_from_path(path)
+        
+        if not sc:
+            return
+        
+        qm = sc.get_entry_view().props.model
+        
+        # FIXME: assuming entry view and query model are never None
+        
+        sp = self.__shell.get_player()
+
+        if sc != self.__playlist_sc:
+            sp.set_selected_source(sc)
+            sp.set_playing_source(sc)
+            
     def play_next(self):
         """ Play the next item. 
         
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        
+        sp = self.__shell.get_player()
         if sp is not None:
-            sp.do_next()
+            try:
+                sp.do_next()
+            except:
+                pass
     
     def play_previous(self):
         """ Play the previous item. 
@@ -214,9 +234,15 @@ class Remythm(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        
+        sp = self.__shell.get_player()
         if sp is not None:
-            sp.do_previous()
+            try:
+                sp.set_playing_time(0)
+                time.sleep(0.1)
+                sp.do_previous()
+            except:
+                pass # no previous song
     
     def rate_current(self, rating):
         """ Rate the currently played item. 
@@ -236,9 +262,12 @@ class Remythm(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
         if sp is not None:
-            sp.playpause()
+            try:
+                sp.playpause()
+            except:
+                pass
                 
     
     def toggle_repeat(self):
@@ -248,6 +277,7 @@ class Remythm(remuco.Player):
                gets called if a remote client wants to control the player.
         """
         logging.warning("toggle_repeat() not yet implemented")
+        
     
     def toggle_shuffle(self):
         """ Toggle shuffle mode. 
@@ -263,7 +293,7 @@ class Remythm(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
         if sp is not None:
             sp.seek(SEEK_STEP)
     
@@ -273,7 +303,7 @@ class Remythm(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
         if sp is not None:
             sp.seek(- SEEK_STEP)
     
@@ -299,7 +329,7 @@ class Remythm(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
         if sp is not None:
             sp.set_volume(float(volume) / 100)
         
@@ -331,76 +361,82 @@ class Remythm(remuco.Player):
         
         gobject.idle_add(self.reply_plob_request, client, id, info)
         
-    def request_playlist(self, id, client):
-        """ Request contents of a specific playlist 
+    def request_playlist(self, client):
         
-        @param id: ID of the requested playlist (string)
-        @param client: the requesting client - use reply_list_request()
-                       to send back the requested playlist
+        try:
+            qm = self.__playlist_sc.get_entry_view().props.model 
+            ids, names = self.__get_tracks_from_qmodel(qm)
+        except:
+            ids, names = [], []
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client request a playlist from the player.
-               
-        @see reply_list_request()
-        """
-        log.debug("called RequestPloblist(%s)" % id)
+        gobject.idle_add(self.reply_playlist_request, client, ids, names)
 
-        nested_ids = []
-        nested_names = []
-        ids = []
-        names = []
+    def request_queue(self, client):
+        
+        sc = self.__queue_sc
+        qm = sc.props.query_model
+
+        ids, names = self.__get_tracks_from_qmodel(qm)
+        
+        gobject.idle_add(self.reply_queue_request, client, ids, names)
+
+    def request_library(self, client, path):
+        log.debug("called RequestPloblist(%s)" % path)
+
+        nested = []
+        plob_ids = []
+        plob_names = []
         
         slm = self.__shell.props.sourcelist_model
         
         if not slm:
-            gobject.idle_add(self.reply_list_request, client, id,
-                             nested_ids, nested_names, ids, names)
+            log.debug("no source list model")
+            gobject.idle_add(self.reply_library_request, client, path, nested,
+                             plob_ids, plob_names)
             return
 
         ### root ? ###
+        
+        # TODO: include Library/* here in root
 
-        if id is None or len(id) == 0:
+        if path is None or len(path) == 0:
             for group in slm:
                 group_name = group[2]
-                nested_ids.append(group_name)
-                nested_names.append(group_name)
-                gobject.idle_add(self.reply_list_request, client, id,
-                                 nested_ids, nested_names, ids, names)
-                return
+                nested.append(group_name)
+            gobject.idle_add(self.reply_library_request, client, path,
+                             nested, plob_ids, plob_names)
+            return
         
-        ### group ? ###
-        
-        if id.find(DELIM) == -1:
+        ### group ? ### Library, Playlists
+
+        if len(path) == 1:
             for group in slm:
                 group_name = group[2]
-                if id == group_name:
+                if path[0] == group_name:
                     for source in group.iterchildren():
                         source_name = source[2]
-                        log.debug("append %s%s%s" %
-                                  (group_name, DELIM, source_name))
-                        nested_ids.append("%s%s%s" %
-                                          (group_name, DELIM, source_name))
-                        nested_names.append(source_name)
+                        log.debug("append %s" % source_name)
+                        nested.append(source_name)
                     break
-            gobject.idle_add(self.reply_list_request, client, id,
-                             nested_ids, nested_names, ids, names)
+            gobject.idle_add(self.reply_library_request, client, path, nested,
+                             plob_ids, plob_names)
             return
             
-        ### regular playlist (source) ! ###
+        ### regular playlist (source) ! ### Library/???, Playlists/???
         
-        source = self.__get_source_from_plid(id)
+        source = self.__get_source_from_path(path)
 
         if not source:
-            gobject.idle_add(self.reply_list_request, client, id,
-                             nested_ids, nested_names, ids, names)
+            gobject.idle_add(self.reply_library_request, client, path, nested,
+                             plob_ids, plob_names)
             return
 
         model = source.get_entry_view().props.model
         
-        ids, names = self.__get_tracks_from_qmodel(model)
+        plob_ids, plob_names = self.__get_tracks_from_qmodel(model)
         
-        gobject.idle_add(self.reply_list_request, client, id,
-                         nested_ids, nested_names, ids, names)
+        gobject.idle_add(self.reply_library_request, client, path, nested,
+                         plob_ids, plob_names)
 
         
     def down(self):
@@ -414,7 +450,7 @@ class Remythm(remuco.Player):
 
         # FIXME: assuming shell player is never None
         
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
 
         for cb_id in self.__cb_ids_sp:
             
@@ -422,32 +458,10 @@ class Remythm(remuco.Player):
             
         self.__cb_ids_sp = ()
 
-        ###### disconnect from playlist signals ######
-
-        self.__cb_sp_playlist_changed(sp, None)
-        
-        ###### disconnect from queue signals ######
-        
-        # FIXME: assuming queue query model is never None
-        
-        qmodel = self.__queue_qm
-        
-        for cb_id in self.__cb_ids_qm_queue:
-            
-            qmodel.disconnect(cb_id)
-            
-        self.__cb_ids_qm_queue = ()
-        
         ###### remove gobject sources ######
         
         if self.__cb_id_mc_poll_misc > 0:
             gobject.source_remove(self.__cb_id_mc_poll_misc)
-
-        if self.__cb_id_mc_update_playlist is not None:
-            gobject.source_remove(self.__cb_id_mc_update_playlist)
-            
-        if self.__cb_id_mc_update_queue is not None:
-            gobject.source_remove(self.__cb_id_mc_update_queue)
 
         # release shell
         self.__shell = None
@@ -511,80 +525,12 @@ class Remythm(remuco.Player):
             self.update_playback(remuco.PLAYBACK_PLAY)
         else:
             self.update_playback(remuco.PLAYBACK_PAUSE)
-            
+
     def __cb_sp_playlist_changed(self, sp, source_new):
         """Shell player signal callback to handle a playlist switch."""
-
-        source_old = self.__playlist_sc
-        
-        if source_old == source_new:
-            return
-        
-        log.debug("sp_playlist_changed: %s" % str(source_new))
-        
-        ###### disconnect signals of old source ######
-        
-        if source_old != None:
-            for cb_id in self.__cb_ids_sc_playlist:
-                source_old.disconnect(cb_id)
-            self.__cb_ids_sc_playlist = ()
-        
+        log.debug("new source: %s" % str(source_new))
         self.__playlist_sc = source_new
         
-        ###### connect to signals of new source and its query model ######
-        
-        if source_new != None:
-
-            self.__cb_ids_sc_playlist = (
-                source_new.connect("filter-changed", self.__cb_sc_playlist_filter_changed),
-            )
-            
-            qmodel = source_new.get_entry_view().props.model
-             
-        else:
-            
-            qmodel = None
-
-        self.__handle_playlist_qmodel_changed(qmodel)
-
-    def __cb_sc_playlist_filter_changed(self, source):
-        """Source signal callback to handle a playlist filter change."""
-        
-        log.debug("sc_playlist_filter_changed: %s" % str(source))
-        
-        ###### handle the new query model (if there is one) ######
-
-        try:
-            qmodel = self.__playlist_sc.get_entry_view().props.model 
-        except:
-            qmodel = None
-
-        self.__handle_playlist_qmodel_changed(qmodel)
-
-    def __cb_qm_playlist_row_inserted(self, qm, gtp, gti):
-        #log.debug("playlist row inserted (last)")
-        self.__update_playlist()
-    
-    def __cb_qm_playlist_row_deleted(self, qm, gtp):
-        #log.debug("playlist row deleted")
-        self.__update_playlist()
-    
-    def __cb_qm_playlist_rows_reordered(self, qm, gtp, gti, gp):
-        #log.debug("playlist rows reordered")
-        self.__update_playlist()
- 
-    def __cb_qm_queue_row_inserted(self, qm, gtp, gti):
-        log.debug("queue row inserted")
-        self.__update_queue()
-    
-    def __cb_qm_queue_row_deleted(self, qm, gtp):
-        log.debug("queue row deleted")
-        self.__update_queue()
-    
-    def __cb_qm_queue_rows_reordered(self, qm, gtp, gti, gp):
-        log.debug("queue rows reordered")
-        self.__update_queue()
-
     #==========================================================================
     # Main context callbacks
     #==========================================================================
@@ -594,7 +540,7 @@ class Remythm(remuco.Player):
         without change signals.
         """ 
         
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
         
         ###### check repeat and shuffle ######
         
@@ -615,6 +561,8 @@ class Remythm(remuco.Player):
         volume = int(sp.get_volume() * 100)
         
         self.update_volume(volume)
+        
+        # TODO: test if __update_position() should be called here 
 
         return True
 
@@ -622,10 +570,10 @@ class Remythm(remuco.Player):
     # helper methods
     #==========================================================================
 
-    def __do_jump(self, id, index):
-        """Jump to a specific song (index) in a specific source (id)."""
+    def __do_jump(self, path, index):
+        """Jump to a specific song (index) in a specific source (path)."""
         
-        source = self.__get_source_from_plid(id)
+        source = self.__get_source_from_path(path)
         
         if not source:
             return
@@ -634,7 +582,7 @@ class Remythm(remuco.Player):
         
         # FIXME: assuming entry view and query model are never None
         
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
 
         id_to_remove_from_queue = None
         
@@ -666,44 +614,6 @@ class Remythm(remuco.Player):
         # which is not the first in the queue, the song does not get moved
         # to the top of the queue .. that's ok
 
-    def __handle_playlist_qmodel_changed(self, qmodel_new):
-        """Connect to signals from the new playlist query model.
-        
-        This includes disconnecting from signals of the old query model and.
-        """
-        
-        qmodel_old = self.__playlist_qm
-        
-        if qmodel_old == qmodel_new:
-            return
-
-        log.debug("playlist query model changed: %s" % str(qmodel_new))
-
-        ###### disconnect from signals of old query model ######
-
-        if qmodel_old is not None:
-            
-            for cb_id in self.__cb_ids_qm_playlist:
-                qmodel_old.disconnect(cb_id)
-                
-        self.__cb_ids_qm_playlist = ()
-            
-        self.__playlist_qm = qmodel_new
-        
-        ###### connect to signals of new query model ######
-
-        if qmodel_new is not None:
-            
-            self.__cb_ids_qm_playlist = (
-                qmodel_new.connect("row-inserted", self.__cb_qm_playlist_row_inserted),
-                qmodel_new.connect("row-deleted", self.__cb_qm_playlist_row_deleted),
-                qmodel_new.connect("rows-reordered", self.__cb_qm_playlist_rows_reordered)
-            )
-        
-        ###### sync with the server (playlist change) ######
-
-        self.__update_playlist()
-        
     def __get_tracks_from_qmodel(self, qmodel):
         """Get all tracks in a query model.
         
@@ -790,24 +700,19 @@ class Remythm(remuco.Player):
                 
         return None
 
-    def __get_source_from_plid(self, id):
+    def __get_source_from_path(self, path):
         """Get the source object of source 'id'.
         
-        'id' is either a combination of the source' group and name or one of
-        the well known IDs 'remuco.PLID_PLAYLIST' and 'remuco.PLID_QUEUE'.
+        'path' contains either the source' group and name (2 element list) or
+        one of the well known IDs 'remuco.PLID_CURRENT' and 'remuco.PLID_QUEUE'
+        (1 element list).
         """
-        
-        if id == remuco.PLID_PLAYLIST:
-            return self.__playlist_sc
-        
-        if id == PLID_QUEUE:
-            return self.__queue_sc
         
         slm = self.__shell.props.sourcelist_model
         
         # FIXME: assuming 'slm' is never None
         
-        group_name, source_name = id.split(DELIM)
+        group_name, source_name = path
         
         if not group_name or not source_name:
             return None
@@ -818,14 +723,9 @@ class Remythm(remuco.Player):
                     if source_name == source[2]:
                         return source[3]
 
-    #==========================================================================
-    # update wrapper
-    #==========================================================================
+    def __get_position(self):
 
-    def __update_position(self):
-        """Determine the current position and update."""
-
-        sp = self.__shell.props.shell_player
+        sp = self.__shell.get_player()
 
         db = self.__shell.props.db
 
@@ -838,9 +738,9 @@ class Remythm(remuco.Player):
             
             if sp.props.playing_from_queue:
                 queue = True
-                qmodel = self.__queue_qm
+                qmodel = self.__queue_sc.props.query_model
             else:
-                qmodel = self.__playlist_qm
+                qmodel = self.__playlist_sc.get_entry_view().props.model
                 
             if qmodel is not None:
                 for row in qmodel:
@@ -851,47 +751,18 @@ class Remythm(remuco.Player):
                     
         log.debug ("position: %i" % position)
         
-        self.update_play_position(position)
+        return position
 
-    def __update_playlist(self):
-        """Get current playlist and update."""
+    #==========================================================================
+    # update wrapper
+    #==========================================================================
 
-        if self.__cb_id_mc_update_playlist is None:
-            self.__cb_id_mc_update_playlist = gobject.idle_add(
-                self.__update_playlist_delayed, priority=gobject.PRIORITY_LOW)
-            
-    def __update_playlist_delayed(self):
-        
-        log.debug("playlist query model: %s" % str(self.__playlist_qm))
+    def __update_position(self):
+        """Determine the current position and update."""
 
-        ids, names = self.__get_tracks_from_qmodel(self.__playlist_qm)
-        
-        self.update_playlist(ids, names)
+        pfq = self.__shell.get_player().props.playing_from_queue
 
-        # a new playlist may result in a new position:
-        self.__update_position()
-        
-        self.__cb_id_mc_update_playlist = None
-
-    def __update_queue(self):
-        """Get current queue and update."""
-
-        if self.__cb_id_mc_update_queue is None:
-            self.__cb_id_mc_update_queue = gobject.idle_add(
-                self.__update_queue_delayed, priority=gobject.PRIORITY_LOW)
-
-    def __update_queue_delayed(self):
-
-        log.debug("queue query model: %s" % str(self.__queue_qm))
-
-        ids, names = self.__get_tracks_from_qmodel(self.__queue_qm)
-        
-        self.update_queue(ids, names)
-
-        # a new playlist may result in a new position:
-        self.__update_position()
-
-        self.__cb_id_mc_update_queue = None
+        self.update_play_position(self.__get_position(), queue=pfq)
 
 if __name__ == "__main__":
     
