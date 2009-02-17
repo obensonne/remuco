@@ -437,7 +437,7 @@ class Player:
         @attention: Do not overwrite!
         """
         
-        self.__state.set_queue(mode)
+        self.__state.set_queue(queue)
         self.__state.set_position(position)
         self.__trigger_sync(self.__sync_state)
         
@@ -562,6 +562,8 @@ class Player:
         
         @see: request_library()
         """ 
+        
+        log.debug("library reply: %s" % str(plob_ids))
         
         library = Library(path, nested, plob_ids, plob_names)
         
@@ -688,6 +690,14 @@ class Player:
             
             self.__handle_message_request_list(bindata, client)
             
+        elif id == message.MSG_ID_PRIV_REQ_INITIAL_DATA:
+            
+            msg = net.build_message(message.MSG_ID_SYN_STATE, self.__state)
+            client.send(msg)
+            
+            msg = net.build_message(message.MSG_ID_SYN_PLOB, self.__plob)
+            client.send(msg)
+            
         else:
             log.warning("unsupported message id: %d" % id)
     
@@ -759,7 +769,13 @@ class Player:
         ok = serial.unpack(ss, bindata)
         if not ok: return
         
-        path = ss.get().split("/")
+        s = ss.get()
+        if s is None or len(s) == 0:
+            path = []
+        else:
+            path = s.split("/")
+        
+        log.debug("list request: %s" % str(path))
         
         if path == Library.PATH_PLAYLIST:
             self.request_playlist(client)

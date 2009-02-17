@@ -35,10 +35,10 @@ def build_message(id, serializable):
     
     header = struct.pack("!ii", id, len(ba))
     
-    hex = ""
-    for c in ba:
-        hex = "%s %X" % (hex, ord(c))
-    log.debug("built message (id %d, size %d, data '%s')" % (id, len(ba), hex))
+#    hex = ""
+#    for c in ba:
+#        hex = "%s %X" % (hex, ord(c))
+#    log.debug("built message (id %d, size %d, data '%s')" % (id, len(ba), hex))
     
     return "%s%s%s%s" % (ClientConnection.IO_PREFIX, header, ba,
                          ClientConnection.IO_SUFFIX)
@@ -199,6 +199,9 @@ class ClientConnection():
             log.debug("sending player info to %s" % self.__addr_str)
             
             self.send(self.__player_info_msg)
+            
+            self.__msg_handler_fn(message.MSG_ID_PRIV_REQ_INITIAL_DATA, None,
+                                  self)
             
         else:
             
@@ -408,6 +411,10 @@ class Server():
 
         if self._sock is not None:
             log.debug("closing %s server socket" % self._get_type())
+            try:
+                self._sock.shutdown(socket.SHUT_RDWR)
+            except socket.error, e:
+                pass
             self._sock.close()
             self._sock = None
 

@@ -12,4 +12,6 @@ MSG_ID_CTL = 10
 MSG_ID_REQ_PLOB = 11
 MSG_ID_REQ_LIBRARY = 12
 
+MSG_ID_PRIV_REQ_INITIAL_DATA = 1001 # used internally in server
+
     
