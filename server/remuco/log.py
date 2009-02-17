@@ -1,3 +1,4 @@
+import sys
 import logging
 
 DEBUG = logging.DEBUG
@@ -45,13 +46,16 @@ def reset_functions():
 def set_file(file):
  
     if config.handler is not None:
-        config.logga.removeHandler(handler)
+        config.logga.removeHandler(config.handler)
     
-    try:
-        new_handler = logging.FileHandler(file, 'w')
-    except IOError, e:
-        print("failed to set up log handler (%s)" % e)
-        return
+    if file is None:
+        new_handler = logging.StreamHandler(sys.stdout)
+    else:
+        try:
+            new_handler = logging.FileHandler(file, 'w')
+        except IOError, e:
+            print("failed to set up log handler (%s)" % e)
+            return
     
     new_handler.setFormatter(config.FORMATTER)
     config.handler = new_handler
