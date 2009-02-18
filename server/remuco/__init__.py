@@ -738,7 +738,7 @@ class Player:
             self.set_tags(id, tags)
         elif cmd == command.CMD_SEEK_FWD:
             self.seek_forward()
-        elif cmd == command.CMD_SEEK_FWD:
+        elif cmd == command.CMD_SEEK_BWD:
             self.seek_backward()
         elif cmd == command.CMD_SHUTDOWN:
             self.__shutdown_system()
