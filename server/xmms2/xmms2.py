@@ -56,7 +56,8 @@ class XMMS2(remuco.Player):
             
         self.__xmms = xmmsclient.XMMS("remuco")
         try:
-            self.__xmms.connect(os.getenv("XMMS_PATH"), self.__x2cb_disconnect)
+            self.__xmms.connect(path=os.getenv("XMMS_PATH"),
+                                disconnect_func=self.__x2cb_disconnect)
         except IOError, e:
             log.error("failed to connect to XMMS2: %s" % str(e))
             self.down()
@@ -183,7 +184,7 @@ class XMMS2(remuco.Player):
         
         self.__xmms.playlist_current_pos(cb=self.__x2cb_position)
     
-    def __x2cb_disconnect(self):
+    def __x2cb_disconnect(self, result):
         
         log.info("xmms2 disconnected")
         self.__ml.quit()
@@ -242,7 +243,6 @@ class XMMS2(remuco.Player):
              
     def seek_backward(self):
         
-        log.debug("seek back")
         self.__xmms.playback_seek_ms_rel(-5000, cb=self.__x2cb_errcheck)
     
     def set_tags(self, id, tags):
@@ -261,6 +261,7 @@ class XMMS2(remuco.Player):
     
     def set_volume(self, volume):
 
+        # TODO: currently this fails, problem relates to xmms2 installation
         for channel in ("right", "left"):
             self.__xmms.playback_volume_set(channel, volume,
                                             cb=self.__x2cb_errcheck)
