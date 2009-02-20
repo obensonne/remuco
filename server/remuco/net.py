@@ -263,7 +263,7 @@ class ClientConnection():
         """
         
         if msg is None:
-            log.warning("oops, looks like a bug: msg is None")
+            log.error("** BUG ** msg is None")
             return
         
         if self.__sock is None:
