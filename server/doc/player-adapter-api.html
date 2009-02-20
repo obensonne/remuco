@@ -25,9 +25,10 @@ logging&nbsp;is&nbsp;configured&nbsp;to&nbsp;log&nbsp;into&nbsp;a&nbsp;player&nb
 configuration&nbsp;file&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).<br>
 &nbsp;<br>
 To&nbsp;use&nbsp;the&nbsp;remuco&nbsp;logging&nbsp;system&nbsp;within&nbsp;a&nbsp;player&nbsp;adapter,&nbsp;import&nbsp;the&nbsp;module<br>
-'log'&nbsp;and&nbsp;use&nbsp;the&nbsp;function&nbsp;log.debug(),&nbsp;log.info(),&nbsp;log.warning()&nbsp;and<br>
+'remuco.log'&nbsp;and&nbsp;use&nbsp;the&nbsp;functions&nbsp;log.debug(),&nbsp;log.info(),&nbsp;log.warning()&nbsp;and<br>
 log.error().&nbsp;Then&nbsp;all&nbsp;messages&nbsp;of&nbsp;the&nbsp;player&nbsp;adapter&nbsp;will&nbsp;be&nbsp;written&nbsp;into&nbsp;the<br>
-same&nbsp;file&nbsp;which&nbsp;is&nbsp;used&nbsp;for&nbsp;internal&nbsp;remuco&nbsp;logging&nbsp;messages.</tt></p>
+same&nbsp;file&nbsp;as&nbsp;used&nbsp;internally&nbsp;by&nbsp;the&nbsp;remuco&nbsp;module&nbsp;-&nbsp;that&nbsp;makes&nbsp;debugging&nbsp;a&nbsp;lot<br>
+easier.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -86,7 +87,9 @@ The&nbsp;following&nbsp;methods&nbsp;may&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;s
 media&nbsp;player&nbsp;specific&nbsp;behavior:<br>
 &nbsp;<br>
 *&nbsp;<a href="#Player-get_rating_max">get_rating_max</a>()<br>
-*&nbsp;jump_to()<br>
+*&nbsp;<a href="#Player-jump_in_playlist">jump_in_playlist</a>()<br>
+*&nbsp;<a href="#Player-jump_in_queue">jump_in_queue</a>()<br>
+*&nbsp;<a href="#Player-load_playlist">load_playlist</a>()<br>
 *&nbsp;<a href="#Player-play_next">play_next</a>()<br>
 *&nbsp;<a href="#Player-play_previous">play_previous</a>()<br>
 *&nbsp;<a href="#Player-rate_current">rate_current</a>()<br>
@@ -130,26 +133,20 @@ Also&nbsp;ignores&nbsp;any&nbsp;subsequent&nbsp;calls&nbsp;to&nbsp;an&nbsp;updat
 <a href="#Player-update_volume">update_volume</a>(),&nbsp;...).&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;(e.g.<br>
-if&nbsp;the&nbsp;music&nbsp;player&nbsp;goes&nbsp;down&nbsp;or&nbsp;the&nbsp;Remuco&nbsp;plugin&nbsp;shall&nbsp;be&nbsp;disabled).<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+if&nbsp;the&nbsp;music&nbsp;player&nbsp;goes&nbsp;down&nbsp;or&nbsp;the&nbsp;Remuco&nbsp;plugin&nbsp;shall&nbsp;be&nbsp;disabled).</tt></dd></dl>
 
 <dl><dt><a name="Player-get_cache_dir"><strong>get_cache_dir</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;cache&nbsp;directory.<br>
 &nbsp;<br>
 In&nbsp;most&nbsp;cases&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER<br>
 &nbsp;<br>
-@return:&nbsp;cache&nbsp;dir&nbsp;name<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@return:&nbsp;cache&nbsp;dir&nbsp;name</tt></dd></dl>
 
 <dl><dt><a name="Player-get_clients"><strong>get_clients</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;may&nbsp;be&nbsp;called&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;to&nbsp;integrate<br>
 connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;UI.<br>
 &nbsp;<br>
-@return:&nbsp;a&nbsp;list&nbsp;of&nbsp;client&nbsp;names&nbsp;(or&nbsp;addresses)<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@return:&nbsp;a&nbsp;list&nbsp;of&nbsp;client&nbsp;names&nbsp;(or&nbsp;addresses)</tt></dd></dl>
 
 <dl><dt><a name="Player-get_log_file"><strong>get_log_file</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file.<br>
 &nbsp;<br>
@@ -158,15 +155,11 @@ connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;UI.<br>
 @note:&nbsp;Do&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;to&nbsp;write&nbsp;log&nbsp;messages&nbsp;into.&nbsp;This&nbsp;should&nbsp;be<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;done&nbsp;with&nbsp;the&nbsp;module&nbsp;log&nbsp;(contained&nbsp;within&nbsp;Remuco).&nbsp;The&nbsp;idea<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;the&nbsp;method&nbsp;is&nbsp;that&nbsp;it&nbsp;can&nbsp;be&nbsp;used&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;integrate&nbsp;log&nbsp;information&nbsp;in&nbsp;the&nbsp;media&nbsp;player&nbsp;UI<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;integrate&nbsp;log&nbsp;information&nbsp;in&nbsp;the&nbsp;media&nbsp;player&nbsp;UI</tt></dd></dl>
 
 <dl><dt><a name="Player-get_name"><strong>get_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;player.<br>
 &nbsp;<br>
-Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;(used&nbsp;internally).<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;(used&nbsp;internally).</tt></dd></dl>
 
 <dl><dt><a name="Player-get_rating_max"><strong>get_rating_max</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;maximum&nbsp;possible&nbsp;rating&nbsp;value.<br>
 &nbsp;<br>
@@ -364,18 +357,14 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;position:&nbsp;position&nbsp;of&nbsp;the&nbsp;currently&nbsp;player&nbsp;item&nbsp;(starting&nbsp;from&nbsp;0)<br>
 @keyword&nbsp;queue:&nbsp;True&nbsp;if&nbsp;currently&nbsp;played&nbsp;item&nbsp;is&nbsp;from&nbsp;the&nbsp;queue,&nbsp;False<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;it&nbsp;is&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist&nbsp;(default)<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;it&nbsp;is&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist&nbsp;(default)</tt></dd></dl>
 
 <dl><dt><a name="Player-update_playback"><strong>update_playback</strong></a>(self, playback)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;playback&nbsp;state.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
-@param&nbsp;playback:&nbsp;playback&nbsp;mode&nbsp;(see&nbsp;constants)<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@param&nbsp;playback:&nbsp;playback&nbsp;mode&nbsp;(see&nbsp;constants)</tt></dd></dl>
 
 <dl><dt><a name="Player-update_plob"><strong>update_plob</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;current&nbsp;PLOB.<br>
 &nbsp;<br>
@@ -388,36 +377,28 @@ currently&nbsp;played&nbsp;item&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instance&nbsp;of&nbsp;Image.Image)<br>
 &nbsp;<br>
 @note:&nbsp;For&nbsp;the&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;dictionary&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;constants<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starting&nbsp;with&nbsp;'INFO_'&nbsp;(e.g.&nbsp;INFO_ARTIST)&nbsp;as&nbsp;keys.&nbsp;<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starting&nbsp;with&nbsp;'INFO_'&nbsp;(e.g.&nbsp;INFO_ARTIST)&nbsp;as&nbsp;keys.</tt></dd></dl>
 
 <dl><dt><a name="Player-update_repeat_mode"><strong>update_repeat_mode</strong></a>(self, repeat)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;repeat&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
-@param&nbsp;repeat:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@param&nbsp;repeat:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
 
 <dl><dt><a name="Player-update_shuffle_mode"><strong>update_shuffle_mode</strong></a>(self, shuffle)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;shuffle&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
-@param&nbsp;shuffle:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@param&nbsp;shuffle:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
 
 <dl><dt><a name="Player-update_volume"><strong>update_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;volume.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
-@param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;overwrite!</tt></dd></dl>
+@param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent</tt></dd></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

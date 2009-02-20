@@ -15,9 +15,10 @@ logging is configured to log into a player specific log file (usually
 configuration file (usually ~/.config/remuco/PLAYER/conf).
 
 To use the remuco logging system within a player adapter, import the module
-'log' and use the function log.debug(), log.info(), log.warning() and
+'remuco.log' and use the functions log.debug(), log.info(), log.warning() and
 log.error(). Then all messages of the player adapter will be written into the
-same file which is used for internal remuco logging messages.
+same file as used internally by the remuco module - that makes debugging a lot
+easier.
 
 """
 #===============================================================================
