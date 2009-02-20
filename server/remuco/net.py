@@ -8,8 +8,6 @@ import message
 import remuco
 import serial
 
-# TODO: remove unused debug messages
-
 def build_message(id, serializable):
     """ Create a message ready to send on a socket.
     
@@ -136,7 +134,7 @@ class ClientConnection():
     def __io_recv(self, fd, cond):
         """ GObject callback function (when there is data to receive). """
         
-        log.debug("client %s is knocking" % self.__addr_str)
+        log.debug("data from client %s available" % self.__addr_str)
 
         if self.__rcv_buff_prefix.rest + self.__rcv_buff_header.rest + \
                     self.__rcv_buff_data.rest + self.__rcv_buff_suffix.rest == 0:
@@ -189,6 +187,8 @@ class ClientConnection():
                 msg_data = self.__rcv_buff_data.data
 
         # handle message
+
+        log.debug("incoming message (id %d, payload %d)" % (msg_id, len(msg_data)))
         
         if msg_id == message.MSG_ID_IFC_CINFO:
             
@@ -386,9 +386,7 @@ class Server():
                 log.debug("connection request from client")
                 client_sock, addr = self._sock.accept();
                 log.debug("connection request accepted")
-                # TODO: timeout does not seem to work
                 client_sock.setblocking(0)
-                #client_sock.settimeout(Server.SOCKET_TIMEOUT)
                 ClientConnection(client_sock, addr, self.__clients,
                                  self.__player_info_msg, self.__msg_handler_fn)
             except IOError, e:
