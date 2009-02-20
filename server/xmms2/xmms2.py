@@ -72,13 +72,18 @@ def x2_result_to_plob(result):
     meta[remuco.INFO_BITRATE] = get_meta("bitrate")
     meta[remuco.INFO_TRACK] = get_meta("tracknr")
     meta[remuco.INFO_RATING] = get_meta("rating")
+    meta[remuco.INFO_TAGS] = get_meta("tag")
 
-    img = get_meta(XMMS2.MINFO_KEY_ART)
-    if img != "":
-        img = "%s/%s" % (XMMS2.BIN_DATA_DIR, img)
-    else:
+    img = None
+    for img_key in XMMS2.MINFO_KEYS_ART:
+        img = get_meta(img_key)
+        if img != "":
+            img = "%s/%s" % (XMMS2.BIN_DATA_DIR, img)
+            break
+    
+    if img == "":
         img = None
-            
+    
     log.debug("image: %s" % img)
     
     return (meta, img)
@@ -229,7 +234,8 @@ class LibraryRequest():
 
 class XMMS2(remuco.Player):
     
-    MINFO_KEY_ART = "picture_front"
+    MINFO_KEYS_ART = ("picture_front", "album_front_large", "album_front_small",
+                      "album_front_thumbnail")
     
     BIN_DATA_DIR = "%s/bindata" % xmmsclient.userconfdir_get()
     
@@ -275,6 +281,101 @@ class XMMS2(remuco.Player):
         self.__x2.playback_volume_get(cb=self.__x2cb_volume)
         self.__x2.playlist_current_pos(cb=self.__x2cb_position)
         
+    def get_rating_max(self):
+        
+        return 5
+    
+    def jump_in_playlist(self, position):
+        
+        self.__x2.playlist_set_next(position, cb=x2_result_control)
+        self.__x2.playback_tickle(cb=x2_result_control)
+        if self.__state_playback != remuco.PLAYBACK_PLAY:
+            self.__x2.playback_start(cb=x2_result_control)
+        
+    def load_playlist(self, path):
+        
+        if len(path) == 1:
+            self.__x2.playlist_load(path[0], cb=x2_result_control)
+        else:
+            log.error("** BUG ** bad path: %s" % str(path))
+    
+    def play_next(self):
+        
+        self.__x2.playlist_set_next_rel(1, cb=x2_result_control)
+        self.__x2.playback_tickle(cb=x2_result_control)
+    
+    def play_previous(self):
+        
+        if self.__state_position > 0:
+            self.__x2.playlist_set_next_rel(-1, cb=x2_result_control)
+            self.__x2.playback_tickle(cb=x2_result_control)
+    
+    def rate_current(self, rating):
+        
+        if self.__plob_id_int == 0:
+            return
+        
+        self.__x2.medialib_property_set(self.__plob_id_int, "rating", rating,
+                                          cb=x2_result_control)
+             
+    def toggle_play_pause(self):
+        
+            if self.__state_playback == remuco.PLAYBACK_STOP or \
+               self.__state_playback == remuco.PLAYBACK_PAUSE:
+                self.__x2.playback_start(cb=x2_result_control)
+            else:
+                self.__x2.playback_pause(cb=x2_result_control)
+                    
+    def toggle_repeat(self):
+        
+        log.info("repeat mode cannot be set for XMMS2")
+    
+    def toggle_shuffle(self):
+        
+        self.__x2.playlist_shuffle(cb=x2_result_control)
+            
+    def seek_forward(self):
+        
+        self.__x2.playback_seek_ms_rel(5000, cb=x2_result_control)
+             
+    def seek_backward(self):
+        
+        self.__x2.playback_seek_ms_rel(-5000, cb=x2_result_control)
+    
+    def set_tags(self, id, tags):
+        
+        try:
+            id_int = int(id)
+        except ValueError:
+            log.error("** BUG ** id is not an int")
+            return
+        
+        self.__x2.medialib_property_set(id_int, "tag", tags,
+                                        cb=x2_result_control)
+    
+    def set_volume(self, volume):
+
+        # TODO: currently this fails, problem relates to xmms2 installation
+        for chan in ("right", "left"):
+            self.__x2.playback_volume_set(chan, volume, cb=x2_result_control)
+
+    def request_plob(self, client, id):
+        
+        PlobRequest(client, self, self.__x2, id)
+        
+    def request_playlist(self, client):
+        
+        PlaylistRequest(client, self.__x2, XMMS2.PLAYLIST_ID_ACTIVE,
+                        self.__mycb_playlist_request)
+
+    def request_library(self, client, path):
+        
+        LibraryRequest(client, self, self.__x2, path)
+        
+    def __mycb_playlist_request(self, pr):
+        
+        self.reply_playlist_request(pr.client, pr.plob_ids, pr.plob_names)
+
     def __x2cb_plob_id(self, result):
         
         if not x2_result_check(result):
@@ -365,104 +466,6 @@ class XMMS2(remuco.Player):
         
         ml.quit()
     
-    def get_rating_max(self):
-        
-        return 5
-    
-    def jump_in_playlist(self, position):
-        
-        self.__x2.playlist_set_next(position, cb=x2_result_control)
-        self.__x2.playback_tickle(cb=x2_result_control)
-        if self.__state_playback != remuco.PLAYBACK_PLAY:
-            self.__x2.playback_start(cb=x2_result_control)
-        
-    def load_playlist(self, path):
-        
-        if len(path) == 1:
-            self.__x2.playlist_load(path[0], cb=x2_result_control)
-        else:
-            log.error("** BUG ** bad path: %s" % str(path))
-    
-    def play_next(self):
-        
-        self.__x2.playlist_set_next_rel(1, cb=x2_result_control)
-        self.__x2.playback_tickle(cb=x2_result_control)
-    
-    def play_previous(self):
-        
-        if self.__state_position > 0:
-            self.__x2.playlist_set_next_rel(-1, cb=x2_result_control)
-            self.__x2.playback_tickle(cb=x2_result_control)
-    
-    def rate_current(self, rating):
-        
-        if self.__plob_id_int == 0:
-            return
-        
-        self.__x2.medialib_property_set(self.__plob_id_int, "rating", rating,
-                                          cb=x2_result_control)
-             
-    def toggle_play_pause(self):
-        
-            if self.__state_playback == remuco.PLAYBACK_STOP or \
-               self.__state_playback == remuco.PLAYBACK_PAUSE:
-                self.__x2.playback_start(cb=x2_result_control)
-            else:
-                self.__x2.playback_pause(cb=x2_result_control)
-                    
-    def toggle_repeat(self):
-        
-        log.info("repeat mode cannot be set for XMMS2")
-    
-    def toggle_shuffle(self):
-        
-        self.__x2.playlist_shuffle(cb=x2_result_control)
-            
-    def seek_forward(self):
-        
-        self.__x2.playback_seek_ms_rel(5000, cb=x2_result_control)
-             
-    def seek_backward(self):
-        
-        self.__x2.playback_seek_ms_rel(-5000, cb=x2_result_control)
-    
-    def set_tags(self, id, tags):
-        """ Attach some tags to a PLOB. 
-        
-        @param id: ID of the PLOB to attach the tags to
-        @param tags: a list of tags
-        
-        @note: Tags does not mean ID3 tags or similar. It means the general
-               idea of tags (e.g. like used at last.fm). 
-
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
-        log.warning("set_tags() not yet implemented")
-    
-    def set_volume(self, volume):
-
-        # TODO: currently this fails, problem relates to xmms2 installation
-        for chan in ("right", "left"):
-            self.__x2.playback_volume_set(chan, volume, cb=x2_result_control)
-
-    def request_plob(self, client, id):
-        
-        PlobRequest(client, self, self.__x2, id)
-        
-    def request_playlist(self, client):
-        
-        PlaylistRequest(client, self.__x2, XMMS2.PLAYLIST_ID_ACTIVE,
-                        self.__cb_playlist_request)
-
-    def __cb_playlist_request(self, pr):
-        
-        self.reply_playlist_request(pr.client, pr.plob_ids, pr.plob_names)
-
-    def request_library(self, client, path):
-        
-        LibraryRequest(client, self, self.__x2, path)
-        
 # =============================================================================
 # main
 # =============================================================================
