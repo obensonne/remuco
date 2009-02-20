@@ -23,6 +23,18 @@ info = config.logga.info
 warning = config.logga.warning
 error = config.logga.error
 
+def bug(msg):
+    """ Log a bug.
+    
+    @param msg: the bug message
+    
+    This simply logs an error message prefixed with a bug indicator.
+    """
+    
+    global error
+    
+    error("** BUG ** %s" % msg)
+
 #===============================================================================
 # configuration functions
 #===============================================================================
