@@ -760,7 +760,7 @@ class Player:
         ok = serial.unpack(ss, bindata)
         if not ok: return
         
-        self.request_plob(ss.get(), client)
+        self.request_plob(client, ss.get())
         
     def __handle_message_request_list(self, bindata, client):
 
