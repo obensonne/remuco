@@ -1,5 +1,6 @@
 import sys
 import os
+import signal
 import gobject
 import xmmsclient
 import xmmsclient.glib
@@ -468,26 +469,37 @@ class XMMS2(remuco.Player):
 
 ml = None
 
+def sighandler(signum, frame):
+    
+    global ml
+    
+    log.info("received signal %i" % signum)
+    
+    if ml != None:
+        ml.quit()
+        
 def main():
+    
+    signal.signal(signal.SIGINT, sighandler)
+    signal.signal(signal.SIGTERM, sighandler)
+
+    try:
+        rem_x2 = XMMS2()
+    except Exception, e:
+        print("Failed to set up XMMS2 player adapter: %s" % str(e))
+        print("See remuco-xmms2 log file for details.")
+        return
     
     global ml
     
     ml = gobject.MainLoop()
     
     try:
-        x2 = XMMS2()
-    except Exception, e:
-        sys.exc_info()
-        print("%s" % str(e))
-        print("See remuco-xmms2 log file for details.")
-        return
-    
-    try:
         ml.run()
     except Exception, e:
         print("exception in main loop: %s" % str(e))
     
-    x2.down()
+    rem_x2.down()
 
 
 if __name__ == '__main__':
