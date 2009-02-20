@@ -19,6 +19,8 @@ class Bin:
     NET_ENCODING_ALT = ("UTF-8", "UTF8", "utf-8", "utf8") # synonyms
     HOST_ENCODING = NET_ENCODING # will be updated with value from config file
     
+    TYPE_UC = type(u'dummy')
+    
     def __init__(self, buff=None):
         
         if not buff:
@@ -143,11 +145,21 @@ class Bin:
     def write_string(self, s):
         """ Write a string. 
         
-        Before writing the string will be converted from Bin.HOST_ENCODING to
-        Bin.NET_ENCODING.
+        If the string is a unicode string, it will be encoded as a normal string
+        in Bin.NET_ENCODING. If it already is a normal string it will be
+        converted from Bin.HOST_ENCODING to Bin.NET_ENCODING.
         """
         
-        if Bin.HOST_ENCODING not in Bin.NET_ENCODING_ALT:
+        if type(s) == Bin.TYPE_UC:
+            
+            try:
+                s = s.encode(Bin.NET_ENCODING)
+            except UnicodeEncodeError, e:
+                log.warning("could not encode '%s' with codec %s (%s)" %
+                            (s, Bin.NET_ENCODING, e))
+                s = str(s)
+        
+        elif Bin.HOST_ENCODING not in Bin.NET_ENCODING_ALT:
             log.debug("convert '%s' from %s to %s" %
                       (s, Bin.HOST_ENCODING, Bin.NET_ENCODING))
             try:
@@ -228,8 +240,7 @@ def pack(serializable):
     data = serializable.get_data()
     
     if len(fmt) != len(data):
-        log.warning("oops, looks lika a bug: %s" %
-                    "format string and data differ in length")
+        log.error("** BUG ** format string and data differ in length")
         return None
         
     #log.debug("data to pack: %s" % str(data))
@@ -273,18 +284,16 @@ def pack(serializable):
                 bin.write_array_byte(data[i])
                 
             else:
-                
-                log.warning("oops, looks like a bug: " +
-                            "unknown data type (%d) in format string" % type)
+                log.error("** BUG ** unknown type (%d) in format string" % type)
                 return None
         
     except struct.error, e:
         
-        log.warning("oops, looks like a bug: %s" % e)
+        log.error("** BUG ** %s" % str(e))
         
         return None
     
-    return bin.get_buff() 
+    return bin.get_buff()
 
 def unpack(serializable, bytes):
     """ Deserialize a Serializable.
