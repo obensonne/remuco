@@ -12,21 +12,16 @@ import rb, rhythmdb
 import remuco
 from remuco import log
 
-
-###############################################################################
-
-PLAYER = "Rhythmbox"
-
-###############################################################################
-#
-# Rhythmbox related constants
-#
-###############################################################################
+# =============================================================================
+# constants
+# =============================================================================
 
 PLAYORDER_SHUFFLE = "shuffle"
 PLAYORDER_SHUFFLE_ALT = "random" # starts with ..
 PLAYORDER_REPEAT = "linear-loop"
 PLAYORDER_NORMAL = "linear"
+
+SECTION_LIBRARY = "Library"
 
 COVER_FILE_NAMES = ("folder", "front", "album", "cover")
 COVER_FILE_TYPES = ("png", "jpeg", "jpg")
@@ -35,13 +30,9 @@ RATING_MAX = 5
 
 SEEK_STEP = 5
 
-DELIM = "__:;:___"
-
-###############################################################################
-#
-# Remuco Plugin
-#
-###############################################################################
+# =============================================================================
+# plugin
+# =============================================================================
 
 class RemucoPlugin(rb.Plugin):
     
@@ -49,11 +40,11 @@ class RemucoPlugin(rb.Plugin):
         
         try:
             
-            print("initialize remuco plugin ..")
+            print("initialize Remuco plugin ..")
 
             rb.Plugin.__init__(self)
         
-            self.__rem = None
+            self.__remrb = None
             
         except Exception, e:
             
@@ -61,44 +52,36 @@ class RemucoPlugin(rb.Plugin):
         
     def activate(self, shell):
         
-        print("activate remuco plugin ..")
+        print("activate Remuco plugin ..")
 
-        if self.__rem is not None:
-            print("remuco plugin already active!")
+        if self.__remrb is not None:
+            print("Remuco plugin already active!")
             return
 
         try:
-            
-            self.__rem = Remythm(shell)
-            
+            self.__remrb = Rhythmbox(shell)
             print("see remuco-rhythmbox log file for further logging")
-            
         except Exception, e:
-            
-            print("failed to init rhythmbox player object (%s)" % e)
+            print("failed to init Rhythmbox player object (%s)" % e)
             traceback.print_exc()
         
-        print("remuco plugin activated")
+        print("activate Remuco plugin .. done")
 
     def deactivate(self, shell):
     
         print("deactivate Remuco plugin ..")
 
-        if self.__rem is not None:
-            self.__rem.down()
-            self.__rem = None
+        if self.__remrb is not None:
+            self.__remrb.down()
+            self.__remrb = None
 
         print("deactivate Remuco plugin .. done")
-###############################################################################
-#
-# Player Proxy
-#
-###############################################################################
+        
+# =============================================================================
+# player adapter
+# =============================================================================
 
-def rblog(s):
-    print (s)
-
-class Remythm(remuco.Player):
+class Rhythmbox(remuco.Player):
 
     def __init__(self, shell):
         
@@ -109,9 +92,6 @@ class Remythm(remuco.Player):
         self.__cover_file = "%s/cover.png" % self.get_cache_dir()
 
         sp = self.__shell.get_player()
-        
-        #log.set_file(None) # log to std-out
-        #log.set_functions(rblog, rblog, rblog, rblog)
         
         ###### shortcuts to RB data ###### 
         
@@ -138,29 +118,29 @@ class Remythm(remuco.Player):
         # state sync will happen by timeout
         self.__cb_sp_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
         
-        log.debug("Remythm() done")
+        log.debug("Remythm.__init__() done")
 
-    #==========================================================================
-    # client side player control (to be implemented by sub classes) 
-    #==========================================================================
+    # =========================================================================
+    # client side player control
+    # =========================================================================
     
     def get_rating_max(self):
-        """ Get the maximum possible rating value.
         
-        @return: the player's maximum rating value
-        
-        @note: This method should be overwritten by sub classes of Player if the
-               corresponding player supports rating.
-        """
         return RATING_MAX
     
     def jump_in_playlist(self, position):
         
-        self.__jump_in_plq(self.__playlist_sc, position)
+        try:
+            self.__jump_in_plq(self.__playlist_sc, position)
+        except Exception, e:
+            log.debug("playlist jump failed: %s" % str(e))
         
     def jump_in_queue(self, position):
 
-        self.__jump_in_plq(self.__queue_sc, position)
+        try:
+            self.__jump_in_plq(self.__queue_sc, position)
+        except Exception, e:
+            log.debug("queue jump failed: %s" % str(e))
 
     def __jump_in_plq(self, sc, position):
 
@@ -168,8 +148,6 @@ class Remythm(remuco.Player):
             return
         
         qm = sc.get_entry_view().props.model
-        
-        # FIXME: assuming entry view and query model are never None
         
         id_to_remove_from_queue = None
         
@@ -197,7 +175,6 @@ class Remythm(remuco.Player):
             self.__shell.remove_from_queue(id_to_remove_from_queue)
 
     def load_playlist(self, path):
-        """Jump to a specific song (index) in a specific source (path)."""
         
         sc = self.__get_source_from_path(path)
         
@@ -206,68 +183,53 @@ class Remythm(remuco.Player):
         
         qm = sc.get_entry_view().props.model
         
-        # FIXME: assuming entry view and query model are never None
-        
         sp = self.__shell.get_player()
 
         if sc != self.__playlist_sc:
-            sp.set_selected_source(sc)
-            sp.set_playing_source(sc)
+            try:
+                sp.set_selected_source(sc)
+                sp.set_playing_source(sc)
+            except Exception, e:
+                log.debug("switching source failed: %s" % str(e))
+            
             
     def play_next(self):
-        """ Play the next item. 
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         
         sp = self.__shell.get_player()
-        if sp is not None:
-            try:
-                sp.do_next()
-            except:
-                pass
+        
+        try:
+            sp.do_next()
+        except Exception, e:
+            log.debug("do next failed: %" % str(e))
     
     def play_previous(self):
-        """ Play the previous item. 
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         
         sp = self.__shell.get_player()
-        if sp is not None:
-            try:
-                sp.set_playing_time(0)
-                time.sleep(0.1)
-                sp.do_previous()
-            except:
-                pass # no previous song
+        
+        try:
+            sp.set_playing_time(0)
+            time.sleep(0.1)
+            sp.do_previous()
+        except Exception, e:
+            log.debug("do previous failed: %" % str(e))
     
     def rate_current(self, rating):
-        """ Rate the currently played item. 
         
-        @param rating: rating value (int)
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
-        db = self.__shell.props.db
         if self.__plob_entry is not None:
-            db.set(self.__plob_entry, rhythmdb.PROP_RATING, rating)
+            db = self.__shell.props.db
+            try:
+                db.set(self.__plob_entry, rhythmdb.PROP_RATING, rating)
+            except Exception, e:
+                log.debug("rating failed: %s" % str(e))
     
     def toggle_play_pause(self):
-        """ Toggle play and pause. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         sp = self.__shell.get_player()
-        if sp is not None:
-            try:
-                sp.playpause()
-            except:
-                pass
+        
+        try:
+            sp.playpause()
+        except Exception, e:
+            log.debug("toggle play pause failed: %" % str(e))
                 
     
     def toggle_repeat(self):
@@ -277,6 +239,7 @@ class Remythm(remuco.Player):
                gets called if a remote client wants to control the player.
         """
         logging.warning("toggle_repeat() not yet implemented")
+        # TODO: implement
         
     
     def toggle_shuffle(self):
@@ -286,75 +249,48 @@ class Remythm(remuco.Player):
                gets called if a remote client wants to control the player.
         """
         logging.warning("toggle_shuffle() not yet implemented")
+        # TODO: implement
     
     def seek_forward(self):
-        """ Seek forward some seconds. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         sp = self.__shell.get_player()
-        if sp is not None:
+
+        try:
             sp.seek(SEEK_STEP)
+        except Exception, e:
+            log.debug("seek fwd failed: %" % str(e))
     
     def seek_backward(self):
-        """ Seek forward some seconds. 
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
-        sp = self.__shell.get_player()
-        if sp is not None:
-            sp.seek(- SEEK_STEP)
-    
-    def set_tags(self, id, tags):
-        """ Attach some tags to a PLOB. 
-        
-        @param id: ID of the PLOB to attach the tags to
-        @param tags: a list of tags
-        
-        @note: Tags does not mean ID3 tags or similar. It means the general
-               idea of tags (e.g. like used at last.fm). 
 
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
-        logging.warning("set_tags() not yet implemented")
+        sp = self.__shell.get_player()
+        
+        try:
+            sp.seek(- SEEK_STEP)
+        except Exception, e:
+            log.debug("seek bwd failed: %" % str(e))
     
     def set_volume(self, volume):
-        """ Set volume. 
         
-        @param volume: the new volume in percent
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         sp = self.__shell.get_player()
-        if sp is not None:
-            sp.set_volume(float(volume) / 100)
-        
-    def request_plob(self, id, client):
-        """ Request information about a specific PLOB. 
-        
-        @param id: ID of the requested PLOB (string)
-        @param client: the requesting client - use reply_plob_request()
-                       to send back the requested PLOB
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client request a PLOB from the player.
-               
-        @see reply_plob_request()
-        """
+
         try:
-            
-            log.debug("called request_plob(%s)" % id)        
-    
-            db = self.__shell.props.db
-    
-            entry = db.entry_lookup_by_location(id)
-            
+            sp.set_volume(float(volume) / 100)
         except Exception, e:
-            log.warning("error while requesting a plob (%s)" % e)
+            log.debug("set volume failed: %" % str(e))
+        
+    # =========================================================================
+    # client side requests
+    # =========================================================================
+    
+    def request_plob(self, client, id):
+        
+        log.debug("called request_plob(%s)" % id)
+                
+        try:
+            db = self.__shell.props.db
+            entry = db.entry_lookup_by_location(id)
+        except Exception, e:
+            log.warning("requesting plob failed: %s" % e)
             entry = None
             
         info = self.__get_plob_info(entry)
@@ -381,7 +317,6 @@ class Remythm(remuco.Player):
         gobject.idle_add(self.reply_queue_request, client, ids, names)
 
     def request_library(self, client, path):
-        log.debug("called RequestPloblist(%s)" % path)
 
         nested = []
         plob_ids = []
@@ -389,16 +324,9 @@ class Remythm(remuco.Player):
         
         slm = self.__shell.props.sourcelist_model
         
-        if not slm:
-            log.debug("no source list model")
-            gobject.idle_add(self.reply_library_request, client, path, nested,
-                             plob_ids, plob_names)
-            return
-
         ### root ? ###
         
         # TODO: include Library/* here in root
-
         if path is None or len(path) == 0:
             for group in slm:
                 group_name = group[2]
@@ -413,8 +341,8 @@ class Remythm(remuco.Player):
             for group in slm:
                 group_name = group[2]
                 if path[0] == group_name:
-                    for source in group.iterchildren():
-                        source_name = source[2]
+                    for sc in group.iterchildren():
+                        source_name = sc[2]
                         log.debug("append %s" % source_name)
                         nested.append(source_name)
                     break
@@ -424,16 +352,16 @@ class Remythm(remuco.Player):
             
         ### regular playlist (source) ! ### Library/???, Playlists/???
         
-        source = self.__get_source_from_path(path)
+        sc = self.__get_source_from_path(path)
 
-        if not source:
+        if not sc:
             gobject.idle_add(self.reply_library_request, client, path, nested,
                              plob_ids, plob_names)
             return
 
-        model = source.get_entry_view().props.model
+        qm = sc.get_entry_view().props.model
         
-        plob_ids, plob_names = self.__get_tracks_from_qmodel(model)
+        plob_ids, plob_names = self.__get_tracks_from_qmodel(qm)
         
         gobject.idle_add(self.reply_library_request, client, path, nested,
                          plob_ids, plob_names)
@@ -448,8 +376,6 @@ class Remythm(remuco.Player):
 
         ###### disconnect from shell player signals ######
 
-        # FIXME: assuming shell player is never None
-        
         sp = self.__shell.get_player()
 
         for cb_id in self.__cb_ids_sp:
@@ -466,9 +392,9 @@ class Remythm(remuco.Player):
         # release shell
         self.__shell = None
         
-    #==========================================================================
-    # Rhythmbox signal callbacks
-    #==========================================================================
+    # ==========================================================================
+    # callbacks
+    # ==========================================================================
     
     def __cb_sp_playing_uri_changed(self, sp, uri):
         """Shell player signal callback to handle a plob change."""
@@ -528,17 +454,13 @@ class Remythm(remuco.Player):
 
     def __cb_sp_playlist_changed(self, sp, source_new):
         """Shell player signal callback to handle a playlist switch."""
-        log.debug("new source: %s" % str(source_new))
+        
+        log.debug("sp_playlist_changed: %s" % str(source_new))
+        
         self.__playlist_sc = source_new
         
-    #==========================================================================
-    # Main context callbacks
-    #==========================================================================
-
     def __cb_mc_poll_misc(self):
-        """Timeout callback to periodically poll RB for state information
-        without change signals.
-        """ 
+        """Periodic callback to poll for state information without signals.""" 
         
         sp = self.__shell.get_player()
         
@@ -566,53 +488,9 @@ class Remythm(remuco.Player):
 
         return True
 
-    #==========================================================================
+    # =========================================================================
     # helper methods
-    #==========================================================================
-
-    def __do_jump(self, path, index):
-        """Jump to a specific song (index) in a specific source (path)."""
-        
-        source = self.__get_source_from_path(path)
-        
-        if not source:
-            return
-        
-        qmodel = source.get_entry_view().props.model
-        
-        # FIXME: assuming entry view and query model are never None
-        
-        sp = self.__shell.get_player()
-
-        id_to_remove_from_queue = None
-        
-        if sp.props.playing_from_queue:
-            id_to_remove_from_queue = self.__plob_id
-
-        if sp.props.playing_from_queue or source != self.__playlist_sc:
-            sp.set_selected_source(source)
-            sp.set_playing_source(source)
-            
-        found = False
-        i = 0
-        for row in qmodel:
-            if i == index:
-                sp.play_entry(row[0])
-                found = True
-                break
-            i += 1
-        
-        if not found:
-            sp.do_next()
-        
-        if id_to_remove_from_queue != None:
-            log.debug("remove %s from queue" % id_to_remove_from_queue)
-            self.__shell.remove_from_queue(id_to_remove_from_queue)
-
-        # this works almost perfect now .. the only difference to directly
-        # doing jumps in the RB UI is that when jumping to a song in the queue
-        # which is not the first in the queue, the song does not get moved
-        # to the top of the queue .. that's ok
+    # =========================================================================
 
     def __get_tracks_from_qmodel(self, qmodel):
         """Get all tracks in a query model.
@@ -703,19 +581,19 @@ class Remythm(remuco.Player):
     def __get_source_from_path(self, path):
         """Get the source object of source 'id'.
         
-        'path' contains either the source' group and name (2 element list) or
-        one of the well known IDs 'remuco.PLID_CURRENT' and 'remuco.PLID_QUEUE'
-        (1 element list).
+        'path' contains the source' group and name (2 element list).
         """
         
-        slm = self.__shell.props.sourcelist_model
-        
-        # FIXME: assuming 'slm' is never None
+        if len(path) != 2:
+            log.error("** BUG ** invalid path length: %s" % str(path))
+            return None
         
         group_name, source_name = path
         
         if not group_name or not source_name:
             return None
+        
+        slm = self.__shell.props.sourcelist_model
         
         for group in slm:
             if group_name == group[2]:
@@ -753,9 +631,9 @@ class Remythm(remuco.Player):
         
         return position
 
-    #==========================================================================
+    # =========================================================================
     # update wrapper
-    #==========================================================================
+    # =========================================================================
 
     def __update_position(self):
         """Determine the current position and update."""
@@ -764,7 +642,3 @@ class Remythm(remuco.Player):
 
         self.update_play_position(self.__get_position(), queue=pfq)
 
-if __name__ == "__main__":
-    
-    print "This python module only works within Rhythmbox."
-    
