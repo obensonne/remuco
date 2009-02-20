@@ -174,7 +174,7 @@ class Player:
         
         self.__shutting_down = False
         
-        log.debug("Player() done")
+        log.debug("Player.__init__() done")
         
     #==========================================================================
     # configuration
@@ -563,7 +563,8 @@ class Player:
         @see: request_library()
         """ 
         
-        log.debug("library reply: %s" % str(plob_ids))
+        log.debug("library reply: %s %s %s %s" %
+                  (str(path), str(nested), str(plob_ids), str(plob_names)))
         
         library = Library(path, nested, plob_ids, plob_names)
         
