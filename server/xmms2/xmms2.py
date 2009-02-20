@@ -71,8 +71,8 @@ def x2_result_to_plob(result):
     meta[remuco.INFO_LENGTH] = get_meta("duration")
     meta[remuco.INFO_BITRATE] = get_meta("bitrate")
     meta[remuco.INFO_TRACK] = get_meta("tracknr")
-    meta[remuco.INFO_RATING] = get_meta("rating")
-    meta[remuco.INFO_TAGS] = get_meta("tag")
+    meta[remuco.INFO_RATING] = get_meta(XMMS2.MINFO_KEY_RATING)
+    meta[remuco.INFO_TAGS] = get_meta(XMMS2.MINFO_KEY_TAGS)
 
     img = None
     for img_key in XMMS2.MINFO_KEYS_ART:
@@ -237,6 +237,9 @@ class XMMS2(remuco.Player):
     MINFO_KEYS_ART = ("picture_front", "album_front_large", "album_front_small",
                       "album_front_thumbnail")
     
+    MINFO_KEY_TAGS = "tag"
+    MINFO_KEY_RATING = "rating"
+    
     BIN_DATA_DIR = "%s/bindata" % xmmsclient.userconfdir_get()
     
     ERROR_DISCONNECTED = "disconnected"
@@ -315,8 +318,9 @@ class XMMS2(remuco.Player):
         if self.__plob_id_int == 0:
             return
         
-        self.__x2.medialib_property_set(self.__plob_id_int, "rating", rating,
-                                          cb=x2_result_control)
+        self.__x2.medialib_property_set(self.__plob_id_int,
+                                        XMMS2.MINFO_KEY_RATING, rating,
+                                        cb=x2_result_control)
              
     def toggle_play_pause(self):
         
@@ -350,7 +354,11 @@ class XMMS2(remuco.Player):
             log.error("** BUG ** id is not an int")
             return
         
-        self.__x2.medialib_property_set(id_int, "tag", tags,
+        s = ""
+        for tag in tags:
+            s = "%s,%s" % (s, tag)
+        
+        self.__x2.medialib_property_set(id_int, XMMS2.MINFO_KEY_TAGS, s,
                                         cb=x2_result_control)
     
     def set_volume(self, volume):
