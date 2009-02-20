@@ -623,9 +623,6 @@ class Player:
                 
         self.__sync_trigger_ids = {}
         
-        #if self.__lfh is not None:
-        #    self.__lfh.close()
-        
     #==========================================================================
     # synchronization (outbound communication)
     #==========================================================================
