@@ -97,7 +97,9 @@ class Player:
     media player specific behavior:
     
     * get_rating_max()
-    * jump_to()
+    * jump_in_playlist()
+    * jump_in_queue()
+    * load_playlist()
     * play_next()
     * play_previous()
     * rate_current()
@@ -186,8 +188,6 @@ class Player:
         In most cases this is ~/.cache/remuco/PLAYER
 
         @return: cache dir name
-        
-        @attention: Do not overwrite!
         """
         
         return self.__config.get_cache_dir()
@@ -201,8 +201,6 @@ class Player:
                done with the module log (contained within Remuco). The idea
                of the method is that it can be used by player adapters to
                integrate log information in the media player UI
-        
-        @attention: Do not overwrite!
         """
         
         return self.__config.get_log_file()
@@ -433,8 +431,6 @@ class Player:
         @param position: position of the currently player item (starting from 0)
         @keyword queue: True if currently played item is from the queue, False
                         if it is from the currently active playlist (default)
-        
-        @attention: Do not overwrite!
         """
         
         self.__state.set_queue(queue)
@@ -448,8 +444,6 @@ class Player:
         state with remote clients.
         
         @param playback: playback mode (see constants)
-        
-        @attention: Do not overwrite!
         """
         
         self.__state.set_playback(playback)
@@ -462,8 +456,6 @@ class Player:
         state with remote clients.
         
         @param repeat: true means on, false means off
-        
-        @attention: Do not overwrite!
         """
         
         self.__state.set_repeat(repeat)
@@ -476,8 +468,6 @@ class Player:
         state with remote clients.
         
         @param shuffle: true means on, false means off
-        
-        @attention: Do not overwrite!
         """
         
         self.__state.set_shuffle(shuffle)
@@ -496,8 +486,6 @@ class Player:
         
         @note: For the PLOB meta information dictionary use one of the constants
                starting with 'INFO_' (e.g. INFO_ARTIST) as keys. 
-        
-        @attention: Do not overwrite!
         """
         
         self.__plob.set_id(id)
@@ -512,8 +500,6 @@ class Player:
         state with remote clients.
         
         @param volume: the volume in percent
-         
-        @attention: Do not overwrite!
         """
         
         self.__state.set_volume(volume)
@@ -599,8 +585,6 @@ class Player:
         
         This method is intended to be called by sub classes of Player (e.g.
         if the music player goes down or the Remuco plugin shall be disabled).
-
-        @attention: Do not overwrite!
         """
 
         if self.__shutting_down: return
@@ -790,8 +774,6 @@ class Player:
         """ Get the name of the player.
         
         Probably not that useful for player adapters (used internally).
-        
-        @attention: Do not overwrite!
         """
         return self.__name
     
@@ -802,8 +784,6 @@ class Player:
         connected clients in a UI.
 
         @return: a list of client names (or addresses)
-
-        @attention: Do not overwrite!
         """ 
         
         l = []
