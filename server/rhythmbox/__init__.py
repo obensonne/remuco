@@ -200,7 +200,7 @@ class Rhythmbox(remuco.Player):
         try:
             sp.do_next()
         except Exception, e:
-            log.debug("do next failed: %" % str(e))
+            log.debug("do next failed: %s" % str(e))
     
     def play_previous(self):
         
@@ -211,7 +211,7 @@ class Rhythmbox(remuco.Player):
             time.sleep(0.1)
             sp.do_previous()
         except Exception, e:
-            log.debug("do previous failed: %" % str(e))
+            log.debug("do previous failed: %s" % str(e))
     
     def rate_current(self, rating):
         
@@ -229,7 +229,7 @@ class Rhythmbox(remuco.Player):
         try:
             sp.playpause()
         except Exception, e:
-            log.debug("toggle play pause failed: %" % str(e))
+            log.debug("toggle play pause failed: %s" % str(e))
                 
     
     def toggle_repeat(self):
@@ -258,7 +258,7 @@ class Rhythmbox(remuco.Player):
         try:
             sp.seek(SEEK_STEP)
         except Exception, e:
-            log.debug("seek fwd failed: %" % str(e))
+            log.debug("seek fwd failed: %s" % str(e))
     
     def seek_backward(self):
 
@@ -267,7 +267,7 @@ class Rhythmbox(remuco.Player):
         try:
             sp.seek(- SEEK_STEP)
         except Exception, e:
-            log.debug("seek bwd failed: %" % str(e))
+            log.debug("seek bwd failed: %s" % str(e))
     
     def set_volume(self, volume):
         
@@ -276,7 +276,7 @@ class Rhythmbox(remuco.Player):
         try:
             sp.set_volume(float(volume) / 100)
         except Exception, e:
-            log.debug("set volume failed: %" % str(e))
+            log.debug("set volume failed: %s" % str(e))
         
     # =========================================================================
     # client side requests
