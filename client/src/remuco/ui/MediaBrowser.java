@@ -238,6 +238,7 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 		screenPloblist.setPloblist(pl);
 
 		if (pl.isPlaylist()) {
+			
 			if (!player.info.supportsJumpPlaylist()) {
 				screenPloblist.removeCommand(CMD.SELECT);
 				screenPloblist.setSelectCommand(CMD.INFO);
@@ -249,10 +250,12 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 				try {
 					screenPloblist.setSelectedIndex(player.state.getPosition(),
 							true);
-				} catch (ArrayIndexOutOfBoundsException e) {
+				} catch (IndexOutOfBoundsException e) {
 				}
 			}
+			
 		} else if (pl.isQueue()) {
+			
 			if (!player.info.supportsJumpQueue()) {
 				screenPloblist.removeCommand(CMD.SELECT);
 				screenPloblist.setSelectCommand(CMD.INFO);
@@ -267,7 +270,9 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 				} catch (ArrayIndexOutOfBoundsException e) {
 				}
 			}
+			
 		} else {
+			
 			screenPloblist.addCommand(CMD.SELECT);
 			screenPloblist.setSelectCommand(CMD.SELECT);
 		}
