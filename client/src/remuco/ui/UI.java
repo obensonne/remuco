@@ -204,7 +204,7 @@ public final class UI implements CommandListener, IConnectionListener,
 			screenPlayer.addCommand(CMD.EXIT);
 			screenPlayer.setCommandListener(this);
 
-			Log.debug("show player screen");
+			Log.ln("[UI] show player screen");
 			
 			display.setCurrent(screenPlayer);
 		}
