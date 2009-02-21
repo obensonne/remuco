@@ -136,8 +136,11 @@ public final class PlobDescScreeny extends Screeny {
 		y = height - Theme.FONT_SMALL.getHeight();
 
 		x = 0;
-		g.drawString(plob.getMeta(Plob.META_YEAR), x, y, Graphics.LEFT
-				| Graphics.BASELINE);
+		String year = plob.getMeta(Plob.META_YEAR);
+		if (year.equals("0") || year.startsWith("-")) {
+			year = "";
+		}
+		g.drawString(year, x, y, Graphics.LEFT | Graphics.BASELINE);
 
 		x = width / 2;
 		g.drawString(plob.getMeta(Plob.META_GENRE), x, y, Graphics.HCENTER
