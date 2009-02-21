@@ -156,7 +156,12 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenTagEditor.setCommandListener(this);
 
 		mediaBrowser = new MediaBrowser(this, display, player);
-		
+
+		/*
+		 * Some devices do not call sizeChanged() when this screen is shown the
+		 * first time. To ensure screenies are initialized properly, we call
+		 * this here already.
+		 */
 		initScreenies();
 
 	}
@@ -169,7 +174,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		if (cmd == CMD.BACK) {
 
-			screenOptions.addCommand(CMD_DISCONNECT, Theme.LIST_ICON_DISCONNECT);
+			screenOptions
+					.addCommand(CMD_DISCONNECT, Theme.LIST_ICON_DISCONNECT);
 
 		} else if (cmd == CMD.EXIT) {
 
@@ -397,17 +403,17 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			}
 
 			break;
-			
+
 		case Keys.ACTION_REPEAT:
-			
+
 			player.ctrlToggleRepeat();
-			
+
 			break;
 
 		case Keys.ACTION_SHUFFLE:
-			
+
 			player.ctrlToggleShuffle();
-			
+
 			break;
 
 		case Keys.ACTION_NOOP:
