@@ -12,17 +12,24 @@ import remuco.ui.Theme;
 public final class KeySetScreen extends Canvas {
 
 	/**
-	 * Just to block the soft keys which are allways used for some menus and
+	 * Just to block the soft keys which are always used for some menus and
 	 * therefore not suited to be used as hot keys.
 	 */
 	private static final Command CMD_BLOCK1 = new Command("BLOCKED",
 			Command.OK, 0);
 
 	/**
-	 * Just to block the soft keys which are allways used for some menus and
+	 * Just to block the soft keys which are always used for some menus and
 	 * therefore not suited to be used as hot keys.
 	 */
 	private static final Command CMD_BLOCK2 = new Command("BLOCKED",
+			Command.BACK, 0);
+
+	/**
+	 * Just to block the soft keys which are always used for some menus and
+	 * therefore not suited to be used as hot keys.
+	 */
+	private static final Command CMD_BLOCK3 = new Command("BLOCKED",
 			Command.BACK, 0);
 
 	private static final Font FONT = Theme.FONT_SMALL;
@@ -42,6 +49,7 @@ public final class KeySetScreen extends Canvas {
 
 		addCommand(CMD_BLOCK1);
 		addCommand(CMD_BLOCK2);
+		addCommand(CMD_BLOCK3);
 
 	}
 
