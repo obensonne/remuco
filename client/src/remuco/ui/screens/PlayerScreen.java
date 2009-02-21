@@ -156,6 +156,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenTagEditor.setCommandListener(this);
 
 		mediaBrowser = new MediaBrowser(this, display, player);
+		
+		initScreenies();
 
 	}
 
