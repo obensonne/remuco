@@ -1,9 +1,5 @@
 package remuco.ui.screens;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;
 
 import remuco.player.PlobList;
@@ -29,8 +25,6 @@ public final class PloblistScreen extends List {
 
 	private final String fixedTitle;
 
-	private final Vector itemCommands;
-
 	private PlobList list = null;
 
 	public PloblistScreen() {
@@ -44,21 +38,6 @@ public final class PloblistScreen extends List {
 
 		fixedTitle = title;
 
-		itemCommands = new Vector();
-
-	}
-
-	/**
-	 * Add a command which shall only be visible if there are any items in this
-	 * list.
-	 */
-	public void addItemCommand(Command c) {
-		if (!itemCommands.contains(c)) {
-			itemCommands.addElement(c);
-		}
-		if (size() > 0) {
-			addCommand(c);
-		}
 	}
 
 	public PlobList getPloblist() {
@@ -100,23 +79,6 @@ public final class PloblistScreen extends List {
 
 		final int plobs = list != null ? list.getNumPlobs() : 0;
 		final int nested = list != null ? list.getNumNested() : 0;
-
-		// show or hide item dependent commands
-
-		final Enumeration e = itemCommands.elements();
-
-		if (plobs + nested == 0) {
-
-			while (e.hasMoreElements()) {
-				super.removeCommand((Command) e.nextElement());
-			}
-
-		} else {
-
-			while (e.hasMoreElements()) {
-				addCommand((Command) e.nextElement());
-			}
-		}
 
 		for (int i = 0; i < nested; i++) {
 			append(list.getNested(i), Theme.LIST_ICON_PLOBLIST);
