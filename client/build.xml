@@ -30,8 +30,8 @@
      Create a file 'build.properties' (use 'build.properties.example' as a
      template) and edit it as described within that file.
 
-     When using the WTK emulator, create a file 'emulator.properties' (use
-     'emulator.properties.example' as a template) and edit it if necessary.
+     When using the WTK emulator, create a file 'wtk-emulator.properties' (use
+     'wtk-emulator.properties.example' as a template) and edit it if necessary.
      
      Run target 'run'.
      
