@@ -122,6 +122,7 @@ public final class DeviceSelectorScreen extends List implements
 		screenScanResults = new List("Scan Results", List.IMPLICIT);
 		screenScanResults.addCommand(CMD.BACK);
 		screenScanResults.addCommand(CMD_SCAN_RESULT_ADD);
+		screenScanResults.setSelectCommand(CMD_SCAN_RESULT_ADD);
 		screenScanResults.setCommandListener(this);
 
 		addCommand(CMD_CONNECT);
