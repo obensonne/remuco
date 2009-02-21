@@ -13,8 +13,9 @@ public final class TagEditorScreen extends Form {
 
 	private String pid;
 
-	private final TextField tagEditField = new TextField("Tags", "", 256,
-			TextField.ANY);
+	private final TextField tagEditField = new TextField(
+			"Attach a comma separted list of tags to the current track.", "",
+			256, TextField.ANY);
 
 	public TagEditorScreen() {
 
