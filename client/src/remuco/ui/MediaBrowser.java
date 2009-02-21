@@ -72,6 +72,8 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 		screenWaiting = new WaitingScreen();
 		screenWaiting.setTitle("Updating");
 		screenWaiting.setCommandListener(this);
+		
+		alertSelect = new Alert("", "", null, AlertType.INFO);
 
 		screenPloblist = new PloblistScreen();
 		screenPloblist.addCommand(CMD_UP);
@@ -96,6 +98,8 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 		displayableBeforeRequest = screenRoot;
 	}
+
+	private final Alert alertSelect;
 
 	public void commandAction(Command c, Displayable d) {
 
@@ -137,8 +141,23 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 				player.reqPloblist(path, this);
 				requestedItem = path;
 			} else {
-				player.ctrlJump(pl.getPath(), index - pl.getNumNested());
-				display.setCurrent(parent);
+
+				if (pl.isPlaylist() && !player.info.supportsJumpPlaylist()) {
+					alertSelect.setString("Sorry, playlist jumps are not "
+							+ "possible with the current player.");
+					display.setCurrent(alertSelect);
+				} else if (pl.isQueue() && !player.info.supportsJumpQueue()) {
+					alertSelect.setString("Sorry, queue jumps are not "
+							+ "possible with the current player.");
+					display.setCurrent(alertSelect);
+				} else if (!player.info.supportsLoadPlaylist()) {
+					alertSelect.setString("Sorry, switching the playlist is "
+							+ "not possible with the current player.");
+					display.setCurrent(alertSelect);
+				} else {
+					player.ctrlJump(pl.getPath(), index - pl.getNumNested());
+					display.setCurrent(parent);
+				}
 			}
 
 		} else if (c == CMD.INFO && d == screenPloblist) {
@@ -237,44 +256,19 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 		screenPloblist.setPloblist(pl);
 
-		if (pl.isPlaylist()) {
-			
-			if (!player.info.supportsJumpPlaylist()) {
-				screenPloblist.removeCommand(CMD.SELECT);
-				screenPloblist.setSelectCommand(CMD.INFO);
-			} else {
-				screenPloblist.addCommand(CMD.SELECT);
-				screenPloblist.setSelectCommand(CMD.SELECT);
+		final boolean pfq = player.state.isPlayingFromQueue();
+		final int position = player.state.getPosition();
+
+		if (pl.isPlaylist() && !pfq) {
+			try {
+				screenPloblist.setSelectedIndex(position, true);
+			} catch (IndexOutOfBoundsException e) {
 			}
-			if (!player.state.isPlayingFromQueue()) {
-				try {
-					screenPloblist.setSelectedIndex(player.state.getPosition(),
-							true);
-				} catch (IndexOutOfBoundsException e) {
-				}
+		} else if (pl.isQueue() && pfq) {
+			try {
+				screenPloblist.setSelectedIndex(position, true);
+			} catch (ArrayIndexOutOfBoundsException e) {
 			}
-			
-		} else if (pl.isQueue()) {
-			
-			if (!player.info.supportsJumpQueue()) {
-				screenPloblist.removeCommand(CMD.SELECT);
-				screenPloblist.setSelectCommand(CMD.INFO);
-			} else {
-				screenPloblist.addCommand(CMD.SELECT);
-				screenPloblist.setSelectCommand(CMD.SELECT);
-			}
-			if (player.state.isPlayingFromQueue()) {
-				try {
-					screenPloblist.setSelectedIndex(player.state.getPosition(),
-							true);
-				} catch (ArrayIndexOutOfBoundsException e) {
-				}
-			}
-			
-		} else {
-			
-			screenPloblist.addCommand(CMD.SELECT);
-			screenPloblist.setSelectCommand(CMD.SELECT);
 		}
 
 		display.setCurrent(screenPloblist);
