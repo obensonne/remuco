@@ -47,7 +47,7 @@ public final class Theme {
 	/** List icon */
 	public static Image LIST_ICON_BLUETOOTH, LIST_ICON_WIFI, LIST_ICON_PLOB,
 			LIST_ICON_PLOBLIST, LIST_ICON_ADD, LIST_ICON_THEMES,
-			LIST_ICON_KEYS, LIST_ICON_OFF, LIST_ICON_LOG;
+			LIST_ICON_KEYS, LIST_ICON_OFF, LIST_ICON_LOG, LIST_ICON_DISCONNECT;
 
 	private static final int LIST_ICON_SIZES[] = new int[] { 12, 16, 22, 24,
 			32, 48 };
@@ -219,6 +219,7 @@ public final class Theme {
 		LIST_ICON_THEMES = loadImage("/theme_" + size + ".png", size);
 		LIST_ICON_KEYS = loadImage("/keys_" + size + ".png", size);
 		LIST_ICON_OFF = loadImage("/off_" + size + ".png", size);
+		LIST_ICON_DISCONNECT = loadImage("/disconnect_" + size + ".png", size);
 		LIST_ICON_LOG = loadImage("/ploblist.png", size);
 	}
 

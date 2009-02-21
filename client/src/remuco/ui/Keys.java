@@ -22,14 +22,16 @@ public final class Keys {
 	public static final int ACTION_PLAYPAUSE = 0, ACTION_NEXT = 1,
 			ACTION_PREV = 2, ACTION_VOLUP = 3, ACTION_VOLDOWN = 4,
 			ACTION_VOLMUTE = 5, ACTION_RATEUP = 6, ACTION_RATEDOWN = 7,
-			ACTION_EDITTAGS = 8, ACTION_IMAGE = 9, ACTION_COUNT = 10;
+			ACTION_EDITTAGS = 8, ACTION_IMAGE = 9, ACTION_REPEAT = 10,
+			ACTION_SHUFFLE = 11, ACTION_COUNT = 12;
 
 	/**
 	 * Mapping of action codes to their names.
 	 */
 	public static final String[] actionNames = new String[] { "Play/Pause",
 			"Next", "Previous", "Volume up", "Volume down", "Volume mute",
-			"Rate up", "Rate down", "Edit Tags", "Show image" };
+			"Rate up", "Rate down", "Edit Tags", "Show image", "Toggle Repeat",
+			"Toggle Shuffle" };
 
 	/**
 	 * Key configuration. Format described at {@link #defaultConfig}. Initially
@@ -38,7 +40,7 @@ public final class Keys {
 	private static final int[] config = new int[] { Canvas.KEY_NUM5,
 			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
 			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
-			Canvas.KEY_NUM3, Canvas.KEY_NUM0 };
+			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9 };
 
 	/**
 	 * Default key configuration.
@@ -50,7 +52,7 @@ public final class Keys {
 	private static final int[] defaultConfig = new int[] { Canvas.KEY_NUM5,
 			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
 			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
-			Canvas.KEY_NUM3, Canvas.KEY_NUM0 };
+			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9 };
 
 	/**
 	 * Set a new key configuration.

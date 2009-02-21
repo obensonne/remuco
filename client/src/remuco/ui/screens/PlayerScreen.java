@@ -42,7 +42,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 	 * this screen.
 	 */
 	private static final Command CMD_DISCONNECT = new Command("Disconnect",
-			Command.SCREEN, 80);
+			Command.SCREEN, 92);
 
 	private static final Command CMD_KEYS = new Command("Key Bindings",
 			Command.SCREEN, 2);
@@ -54,7 +54,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			Command.BACK, 2);
 
 	private static final Command CMD_SHUTDOWN_HOST = new Command(
-			"Shutdown Host", Command.SCREEN, 3);
+			"Shutdown Host", Command.SCREEN, 95);
 
 	private static final Command CMD_THEMES = new Command("Themes",
 			Command.SCREEN, 1);
@@ -167,7 +167,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		if (cmd == CMD.BACK) {
 
-			screenOptions.addCommand(CMD_DISCONNECT, Theme.LIST_ICON_OFF);
+			screenOptions.addCommand(CMD_DISCONNECT, Theme.LIST_ICON_DISCONNECT);
 
 		} else if (cmd == CMD.EXIT) {
 
@@ -394,6 +394,18 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 				display.setCurrent(screenTagEditor);
 			}
 
+			break;
+			
+		case Keys.ACTION_REPEAT:
+			
+			player.ctrlToggleRepeat();
+			
+			break;
+
+		case Keys.ACTION_SHUFFLE:
+			
+			player.ctrlToggleShuffle();
+			
 			break;
 
 		case Keys.ACTION_NOOP:
