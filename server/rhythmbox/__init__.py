@@ -238,7 +238,7 @@ class Rhythmbox(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        logging.warning("toggle_repeat() not yet implemented")
+        log.warning("toggle_repeat() not yet implemented")
         # TODO: implement
         
     
@@ -248,7 +248,7 @@ class Rhythmbox(remuco.Player):
         @note: This method should be overwritten by sub classes of Player. It
                gets called if a remote client wants to control the player.
         """
-        logging.warning("toggle_shuffle() not yet implemented")
+        log.warning("toggle_shuffle() not yet implemented")
         # TODO: implement
     
     def seek_forward(self):
@@ -427,7 +427,7 @@ class Rhythmbox(remuco.Player):
                     img_data.save(self.__cover_file, "png")
                     img_file = self.__cover_file
                 except IOError, e:
-                    logging.warning("failed to save RB cover (%s)" % e)
+                    log.warning("failed to save RB cover (%s)" % e)
                     img_file = None
     
             log.debug("image: %s" % str(img_file))
