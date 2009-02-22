@@ -40,18 +40,6 @@ public final class Theme {
 	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
 			Font.STYLE_BOLD, Font.SIZE_LARGE);
 
-	/** Alert icon */
-	public static final Image ALERT_ICON_BLUETOOTH, ALERT_ICON_WIFI,
-			ALERT_ICON_CONNECTING, ALERT_ICON_REFRESH;
-
-	/** List icon */
-	public static Image LIST_ICON_BLUETOOTH, LIST_ICON_WIFI, LIST_ICON_PLOB,
-			LIST_ICON_PLOBLIST, LIST_ICON_ADD, LIST_ICON_THEMES,
-			LIST_ICON_KEYS, LIST_ICON_OFF, LIST_ICON_LOG, LIST_ICON_DISCONNECT;
-
-	private static final int LIST_ICON_SIZES[] = new int[] { 12, 16, 22, 24,
-			32, 48 };
-
 	/** Image ID */
 	public static final byte IMGID_PLOB_BORDER_TOP = 0,
 			IMGID_PLOB_BORDER_BOTTOM = 1, IMGID_PLOB_BORDER_LEFT = 2,
@@ -66,10 +54,6 @@ public final class Theme {
 			IMGID_STATE_SPACER = 19, IMGID_STATE_BORDER_LEFT = 20,
 			IMGID_STATE_BORDER_RIGHT = 21, IMGID_PLOB_RATE_OFF = 22,
 			IMGID_PLOB_RATE_ON = 23, IMGID_COLORS = 24;
-
-	private static final int[] colors = new int[COLORS_COUNT];
-
-	private static String current = null;
 
 	private static final String DEFAULT = "Korama";
 
@@ -89,24 +73,12 @@ public final class Theme {
 			"state.border-right.png", "plob.rate-off.png", "plob.rate-on.png",
 			"colors.png" };
 
-	private static final Image[] img = new Image[IMG_NAME.length];
+	private static Theme instance = null;
 
-	private static String[] list = new String[] { DEFAULT };
-
-	private static final Vector themeChangeListener;
+	private static final int LIST_ICON_SIZES[] = new int[] { 12, 16, 22, 24,
+			32, 48 };
 
 	static {
-
-		themeChangeListener = new Vector();
-
-		// //// load icons //// //
-
-		loadListIcons(LIST_ICON_SIZES[0]); // for now use default icon size
-
-		ALERT_ICON_BLUETOOTH = loadImage("/bluetooth_48.png", 48);
-		ALERT_ICON_WIFI = loadImage("/wifi_48.png", 48);
-		ALERT_ICON_CONNECTING = loadImage("/connecting_48.png", 48);
-		ALERT_ICON_REFRESH = loadImage("/refresh_48.png", 48);
 
 		// //// create fall back image for missing theme images //////
 
@@ -117,16 +89,6 @@ public final class Theme {
 		g.setColor(0);
 		g.drawLine(0, 0, 20 - 1, 20 - 1);
 		g.drawLine(20 - 1, 0, 0, 20 - 1);
-
-		// //// load theme //////
-
-		update(DEFAULT);
-
-	}
-
-	public static void addThemeChangeListener(IThemeChangeListener listener) {
-
-		themeChangeListener.addElement(listener);
 
 	}
 
@@ -142,85 +104,21 @@ public final class Theme {
 	}
 
 	/**
-	 * Get a specific color of this theme.
+	 * Get the singleton theme instance. <em>Must not</em> get called from a
+	 * static context!
 	 * 
-	 * @param id
-	 *            the color id, one of <code>COLOR_...</code>
-	 * @return the color value
+	 * @return the theme
 	 */
-	public static int getColor(int id) {
-		return colors[id];
+	public static Theme getInstance() {
+		return instance;
 	}
 
-	/**
-	 * Get a specific image of this theme.
-	 * 
-	 * @param id
-	 *            the image id, one of <code>IMIGID_...</code>
-	 * @return the image
-	 */
-	public static Image getImg(int id) {
-		return img[id];
-	}
+	public static void init(Display display) {
 
-	/**
-	 * Get a list of available Themes.
-	 * <p>
-	 * <em>Note:</em> Must not be called before the MIDlet has been
-	 * instantiated, because this method uses application properties which are
-	 * not available in a pure static context.
-	 * 
-	 * @return string array with the names of available themes
-	 * 
-	 */
-	public static String[] getList() {
-		return list;
-	}
-
-	/**
-	 * Get the name of the currently loaded theme.
-	 * 
-	 * @return the name or <code>null</code> if no theme has been loaded yet
-	 */
-	public static String getName() {
-		return current;
-	}
-
-	/**
-	 * Load list icons.
-	 * 
-	 * @param suggestedSize
-	 *            suggested width and height of the list icons
-	 * 
-	 * @see Display#getBestImageWidth(int)
-	 */
-	public static void loadListIcons(int suggestedSize) {
-
-		int size = -1;
-
-		for (int i = 0; i < LIST_ICON_SIZES.length; i++) {
-			if (suggestedSize <= LIST_ICON_SIZES[i]) {
-				size = LIST_ICON_SIZES[i];
-				break;
-			}
-		}
-		if (size == -1) {
-			size = LIST_ICON_SIZES[LIST_ICON_SIZES.length - 1];
+		if (instance == null) {
+			instance = new Theme(display);
 		}
 
-		LIST_ICON_BLUETOOTH = loadImage("/bluetooth_" + size + ".png", size);
-		LIST_ICON_WIFI = loadImage("/wifi_" + size + ".png", size);
-		// TODO provide multiple size icons for plob and ploblist
-		LIST_ICON_PLOB = loadImage("/plob.png", size);
-		// LIST_ICON_PLOB = loadImage("/plob_" + size + ".png", size);
-		LIST_ICON_PLOBLIST = loadImage("/ploblist.png", size);
-		// LIST_ICON_PLOBLIST = loadImage("/ploblist_" + size + ".png", size);
-		LIST_ICON_ADD = loadImage("/add_" + size + ".png", size);
-		LIST_ICON_THEMES = loadImage("/theme_" + size + ".png", size);
-		LIST_ICON_KEYS = loadImage("/keys_" + size + ".png", size);
-		LIST_ICON_OFF = loadImage("/off_" + size + ".png", size);
-		LIST_ICON_DISCONNECT = loadImage("/disconnect_" + size + ".png", size);
-		LIST_ICON_LOG = loadImage("/ploblist.png", size);
 	}
 
 	/**
@@ -274,12 +172,6 @@ public final class Theme {
 
 	}
 
-	public static void removeThemeChangeListener(IThemeChangeListener listener) {
-
-		themeChangeListener.removeElement(listener);
-
-	}
-
 	/**
 	 * Scale an image. The width and height get scaled by the factor
 	 * <code>numerator/denominator</code>.
@@ -328,15 +220,6 @@ public final class Theme {
 			return img;
 		}
 
-	}
-
-	/** Set the list of available themes. */
-	public static void setList(String[] list) {
-
-		if (list == null || list.length == 0)
-			return;
-
-		Theme.list = list;
 	}
 
 	/**
@@ -433,34 +316,195 @@ public final class Theme {
 	}
 
 	/**
-	 * Load a theme.
+	 * @emulator Only used for testing!
+	 * @param imgs
+	 * @param checkWidth
+	 * @param checkHeight
+	 */
+	private static boolean checkSizesEqual(Vector imgs, boolean checkWidth,
+			boolean checkHeight) {
+
+		final Enumeration enu;
+
+		enu = imgs.elements();
+
+		if (!enu.hasMoreElements())
+			return true;
+
+		Image i;
+		int w1, w2, h1, h2;
+		boolean ok = true;
+
+		i = (Image) enu.nextElement();
+		w1 = i.getWidth();
+		h1 = i.getHeight();
+
+		while (enu.hasMoreElements()) {
+
+			i = (Image) enu.nextElement();
+			w2 = i.getWidth();
+			h2 = i.getHeight();
+
+			if (checkWidth && w1 != w2) {
+				Log.ln("[TH] VALIDATION:     width differs");
+				ok = false;
+			}
+			if (checkHeight && h1 != h2) {
+				Log.ln("[TH] VALIDATION:     height differs");
+				ok = false;
+			}
+
+			w1 = w2;
+			h1 = h2;
+		}
+
+		return ok;
+	}
+
+	/**
+	 * Load an image file.
+	 * 
+	 * @param file
+	 *            path to the file
+	 * @param fallBackSize
+	 *            size of the fallback image to return if loading fails (if set
+	 *            to zero then {@link #IMG_FALLBACK} is used as fallback image)
+	 * @return the image (never <code>null</code>)
+	 */
+	private static Image loadImage(String file, int fallBackSize) {
+
+		try {
+			return Image.createImage(file);
+		} catch (IOException e) {
+			Log.ln("[TH] missing " + file);
+			if (fallBackSize == 0) {
+				return IMG_FALLBACK;
+			} else {
+				final Image img = Image.createImage(fallBackSize, fallBackSize);
+				img.getGraphics().setColor(0);
+				img.getGraphics().drawString("X", 2, 2,
+						Graphics.TOP | Graphics.LEFT);
+				return img;
+			}
+		}
+	}
+
+	/** Alert icon */
+	public final Image ALERT_ICON_BLUETOOTH, ALERT_ICON_WIFI,
+			ALERT_ICON_CONNECTING, ALERT_ICON_REFRESH;
+
+	/** List icon */
+	public final Image LIST_ICON_BLUETOOTH, LIST_ICON_WIFI, LIST_ICON_PLOB,
+			LIST_ICON_PLOBLIST, LIST_ICON_ADD, LIST_ICON_THEMES,
+			LIST_ICON_KEYS, LIST_ICON_OFF, LIST_ICON_LOG, LIST_ICON_DISCONNECT;
+
+	private final int[] colors;
+
+	private String current = null;
+
+	private final Image[] img;
+
+	private Theme(Display display) {
+
+		img = new Image[IMG_NAME.length];
+		colors = new int[COLORS_COUNT];
+
+		// alert icons //
+
+		ALERT_ICON_BLUETOOTH = loadImage("/bluetooth_48.png", 48);
+		ALERT_ICON_WIFI = loadImage("/wifi_48.png", 48);
+		ALERT_ICON_CONNECTING = loadImage("/connecting_48.png", 48);
+		ALERT_ICON_REFRESH = loadImage("/refresh_48.png", 48);
+
+		// list icons //
+
+		int size = -1;
+
+		final int suggested = display.getBestImageWidth(Display.LIST_ELEMENT);
+
+		for (int i = 0; i < LIST_ICON_SIZES.length; i++) {
+			if (suggested <= LIST_ICON_SIZES[i]) {
+				size = LIST_ICON_SIZES[i];
+				break;
+			}
+		}
+		if (size == -1) {
+			size = LIST_ICON_SIZES[LIST_ICON_SIZES.length - 1];
+		}
+
+		LIST_ICON_BLUETOOTH = loadImage("/bluetooth_" + size + ".png", size);
+		LIST_ICON_WIFI = loadImage("/wifi_" + size + ".png", size);
+		// TODO provide multiple size icons for plob and ploblist
+		LIST_ICON_PLOB = loadImage("/plob.png", size);
+		// LIST_ICON_PLOB = loadImage("/plob_" + size + ".png", size);
+		LIST_ICON_PLOBLIST = loadImage("/ploblist.png", size);
+		// LIST_ICON_PLOBLIST = loadImage("/ploblist_" + size + ".png", size);
+		LIST_ICON_ADD = loadImage("/add_" + size + ".png", size);
+		LIST_ICON_THEMES = loadImage("/theme_" + size + ".png", size);
+		LIST_ICON_KEYS = loadImage("/keys_" + size + ".png", size);
+		LIST_ICON_OFF = loadImage("/off_" + size + ".png", size);
+		LIST_ICON_DISCONNECT = loadImage("/disconnect_" + size + ".png", size);
+		LIST_ICON_LOG = loadImage("/ploblist.png", size);
+
+		loadPrivate(DEFAULT);
+
+	}
+
+	/**
+	 * Get a specific color of this theme.
+	 * 
+	 * @param id
+	 *            the color id, one of <code>COLOR_...</code>
+	 * @return the color value
+	 */
+	public int getColor(int id) {
+		return colors[id];
+	}
+
+	/**
+	 * Get a specific image of this theme.
+	 * 
+	 * @param id
+	 *            the image id, one of <code>IMIGID_...</code>
+	 * @return the image
+	 */
+	public Image getImg(int id) {
+		return img[id];
+	}
+
+	/**
+	 * Get the name of the currently loaded theme.
+	 * 
+	 * @return the name
+	 */
+	public String getName() {
+		return current;
+	}
+
+	/**
+	 * Load a new theme.
 	 * 
 	 * @param name
 	 *            theme name (may be <code>null</code> - in this case the
 	 *            default theme gets loaded)
 	 */
-	public static void update(String name) {
+	public void load(String name) {
 
 		if (name == null)
 			name = DEFAULT;
 
-		if (current == null || !current.equals(name))
-			load(name);
+		if (!current.equals(name)) {
+			loadPrivate(name);
+		}
 
 		Log.ln("[TH] loaded theme " + name);
-
-		final Enumeration e = themeChangeListener.elements();
-
-		while (e.hasMoreElements()) {
-			((IThemeChangeListener) e.nextElement()).notifyThemeChanged();
-		}
 
 	}
 
 	/**
 	 * @emulator Only used for testing!
 	 */
-	private static boolean checkSizes() {
+	private boolean checkSizes() {
 
 		final Vector v = new Vector(30);
 		boolean ok = true;
@@ -559,82 +603,17 @@ public final class Theme {
 
 	}
 
-	/**
-	 * @emulator Only used for testing!
-	 * @param imgs
-	 * @param checkWidth
-	 * @param checkHeight
-	 */
-	private static boolean checkSizesEqual(Vector imgs, boolean checkWidth,
-			boolean checkHeight) {
-
-		final Enumeration enu;
-
-		enu = imgs.elements();
-
-		if (!enu.hasMoreElements())
-			return true;
-
-		Image i;
-		int w1, w2, h1, h2;
-		boolean ok = true;
-
-		i = (Image) enu.nextElement();
-		w1 = i.getWidth();
-		h1 = i.getHeight();
-
-		while (enu.hasMoreElements()) {
-
-			i = (Image) enu.nextElement();
-			w2 = i.getWidth();
-			h2 = i.getHeight();
-
-			if (checkWidth && w1 != w2) {
-				Log.ln("[TH] VALIDATION:     width differs");
-				ok = false;
-			}
-			if (checkHeight && h1 != h2) {
-				Log.ln("[TH] VALIDATION:     height differs");
-				ok = false;
-			}
-
-			w1 = w2;
-			h1 = h2;
-		}
-
-		return ok;
-	}
-
-	private static void load(String name) {
+	private void loadPrivate(String name) {
 
 		boolean ok = true;
-		boolean existent = false;
 
-		getList();
+		current = name;
 
-		for (int j = 0; j < list.length; j++) {
-			if (name.equals(list[j])) {
-				existent = true;
-				break;
-			}
-		}
-
-		if (existent)
-			current = name;
-		else {
-			Log.ln("[TH] Theme " + name + " not found, using " + DEFAULT);
-			current = DEFAULT;
-		}
+		final String themeDir = "/themes/" + current + "/";
 
 		for (int i = 0; i < img.length; i++) {
-			try {
-				img[i] = Image.createImage("/themes/" + current + "/"
-						+ IMG_NAME[i]);
-			} catch (IOException e) {
-				Log.ln("[TH] VALIDATION: missing image " + IMG_NAME[i]);
-				img[i] = IMG_FALLBACK;
-				ok = false;
-			}
+			img[i] = loadImage(themeDir + IMG_NAME[i], 0);
+			ok &= img[i] != IMG_FALLBACK;
 		}
 
 		if (ok && Remuco.EMULATION) {
@@ -645,34 +624,10 @@ public final class Theme {
 			img[IMGID_COLORS].getRGB(colors, 0, COLORS_COUNT, 0, 0,
 					COLORS_COUNT, 1);
 		else {
-			Log.ln("[TH] VALIDATION: FAILED !!!");
+			Log.ln("[TH] VALIDATION FAILED !!!");
 			colors[COLOR_BG] = 0xFF33AA;
 		}
 
-	}
-
-	/**
-	 * Load a theme independent image file.
-	 * 
-	 * @param file
-	 *            path to the file (if not found, a fallback image will be
-	 *            returned)
-	 * @param fallBackSize
-	 *            size of the fall back image
-	 * @return the image (never <code>null</code>)
-	 */
-	private static Image loadImage(String file, int fallBackSize) {
-
-		try {
-			return Image.createImage(file);
-		} catch (IOException e) {
-			Log.ln("missing " + file);
-			final Image img = Image.createImage(fallBackSize, fallBackSize);
-			img.getGraphics().setColor(0);
-			img.getGraphics().drawString("X", 2, 2,
-					Graphics.TOP | Graphics.LEFT);
-			return img;
-		}
 	}
 
 }

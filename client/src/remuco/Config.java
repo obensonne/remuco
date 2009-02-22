@@ -23,7 +23,6 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.comm.Serial;
 import remuco.ui.KeyBindings;
-import remuco.ui.Theme;
 import remuco.util.Log;
 import remuco.util.Tools;
 
@@ -522,11 +521,17 @@ public final class Config {
 			}
 		}
 
-		// list of themes is now available:
+	}
+	
+	public static String[] getThemeList() {
+		
 		final String list = getApplicationProperty(APP_PROP_THEMES);
 		if (list != null) {
-			Theme.setList(Tools.splitString(list, ","));
+			return Tools.splitString(list, ",");
+		} else {
+			return null;
 		}
+		
 	}
 
 	private static void closeRecord(RecordStore rs) {

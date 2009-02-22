@@ -19,12 +19,9 @@ public class StateScreeny extends Screeny {
 
 		super(player);
 
-		screenyPlayback = new SimpleScreeny(player,
-				SimpleScreeny.TYPE_PLAYBACK);
-		screenyRepeat = new SimpleScreeny(player,
-				SimpleScreeny.TYPE_REPEAT);
-		screenyShuffle = new SimpleScreeny(player,
-				SimpleScreeny.TYPE_SHUFFLE);
+		screenyPlayback = new SimpleScreeny(player, SimpleScreeny.TYPE_PLAYBACK);
+		screenyRepeat = new SimpleScreeny(player, SimpleScreeny.TYPE_REPEAT);
+		screenyShuffle = new SimpleScreeny(player, SimpleScreeny.TYPE_SHUFFLE);
 
 		screenyVolume = new SliderScreeny(player);
 
@@ -50,9 +47,9 @@ public class StateScreeny extends Screeny {
 		int w, x, wSpacer;
 		Image borderLeft, borderRight, spacer;
 
-		borderLeft = Theme.getImg(Theme.IMGID_STATE_BORDER_LEFT);
-		borderRight = Theme.getImg(Theme.IMGID_STATE_BORDER_RIGHT);
-		spacer = Theme.getImg(Theme.IMGID_STATE_SPACER);
+		borderLeft = theme.getImg(Theme.IMGID_STATE_BORDER_LEFT);
+		borderRight = theme.getImg(Theme.IMGID_STATE_BORDER_RIGHT);
+		spacer = theme.getImg(Theme.IMGID_STATE_SPACER);
 
 		setImage(Image.createImage(width, borderLeft.getHeight()));
 
@@ -69,13 +66,13 @@ public class StateScreeny extends Screeny {
 		g.drawImage(borderRight, width, 0, TOP_RIGHT);
 
 		// ////// draw state elements ////// //
-		
+
 		w = width - borderLeft.getWidth() - borderRight.getWidth();
 
 		x = borderLeft.getWidth();
 		screenyPlayback.initRepresentation(x, 0, TOP_LEFT, w, height);
 		w -= screenyPlayback.getWidth();
-		
+
 		x = width - borderRight.getWidth();
 		screenyShuffle.initRepresentation(x, 0, TOP_RIGHT, w, height);
 		w -= screenyShuffle.getWidth();

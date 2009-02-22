@@ -70,6 +70,8 @@ public final class DeviceSelectorScreen extends List implements
 
 	private final List screenScanResults;
 
+	private final Theme theme;
+
 	public DeviceSelectorScreen(CommandListener parent, Display display,
 			IDeviceSelectionListener listener) {
 
@@ -78,6 +80,8 @@ public final class DeviceSelectorScreen extends List implements
 		this.parent = parent;
 		this.display = display;
 		this.listener = listener;
+
+		theme = Theme.getInstance();
 
 		if (BluetoothFactory.BLUETOOTH) {
 			bluetoothScanner = BluetoothFactory.createBluetoothScanner();
@@ -107,15 +111,15 @@ public final class DeviceSelectorScreen extends List implements
 		screenDeviceTypeSelection.addCommand(CMD.BACK);
 		if (bluetoothScanner != null) {
 			screenDeviceTypeSelection.addCommand(CMD_ADD_BLUETOOTH,
-					Theme.LIST_ICON_BLUETOOTH);
+					theme.LIST_ICON_BLUETOOTH);
 		}
 		screenDeviceTypeSelection
-				.addCommand(CMD_ADD_INET, Theme.LIST_ICON_WIFI);
+				.addCommand(CMD_ADD_INET, theme.LIST_ICON_WIFI);
 		screenDeviceTypeSelection.setCommandListener(this);
 
 		screenScanning = new WaitingScreen();
 		screenScanning.setTitle("Scanning");
-		screenScanning.setImage(Theme.ALERT_ICON_BLUETOOTH);
+		screenScanning.setImage(theme.ALERT_ICON_BLUETOOTH);
 		screenScanning.setMessage("Searching for Bluetooth devices.");
 		screenScanning.setCommandListener(this);
 
@@ -282,9 +286,9 @@ public final class DeviceSelectorScreen extends List implements
 			final Image icon;
 
 			if (devs[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
-				icon = Theme.LIST_ICON_BLUETOOTH;
+				icon = theme.LIST_ICON_BLUETOOTH;
 			} else if (devs[i + 2].equals(Config.DEVICE_TYPE_INET)) {
-				icon = Theme.LIST_ICON_WIFI;
+				icon = theme.LIST_ICON_WIFI;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
@@ -311,7 +315,7 @@ public final class DeviceSelectorScreen extends List implements
 				final Alert alert = new Alert("No Bluetooth",
 						"Bluetooth is not available. "
 								+ "Only Wifi connections are possible.",
-						Theme.ALERT_ICON_WIFI, AlertType.INFO);
+						theme.ALERT_ICON_WIFI, AlertType.INFO);
 				display.setCurrent(alert, screenAddInetDevice);
 			}
 		} else
@@ -347,9 +351,9 @@ public final class DeviceSelectorScreen extends List implements
 			final Image icon;
 
 			if (devices[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
-				icon = Theme.LIST_ICON_BLUETOOTH;
+				icon = theme.LIST_ICON_BLUETOOTH;
 			} else if (devices[i + 2].equals(Config.DEVICE_TYPE_INET)) {
-				icon = Theme.LIST_ICON_WIFI;
+				icon = theme.LIST_ICON_WIFI;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
@@ -358,7 +362,7 @@ public final class DeviceSelectorScreen extends List implements
 			append(name, icon);
 		}
 
-		append("Add", Theme.LIST_ICON_ADD);
+		append("Add", theme.LIST_ICON_ADD);
 
 		setSelectedIndex(0, true);
 	}

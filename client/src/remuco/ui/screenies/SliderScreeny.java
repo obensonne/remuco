@@ -42,17 +42,16 @@ public final class SliderScreeny extends Screeny {
 			return;
 		}
 
-		imgLeft = Theme.getImg(Theme.IMGID_STATE_VOLUME_LEFT);
-		imgOn = Theme.getImg(Theme.IMGID_STATE_VOLUME_ON);
-		imgOff = Theme.getImg(Theme.IMGID_STATE_VOLUME_OFF);
-		imgRight = Theme.getImg(Theme.IMGID_STATE_VOLUME_RIGHT);
+		imgLeft = theme.getImg(Theme.IMGID_STATE_VOLUME_LEFT);
+		imgOn = theme.getImg(Theme.IMGID_STATE_VOLUME_ON);
+		imgOff = theme.getImg(Theme.IMGID_STATE_VOLUME_OFF);
+		imgRight = theme.getImg(Theme.IMGID_STATE_VOLUME_RIGHT);
 
 		xBar = imgLeft.getWidth();
 
-		resolution = width - imgRight.getWidth()- xBar;
+		resolution = width - imgRight.getWidth() - xBar;
 
-		w = imgLeft.getWidth() + resolution
-				+ imgRight.getWidth();
+		w = imgLeft.getWidth() + resolution + imgRight.getWidth();
 		h = imgLeft.getHeight();
 
 		setImage(Image.createImage(w, h));

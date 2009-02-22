@@ -8,8 +8,9 @@ import remuco.ui.Theme;
 import remuco.util.Log;
 
 /**
- * A simple screeny represents integer values with a specific immutable image for each
- * defined value. It is used to display certain elements of a {@link State}.
+ * A simple screeny represents integer values with a specific immutable image
+ * for each defined value. It is used to display certain elements of a
+ * {@link State}.
  */
 public final class SimpleScreeny extends Screeny {
 
@@ -131,7 +132,7 @@ public final class SimpleScreeny extends Screeny {
 		case TYPE_PLAYBACK:
 			val = s.getPlayback();
 			break;
-			
+
 		default:
 			Log.asssertNotReached(this);
 			break;
@@ -145,10 +146,9 @@ public final class SimpleScreeny extends Screeny {
 			setImage(INVISIBLE);
 			return;
 		}
-		
-		
+
 		for (int i = 0; i < images.length; i++) {
-			images[i] = Theme.getImg(imgIDs[i]);
+			images[i] = theme.getImg(imgIDs[i]);
 		}
 
 		setImage(images[0]);

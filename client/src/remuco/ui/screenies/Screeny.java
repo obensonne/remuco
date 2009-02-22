@@ -46,6 +46,14 @@ public abstract class Screeny {
 	/** Used often .. */
 	public static final int TOP_RIGHT = Graphics.TOP | Graphics.RIGHT;
 
+	/**
+	 * The image to set as the representation image in
+	 * {@link #initRepresentation()} if a screeny wants to be invisible.
+	 * 
+	 * @see #setImage(Image)
+	 */
+	protected static final Image INVISIBLE = Image.createImage(1, 1);
+
 	/** The data to represent (with an image) by a screeny implementation. */
 	protected Object data;
 
@@ -57,13 +65,7 @@ public abstract class Screeny {
 
 	protected final PlayerInfo player;
 
-	/**
-	 * The image to set as the representation image in
-	 * {@link #initRepresentation()} if a screeny wants to be invisible.
-	 * 
-	 * @see #setImage(Image)
-	 */
-	protected static final Image INVISIBLE = Image.createImage(1, 1);
+	protected final Theme theme;
 
 	/**
 	 * Size of the representation image. When entering the method
@@ -89,11 +91,6 @@ public abstract class Screeny {
 	/**
 	 * Create a new screeny.
 	 * 
-	 * @param theme
-	 *            the theme to get theme data from - this theme reference must
-	 *            be valid the whole lifetime of the screeny, but its contents
-	 *            may change (in this case the class that uses the screeny must
-	 *            call {@link #initRepresentation(int, int, int, int, int)})
 	 * @param player
 	 *            the player reference may be used by the screeny to adjust its
 	 *            representation according to characteristics of the player -
@@ -104,13 +101,14 @@ public abstract class Screeny {
 	 */
 	public Screeny(PlayerInfo player) {
 		this.player = player;
+		theme = Theme.getInstance();
 	}
 
 	/**
 	 * Draws the screeny's representation image into the given graphics object
 	 * at the position previously specified via
-	 * {@link #initRepresentation(int, int, int, int, int)}. The drawn image
-	 * has allways the same size between to calls to
+	 * {@link #initRepresentation(int, int, int, int, int)}. The drawn image has
+	 * allways the same size between to calls to
 	 * {@link #initRepresentation(int, int, int, int, int)}.
 	 * 
 	 * @param g

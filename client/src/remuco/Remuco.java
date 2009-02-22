@@ -83,15 +83,13 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	public Remuco() {
 
-		String emu = this.getAppProperty("Remuco-emulation");
+		final String emu = this.getAppProperty("Remuco-emulation");
 
 		EMULATION = emu != null && emu.equalsIgnoreCase("true");
 
 		// get the display
 
 		display = Display.getDisplay(this);
-
-		Theme.loadListIcons(display.getBestImageWidth(Display.LIST_ELEMENT));
 
 		// set up logging
 
@@ -118,6 +116,8 @@ public final class Remuco extends MIDlet implements CommandListener {
 		configSuccessfullyLoaded = Config.load();
 
 		Config.setApplicationProperties(this);
+
+		Theme.init(display);
 
 		// set up some displayables
 

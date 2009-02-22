@@ -55,8 +55,8 @@ public final class RateScreeny extends Screeny {
 			return;
 		}
 
-		ratingOn = Theme.getImg(Theme.IMGID_PLOB_RATE_ON);
-		ratingOff = Theme.getImg(Theme.IMGID_PLOB_RATE_OFF);
+		ratingOn = theme.getImg(Theme.IMGID_PLOB_RATE_ON);
+		ratingOff = theme.getImg(Theme.IMGID_PLOB_RATE_OFF);
 
 		// scale rate images if needed (may happen if the remote player has a
 		// wide rating range)
@@ -72,7 +72,7 @@ public final class RateScreeny extends Screeny {
 
 		setImage(i);
 
-		g.setColor(Theme.getColor(Theme.COLOR_BG));
+		g.setColor(theme.getColor(Theme.COLOR_BG));
 		g.fillRect(0, 0, width, height);
 
 	}

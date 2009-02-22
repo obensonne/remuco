@@ -91,6 +91,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	private final StateScreeny screenyState;
 
+	private final Theme theme;
+
 	/**
 	 * Thread responsible for adjusting the volume/progress in the time between
 	 * the key volume up/down respectively seek forward/backward has been
@@ -113,7 +115,9 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		this.display = display;
 		this.conn = conn;
 
-		Theme.update(Config.get(CONFIG_THEME));
+		theme = Theme.getInstance();
+
+		theme.load(Config.get(CONFIG_THEME));
 
 		player = new Player(conn, pinfo);
 
@@ -128,18 +132,18 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		super.setCommandListener(this);
 
 		screenOptions = new CommandList("Options");
-		screenOptions.addCommand(CMD_THEMES, Theme.LIST_ICON_THEMES);
-		screenOptions.addCommand(CMD_KEYS, Theme.LIST_ICON_KEYS);
+		screenOptions.addCommand(CMD_THEMES, theme.LIST_ICON_THEMES);
+		screenOptions.addCommand(CMD_KEYS, theme.LIST_ICON_KEYS);
 		if (pinfo.supportsShutdownHost()) {
-			screenOptions.addCommand(CMD_SHUTDOWN_HOST, Theme.LIST_ICON_OFF);
+			screenOptions.addCommand(CMD_SHUTDOWN_HOST, theme.LIST_ICON_OFF);
 		}
 		screenOptions.addCommand(CMD.BACK);
 		screenOptions.setCommandListener(this);
 
 		screenThemeSelection = new List("Themes", List.IMPLICIT);
-		final String[] themes = Theme.getList();
+		final String[] themes = Config.getThemeList();
 		for (int i = 0; i < themes.length; i++) {
-			screenThemeSelection.append(themes[i], Theme.LIST_ICON_THEMES);
+			screenThemeSelection.append(themes[i], theme.LIST_ICON_THEMES);
 		}
 		screenThemeSelection.addCommand(CMD.BACK);
 		screenThemeSelection.addCommand(CMD.SELECT);
@@ -177,19 +181,19 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		if (cmd == CMD.BACK) {
 
 			screenOptions
-					.addCommand(CMD_DISCONNECT, Theme.LIST_ICON_DISCONNECT);
+					.addCommand(CMD_DISCONNECT, theme.LIST_ICON_DISCONNECT);
 
 		} else if (cmd == CMD.EXIT) {
 
-			screenOptions.addCommand(cmd, Theme.LIST_ICON_OFF);
+			screenOptions.addCommand(cmd, theme.LIST_ICON_OFF);
 
 		} else if (cmd == CMD.LOG) {
 
-			screenOptions.addCommand(cmd, Theme.LIST_ICON_LOG);
+			screenOptions.addCommand(cmd, theme.LIST_ICON_LOG);
 
 		} else {
 
-			screenOptions.addCommand(cmd, Theme.LIST_ICON_PLOB);
+			screenOptions.addCommand(cmd, theme.LIST_ICON_PLOB);
 		}
 
 	}
@@ -220,7 +224,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			// preselect the current theme in the theme selection
 			for (int i = 0; i < screenThemeSelection.size(); i++) {
-				if (screenThemeSelection.getString(i).equals(Theme.getName())) {
+				if (screenThemeSelection.getString(i).equals(theme.getName())) {
 					screenThemeSelection.setSelectedIndex(i, true);
 					break;
 				}
@@ -240,7 +244,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			final String name = screenThemeSelection
 					.getString(screenThemeSelection.getSelectedIndex());
-			Theme.update(name);
+			theme.load(name);
 			initScreenies(); // let new theme take effect
 			Config.set(CONFIG_THEME, name);
 			display.setCurrent(this);
@@ -320,7 +324,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		// + " (id "
 		// + key
 		// + ") -> "
-		// + (action != KeyBindings.ACTION_NOOP ? KeyBindings.actionNames[action]
+		// + (action != KeyBindings.ACTION_NOOP ?
+		// KeyBindings.actionNames[action]
 		// : "no action") + " (id " + action + ")");
 
 		switch (action) {
@@ -491,7 +496,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 					Graphics.HCENTER | Graphics.BASELINE);
 
 			y += Theme.FONT_SMALL.getHeight() * 2;
-			g.drawString("for the theme " + Theme.getName() + "!",
+			g.drawString("for the theme " + theme.getName() + "!",
 					getWidth() / 2, y, Graphics.HCENTER | Graphics.BASELINE);
 
 		} else {

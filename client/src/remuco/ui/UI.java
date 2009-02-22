@@ -103,7 +103,7 @@ public final class UI implements CommandListener, IConnectionListener,
 		screenConnecting = new WaitingScreen();
 		// screenConnecting = new WaitingAlert();
 		screenConnecting.setTitle("Connecting");
-		screenConnecting.setImage(Theme.ALERT_ICON_CONNECTING);
+		screenConnecting.setImage(Theme.getInstance().ALERT_ICON_CONNECTING);
 		screenConnecting.setCommandListener(this);
 
 		screenDeviceSelector = new DeviceSelectorScreen(this, display, this);

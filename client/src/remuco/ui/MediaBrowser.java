@@ -59,11 +59,17 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 	 */
 	private final WaitingScreen screenWaiting;
 
+	private final Theme theme;
+
+	private final Alert alertSelect;
+
 	public MediaBrowser(Displayable parent, Display display, Player player) {
 
 		this.display = display;
 		this.parent = parent;
 		this.player = player;
+
+		theme = Theme.getInstance();
 
 		screenPlobInfo = new PlobInfoScreen();
 		screenPlobInfo.addCommand(CMD.BACK);
@@ -72,7 +78,7 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 		screenWaiting = new WaitingScreen();
 		screenWaiting.setTitle("Updating");
 		screenWaiting.setCommandListener(this);
-		
+
 		alertSelect = new Alert("", "", null, AlertType.INFO);
 
 		screenPloblist = new PloblistScreen();
@@ -85,21 +91,19 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 		screenRoot = new CommandList("Media Browser");
 		if (player.info.supportsPlaylist()) {
-			screenRoot.addCommand(CMD_PLAYLIST, Theme.LIST_ICON_PLOBLIST);
+			screenRoot.addCommand(CMD_PLAYLIST, theme.LIST_ICON_PLOBLIST);
 		}
 		if (player.info.supportsQueue()) {
-			screenRoot.addCommand(CMD_QUEUE, Theme.LIST_ICON_PLOBLIST);
+			screenRoot.addCommand(CMD_QUEUE, theme.LIST_ICON_PLOBLIST);
 		}
 		if (player.info.supportsLibrary()) {
-			screenRoot.addCommand(CMD_LIBRARY, Theme.LIST_ICON_PLOBLIST);
+			screenRoot.addCommand(CMD_LIBRARY, theme.LIST_ICON_PLOBLIST);
 		}
 		screenRoot.addCommand(CMD.BACK);
 		screenRoot.setCommandListener(this);
 
 		displayableBeforeRequest = screenRoot;
 	}
-
-	private final Alert alertSelect;
 
 	public void commandAction(Command c, Displayable d) {
 
@@ -134,7 +138,7 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 			final PlobList pl = screenPloblist.getPloblist();
 
-			if (screenPloblist.getImage(index) == Theme.LIST_ICON_PLOBLIST) {
+			if (screenPloblist.getImage(index) == theme.LIST_ICON_PLOBLIST) {
 				displayableBeforeRequest = d;
 				display.setCurrent(screenWaiting);
 				final String path = pl.getPathForNested(index);
@@ -170,7 +174,7 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 			final PlobList pl = screenPloblist.getPloblist();
 
-			if (screenPloblist.getImage(index) == Theme.LIST_ICON_PLOBLIST) {
+			if (screenPloblist.getImage(index) == theme.LIST_ICON_PLOBLIST) {
 
 				displayableBeforeRequest = d;
 				display.setCurrent(screenWaiting);

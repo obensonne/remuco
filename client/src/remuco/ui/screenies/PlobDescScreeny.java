@@ -10,8 +10,8 @@ import remuco.player.Plob;
 import remuco.ui.Theme;
 
 /**
- * A screeny for textual meta informaton of a {@link Plob}. Represents a
- * plobs's title, artist, album, year, genre and duration.
+ * A screeny for textual meta informaton of a {@link Plob}. Represents a plobs's
+ * title, artist, album, year, genre and duration.
  * 
  * @author Oben Sonne
  * 
@@ -38,11 +38,11 @@ public final class PlobDescScreeny extends Screeny {
 
 		Image i = Image.createImage(width, height);
 
-		colorAlbum = Theme.getColor(Theme.COLOR_ALBUM);
-		colorArtist = Theme.getColor(Theme.COLOR_ARTIST);
-		colorBg = Theme.getColor(Theme.COLOR_BG);
-		colorText = Theme.getColor(Theme.COLOR_TEXT);
-		colorTitle = Theme.getColor(Theme.COLOR_TITLE);
+		colorAlbum = theme.getColor(Theme.COLOR_ALBUM);
+		colorArtist = theme.getColor(Theme.COLOR_ARTIST);
+		colorBg = theme.getColor(Theme.COLOR_BG);
+		colorText = theme.getColor(Theme.COLOR_TEXT);
+		colorTitle = theme.getColor(Theme.COLOR_TITLE);
 
 		try {
 			noPlobImage = Image.createImage("/monkey.png");

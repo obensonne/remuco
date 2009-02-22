@@ -18,7 +18,7 @@ public final class ImageScreeny extends Screeny {
 
 		// fill with background color
 
-		g.setColor(Theme.getColor(Theme.COLOR_BG));
+		g.setColor(theme.getColor(Theme.COLOR_BG));
 		g.fillRect(0, 0, width, height);
 
 	}
@@ -27,7 +27,7 @@ public final class ImageScreeny extends Screeny {
 
 		Image img = (Image) data;
 
-		g.setColor(Theme.getColor(Theme.COLOR_BG));
+		g.setColor(theme.getColor(Theme.COLOR_BG));
 		g.fillRect(0, 0, width, height);
 
 		if (img == null)

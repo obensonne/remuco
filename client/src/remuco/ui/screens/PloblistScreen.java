@@ -26,6 +26,8 @@ public final class PloblistScreen extends List {
 	private final String fixedTitle;
 
 	private PlobList list = null;
+	
+	private final Theme theme;
 
 	public PloblistScreen() {
 
@@ -36,6 +38,8 @@ public final class PloblistScreen extends List {
 
 		super("", List.IMPLICIT);
 
+		theme = Theme.getInstance();
+		
 		fixedTitle = title;
 
 	}
@@ -81,10 +85,10 @@ public final class PloblistScreen extends List {
 		final int nested = list != null ? list.getNumNested() : 0;
 
 		for (int i = 0; i < nested; i++) {
-			append(list.getNested(i), Theme.LIST_ICON_PLOBLIST);
+			append(list.getNested(i), theme.LIST_ICON_PLOBLIST);
 		}
 		for (int i = 0; i < plobs; i++) {
-			append(list.getPlobName(i), Theme.LIST_ICON_PLOB);
+			append(list.getPlobName(i), theme.LIST_ICON_PLOB);
 		}
 	}
 
