@@ -17,7 +17,7 @@ import remuco.util.Log;
 
 public final class BluetoothScanner implements DiscoveryListener, IScanner {
 
-	private DiscoveryAgent agent;
+	private final DiscoveryAgent agent;
 
 	/**
 	 * Indicates if the user has canceled the device scan. If <code>true</code>,
@@ -27,11 +27,38 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 	 */
 	private boolean canceled = false;
 
-	private LocalDevice localDevice;
+	private final LocalDevice localDevice;
 
 	private Vector remoteDevices = new Vector();
 
 	private IScanListener listener;
+
+	private final UserException startScanException;
+
+	public BluetoothScanner() {
+
+		LocalDevice ldev;
+		UserException sse;
+
+		try {
+			ldev = LocalDevice.getLocalDevice();
+			sse = null;
+		} catch (BluetoothStateException e) {
+			Log.ln("[BS] failed to get local device", e);
+			sse = new UserException("Bluetooth Error",
+					"Bluetooth seems to be off.");
+			ldev = null;
+		}
+
+		startScanException = sse;
+		localDevice = ldev;
+		if (localDevice != null) {
+			agent = localDevice.getDiscoveryAgent();
+		} else {
+			agent = null;
+		}
+
+	}
 
 	public void cancelScan() {
 
@@ -109,40 +136,25 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 	 * @throws UserException
 	 *             if scan initiation failed
 	 */
-	public void startScan(IScanListener listener)
-			throws UserException {
+	public void startScan(IScanListener listener) throws UserException {
 
 		this.listener = listener;
 
 		canceled = false;
 
-		if (localDevice == null) {
-
-			try {
-
-				localDevice = LocalDevice.getLocalDevice();
-
-			} catch (BluetoothStateException e) {
-
-				Log.ln("[BT] failed to get local device", e);
-				throw new UserException("Bluetooth Error",
-						"Bluetooth seems to be off.");
-
-			}
-
-			agent = localDevice.getDiscoveryAgent();
+		if (startScanException != null) {
+			throw startScanException;
 		}
-
-		Log.asssert(this, agent);
 
 		try {
 			agent.startInquiry(DiscoveryAgent.GIAC, this);
 		} catch (BluetoothStateException e) {
 
-			Log.ln("[BT]", e);
+			Log.ln("[BS]", e);
 
 			throw new UserException("Bluetooth Error",
-					"Bluetooth seems to be busy. Cannot scan for nearby devices right now.");
+					"Bluetooth seems to be busy. "
+							+ "Cannot scan for nearby devices right now.");
 
 		}
 
