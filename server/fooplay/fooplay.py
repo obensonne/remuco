@@ -23,7 +23,7 @@ class FooPlay(remuco.Player):
         sid = gobject.timeout_add(5000, self.__update_state)
         
         # important: remember source ids (for shutting down):
-        self.__gobject_source_ids = (id,)
+        self.__gobject_source_ids = (sid,)
         
         # example: logging
         log.debug("FooPlay.__init__() done")
