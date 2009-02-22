@@ -496,9 +496,6 @@ public final class Theme {
 		if (!current.equals(name)) {
 			loadPrivate(name);
 		}
-
-		Log.ln("[TH] loaded theme " + name);
-
 	}
 
 	/**
@@ -628,6 +625,7 @@ public final class Theme {
 			colors[COLOR_BG] = 0xFF33AA;
 		}
 
+		Log.ln("[TH] loaded theme " + name);
 	}
 
 }
