@@ -22,7 +22,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.comm.Serial;
-import remuco.ui.Keys;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.util.Log;
 import remuco.util.Tools;
@@ -291,11 +291,11 @@ public final class Config {
 
 		try {
 			final int len = dis.readInt();
-			final int keys[] = new int[len];
+			final int kb[] = new int[len];
 			for (int i = 0; i < len; i++) {
-				keys[i] = dis.readInt();
+				kb[i] = dis.readInt();
 			}
-			keyBindings = keys;
+			keyBindings = kb;
 		} catch (NegativeArraySizeException e) {
 			Log.ln("[CF] load: keys malformed", e);
 			ret = false;
@@ -360,7 +360,7 @@ public final class Config {
 
 	/**
 	 * Saves the current configuration. This automatically saves the current
-	 * {@link Keys} configuration using {@link Keys#getConfiguration()}.
+	 * {@link KeyBindings} configuration using {@link KeyBindings#getConfiguration()}.
 	 * 
 	 * @return <code>true</code> on success, <code>false</code> if errors
 	 *         occured

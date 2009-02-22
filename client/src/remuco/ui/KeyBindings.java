@@ -6,7 +6,7 @@ import remuco.Config;
 import remuco.util.Log;
 
 /**
- * Key configuration manager. Manages mappings between actions and key codes.
+ * Key bindings manager. Manages mappings between actions and key codes.
  * <p>
  * Note: Synchronizing the methods in this class is not needed since they only
  * get called by the MIDlet thread.
@@ -15,9 +15,9 @@ import remuco.util.Log;
  * @author Oben Sonne
  * 
  */
-public final class Keys {
+public final class KeyBindings {
 
-	private static Keys instance = null;
+	private static KeyBindings instance = null;
 
 	public static final int ACTION_NOOP = 100;
 
@@ -42,43 +42,42 @@ public final class Keys {
 	 * 
 	 * @return the key bindings singleton
 	 */
-	public static Keys getInstance() {
+	public static KeyBindings getInstance() {
 
 		if (instance == null) {
-			instance = new Keys();
+			instance = new KeyBindings();
 		}
 		return instance;
 	}
 
 	/**
-	 * Current key configuration. Format described at {@link #defaultConfig}.
+	 * Current key bindings. Format described at {@link #defaultBindings}.
 	 */
-	private final int[] config;
+	private final int[] bindings;
 
 	/**
-	 * Default key configuration.
+	 * Default key bindings.
 	 * <p>
 	 * Format:<br>
 	 * The key code at <code>i</code> is mapped to the action code
 	 * <code>i</code>.
 	 */
-	private static final int[] defaultConfig = new int[] { Canvas.KEY_NUM5,
+	private static final int[] defaultBindings = new int[] { Canvas.KEY_NUM5,
 			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
 			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
 			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9 };
 
-	private Keys() {
+	private KeyBindings() {
 
-		int keys[] = Config.getKeyBindings();
+		int kb[] = Config.getKeyBindings();
 
-		if (keys.length != defaultConfig.length) {
-			Log.ln("[KY] saved key bindings malformed");
-			keys = new int[defaultConfig.length];
-			System.arraycopy(defaultConfig, 0, keys, 0, keys.length);
-			Config.setKeyBindings(keys);
+		if (!validate(kb)) {
+			kb = new int[defaultBindings.length];
+			System.arraycopy(defaultBindings, 0, kb, 0, kb.length);
+			Config.setKeyBindings(kb);
 		}
 
-		config = keys;
+		bindings = kb;
 
 	}
 
@@ -96,7 +95,7 @@ public final class Keys {
 	public int getActionForKey(int key) {
 
 		for (int i = 0; i < ACTION_COUNT; i++) {
-			if (key == config[i])
+			if (key == bindings[i])
 				return i;
 		}
 
@@ -113,7 +112,7 @@ public final class Keys {
 	 */
 	public int getKeyForAction(int action) {
 
-		return config[action];
+		return bindings[action];
 
 	}
 
@@ -127,8 +126,8 @@ public final class Keys {
 	 */
 	public boolean keyIsAlreadySet(int key) {
 
-		for (int i = 0; i < config.length; i++) {
-			if (key == config[i]) {
+		for (int i = 0; i < bindings.length; i++) {
+			if (key == bindings[i]) {
 				return true;
 			}
 		}
@@ -138,7 +137,7 @@ public final class Keys {
 	}
 
 	public void resetToDefaults() {
-		System.arraycopy(defaultConfig, 0, config, 0, config.length);
+		System.arraycopy(defaultBindings, 0, bindings, 0, bindings.length);
 	}
 
 	/**
@@ -160,7 +159,7 @@ public final class Keys {
 			if (keyIsAlreadySet(key))
 				return false;
 
-		config[action] = key;
+		bindings[action] = key;
 
 		return true;
 
@@ -176,9 +175,9 @@ public final class Keys {
 	 */
 	public int unsetKey(int key) {
 
-		for (int i = 0; i < config.length; i++) {
-			if (key == config[i]) {
-				config[i] = 0;
+		for (int i = 0; i < bindings.length; i++) {
+			if (key == bindings[i]) {
+				bindings[i] = 0;
 				return i;
 			}
 		}
@@ -192,25 +191,31 @@ public final class Keys {
 	 */
 	public void unsetKeyForAction(int action) {
 
-		config[action] = 0;
+		bindings[action] = 0;
 
 	}
 
 	/**
-	 * Validate the current configuration, i.e. check if no key code is used
-	 * twice.
+	 * Validate the given key bindings.
 	 * 
-	 * @return <code>true</code> if the configuration is valid,
-	 *         <code>false</code> otherwise.
+	 * @param kb
+	 *            the bindings to validate
+	 * @return <code>true</code> if the bindings are valid, <code>false</code>
+	 *         otherwise.
 	 */
-	private boolean check(int[] config) {
+	private boolean validate(int[] kb) {
 
-		for (int i = 0; i < config.length; i++) {
-			if (config[i] == 0)
+		if (kb == null || kb.length != defaultBindings.length) {
+			Log.ln("[KB] key bindings malformed");
+			return false;
+		}
+
+		for (int i = 0; i < kb.length; i++) {
+			if (kb[i] == 0)
 				continue;
-			for (int j = i + 1; j < config.length; j++) {
-				if (config[i] == config[j]) {
-					Log.ln("[KE] check: key " + config[i] + " is set twice");
+			for (int j = i + 1; j < kb.length; j++) {
+				if (kb[i] == kb[j]) {
+					Log.ln("[KB] check: key " + kb[i] + " is set twice");
 					return false;
 				}
 			}

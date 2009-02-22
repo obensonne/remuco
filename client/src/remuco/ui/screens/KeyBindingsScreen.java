@@ -10,9 +10,10 @@ import javax.microedition.lcdui.List;
 
 import remuco.ui.CMD;
 import remuco.ui.IKeyListener;
-import remuco.ui.Keys;
+import remuco.ui.KeyBindings;
 
-public final class KeyConfigScreen extends List implements CommandListener,
+/** Screen to configure key bindings. */
+public final class KeyBindingsScreen extends List implements CommandListener,
 		IKeyListener {
 
 	private static final Command CMD_RESET = new Command("Reset to defaults",
@@ -20,7 +21,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 	/** The current action to set a key for. */
 	private int actionToSet;
-	
+
 	private final Alert alertKeyConflict, alertReset;
 
 	private final Display display;
@@ -29,9 +30,9 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 	private final CommandListener parent;
 
-	private final KeySetScreen screenKeySet;
-	
-	private final Keys keys;
+	private final KeyBinderScreen screenKeyBinder;
+
+	private final KeyBindings keyBindings;
 
 	/**
 	 * The key selected to set for {@link #actionToSet}. This field has only a
@@ -45,21 +46,21 @@ public final class KeyConfigScreen extends List implements CommandListener,
 	 * @param parent
 	 * @param player
 	 */
-	public KeyConfigScreen(final CommandListener parent, final Display display) {
+	public KeyBindingsScreen(final CommandListener parent, final Display display) {
 
 		super("Key Configuration", IMPLICIT);
 
 		this.display = display;
 		this.parent = parent;
-		
-		keys = Keys.getInstance();
 
-		screenKeySet = new KeySetScreen(this);
+		keyBindings = KeyBindings.getInstance();
+
+		screenKeyBinder = new KeyBinderScreen(this);
 
 		addCommand(CMD_RESET);
 		setCommandListener(this);
 
-		for (int i = 0; i < Keys.actionNames.length; i++)
+		for (int i = 0; i < KeyBindings.actionNames.length; i++)
 			append("", null);
 		updateList();
 
@@ -81,14 +82,14 @@ public final class KeyConfigScreen extends List implements CommandListener,
 	public void commandAction(Command c, Displayable d) {
 
 		int actionOld;
-		
+
 		if (c == CMD_RESET) {
 
 			display.setCurrent(alertReset);
 
 		} else if (c == CMD.YES && d == alertReset) {
 
-			keys.resetToDefaults();
+			keyBindings.resetToDefaults();
 
 			updateList();
 
@@ -103,14 +104,14 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 			actionToSet = getSelectedIndex();
 
-			screenKeySet.configure(actionToSet);
+			screenKeyBinder.configure(actionToSet);
 
-			display.setCurrent(screenKeySet);
+			display.setCurrent(screenKeyBinder);
 
 		} else if (c == CMD.YES && d == alertKeyConflict) {
 
-			actionOld = keys.unsetKey(selectedKey);
-			keys.setKeyForAction(actionToSet, selectedKey);
+			actionOld = keyBindings.unsetKey(selectedKey);
+			keyBindings.setKeyForAction(actionToSet, selectedKey);
 
 			updateList(actionToSet);
 			if (actionOld >= 0)
@@ -134,32 +135,34 @@ public final class KeyConfigScreen extends List implements CommandListener,
 		int actionOld;
 		String keyName;
 
-		if (key == 0 || key == keys.getKeyForAction(actionToSet)) {
+		if (key == 0 || key == keyBindings.getKeyForAction(actionToSet)) {
 
 			display.setCurrent(this);
 
-		} else if (keys.keyIsAlreadySet(key)) {
+		} else if (keyBindings.keyIsAlreadySet(key)) {
 
 			selectedKey = key;
 
-			actionOld = keys.getActionForKey(key);
-			keyName = screenKeySet.getKeyName(key);
+			actionOld = keyBindings.getActionForKey(key);
+			keyName = screenKeyBinder.getKeyName(key);
 
 			msgKeyConflict.delete(0, msgKeyConflict.length());
 			msgKeyConflict.append("Key ").append(keyName);
 			msgKeyConflict.append(" is already in use for '");
-			msgKeyConflict.append(Keys.actionNames[actionOld]).append("'.");
+			msgKeyConflict.append(KeyBindings.actionNames[actionOld]).append(
+					"'.");
 			msgKeyConflict.append("\nDo you want to unset it from '");
-			msgKeyConflict.append(Keys.actionNames[actionOld]);
+			msgKeyConflict.append(KeyBindings.actionNames[actionOld]);
 			msgKeyConflict.append("' and use it for '");
-			msgKeyConflict.append(Keys.actionNames[actionToSet]).append("' ?");
+			msgKeyConflict.append(KeyBindings.actionNames[actionToSet]).append(
+					"' ?");
 			alertKeyConflict.setString(msgKeyConflict.toString());
 
 			display.setCurrent(alertKeyConflict);
 
 		} else { // key is valid and free
 
-			keys.setKeyForAction(actionToSet, key);
+			keyBindings.setKeyForAction(actionToSet, key);
 
 			updateList(actionToSet);
 
@@ -178,7 +181,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 	 */
 	private void updateList() {
 
-		for (int action = 0; action < Keys.actionNames.length; action++) {
+		for (int action = 0; action < KeyBindings.actionNames.length; action++) {
 
 			updateList(action);
 
@@ -196,9 +199,9 @@ public final class KeyConfigScreen extends List implements CommandListener,
 		int key;
 		String keyName;
 
-		key = keys.getKeyForAction(action);
-		keyName = (key != 0) ? screenKeySet.getKeyName(key) : "";
-		set(action, Keys.actionNames[action] + ": " + keyName, null);
+		key = keyBindings.getKeyForAction(action);
+		keyName = (key != 0) ? screenKeyBinder.getKeyName(key) : "";
+		set(action, KeyBindings.actionNames[action] + ": " + keyName, null);
 
 	}
 }

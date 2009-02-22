@@ -20,7 +20,7 @@ import remuco.player.Plob;
 import remuco.ui.Adjuster;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
-import remuco.ui.Keys;
+import remuco.ui.KeyBindings;
 import remuco.ui.MediaBrowser;
 import remuco.ui.Theme;
 import remuco.ui.screenies.PlobScreeny;
@@ -72,7 +72,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 	private final Player player;
 
 	/** Screen to configure key setup */
-	private final KeyConfigScreen screenKeyConfig;
+	private final KeyBindingsScreen screenKeyConfig;
 
 	/** Screen for browsing the remote player's media */
 	private final MediaBrowser mediaBrowser;
@@ -149,7 +149,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenyState = new StateScreeny(player.info);
 		screenyPlob = new PlobScreeny(player.info);
 
-		screenKeyConfig = new KeyConfigScreen(this, display);
+		screenKeyConfig = new KeyBindingsScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
 
 		screenTagEditor = new TagEditorScreen();
@@ -312,7 +312,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	protected void keyPressed(int key) {
 
-		final int action = Keys.getInstance().getActionForKey(key);
+		final int action = KeyBindings.getInstance().getActionForKey(key);
 		final int rating, ratingMax;
 
 		// Log.debug("[UI] pressed key "
@@ -320,36 +320,36 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		// + " (id "
 		// + key
 		// + ") -> "
-		// + (action != Keys.ACTION_NOOP ? Keys.actionNames[action]
+		// + (action != KeyBindings.ACTION_NOOP ? KeyBindings.actionNames[action]
 		// : "no action") + " (id " + action + ")");
 
 		switch (action) {
-		case Keys.ACTION_VOLUP:
+		case KeyBindings.ACTION_VOLUP:
 
 			volumeAdjuster.startAdjust(true, 0);
 			break;
 
-		case Keys.ACTION_VOLDOWN:
+		case KeyBindings.ACTION_VOLDOWN:
 
 			volumeAdjuster.startAdjust(false, 0);
 			break;
 
-		case Keys.ACTION_PLAYPAUSE:
+		case KeyBindings.ACTION_PLAYPAUSE:
 
 			player.ctrlPlayPause();
 			break;
 
-		case Keys.ACTION_NEXT:
+		case KeyBindings.ACTION_NEXT:
 
 			progressAdjuster.startAdjust(true, SEEK_DELAY);
 			break;
 
-		case Keys.ACTION_PREV:
+		case KeyBindings.ACTION_PREV:
 
 			progressAdjuster.startAdjust(false, SEEK_DELAY);
 			break;
 
-		case Keys.ACTION_RATEDOWN:
+		case KeyBindings.ACTION_RATEDOWN:
 
 			rating = player.plob.getRating() - 1;
 			ratingMax = player.info.getMaxRating();
@@ -363,7 +363,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			break;
 
-		case Keys.ACTION_RATEUP:
+		case KeyBindings.ACTION_RATEUP:
 
 			rating = player.plob.getRating() + 1;
 			ratingMax = player.info.getMaxRating();
@@ -377,12 +377,12 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			break;
 
-		case Keys.ACTION_VOLMUTE:
+		case KeyBindings.ACTION_VOLMUTE:
 
 			player.ctrlVolumeMute();
 			break;
 
-		case Keys.ACTION_IMAGE:
+		case KeyBindings.ACTION_IMAGE:
 
 			if (player.plob.getImg() != null) {
 
@@ -394,7 +394,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			break;
 
-		case Keys.ACTION_EDITTAGS:
+		case KeyBindings.ACTION_EDITTAGS:
 
 			if (player.plob.hasTags()) {
 
@@ -406,19 +406,19 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			break;
 
-		case Keys.ACTION_REPEAT:
+		case KeyBindings.ACTION_REPEAT:
 
 			player.ctrlToggleRepeat();
 
 			break;
 
-		case Keys.ACTION_SHUFFLE:
+		case KeyBindings.ACTION_SHUFFLE:
 
 			player.ctrlToggleShuffle();
 
 			break;
 
-		case Keys.ACTION_NOOP:
+		case KeyBindings.ACTION_NOOP:
 
 			break;
 
@@ -434,26 +434,26 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		final boolean stillInDelay;
 
-		final int action = Keys.getInstance().getActionForKey(key);
+		final int action = KeyBindings.getInstance().getActionForKey(key);
 
 		switch (action) {
 
-		case Keys.ACTION_VOLUP:
+		case KeyBindings.ACTION_VOLUP:
 			volumeAdjuster.stopAdjust();
 			break;
 
-		case Keys.ACTION_VOLDOWN:
+		case KeyBindings.ACTION_VOLDOWN:
 			volumeAdjuster.stopAdjust();
 			break;
 
-		case Keys.ACTION_NEXT:
+		case KeyBindings.ACTION_NEXT:
 			stillInDelay = progressAdjuster.stopAdjust();
 			if (stillInDelay) { // key pressed for a short time -> no seek
 				player.ctrlNext();
 			} // else: progress adjuster did some seeks, we are done already
 			break;
 
-		case Keys.ACTION_PREV:
+		case KeyBindings.ACTION_PREV:
 			stillInDelay = progressAdjuster.stopAdjust();
 			if (stillInDelay) { // key pressed for a short time -> no seek
 				player.ctrlPrev();

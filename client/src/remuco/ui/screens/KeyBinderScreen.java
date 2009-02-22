@@ -6,10 +6,11 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import remuco.ui.IKeyListener;
-import remuco.ui.Keys;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
-public final class KeySetScreen extends Canvas {
+/** Screen to configure the binding for one specific key. */
+public final class KeyBinderScreen extends Canvas {
 
 	/**
 	 * Just to block the soft keys which are always used for some menus and
@@ -40,7 +41,7 @@ public final class KeySetScreen extends Canvas {
 
 	private final StringBuffer textHint, textCurrent;
 
-	public KeySetScreen(IKeyListener kl) {
+	public KeyBinderScreen(IKeyListener kl) {
 
 		this.kl = kl;
 
@@ -72,12 +73,12 @@ public final class KeySetScreen extends Canvas {
 
 		textHint.delete(0, textHint.length());
 		textHint.append("Please press the key for action '");
-		textHint.append(Keys.actionNames[actionCode]).append("'");
+		textHint.append(KeyBindings.actionNames[actionCode]).append("'");
 
 		textCurrent.delete(0, textCurrent.length());
 		textCurrent.append("Currently ");
 
-		key = Keys.getInstance().getKeyForAction(actionCode);
+		key = KeyBindings.getInstance().getKeyForAction(actionCode);
 
 		if (key == 0)
 			textCurrent.append("no key is set.");
