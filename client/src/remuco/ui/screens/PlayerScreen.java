@@ -312,7 +312,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	protected void keyPressed(int key) {
 
-		final int action = Keys.getActionForKey(key);
+		final int action = Keys.getInstance().getActionForKey(key);
 		final int rating, ratingMax;
 
 		// Log.debug("[UI] pressed key "
@@ -434,7 +434,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		final boolean stillInDelay;
 
-		final int action = Keys.getActionForKey(key);
+		final int action = Keys.getInstance().getActionForKey(key);
 
 		switch (action) {
 

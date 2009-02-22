@@ -77,7 +77,7 @@ public final class KeySetScreen extends Canvas {
 		textCurrent.delete(0, textCurrent.length());
 		textCurrent.append("Currently ");
 
-		key = Keys.getKeyForAction(actionCode);
+		key = Keys.getInstance().getKeyForAction(actionCode);
 
 		if (key == 0)
 			textCurrent.append("no key is set.");

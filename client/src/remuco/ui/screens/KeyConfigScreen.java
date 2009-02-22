@@ -30,6 +30,8 @@ public final class KeyConfigScreen extends List implements CommandListener,
 	private final CommandListener parent;
 
 	private final KeySetScreen screenKeySet;
+	
+	private final Keys keys;
 
 	/**
 	 * The key selected to set for {@link #actionToSet}. This field has only a
@@ -49,6 +51,8 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 		this.display = display;
 		this.parent = parent;
+		
+		keys = Keys.getInstance();
 
 		screenKeySet = new KeySetScreen(this);
 
@@ -84,7 +88,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 		} else if (c == CMD.YES && d == alertReset) {
 
-			Keys.resetToDefaults();
+			keys.resetToDefaults();
 
 			updateList();
 
@@ -105,8 +109,8 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 		} else if (c == CMD.YES && d == alertKeyConflict) {
 
-			actionOld = Keys.unsetKey(selectedKey);
-			Keys.setKeyForAction(actionToSet, selectedKey);
+			actionOld = keys.unsetKey(selectedKey);
+			keys.setKeyForAction(actionToSet, selectedKey);
 
 			updateList(actionToSet);
 			if (actionOld >= 0)
@@ -130,15 +134,15 @@ public final class KeyConfigScreen extends List implements CommandListener,
 		int actionOld;
 		String keyName;
 
-		if (key == 0 || key == Keys.getKeyForAction(actionToSet)) {
+		if (key == 0 || key == keys.getKeyForAction(actionToSet)) {
 
 			display.setCurrent(this);
 
-		} else if (Keys.keyIsAlreadySet(key)) {
+		} else if (keys.keyIsAlreadySet(key)) {
 
 			selectedKey = key;
 
-			actionOld = Keys.getActionForKey(key);
+			actionOld = keys.getActionForKey(key);
 			keyName = screenKeySet.getKeyName(key);
 
 			msgKeyConflict.delete(0, msgKeyConflict.length());
@@ -155,7 +159,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 
 		} else { // key is valid and free
 
-			Keys.setKeyForAction(actionToSet, key);
+			keys.setKeyForAction(actionToSet, key);
 
 			updateList(actionToSet);
 
@@ -192,7 +196,7 @@ public final class KeyConfigScreen extends List implements CommandListener,
 		int key;
 		String keyName;
 
-		key = Keys.getKeyForAction(action);
+		key = keys.getKeyForAction(action);
 		keyName = (key != 0) ? screenKeySet.getKeyName(key) : "";
 		set(action, Keys.actionNames[action] + ": " + keyName, null);
 

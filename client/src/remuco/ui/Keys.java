@@ -2,6 +2,7 @@ package remuco.ui;
 
 import javax.microedition.lcdui.Canvas;
 
+import remuco.Config;
 import remuco.util.Log;
 
 /**
@@ -15,6 +16,8 @@ import remuco.util.Log;
  * 
  */
 public final class Keys {
+
+	private static Keys instance = null;
 
 	public static final int ACTION_NOOP = 100;
 
@@ -34,13 +37,23 @@ public final class Keys {
 			"Toggle Shuffle" };
 
 	/**
-	 * Key configuration. Format described at {@link #defaultConfig}. Initially
-	 * it is the same as {@link #defaultConfig}.
+	 * Get the key bindings instance. {@link Config} must be initialized already
+	 * when calling this method.
+	 * 
+	 * @return the key bindings singleton
 	 */
-	private static final int[] config = new int[] { Canvas.KEY_NUM5,
-			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
-			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
-			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9 };
+	public static Keys getInstance() {
+
+		if (instance == null) {
+			instance = new Keys();
+		}
+		return instance;
+	}
+
+	/**
+	 * Current key configuration. Format described at {@link #defaultConfig}.
+	 */
+	private final int[] config;
 
 	/**
 	 * Default key configuration.
@@ -54,25 +67,18 @@ public final class Keys {
 			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
 			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9 };
 
-	/**
-	 * Set a new key configuration.
-	 * 
-	 * @param newConfig
-	 *            the new configuration
-	 * @return <code>false</code> if the new configuration is not valid (the
-	 *         current configuration is not changed), <code>true</code>
-	 *         otheriwse.
-	 */
-	public static boolean configure(int[] newConfig) {
+	private Keys() {
 
-		if (!check(newConfig)) {
-			Log.ln("[KE] bad config, keep current");
-			return false;
+		int keys[] = Config.getKeyBindings();
+
+		if (keys.length != defaultConfig.length) {
+			Log.ln("[KY] saved key bindings malformed");
+			keys = new int[defaultConfig.length];
+			System.arraycopy(defaultConfig, 0, keys, 0, keys.length);
+			Config.setKeyBindings(keys);
 		}
 
-		System.arraycopy(newConfig, 0, config, 0, config.length);
-
-		return true;
+		config = keys;
 
 	}
 
@@ -87,7 +93,7 @@ public final class Keys {
 	 *         or alternative key code. If no action is associated with
 	 *         <code>key</code>, {@link #ACTION_NOOP} is returned.
 	 */
-	public static int getActionForKey(int key) {
+	public int getActionForKey(int key) {
 
 		for (int i = 0; i < ACTION_COUNT; i++) {
 			if (key == config[i])
@@ -98,20 +104,6 @@ public final class Keys {
 	}
 
 	/**
-	 * Get the current configuration.
-	 * 
-	 * @return The current configuration. Do not alter this configuration
-	 *         directly, use {@link #setKeyForAction(int, int)},
-	 *         {@link #unsetKey(int)}, {@link #unsetKeyForAction(int)} or
-	 *         {@link #configure(int[])} to change the config !
-	 */
-	public static int[] getConfiguration() {
-
-		return config;
-
-	}
-
-	/**
 	 * Get an actions key.
 	 * 
 	 * @param action
@@ -119,7 +111,7 @@ public final class Keys {
 	 * @return the key code (<code>0</code> if no key is associated with the
 	 *         action)
 	 */
-	public static int getKeyForAction(int action) {
+	public int getKeyForAction(int action) {
 
 		return config[action];
 
@@ -133,7 +125,7 @@ public final class Keys {
 	 * @return <code>true</code> if the key is set, <code>false</code>
 	 *         otherwise.
 	 */
-	public static boolean keyIsAlreadySet(int key) {
+	public boolean keyIsAlreadySet(int key) {
 
 		for (int i = 0; i < config.length; i++) {
 			if (key == config[i]) {
@@ -145,13 +137,13 @@ public final class Keys {
 
 	}
 
-	public static void resetToDefaults() {
+	public void resetToDefaults() {
 		System.arraycopy(defaultConfig, 0, config, 0, config.length);
 	}
 
 	/**
 	 * Associate a key code with an action code. If <code>key == 0</code>, the
-	 * behaviour is identical to {@link #unsetKeyForAction(int)} with param
+	 * behavior is identical to {@link #unsetKeyForAction(int)} with param
 	 * <code>action</code>.
 	 * 
 	 * @param action
@@ -162,7 +154,7 @@ public final class Keys {
 	 *         configuration is not changed in that case), <code>true</code>
 	 *         otherwise
 	 */
-	public static boolean setKeyForAction(int action, int key) {
+	public boolean setKeyForAction(int action, int key) {
 
 		if (key != 0)
 			if (keyIsAlreadySet(key))
@@ -182,7 +174,7 @@ public final class Keys {
 	 * @return the action the key has been associated with until now, or -1 if
 	 *         the key has been free until now
 	 */
-	public static int unsetKey(int key) {
+	public int unsetKey(int key) {
 
 		for (int i = 0; i < config.length; i++) {
 			if (key == config[i]) {
@@ -198,31 +190,20 @@ public final class Keys {
 	 * 
 	 * @param action
 	 */
-	public static void unsetKeyForAction(int action) {
+	public void unsetKeyForAction(int action) {
 
 		config[action] = 0;
 
 	}
 
 	/**
-	 * Validate the current configuration, i.e. check if size of {@link #config}
-	 * equals <code>2 * </code>{@link #ACTION_COUNT} and if no key code is used
+	 * Validate the current configuration, i.e. check if no key code is used
 	 * twice.
 	 * 
 	 * @return <code>true</code> if the configuration is valid,
 	 *         <code>false</code> otherwise.
 	 */
-	private static boolean check(int[] config) {
-
-		if (config == null) {
-			Log.ln("[KE] check: null config");
-			return false;
-		}
-
-		if (config.length != ACTION_COUNT) {
-			Log.ln("[KE] check: wrong mapping length");
-			return false;
-		}
+	private boolean check(int[] config) {
 
 		for (int i = 0; i < config.length; i++) {
 			if (config[i] == 0)

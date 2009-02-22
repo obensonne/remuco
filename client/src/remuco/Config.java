@@ -86,10 +86,10 @@ public final class Config {
 
 		try {
 			"".getBytes(Serial.ENCODING);
-			Log.ln("[CONF] " + Serial.ENCODING + ": yes");
+			Log.ln("[CF] " + Serial.ENCODING + ": yes");
 			b = true;
 		} catch (UnsupportedEncodingException e) {
-			Log.ln("[CONF] " + Serial.ENCODING + ": no");
+			Log.ln("[CF] " + Serial.ENCODING + ": no");
 			b = false;
 		}
 
@@ -137,6 +137,12 @@ public final class Config {
 
 		return (String) applicationProperties.get(key);
 
+	}
+	
+	private static int[] keyBindings = new int[0];
+	
+	public static int[] getKeyBindings() {
+		return keyBindings;
 	}
 
 	/**
@@ -222,8 +228,7 @@ public final class Config {
 	}
 
 	/**
-	 * Load the configuration. This automatically configures the {@link Keys}
-	 * (using {@link Keys#configure(int[])}).
+	 * Load the configuration.
 	 * 
 	 * @return <code>true</code> if loading was successful, <code>false</code>
 	 *         if errors occurred (in this case defaults are used for the
@@ -232,13 +237,11 @@ public final class Config {
 	 */
 	public static boolean load() {
 
-		RecordStore rs = null;
 		ByteArrayInputStream bais;
 		DataInputStream dis;
 		byte[] ba;
 		int nextId;
 		String key, val;
-		int[] keyConfig = new int[Keys.getConfiguration().length];
 		boolean ret = true;
 
 		// open record
@@ -248,7 +251,7 @@ public final class Config {
 
 		loaded = true;
 
-		rs = openRecord(RECORD);
+		final RecordStore rs = openRecord(RECORD);
 
 		if (rs == null)
 			return false;
@@ -256,10 +259,10 @@ public final class Config {
 		try {
 			nextId = rs.getNextRecordID();
 		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CONF] load: error, not open ???");
+			Log.ln("[CF] load: error, not open ???");
 			return false;
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] load: unknown error", e);
+			Log.ln("[CF] load: unknown error", e);
 			closeRecord(rs);
 			return false;
 		}
@@ -274,30 +277,33 @@ public final class Config {
 			dis = new DataInputStream(bais);
 
 		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CONF] load: error, not open ???");
+			Log.ln("[CF] load: error, not open ???");
 			return false;
 		} catch (InvalidRecordIDException e) {
-			Log.ln("[CONF] load: record seems to be empty", e);
+			Log.ln("[CF] load: record seems to be empty", e);
 			closeRecord(rs);
 			return true;
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] load: unknown error", e);
+			Log.ln("[CF] load: unknown error", e);
 			closeRecord(rs);
 			return false;
 		}
 
 		try {
-			for (int i = 0; i < keyConfig.length; i++) {
-				keyConfig[i] = dis.readInt();
+			final int len = dis.readInt();
+			final int keys[] = new int[len];
+			for (int i = 0; i < len; i++) {
+				keys[i] = dis.readInt();
 			}
-			ret = Keys.configure(keyConfig);
-			if (!ret)
-				Log.ln("[CONF] load: keys malformed");
+			keyBindings = keys;
+		} catch (NegativeArraySizeException e) {
+			Log.ln("[CF] load: keys malformed", e);
+			ret = false;
 		} catch (EOFException e) {
-			Log.ln("[CONF] load: keys malformed", e);
+			Log.ln("[CF] load: keys malformed", e);
 			ret = false;
 		} catch (IOException e) {
-			Log.ln("[CONF] load: unknown IO error", e);
+			Log.ln("[CF] load: unknown IO error", e);
 			ret = false;
 		}
 
@@ -314,12 +320,12 @@ public final class Config {
 				dis = new DataInputStream(bais);
 
 			} catch (RecordStoreNotOpenException e) {
-				Log.ln("[CONF] load: error, not open ???");
+				Log.ln("[CF] load: error, not open ???");
 				return false;
 			} catch (InvalidRecordIDException e) {
 				continue;
 			} catch (RecordStoreException e) {
-				Log.ln("[CONF] load: unknown error", e);
+				Log.ln("[CF] load: unknown error", e);
 				closeRecord(rs);
 				return false;
 			}
@@ -327,9 +333,9 @@ public final class Config {
 			try {
 				key = dis.readUTF();
 				val = dis.readUTF();
-				Log.ln("[CONF] load: " + key + " = '" + val + "'");
+				Log.ln("[CF] load: " + key + " = '" + val + "'");
 			} catch (IOException e) {
-				Log.ln("[CONF] load: error, bad strings in record " + i, e);
+				Log.ln("[CF] load: error, bad strings in record " + i, e);
 				ret = false;
 				continue;
 			}
@@ -346,7 +352,7 @@ public final class Config {
 
 		devicesFromOptions();
 
-		Log.ln("[CONF] load: " + (ret ? "success" : "erros"));
+		Log.ln("[CF] load: " + (ret ? "success" : "erros"));
 
 		return ret;
 
@@ -361,12 +367,10 @@ public final class Config {
 	 */
 	public static boolean save() {
 
-		RecordStore rs;
 		ByteArrayOutputStream baos;
 		DataOutputStream dos;
 		byte[] ba;
 		String key, val;
-		int[] keyConfig;
 		Enumeration keys;
 		boolean ret = true;
 		int rid;
@@ -375,17 +379,17 @@ public final class Config {
 
 		try {
 			RecordStore.deleteRecordStore(RECORD);
-			Log.ln("[CONF] save: deleted old config");
+			Log.ln("[CF] save: deleted old config");
 		} catch (RecordStoreNotFoundException e) {
-			Log.ln("[CONF] save: no config yet");
+			Log.ln("[CF] save: no config yet");
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] save: unknown error", e);
+			Log.ln("[CF] save: unknown error", e);
 			return false;
 		}
 
 		// open record
 
-		rs = openRecord(RECORD);
+		final RecordStore rs = openRecord(RECORD);
 
 		if (rs == null)
 			return false;
@@ -395,18 +399,15 @@ public final class Config {
 		baos = new ByteArrayOutputStream();
 		dos = new DataOutputStream(baos);
 
-		// get current key config
-
-		keyConfig = Keys.getConfiguration();
-
 		// save key config
 
 		try {
-			for (int i = 0; i < keyConfig.length; i++) {
-				dos.writeInt(keyConfig[i]);
+			dos.writeInt(keyBindings.length);
+			for (int i = 0; i < keyBindings.length; i++) {
+				dos.writeInt(keyBindings[i]);
 			}
 		} catch (IOException e) {
-			Log.ln("[CONF] save: unknown IO error", e);
+			Log.ln("[CF] save: unknown IO error", e);
 		}
 
 		ba = baos.toByteArray();
@@ -415,19 +416,19 @@ public final class Config {
 		try {
 			rid = rs.addRecord(ba, 0, ba.length);
 			if (rid != FIRST_RECORD_ID) {
-				Log.ln("[CONF] save: WARNING, keys not in record 1 !!!");
+				Log.ln("[CF] save: WARNING, keys not in record 1 !!!");
 				closeRecord(rs);
 				return false;
 			}
 		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CONF] save: error, not open ???");
+			Log.ln("[CF] save: error, not open ???");
 			return false;
 		} catch (RecordStoreFullException e) {
-			Log.ln("[CONF] save: error, full");
+			Log.ln("[CF] save: error, full");
 			closeRecord(rs);
 			return false;
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] save: unknown error", e);
+			Log.ln("[CF] save: unknown error", e);
 			closeRecord(rs);
 			return false;
 		}
@@ -445,7 +446,7 @@ public final class Config {
 				dos.writeUTF(key);
 				dos.writeUTF(val);
 			} catch (IOException e) {
-				Log.ln("[CONF] save: bad string (" + key + "/" + val + ")", e);
+				Log.ln("[CF] save: bad string (" + key + "/" + val + ")", e);
 				ret = false;
 				continue;
 			}
@@ -456,14 +457,14 @@ public final class Config {
 			try {
 				rs.addRecord(ba, 0, ba.length);
 			} catch (RecordStoreNotOpenException e) {
-				Log.ln("[CONF] save: error, not open ???");
+				Log.ln("[CF] save: error, not open ???");
 				return false;
 			} catch (RecordStoreFullException e) {
-				Log.ln("[CONF] save: error, full");
+				Log.ln("[CF] save: error, full");
 				closeRecord(rs);
 				return false;
 			} catch (RecordStoreException e) {
-				Log.ln("[CONF] save: unknown error", e);
+				Log.ln("[CF] save: unknown error", e);
 				closeRecord(rs);
 				return false;
 			}
@@ -474,10 +475,14 @@ public final class Config {
 
 		closeRecord(rs);
 
-		Log.ln("[CONF] save: " + (ret ? "success" : "erros"));
+		Log.ln("[CF] save: " + (ret ? "success" : "erros"));
 
 		return ret;
 
+	}
+
+	public static void setKeyBindings(int[] keyBindings) {
+		Config.keyBindings = keyBindings;
 	}
 
 	/**
@@ -531,11 +536,11 @@ public final class Config {
 
 		try {
 			rs.closeRecordStore();
-			Log.ln("[CONF] close: ok");
+			Log.ln("[CF] close: ok");
 		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CONF] close: not open!");
+			Log.ln("[CF] close: not open!");
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] close: unknown error", e);
+			Log.ln("[CF] close: unknown error", e);
 		}
 
 	}
@@ -559,7 +564,7 @@ public final class Config {
 			return;
 
 		if (devs.length % 3 != 0) {
-			Log.ln("[CONF] option devs malformed");
+			Log.ln("[CF] option devs malformed");
 			return;
 		}
 
@@ -613,14 +618,14 @@ public final class Config {
 			rs = RecordStore.openRecordStore(RECORD, true);
 			rsUsed = (rs.getSize() / 1024) + 1;
 			rsTotal = (rs.getSizeAvailable() / 1024) + 1;
-			Log.ln("[CONF] open: ok, using " + rsUsed + "/" + rsTotal + "KB");
+			Log.ln("[CF] open: ok, using " + rsUsed + "/" + rsTotal + "KB");
 			return rs;
 		} catch (RecordStoreFullException e) {
-			Log.ln("[CONF] open: error, full");
+			Log.ln("[CF] open: error, full");
 		} catch (RecordStoreNotFoundException e) {
-			Log.ln("[CONF] open: error, not found ???");
+			Log.ln("[CF] open: error, not found ???");
 		} catch (RecordStoreException e) {
-			Log.ln("[CONF] open: unknown error", e);
+			Log.ln("[CF] open: unknown error", e);
 		}
 
 		return null;
