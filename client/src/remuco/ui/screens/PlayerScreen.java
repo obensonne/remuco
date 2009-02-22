@@ -130,7 +130,9 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenOptions = new CommandList("Options");
 		screenOptions.addCommand(CMD_THEMES, Theme.LIST_ICON_THEMES);
 		screenOptions.addCommand(CMD_KEYS, Theme.LIST_ICON_KEYS);
-		screenOptions.addCommand(CMD_SHUTDOWN_HOST, Theme.LIST_ICON_OFF);
+		if (pinfo.supportsShutdownHost()) {
+			screenOptions.addCommand(CMD_SHUTDOWN_HOST, Theme.LIST_ICON_OFF);
+		}
 		screenOptions.addCommand(CMD.BACK);
 		screenOptions.setCommandListener(this);
 

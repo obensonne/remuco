@@ -16,6 +16,7 @@ public class PlayerInfo implements ISerializable {
 	private static final int FEATURE_JUMP_PLAYLIST = 1 << 5;
 	private static final int FEATURE_JUMP_QUEUE = 1 << 6;
 	private static final int FEATURE_LOAD_PLAYLIST = 1 << 7;
+	private static final int FEATURE_SHUTDOWN_HOST = 1 << 8;
 	private static final int FEATURE_VOLUME_UNKNOWN = 1 << 17;
 	private static final int FEATURE_PLAYBACK_UNKNOWN = 1 << 18;
 
@@ -94,6 +95,10 @@ public class PlayerInfo implements ISerializable {
 
 	public boolean supportsQueue() {
 		return (flags & FEATURE_QUEUE) != 0;
+	}
+
+	public boolean supportsShutdownHost() {
+		return (flags & FEATURE_SHUTDOWN_HOST) != 0;
 	}
 
 	public boolean supportsTags() {
