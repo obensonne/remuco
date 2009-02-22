@@ -645,6 +645,9 @@ class Player:
                 gobject.source_remove(id)
                 
         self.__sync_trigger_ids = {}
+
+        if self.__ping_sid > 0:
+            gobject.source_remove(self.__ping_sid)
         
     #==========================================================================
     # synchronization (outbound communication)
