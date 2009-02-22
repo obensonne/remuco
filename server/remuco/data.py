@@ -263,6 +263,7 @@ class PlayerInfo(serial.Serializable):
     FEATURE_JUMP_PLAYLIST = 1 << 5
     FEATURE_JUMP_QUEUE = 1 << 6
     FEATURE_LOAD_PLAYLIST = 1 << 7
+    FEATURE_SHUTDOWN_HOST = 1 << 8    
     
     def __init__(self, name, flags, rating_max):
         

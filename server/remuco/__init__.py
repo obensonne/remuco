@@ -27,6 +27,7 @@ easier.
 
 import gobject
 import subprocess
+import os
 
 import log
 import message
@@ -816,21 +817,25 @@ class Player:
         me = str(self.__get_flags.__module__)
         
         if str(self.request_playlist.__module__) != me:
-             flags |= PlayerInfo.FEATURE_PLAYLIST
+            flags |= PlayerInfo.FEATURE_PLAYLIST
         if str(self.request_queue.__module__) != me:
-             flags |= PlayerInfo.FEATURE_QUEUE
+            flags |= PlayerInfo.FEATURE_QUEUE
         if str(self.request_library.__module__) != me:
-             flags |= PlayerInfo.FEATURE_LIBRARY
+            flags |= PlayerInfo.FEATURE_LIBRARY
         if str(self.request_plob.__module__) != me:
-             flags |= PlayerInfo.FEATURE_PLOBINFO
+            flags |= PlayerInfo.FEATURE_PLOBINFO
         if str(self.set_tags.__module__) != me:
-             flags |= PlayerInfo.FEATURE_TAGS
+            flags |= PlayerInfo.FEATURE_TAGS
         if str(self.jump_in_playlist.__module__) != me:
-             flags |= PlayerInfo.FEATURE_JUMP_PLAYLIST
+            flags |= PlayerInfo.FEATURE_JUMP_PLAYLIST
         if str(self.jump_in_queue.__module__) != me:
-             flags |= PlayerInfo.FEATURE_JUMP_QUEUE
+            flags |= PlayerInfo.FEATURE_JUMP_QUEUE
         if str(self.load_playlist.__module__) != me:
-             flags |= PlayerInfo.FEATURE_LOAD_PLAYLIST
+            flags |= PlayerInfo.FEATURE_LOAD_PLAYLIST
+             
+        shutdown_cmd = self.__config.get_shutdown_system_command()
+        if shutdown_cmd is not None and os.access(shutdown_cmd, os.X_OK):
+            flags |= PlayerInfo.FEATURE_SHUTDOWN_HOST
              
         log.debug("features: %X" % flags)
         
