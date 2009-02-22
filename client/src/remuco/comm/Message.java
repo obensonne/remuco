@@ -53,21 +53,8 @@ public final class Message {
 	 */
 	protected void dumpBin() {
 
-		int i;
-
 		Log.ln(bytes.length + " bytes message:");
-
-		for (i = 0; i < bytes.length; i++) {
-			if ((bytes[i] & 0xFF) > 0x0F)
-				Log.l(Integer.toHexString((bytes[i] & 0xFF)) + " ");
-			else
-				Log.l("0" + Integer.toHexString((bytes[i] & 0xFF)) + " ");
-			if ((i + 1) % 16 == 0)
-				Log.ln();
-		}
-
-		Log.ln();
-
+		Log.ln(bytes);
 	}
 
 }

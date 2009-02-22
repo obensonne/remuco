@@ -48,8 +48,17 @@ public final class Log {
 	 *            the byte array to log
 	 */
 	public static void ln(byte[] ba) {
+		
 		for (int i = 0; i < ba.length; i++) {
-			out.print(Integer.toHexString(ba[i]) + " ");
+			
+			if ((ba[i] & 0xFF) > 0x0F) {
+				out.print(Integer.toHexString((ba[i] & 0xFF)) + " ");
+			} else {
+				out.print("0" + Integer.toHexString((ba[i] & 0xFF)) + " ");
+			}
+			if ((i + 1) % 16 == 0 && i + 1 < ba.length) {
+				out.println();
+			}
 		}
 		out.println();
 	}
