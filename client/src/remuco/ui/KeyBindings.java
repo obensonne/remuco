@@ -82,6 +82,30 @@ public final class KeyBindings {
 	}
 
 	/**
+	 * Associate a key code with an action code. If <code>key == 0</code>, the
+	 * behavior is identical to {@link #releaseForAction(int)} with param
+	 * <code>action</code>.
+	 * 
+	 * @param action
+	 *            the action code
+	 * @param key
+	 *            the key code
+	 * @return <code>false</code> if the key code is already in use (bindings
+	 *         are not changed in that case), <code>true</code> otherwise
+	 */
+	public boolean bindKeyToAction(int action, int key) {
+
+		if (key != 0)
+			if (isBound(key))
+				return false;
+
+		bindings[action] = key;
+
+		return true;
+
+	}
+
+	/**
 	 * Get the action code for a key.
 	 * 
 	 * @param key
@@ -117,14 +141,14 @@ public final class KeyBindings {
 	}
 
 	/**
-	 * Check if a key is already set in the current configuration.
+	 * Check if a key is already bound to an action.
 	 * 
 	 * @param key
-	 *            the key code to check for
-	 * @return <code>true</code> if the key is set, <code>false</code>
+	 *            the key code to check
+	 * @return <code>true</code> if the key is bound, <code>false</code>
 	 *         otherwise.
 	 */
-	public boolean keyIsAlreadySet(int key) {
+	public boolean isBound(int key) {
 
 		for (int i = 0; i < bindings.length; i++) {
 			if (key == bindings[i]) {
@@ -136,35 +160,6 @@ public final class KeyBindings {
 
 	}
 
-	public void resetToDefaults() {
-		System.arraycopy(defaultBindings, 0, bindings, 0, bindings.length);
-	}
-
-	/**
-	 * Associate a key code with an action code. If <code>key == 0</code>, the
-	 * behavior is identical to {@link #unsetKeyForAction(int)} with param
-	 * <code>action</code>.
-	 * 
-	 * @param action
-	 *            the action code
-	 * @param key
-	 *            the key code
-	 * @return <code>false</code> if the key code is already in use (the
-	 *         configuration is not changed in that case), <code>true</code>
-	 *         otherwise
-	 */
-	public boolean setKeyForAction(int action, int key) {
-
-		if (key != 0)
-			if (keyIsAlreadySet(key))
-				return false;
-
-		bindings[action] = key;
-
-		return true;
-
-	}
-
 	/**
 	 * Release a key. Dissociates <code>key</code> from the action it is
 	 * currently associated with (if any).
@@ -173,7 +168,7 @@ public final class KeyBindings {
 	 * @return the action the key has been associated with until now, or -1 if
 	 *         the key has been free until now
 	 */
-	public int unsetKey(int key) {
+	public int release(int key) {
 
 		for (int i = 0; i < bindings.length; i++) {
 			if (key == bindings[i]) {
@@ -189,10 +184,14 @@ public final class KeyBindings {
 	 * 
 	 * @param action
 	 */
-	public void unsetKeyForAction(int action) {
+	public void releaseForAction(int action) {
 
 		bindings[action] = 0;
 
+	}
+
+	public void resetToDefaults() {
+		System.arraycopy(defaultBindings, 0, bindings, 0, bindings.length);
 	}
 
 	/**

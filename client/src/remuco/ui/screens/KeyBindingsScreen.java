@@ -16,11 +16,11 @@ import remuco.ui.KeyBindings;
 public final class KeyBindingsScreen extends List implements CommandListener,
 		IKeyListener {
 
-	private static final Command CMD_RESET = new Command("Reset to defaults",
+	private static final Command CMD_RESET = new Command("Reset",
 			Command.SCREEN, 30);
 
-	/** The current action to set a key for. */
-	private int actionToSet;
+	/** The current action to bind a key to. */
+	private int actionToBind;
 
 	private final Alert alertKeyConflict, alertReset;
 
@@ -35,9 +35,9 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	private final KeyBindings keyBindings;
 
 	/**
-	 * The key selected to set for {@link #actionToSet}. This field has only a
+	 * The key selected to set for {@link #actionToBind}. This field has only a
 	 * valid value if the selected key is already in use for another action --
-	 * it is used for handling this situtation by interacting with the user.
+	 * it is used for handling this situation by interacting with the user.
 	 */
 	private int selectedKey;
 
@@ -48,7 +48,7 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	 */
 	public KeyBindingsScreen(final CommandListener parent, final Display display) {
 
-		super("Key Configuration", IMPLICIT);
+		super("Key Bindings", IMPLICIT);
 
 		this.display = display;
 		this.parent = parent;
@@ -72,7 +72,7 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 		alertKeyConflict.setCommandListener(this);
 
 		alertReset = new Alert("Please confirm:");
-		alertReset.setString("Reset to defaults?");
+		alertReset.setString("Reset to default key bindings?");
 		alertReset.setType(AlertType.WARNING);
 		alertReset.addCommand(CMD.NO);
 		alertReset.addCommand(CMD.YES);
@@ -102,18 +102,18 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 		} else if (c == List.SELECT_COMMAND) { // an action to set a key for
 			// has been chosen
 
-			actionToSet = getSelectedIndex();
+			actionToBind = getSelectedIndex();
 
-			screenKeyBinder.configure(actionToSet);
+			screenKeyBinder.configure(actionToBind);
 
 			display.setCurrent(screenKeyBinder);
 
 		} else if (c == CMD.YES && d == alertKeyConflict) {
 
-			actionOld = keyBindings.unsetKey(selectedKey);
-			keyBindings.setKeyForAction(actionToSet, selectedKey);
+			actionOld = keyBindings.release(selectedKey);
+			keyBindings.bindKeyToAction(actionToBind, selectedKey);
 
-			updateList(actionToSet);
+			updateList(actionToBind);
 			if (actionOld >= 0)
 				updateList(actionOld);
 
@@ -135,11 +135,11 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 		int actionOld;
 		String keyName;
 
-		if (key == 0 || key == keyBindings.getKeyForAction(actionToSet)) {
+		if (key == 0 || key == keyBindings.getKeyForAction(actionToBind)) {
 
 			display.setCurrent(this);
 
-		} else if (keyBindings.keyIsAlreadySet(key)) {
+		} else if (keyBindings.isBound(key)) {
 
 			selectedKey = key;
 
@@ -154,7 +154,7 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 			msgKeyConflict.append("\nDo you want to unset it from '");
 			msgKeyConflict.append(KeyBindings.actionNames[actionOld]);
 			msgKeyConflict.append("' and use it for '");
-			msgKeyConflict.append(KeyBindings.actionNames[actionToSet]).append(
+			msgKeyConflict.append(KeyBindings.actionNames[actionToBind]).append(
 					"' ?");
 			alertKeyConflict.setString(msgKeyConflict.toString());
 
@@ -162,9 +162,9 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 
 		} else { // key is valid and free
 
-			keyBindings.setKeyForAction(actionToSet, key);
+			keyBindings.bindKeyToAction(actionToBind, key);
 
-			updateList(actionToSet);
+			updateList(actionToBind);
 
 			display.setCurrent(this);
 		}
@@ -176,7 +176,7 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	}
 
 	/**
-	 * Update the key name for all actions in the key configuration list.
+	 * Update the key name for all actions in the displayed key bindings list.
 	 * 
 	 */
 	private void updateList() {
@@ -190,7 +190,8 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	}
 
 	/**
-	 * Update the key name for an action in the key configuration list.
+	 * Update the key name mapped to the given action in the displayed key
+	 * bindings list.
 	 * 
 	 * @param action
 	 */
