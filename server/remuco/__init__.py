@@ -147,12 +147,16 @@ class Player:
         
         self.__name = name
         
+        # init config and logging
+        
         self.__config = config.Config(self.__name)
 
         log.set_file(self.__config.get_log_file())
         log.set_level(self.__config.get_log_level())
         
         self.__config.set_custom("dummy", "ymmud") # force a config save
+        
+        # init misc fields
         
         serial.Bin.HOST_ENCODING = self.__config.get_encoding()
         
@@ -161,6 +165,12 @@ class Player:
         self.__state = PlayerState()
         self.__plob = Plob()
         self.__info = PlayerInfo(name, self.__get_flags(), self.get_rating_max())
+        
+        self.__sync_trigger_ids = {}
+        
+        self.__shutting_down = False
+        
+        # set up server
         
         if self.__config.get_bluetooth():
             self.__server_bluetooth = net.BluetoothServer(self.__clients,
@@ -174,9 +184,17 @@ class Player:
         else:
             self.__server_wifi = None
             
-        self.__sync_trigger_ids = {}
+        # client ping
         
-        self.__shutting_down = False
+        self.__ping_msg = net.build_message(message.MSG_ID_IGNORE, None)
+        ping = self.__config.get_ping()
+        if ping > 0:
+            log.debug("ping clients every %d seconds" % ping)
+            self.__ping_sid = gobject.timeout_add(ping * 1000, self.__ping)
+        else:
+            self.__ping_sid = 0
+        
+        # done
         
         log.debug("Player.__init__() done")
         
@@ -435,9 +453,13 @@ class Player:
                         if it is from the currently active playlist (default)
         """
         
-        self.__state.set_queue(queue)
-        self.__state.set_position(position)
-        self.__trigger_sync(self.__sync_state)
+        change = self.__state.get_queue() != queue
+        change |= self.__state.get_position() != position
+        
+        if change:
+            self.__state.set_queue(queue)
+            self.__state.set_position(position)
+            self.__trigger_sync(self.__sync_state)
         
     def update_playback(self, playback):
         """Set the current playback state.
@@ -448,8 +470,11 @@ class Player:
         @param playback: playback mode (see constants)
         """
         
-        self.__state.set_playback(playback)
-        self.__trigger_sync(self.__sync_state)
+        change = self.__state.get_playback() != playback
+        
+        if change:
+            self.__state.set_playback(playback)
+            self.__trigger_sync(self.__sync_state)
     
     def update_repeat_mode(self, repeat):
         """Set the current repeat mode. 
@@ -460,8 +485,11 @@ class Player:
         @param repeat: true means on, false means off
         """
         
-        self.__state.set_repeat(repeat)
-        self.__trigger_sync(self.__sync_state)
+        change = self.__state.get_repeat() != repeat
+        
+        if change:
+            self.__state.set_repeat(repeat)
+            self.__trigger_sync(self.__sync_state)
     
     def update_shuffle_mode(self, shuffle):
         """Set the current shuffle mode. 
@@ -472,8 +500,26 @@ class Player:
         @param shuffle: true means on, false means off
         """
         
-        self.__state.set_shuffle(shuffle)
-        self.__trigger_sync(self.__sync_state)
+        change = self.__state.get_shuffle() != shuffle
+        
+        if change:
+            self.__state.set_shuffle(shuffle)
+            self.__trigger_sync(self.__sync_state)
+    
+    def update_volume(self, volume):
+        """Set the current volume.
+        
+        This method is intended to be called by player adapters to sync player
+        state with remote clients.
+        
+        @param volume: the volume in percent
+        """
+        
+        change = self.__state.get_volume() != volume
+        
+        if change:
+            self.__state.set_volume(volume)
+            self.__trigger_sync(self.__sync_state)
     
     def update_plob(self, id, info, img):
         """Set current PLOB.
@@ -490,23 +536,14 @@ class Player:
                starting with 'INFO_' (e.g. INFO_ARTIST) as keys. 
         """
         
-        self.__plob.set_id(id)
-        self.__plob.set_info(info)
-        self.__plob.set_img(img)
-        self.__trigger_sync(self.__sync_plob)
+        change = self.__plob.get_id() != id
         
-    def update_volume(self, volume):
-        """Set the current volume.
+        if change:
+            self.__plob.set_id(id)
+            self.__plob.set_info(info)
+            self.__plob.set_img(img)
+            self.__trigger_sync(self.__sync_plob)
         
-        This method is intended to be called by player adapters to sync player
-        state with remote clients.
-        
-        @param volume: the volume in percent
-        """
-        
-        self.__state.set_volume(volume)
-        self.__trigger_sync(self.__sync_state)
-    
     def reply_playlist_request(self, client, plob_ids, plob_names):
         """Send the reply to a playlist request back to the client.
         
@@ -840,3 +877,12 @@ class Player:
         log.debug("features: %X" % flags)
         
         return flags
+
+    def __ping(self):
+        """ Ping clients to keep connection alive."""
+        
+        for c in self.__clients:
+            log.debug("ping client %s" % c.get_address())
+            c.send(self.__ping_msg)
+            
+        return True
