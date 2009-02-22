@@ -37,8 +37,8 @@ public final class KeyBindings {
 			"Toggle Shuffle" };
 
 	/**
-	 * Get the key bindings instance. {@link Config} must be initialized already
-	 * when calling this method.
+	 * Get the key bindings instance. <em>Must not</em> get called from a static
+	 * context!
 	 * 
 	 * @return the key bindings singleton
 	 */
@@ -69,12 +69,14 @@ public final class KeyBindings {
 
 	private KeyBindings() {
 
-		int kb[] = Config.getKeyBindings();
+		final Config config = Config.getInstance();
+
+		int kb[] = config.getKeyBindings();
 
 		if (!validate(kb)) {
 			kb = new int[defaultBindings.length];
 			System.arraycopy(defaultBindings, 0, kb, 0, kb.length);
-			Config.setKeyBindings(kb);
+			config.setKeyBindings(kb);
 		}
 
 		bindings = kb;

@@ -59,9 +59,11 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 	private static final Command CMD_THEMES = new Command("Themes",
 			Command.SCREEN, 1);
 
-	private static final String CONFIG_THEME = "theme";
+	private static final String CONFIG_OPTION_THEME = "theme";
 
 	private static final int SEEK_DELAY = 600;
+
+	private final Config config;
 
 	private final Connection conn;
 
@@ -69,13 +71,13 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	private CommandListener externalCommandListener = null;
 
+	/** Screen for browsing the remote player's media */
+	private final MediaBrowser mediaBrowser;
+
 	private final Player player;
 
 	/** Screen to configure key setup */
 	private final KeyBindingsScreen screenKeyConfig;
-
-	/** Screen for browsing the remote player's media */
-	private final MediaBrowser mediaBrowser;
 
 	private final CommandList screenOptions;
 
@@ -115,9 +117,11 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		this.display = display;
 		this.conn = conn;
 
+		config = Config.getInstance();
+
 		theme = Theme.getInstance();
 
-		theme.load(Config.get(CONFIG_THEME));
+		theme.load(config.getOption(CONFIG_OPTION_THEME));
 
 		player = new Player(conn, pinfo);
 
@@ -141,7 +145,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenOptions.setCommandListener(this);
 
 		screenThemeSelection = new List("Themes", List.IMPLICIT);
-		final String[] themes = Config.getThemeList();
+		final String[] themes = config.getThemeList();
 		for (int i = 0; i < themes.length; i++) {
 			screenThemeSelection.append(themes[i], theme.LIST_ICON_THEMES);
 		}
@@ -246,7 +250,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 					.getString(screenThemeSelection.getSelectedIndex());
 			theme.load(name);
 			initScreenies(); // let new theme take effect
-			Config.set(CONFIG_THEME, name);
+			config.setOption(CONFIG_OPTION_THEME, name);
 			display.setCurrent(this);
 
 		} else if (c == CMD.BACK && d == screenThemeSelection) {

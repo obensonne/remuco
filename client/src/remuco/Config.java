@@ -27,7 +27,7 @@ import remuco.util.Log;
 import remuco.util.Tools;
 
 /**
- * Helper class which provides various configuration values and tools.
+ * {@link Config} provides global access to various configuration options.
  * 
  * @author Oben Sonne
  * 
@@ -46,29 +46,22 @@ public final class Config {
 	/** Indicates if UTF-8 is supported. */
 	public static final boolean UTF8;
 
+	/** Name of the application property that indicates emulation mode. */
+	protected static final String APP_PROP_EMULATION = "Remuco-emulation";
+
 	private static final String APP_PROP_THEMES = "Remuco-themes";
-
-	private static final String[] APP_PROP_ALLKEYS = new String[] { APP_PROP_THEMES };
-
-	private static final Hashtable applicationProperties = new Hashtable();
 
 	private static final String DEVICE_SPLITTER = ",";
 
-	private static final Vector devices = new Vector();
-
 	private static final int FIRST_RECORD_ID = 1;
 
-	private static final String KEY_DEVICES = "devs";
+	private static Config instance = null;
 
-	private static boolean loaded = false;
-
-	private static final Hashtable options = new Hashtable();
+	private static final String OPTION_KEY_DEVS = "__devs__";
 
 	private static final String RECORD = "options";
 
 	static {
-
-		Log.debug("init config");
 
 		// get screen size
 
@@ -97,51 +90,89 @@ public final class Config {
 	}
 
 	/**
-	 * Get the value of a configuration option.
+	 * Get the singleton config instance. <em>Must not</em> get called from a
+	 * static context!
 	 * 
-	 * @param name
-	 *            the option to get the value of
-	 * @return the option's value or <code>null</code> if the option is not set
+	 * @return the config
 	 */
-	public static String get(String name) {
-
-		return (String) options.get(name);
-
+	public static Config getInstance() {
+		return instance;
 	}
 
 	/**
-	 * Get the value of a configuration option.
+	 * Initialize. Must be called before any call to {@link #getInstance()}.
 	 * 
-	 * @param name
-	 *            the option to get the value of
-	 * @param def
-	 *            the default alternative, if the option is not set
-	 * @return the option's value or it's default
+	 * @param midlet
+	 *            the MIDlet to use for access to application properties
 	 */
-	public static String get(String name, String def) {
+	public static void init(MIDlet midlet) {
+		if (instance == null) {
+			instance = new Config(midlet);
+		}
+	}
 
-		return (String) options.get(name);
+	private static void closeRecord(RecordStore rs) {
+
+		if (rs == null)
+			return;
+
+		try {
+			rs.closeRecordStore();
+			Log.ln("[CF] close: ok");
+		} catch (RecordStoreNotOpenException e) {
+			Log.ln("[CF] close: not open!");
+		} catch (RecordStoreException e) {
+			Log.ln("[CF] close: unknown error", e);
+		}
 
 	}
+
+	private static RecordStore openRecord(String name) {
+
+		RecordStore rs = null;
+		int rsUsed, rsTotal;
+
+		try {
+			rs = RecordStore.openRecordStore(RECORD, true);
+			rsUsed = (rs.getSize() / 1024) + 1;
+			rsTotal = (rs.getSizeAvailable() / 1024) + 1;
+			Log.ln("[CF] open: ok, using " + rsUsed + "/" + rsTotal + "KB");
+			return rs;
+		} catch (RecordStoreFullException e) {
+			Log.ln("[CF] open: error, full");
+		} catch (RecordStoreNotFoundException e) {
+			Log.ln("[CF] open: error, not found ???");
+		} catch (RecordStoreException e) {
+			Log.ln("[CF] open: unknown error", e);
+		}
+
+		return null;
+	}
+
+	private final Vector devices = new Vector();
+
+	private int[] keyBindings = new int[0];
+
+	private final boolean loadedSuccessfully;
+
+	/** MIDlet reference for access to application properties. */
+	private final MIDlet midlet;
+
+	/** Options loaded from / saved to a record store. */
+	private final Hashtable options = new Hashtable();
 
 	/**
-	 * Get a property defined in the application's manifest or jad file.
+	 * Create a new configuration.
 	 * 
-	 * @param key
-	 *            property name, one of <code>Config.APP_PROP_..</code>
-	 * @return the property's value or <code>null</code> if the property is not
-	 *         set
+	 * @param midlet
+	 *            the MIDlet to use for access to application properties
 	 */
-	public static String getApplicationProperty(String key) {
+	private Config(MIDlet midlet) {
 
-		return (String) applicationProperties.get(key);
+		this.midlet = midlet;
 
-	}
-	
-	private static int[] keyBindings = new int[0];
-	
-	public static int[] getKeyBindings() {
-		return keyBindings;
+		loadedSuccessfully = load();
+
 	}
 
 	/**
@@ -154,10 +185,12 @@ public final class Config {
 	 *            the device name or <code>null</code> for an unknown name -
 	 *            note that the empty string will also be treated as an unknown
 	 *            name
-	 * 
+	 * @param type
+	 *            the device type (either {@link #DEVICE_TYPE_BLUETOOTH} or
+	 *            {@link #DEVICE_TYPE_INET})
 	 * 
 	 */
-	public static void knownDevicesAdd(String addr, String name, String type) {
+	public void addKnownDevice(String addr, String name, String type) {
 
 		int pos;
 
@@ -187,7 +220,7 @@ public final class Config {
 	 * @param addr
 	 *            the address of the device to delete
 	 */
-	public static void knownDevicesDelete(String addr) {
+	public void deleteKnownDevice(String addr) {
 
 		int pos;
 
@@ -203,14 +236,8 @@ public final class Config {
 		}
 	}
 
-	/**
-	 * Forget all known devices.
-	 * 
-	 */
-	public static void knownDevicesDeleteAll() {
-
-		devices.removeAllElements();
-
+	public int[] getKeyBindings() {
+		return keyBindings;
 	}
 
 	/**
@@ -222,149 +249,79 @@ public final class Config {
 	 *         and its type (element <code>3*i+2</code>, one of
 	 *         {@link #DEVICE_TYPE_BLUETOOTH} or {@link #DEVICE_TYPE_INET})
 	 */
-	public static Vector knownDevicesGet() {
+	public Vector getKnownDevices() {
 		return devices;
 	}
 
 	/**
-	 * Load the configuration.
+	 * Get the value of a configuration option.
 	 * 
-	 * @return <code>true</code> if loading was successful, <code>false</code>
-	 *         if errors occurred (in this case defaults are used for the
-	 *         configurations which could not get set, so the application can
-	 *         continue its work as normal)
+	 * @param name
+	 *            the option to get the value of
+	 * @return the option's value or <code>null</code> if the option is not set
 	 */
-	public static boolean load() {
+	public String getOption(String name) {
 
-		ByteArrayInputStream bais;
-		DataInputStream dis;
-		byte[] ba;
-		int nextId;
-		String key, val;
-		boolean ret = true;
+		return (String) options.get(name);
 
-		// open record
+	}
 
-		if (loaded)
-			return true; // may happen if Remuco gets started more than once
+	/**
+	 * Get the value of a configuration option.
+	 * 
+	 * @param name
+	 *            the option to get the value of
+	 * @param def
+	 *            the default alternative, if the option is not set
+	 * @return the option's value or it's default
+	 */
+	public String getOption(String name, String def) {
 
-		loaded = true;
+		return (String) options.get(name);
 
-		final RecordStore rs = openRecord(RECORD);
+	}
 
-		if (rs == null)
-			return false;
+	/**
+	 * Get the value of an application property (defined in the MIDlet's
+	 * manifest file).
+	 * 
+	 * @param key
+	 *            the property name to get the value of
+	 * @return the property's value or <code>null</code> if the property is not
+	 *         set
+	 */
+	public String getProperty(String key) {
 
-		try {
-			nextId = rs.getNextRecordID();
-		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CF] load: error, not open ???");
-			return false;
-		} catch (RecordStoreException e) {
-			Log.ln("[CF] load: unknown error", e);
-			closeRecord(rs);
-			return false;
+		return midlet.getAppProperty(key);
+
+	}
+
+	/**
+	 * Get a list of available themes.
+	 * 
+	 * @return the theme names or <code>null</code> if unknown
+	 */
+	public String[] getThemeList() {
+
+		final String list = getProperty(APP_PROP_THEMES);
+		if (list != null) {
+			return Tools.splitString(list, ",");
+		} else {
+			Log.bug("Feb 22, 2009.5:37:00 PM");
+			return null;
 		}
-
-		// load keys
-
-		try {
-			ba = new byte[rs.getRecordSize(FIRST_RECORD_ID)];
-			rs.getRecord(FIRST_RECORD_ID, ba, 0);
-
-			bais = new ByteArrayInputStream(ba);
-			dis = new DataInputStream(bais);
-
-		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CF] load: error, not open ???");
-			return false;
-		} catch (InvalidRecordIDException e) {
-			Log.ln("[CF] load: record seems to be empty", e);
-			closeRecord(rs);
-			return true;
-		} catch (RecordStoreException e) {
-			Log.ln("[CF] load: unknown error", e);
-			closeRecord(rs);
-			return false;
-		}
-
-		try {
-			final int len = dis.readInt();
-			final int kb[] = new int[len];
-			for (int i = 0; i < len; i++) {
-				kb[i] = dis.readInt();
-			}
-			keyBindings = kb;
-		} catch (NegativeArraySizeException e) {
-			Log.ln("[CF] load: keys malformed", e);
-			ret = false;
-		} catch (EOFException e) {
-			Log.ln("[CF] load: keys malformed", e);
-			ret = false;
-		} catch (IOException e) {
-			Log.ln("[CF] load: unknown IO error", e);
-			ret = false;
-		}
-
-		// load options
-
-		for (int i = FIRST_RECORD_ID + 1; i < nextId; i++) {
-
-			try {
-
-				ba = new byte[rs.getRecordSize(i)];
-				rs.getRecord(i, ba, 0);
-
-				bais = new ByteArrayInputStream(ba);
-				dis = new DataInputStream(bais);
-
-			} catch (RecordStoreNotOpenException e) {
-				Log.ln("[CF] load: error, not open ???");
-				return false;
-			} catch (InvalidRecordIDException e) {
-				continue;
-			} catch (RecordStoreException e) {
-				Log.ln("[CF] load: unknown error", e);
-				closeRecord(rs);
-				return false;
-			}
-
-			try {
-				key = dis.readUTF();
-				val = dis.readUTF();
-				Log.ln("[CF] load: " + key + " = '" + val + "'");
-			} catch (IOException e) {
-				Log.ln("[CF] load: error, bad strings in record " + i, e);
-				ret = false;
-				continue;
-			}
-
-			options.put(key, val);
-
-		}
-
-		// ok, done
-
-		closeRecord(rs);
-
-		// update device list
-
-		devicesFromOptions();
-
-		Log.ln("[CF] load: " + (ret ? "success" : "erros"));
-
-		return ret;
 
 	}
 
 	/**
 	 * Saves the current configuration. This automatically saves the current
-	 * {@link KeyBindings} configuration using {@link KeyBindings#getConfiguration()}.
+	 * {@link KeyBindings} configuration using
+	 * {@link KeyBindings#getConfiguration()}.
 	 * 
 	 * @return <code>true</code> on success, <code>false</code> if errors
 	 *         occured
 	 */
-	public static boolean save() {
+	public boolean save() {
 
 		ByteArrayOutputStream baos;
 		DataOutputStream dos;
@@ -480,20 +437,20 @@ public final class Config {
 
 	}
 
-	public static void setKeyBindings(int[] keyBindings) {
-		Config.keyBindings = keyBindings;
+	public void setKeyBindings(int[] keyBindings) {
+		this.keyBindings = keyBindings;
 	}
 
 	/**
-	 * Set an configuration option which will be saved later when
-	 * {@link #save()} gets called.
+	 * Set a configuration option which will be saved later when {@link #save()}
+	 * gets called.
 	 * 
 	 * @param name
-	 *            option name (name {@value #KEY_DEVICES} is reserved !)
+	 *            option name
 	 * @param value
-	 *            the option's value (use <code>null</code> to unset an option)
+	 *            option value (use <code>null</code> to unset an option)
 	 */
-	public static void set(String name, String value) {
+	public void setOption(String name, String value) {
 
 		if (value == null)
 			options.remove(name);
@@ -502,63 +459,19 @@ public final class Config {
 
 	}
 
-	/**
-	 * Makes all known application properties accessible to other classes via
-	 * the method {@link #getApplicationProperty(String)}. Known properties are
-	 * <code>Config.APP_PROP_..</code>.
-	 * 
-	 * @param midlet
-	 *            the midlet which has access to the application properties
-	 */
-	protected static void setApplicationProperties(MIDlet midlet) {
-
-		String val;
-
-		for (int i = 0; i < APP_PROP_ALLKEYS.length; i++) {
-			val = midlet.getAppProperty(APP_PROP_ALLKEYS[i]);
-			if (val != null) {
-				applicationProperties.put(APP_PROP_ALLKEYS[i], val);
-			}
-		}
-
-	}
-	
-	public static String[] getThemeList() {
-		
-		final String list = getApplicationProperty(APP_PROP_THEMES);
-		if (list != null) {
-			return Tools.splitString(list, ",");
-		} else {
-			return null;
-		}
-		
-	}
-
-	private static void closeRecord(RecordStore rs) {
-
-		if (rs == null)
-			return;
-
-		try {
-			rs.closeRecordStore();
-			Log.ln("[CF] close: ok");
-		} catch (RecordStoreNotOpenException e) {
-			Log.ln("[CF] close: not open!");
-		} catch (RecordStoreException e) {
-			Log.ln("[CF] close: unknown error", e);
-		}
-
+	protected boolean loadedSuccessfully() {
+		return loadedSuccessfully;
 	}
 
 	/** @see #devicesIntoOptions() */
-	private static void devicesFromOptions() {
+	private void devicesFromOptions() {
 
 		String val;
 		String[] devs;
 
 		devices.removeAllElements();
 
-		val = (String) options.get(KEY_DEVICES);
+		val = (String) options.get(OPTION_KEY_DEVS);
 
 		if (val == null)
 			return;
@@ -569,7 +482,7 @@ public final class Config {
 			return;
 
 		if (devs.length % 3 != 0) {
-			Log.ln("[CF] option devs malformed");
+			Log.ln("[CF] option 'devs' malformed");
 			return;
 		}
 
@@ -588,7 +501,7 @@ public final class Config {
 	 * {@link #devicesFromOptions()} as a <code>null</code> device name (which
 	 * is just o.k.).
 	 */
-	private static void devicesIntoOptions() {
+	private void devicesIntoOptions() {
 
 		StringBuffer val = new StringBuffer(100);
 		String s;
@@ -598,7 +511,7 @@ public final class Config {
 		len = devices.size();
 
 		if (len == 0) {
-			options.remove(KEY_DEVICES);
+			options.remove(OPTION_KEY_DEVS);
 			return;
 		}
 
@@ -610,30 +523,134 @@ public final class Config {
 		if (len > 0)
 			val.deleteCharAt(val.length() - 1);
 
-		options.put(KEY_DEVICES, val.toString());
+		options.put(OPTION_KEY_DEVS, val.toString());
 
 	}
 
-	private static RecordStore openRecord(String name) {
+	/**
+	 * Load the configuration.
+	 * 
+	 * @return <code>true</code> if loading was successful, <code>false</code>
+	 *         if errors occurred (in this case defaults are used for the
+	 *         configurations which could not get set, so the application can
+	 *         continue its work as normal)
+	 */
+	private boolean load() {
 
-		RecordStore rs = null;
-		int rsUsed, rsTotal;
+		ByteArrayInputStream bais;
+		DataInputStream dis;
+		byte[] ba;
+		int nextId;
+		String key, val;
+		boolean ret = true;
+
+		// open record
+
+		final RecordStore rs = openRecord(RECORD);
+
+		if (rs == null)
+			return false;
 
 		try {
-			rs = RecordStore.openRecordStore(RECORD, true);
-			rsUsed = (rs.getSize() / 1024) + 1;
-			rsTotal = (rs.getSizeAvailable() / 1024) + 1;
-			Log.ln("[CF] open: ok, using " + rsUsed + "/" + rsTotal + "KB");
-			return rs;
-		} catch (RecordStoreFullException e) {
-			Log.ln("[CF] open: error, full");
-		} catch (RecordStoreNotFoundException e) {
-			Log.ln("[CF] open: error, not found ???");
+			nextId = rs.getNextRecordID();
+		} catch (RecordStoreNotOpenException e) {
+			Log.ln("[CF] load: error, not open ???");
+			return false;
 		} catch (RecordStoreException e) {
-			Log.ln("[CF] open: unknown error", e);
+			Log.ln("[CF] load: unknown error", e);
+			closeRecord(rs);
+			return false;
 		}
 
-		return null;
+		// first record contains key bindings:
+
+		try {
+			ba = new byte[rs.getRecordSize(FIRST_RECORD_ID)];
+			rs.getRecord(FIRST_RECORD_ID, ba, 0);
+
+			bais = new ByteArrayInputStream(ba);
+			dis = new DataInputStream(bais);
+
+		} catch (RecordStoreNotOpenException e) {
+			Log.ln("[CF] load: error, not open ???");
+			return false;
+		} catch (InvalidRecordIDException e) {
+			Log.ln("[CF] load: record seems to be empty", e);
+			closeRecord(rs);
+			return true;
+		} catch (RecordStoreException e) {
+			Log.ln("[CF] load: unknown error", e);
+			closeRecord(rs);
+			return false;
+		}
+
+		try {
+			final int len = dis.readInt();
+			final int kb[] = new int[len];
+			for (int i = 0; i < len; i++) {
+				kb[i] = dis.readInt();
+			}
+			keyBindings = kb;
+		} catch (NegativeArraySizeException e) {
+			Log.ln("[CF] load: keys malformed", e);
+			ret = false;
+		} catch (EOFException e) {
+			Log.ln("[CF] load: keys malformed", e);
+			ret = false;
+		} catch (IOException e) {
+			Log.ln("[CF] load: unknown IO error", e);
+			ret = false;
+		}
+
+		// next record contains options
+
+		for (int i = FIRST_RECORD_ID + 1; i < nextId; i++) {
+
+			try {
+
+				ba = new byte[rs.getRecordSize(i)];
+				rs.getRecord(i, ba, 0);
+
+				bais = new ByteArrayInputStream(ba);
+				dis = new DataInputStream(bais);
+
+			} catch (RecordStoreNotOpenException e) {
+				Log.ln("[CF] load: error, not open ???");
+				return false;
+			} catch (InvalidRecordIDException e) {
+				continue;
+			} catch (RecordStoreException e) {
+				Log.ln("[CF] load: unknown error", e);
+				closeRecord(rs);
+				return false;
+			}
+
+			try {
+				key = dis.readUTF();
+				val = dis.readUTF();
+				Log.ln("[CF] load: " + key + " = '" + val + "'");
+			} catch (IOException e) {
+				Log.ln("[CF] load: error, bad strings in record " + i, e);
+				ret = false;
+				continue;
+			}
+
+			options.put(key, val);
+
+		}
+
+		// ok, done
+
+		closeRecord(rs);
+
+		// update device list
+
+		devicesFromOptions();
+
+		Log.ln("[CF] load: " + (ret ? "success" : "erros"));
+
+		return ret;
+
 	}
 
 }

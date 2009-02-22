@@ -59,8 +59,6 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	private final Alert alertSaveConfig;
 
-	private final boolean configSuccessfullyLoaded;
-
 	private final Display display;
 
 	private Displayable displayableAfterLog;
@@ -72,6 +70,8 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	/** Text for the memory status alert */
 	private final StringBuffer logSysInfoText;
+	
+	private final Config config;
 
 	/**
 	 * We need to know this since {@link #startApp()} might get called more than
@@ -83,7 +83,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	public Remuco() {
 
-		final String emu = this.getAppProperty("Remuco-emulation");
+		final String emu = this.getAppProperty(Config.APP_PROP_EMULATION);
 
 		EMULATION = emu != null && emu.equalsIgnoreCase("true");
 
@@ -113,9 +113,9 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 		// load the configuration
 
-		configSuccessfullyLoaded = Config.load();
-
-		Config.setApplicationProperties(this);
+		Config.init(this);
+		
+		config = Config.getInstance();
 
 		Theme.init(display);
 
@@ -185,7 +185,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 		} else if (c == CMD.EXIT) {
 
-			if (!Config.save())
+			if (!config.save())
 				display.setCurrent(alertSaveConfig);
 			else
 				notifyDestroyed();
@@ -213,7 +213,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 	protected void destroyApp(boolean unconditional)
 			throws MIDletStateChangeException {
 
-		Config.save();
+		config.save();
 
 	}
 
@@ -229,7 +229,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 			startAppFirstTime = false;
 
-			if (!configSuccessfullyLoaded) {
+			if (!config.loadedSuccessfully()) {
 				display.setCurrent(alertLoadConfig);
 				return;
 			}

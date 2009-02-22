@@ -45,6 +45,8 @@ public final class DeviceSelectorScreen extends List implements
 
 	private final IScanner bluetoothScanner;
 
+	private final Config config;
+
 	/**
 	 * Contains the devices currently selectable by the user. Element
 	 * <code>3 * i</code> is the address of device <code>i</code>, element
@@ -81,6 +83,7 @@ public final class DeviceSelectorScreen extends List implements
 		this.display = display;
 		this.listener = listener;
 
+		config = Config.getInstance();
 		theme = Theme.getInstance();
 
 		if (BluetoothFactory.BLUETOOTH) {
@@ -155,7 +158,7 @@ public final class DeviceSelectorScreen extends List implements
 			final String type = devices[3 * index + 2];
 
 			// remember the device
-			Config.knownDevicesAdd(addr, name, type);
+			config.addKnownDevice(addr, name, type);
 
 			listener.notifySelectedDevice(type, addr);
 
@@ -197,7 +200,7 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			Config.knownDevicesAdd(address, null, Config.DEVICE_TYPE_INET);
+			config.addKnownDevice(address, null, Config.DEVICE_TYPE_INET);
 
 			update();
 
@@ -223,7 +226,7 @@ public final class DeviceSelectorScreen extends List implements
 			final String name = scanResults[3 * index + 1];
 			final String type = scanResults[3 * index + 2];
 
-			Config.knownDevicesAdd(addr, name, type);
+			config.addKnownDevice(addr, name, type);
 
 			update();
 
@@ -248,7 +251,7 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			Config.knownDevicesDelete(devices[3 * index]);
+			config.deleteKnownDevice(devices[3 * index]);
 
 			update();
 
@@ -325,11 +328,11 @@ public final class DeviceSelectorScreen extends List implements
 
 	/**
 	 * Update list to show all known devices. As a side effect, {@link #devices}
-	 * gets updated to the devices returned by {@link Config#knownDevicesGet()}.
+	 * gets updated to the devices returned by {@link Config#getKnownDevices()}.
 	 */
 	private void update() {
 
-		final Vector knownDevs = Config.knownDevicesGet();
+		final Vector knownDevs = config.getKnownDevices();
 
 		devices = new String[knownDevs.size()];
 
