@@ -141,7 +141,10 @@ public final class BaOut extends ByteArrayOutputStream {
 	 */
 	public void writeIntAt(int i, int at) {
 
-		Log.asssert(this, at + 4 <= count);
+		if (at + 4 > count) {
+			Log.bug("Feb 22, 2009.6:27:49 PM");
+			return;
+		}
 
 		int tmp = count;
 

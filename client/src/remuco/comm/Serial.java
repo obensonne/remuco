@@ -51,7 +51,7 @@ public final class Serial {
 				atoms[i].as = bis.readAS();
 				break;
 			default:
-				Log.asssertNotReached(Serial.class);
+				Log.bug("Feb 22, 2009.6:25:57 PM");
 				break;
 			}
 		}
@@ -109,7 +109,7 @@ public final class Serial {
 				bos.writeAS(atoms[i].as);
 				break;
 			default:
-				Log.asssertNotReached(Serial.class);
+				Log.bug("Feb 22, 2009.6:26:09 PM");
 				break;
 			}
 		}

@@ -53,9 +53,7 @@ public final class Control implements ISerializable {
 	}
 
 	public void atomsHasBeenUpdated() {
-
-		// not needed
-		Log.asssertNotReached(this);
+		Log.bug("Feb 22, 2009.6:26:18 PM");
 	}
 
 	public SerialAtom[] getAtoms() {

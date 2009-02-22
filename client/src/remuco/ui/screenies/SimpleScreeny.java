@@ -134,7 +134,7 @@ public final class SimpleScreeny extends Screeny {
 			break;
 
 		default:
-			Log.asssertNotReached(this);
+			Log.bug("Feb 22, 2009.6:27:06 PM");
 			break;
 		}
 

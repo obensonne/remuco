@@ -102,10 +102,7 @@ public final class State implements ISerializable {
 	}
 
 	public void updateAtoms() {
-
-		// not needed
-		Log.asssertNotReached(this);
-
+		Log.bug("Feb 22, 2009.6:26:40 PM");
 	}
 
 	protected void setRepeat(boolean repeat) {

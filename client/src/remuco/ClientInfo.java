@@ -26,8 +26,7 @@ public final class ClientInfo implements ISerializable {
 	}
 
 	public void atomsHasBeenUpdated() {
-		// not needed
-		Log.asssertNotReached(this);
+		Log.bug("Feb 22, 2009.6:25:29 PM");
 	}
 
 	public SerialAtom[] getAtoms() {

@@ -116,15 +116,11 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 	}
 
 	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
-
-		Log.asssertNotReached(this);
-
+		Log.bug("Feb 22, 2009.6:25:42 PM");
 	}
 
 	public void serviceSearchCompleted(int arg0, int arg1) {
-
-		Log.asssertNotReached(this);
-
+		Log.bug("Feb 22, 2009.6:25:47 PM");
 	}
 
 	/**
