@@ -13,6 +13,7 @@ class Config:
     OPTION_WIFI = "wifi"
     OPTION_ENDCODING = "encoding"
     OPTION_LOGLEVEL = "loglevel"
+    OPTION_PING = "ping"
     SECTION_CUSTOM = "custom"
     
     def __init__(self, player_name):
@@ -54,6 +55,7 @@ class Config:
         self.__cp.set(Config.SECTION_GENERAL, Config.OPTION_WIFI, "1")
         self.__cp.set(Config.SECTION_GENERAL, Config.OPTION_ENDCODING, "UTF-8")
         self.__cp.set(Config.SECTION_GENERAL, Config.OPTION_LOGLEVEL, "INFO")
+        self.__cp.set(Config.SECTION_GENERAL, Config.OPTION_PING, "15")
         
     def __load(self):
 
@@ -123,6 +125,16 @@ class Config:
         log.warning("config option %s has invalid value" %
                     Config.OPTION_LOGLEVEL)
         return log.INFO
+    
+    def get_ping(self):
+        
+        try:
+            return self.__cp.getint(Config.SECTION_GENERAL, Config.OPTION_PING)
+        except ValueError, e:
+            log.warning("config option %s malformed (%s)" %
+                        (Config.OPTION_PING, e))
+            return 15
+        
     
     def get_custom(self, option):
         

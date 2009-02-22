@@ -47,6 +47,24 @@ class PlayerState(serial.Serializable):
         self.__playback, self.__volume, self.__repeat, \
             self.__shuffle, self.__position, self.__queue = data
             
+    def get_playback(self):
+        return self.__playback
+        
+    def get_volume(self):
+        return self.__volume
+    
+    def get_position(self):
+        return self.__position
+    
+    def get_repeat(self):
+        return self.__repeat
+        
+    def get_shuffle(self):
+        return self.__shuffle
+        
+    def get_queue(self):
+        return self.__queue
+    
     def set_playback(self, playback):
         self.__playback = playback
         
@@ -109,7 +127,7 @@ class Plob(serial.Serializable):
     
     def __init__(self):
         
-        self.__path = None
+        self.__id = None
         self.__info = None
         self.__img_data = None
         
@@ -120,7 +138,7 @@ class Plob(serial.Serializable):
         if not isinstance(other, Plob): return False
         
         try:
-            if other.__id != self.__path: return False
+            if other.__id != self.__id: return False
             #if other.__img != self.__img: return False
             if other.__info != self.__info: return False
         except AttributeError:
@@ -132,13 +150,16 @@ class Plob(serial.Serializable):
         return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AY)
         
     def get_data(self):
-        return (self.__path, self.__info, self.__img_data)
+        return (self.__id, self.__info, self.__img_data)
+    
+    def get_id(self):
+        return self.__id
         
     def set_data(self, data):
-        self.__path, self.__info, self.__img_data = data
+        self.__id, self.__info, self.__img_data = data
     
     def set_id(self, id):
-        self.__path = id
+        self.__id = id
     
     def set_img(self, img):
         
