@@ -105,6 +105,8 @@ public final class Connection implements Runnable {
 		this.connectionListener = connectionListener;
 		this.messageListener = messageListener;
 
+		Log.ln("[CN] url: " + url);
+		
 		try {
 			sc = (StreamConnection) Connector.open(url);
 			logSocketOptions(sc);
@@ -375,6 +377,11 @@ public final class Connection implements Runnable {
 			downPrivate();
 			throw new UserException("Connection broken",
 					"There was an IO error while receiving data.", e);
+		}
+
+		if (m.id == Message.ID_IFS_SRVDOWN) {
+			downPrivate();
+			throw new UserException("Disconnected.", "Remote player said bye.");
 		}
 
 		return m;
