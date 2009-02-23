@@ -1,41 +1,69 @@
-ADAPTERS := fooplay rhythmbox
+ADAPTERS := fooplay rhythmbox xmms2
 
 VERSION_BASE := 0.8
+REVISION := $(shell svn info -R | grep "^Revision" | sed -e "s/^Revision: //" | sort -n | tail -n 1)
+VERSION := $(VERSION_BASE).$(REVISION)
+PKG := remuco-source-$(VERSION)
+
 
 help:
-	@echo "This make file is only used for building distribution packages."
-	@echo "To install a player, run the script install.sh:"
-	@echo "\$$ ./install.sh fooplay|rhythmbox|..."
+	@echo "To install the Remuco module, run 'make install'."
+	@echo "Subsequent install a player adapter with one of the following:"
+	@for PA in $(ADAPTERS); do \
+		echo "make install-$$PA"; \
+		done
 
 all: help
 	@echo -n ""
 
-install: help
-	@echo -n ""
+install:
+	python setup.py install
+	@echo
+	@echo "Installed Remuco module."
+	@echo "You can now install a player adapter with one of the following:"
+	@for PA in $(ADAPTERS); do \
+		echo "make install-$$PA"; \
+		done
+	@echo
+
+uninstall:
+	@echo "Please uninstall the Remuco module manually. Delete the files "
+	@echo "listed in 'install.log'. To uninstall a player adapter, run one of"
+	@echo "the following:"
+	@for PA in $(ADAPTERS); do \
+		echo "make uninstall-$$PA"; \
+		done
+	@echo
 
 clean:
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
 
-REVISION := $(shell svn info -R | grep "^Revision" | sed -e "s/^Revision: //" | sort -n | tail -n 1)
-VERSION := $(VERSION_BASE).$(REVISION)
-PKG := remuco-source-$(VERSION)
-
-dist: pydoc clean
+dist: clean
 	#[ -z "`svn st`" ] || { echo "ERROR: working copy has local changes" ; exit 1 ; }
 	mkdir -p build/$(PKG)
-	cp -r doc test remuco $(ADAPTERS) build/$(PKG)
-	cp install.sh Makefile build/$(PKG)
+	cp -r test remuco $(ADAPTERS) build/$(PKG)
+	cp Makefile pa-api.html README build/$(PKG)
 	find build -type d -name ".svn" | xargs rm -rf
 	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
-pydoc: doc/player-adapter-api.html
+pydoc: pa-api.html
 
-doc/player-adapter-api.html: remuco/__init__.py
+pa-api.html: remuco/__init__.py
 	pydoc -w remuco
-	mv remuco.html doc/player-adapter-api.html
+	mv remuco.html pa-api.html
 
-	
+check:
+	@cd /; echo "import remuco" | python 2>/dev/null || \
+		{ echo "ERROR: module remuco not yet installed (run 'make install' first)"; \
+		exit 1; } \
 
+install-%: check
+	@[ -d $(subst install-,,$@) ] || { echo "bad player name"; exit 1; }
+	make -C $(subst install-,,$@) install
+
+uninstall-%:
+	@[ -d $(subst uninstall-,,$@) ] || { echo "bad player name"; exit 1; }
+	make -C $(subst uninstall-,,$@) uninstall
 	

@@ -1,15 +1,46 @@
-Remuco - Linux remote media player control
+Remuco - Remote media player control
 
-===============================================================================
+http://remuco.sf.net
 
-Installation and usage ........................................................
+=== Installation ==============================================================
 
 To install, run:
 
-$ ./install.sh <PLAYER>
+$ make install
 
-Replace <PLAYER> with a player of your choice, e.g. fooplay or rhythmbox.
+This installs the Remuco moudle uses by all player adapters. Now run: 
+
+$ make install-<PLAYER>
+
+to install a player adapter of your choice. Multiple player adapters can be
+installed and used simultaneously.
+
+
+=== Usage =====================================================================
+
+Rhythmbox .....................................................................
+
+The Rhythmbox player adapter is realized as a Rhythmbox plugin. Just start
+Rhythmbox and activate the Remuco plugin.
+
+XMMS2 .........................................................................
+
+The XMMS2 player adapter is realized as a XMMS2 startup script. It automatically
+gets started when XMMS2 starts. It requires XMMS2 >= 0.5 and the XMMS2 Python
+bindings.
+
+=== Configuration and Logging =================================================
+
+Each player adapter has a configuration file ~/.config/remuco/<PLAYER>/conf.
+Edit this file if needed. Logging output of a player adapter goes to
+~/.cache/remuco/<PLAYER>/log.
+
+
+=== Player Adapter Development ================================================
+
+To develop a player adapter, use 'fooplay' as a template and implement it as
+described in the file 'pa-api.html'.
 
 ===============================================================================
 
-More information: visit http://remuco.sf.net
+More information at http://remuco.sf.net
