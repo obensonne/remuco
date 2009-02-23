@@ -1,17 +1,15 @@
+#!/usr/bin/python
+
 import sys
 import os
 import signal
 import gobject
+
 import xmmsclient
 import xmmsclient.glib
 
-try:
-    import remuco
-    from remuco import log
-    IMPORT_ERROR = None
-except ImportError, e:
-    IMPORT_ERROR = str(e)
-
+import remuco
+from remuco import log
 
 # =============================================================================
 # helper functions
@@ -512,13 +510,9 @@ def main():
     
     rem_x2.down()
 
+# -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
     
-    if IMPORT_ERROR != None:
-        log.error("missing a python module (%s)" % IMPORT_ERROR)
-    else:
-        log.info("starting")
-        
     main()
     

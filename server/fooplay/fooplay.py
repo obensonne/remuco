@@ -1,16 +1,12 @@
 #!/usr/bin/python
 
 import sys
-import gobject
 import dircache
 import signal
+import gobject
 
-try:
-    import remuco
-    from remuco import log
-    IMPORT_ERROR = None
-except ImportError, e:
-    IMPORT_ERROR = str(e)
+import remuco
+from remuco import log
 
 class FooPlay(remuco.Player):
     
@@ -130,9 +126,4 @@ def main():
 
 if __name__ == '__main__':
     
-    if IMPORT_ERROR != None:
-        log.error("missing a python module (%s)" % IMPORT_ERROR)
-    else:
-        log.info("starting")
-        
     main()
