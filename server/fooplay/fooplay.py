@@ -3,27 +3,42 @@
 import sys
 import dircache
 import signal
+
 import gobject
 
 import remuco
 from remuco import log
 
-class FooPlay(remuco.Player):
+class FooPlayAdapter(remuco.PlayerAdapter):
     
     def __init__(self):
         
         # important: this must be called first:
-        remuco.Player.__init__(self, "FooPlay")
+        remuco.PlayerAdapter.__init__(self, "FooPlay")
         
+    def start(self):
+        
+        # important: call super class implementation:
+        remuco.PlayerAdapter.start(self)
+
         # example: periodic player state update function:
-        sid = gobject.timeout_add(5000, self.__update_state)
-        
-        # important: remember source ids (for shutting down):
-        self.__gobject_source_ids = (sid,)
+        self.__gobject_source_ids = (
+            gobject.timeout_add(5000, self.__update_state)
+            ,
+        )
         
         # example: logging
-        log.debug("FooPlay.__init__() done")
+        log.debug("start done")
         
+    def stop(self):
+        
+        # important: call super class implementation:
+        remuco.PlayerAdapter.stop(self)
+        
+        # example: remove sources we've added to the gobject main loop:
+        for source_id in self.__gobject_source_ids:
+            gobject.source_remove(source_id)
+
     def request_playlist(self, client):
         
         # example: 2 tracks in the playlist
@@ -66,15 +81,6 @@ class FooPlay(remuco.Player):
         
         self.reply_library_request(client, path, nested, plob_ids, plob_names)
         
-    def down(self):
-        
-        # important: call super class implementation:
-        remuco.Player.down(self)
-        
-        # example: remove sources we've added to the gobject main loop:
-        for source_id in self.__gobject_source_ids:
-            gobject.source_remove(source_id)
-
     def __update_state(self):
         
         # example: update current volume
@@ -83,47 +89,16 @@ class FooPlay(remuco.Player):
         return True
 
 # =============================================================================
-# main (example startup)
+# main (example startup using remuco.ScriptManager)
 # =============================================================================
-
-ml = None
-
-def sighandler(signum, frame):
-    
-    global ml
-    
-    log.info("received signal %i" % signum)
-    
-    if ml != None:
-        ml.quit()
-        
-def main():
-    
-    signal.signal(signal.SIGINT, sighandler)
-    signal.signal(signal.SIGTERM, sighandler)
-
-    try:
-        fp = FooPlay()
-    except Exception, e:
-        print("Failed to set up FooPlay player adapter: %s" % str(e))
-        print("See remuco-fooplay log file for details.")
-        return
-    
-    global ml
-    
-    ml = gobject.MainLoop()
-    
-    try:
-        ml.run() # Remuco always needs a main loop to run
-    except Exception, e:
-        print("exception in main loop: %s" % str(e))
-    
-    # main loop has been stopped
-    
-    fp.down()
-
-# -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
     
-    main()
+    # create the player adapter
+    pa = FooPlayAdapter()
+    
+    # pass it to a script manager
+    sm = remuco.ScriptManager(pa)
+    
+    # run the script manager (blocks until interrupt signal)
+    sm.run()
