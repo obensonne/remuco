@@ -71,7 +71,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         self.__shell = None
         
-        remuco.PlayerAdapter.__init__(self, "Rhythmbox")
+        remuco.PlayerAdapter.__init__(self, "Rhythmbox", max_rating=5)
         
         self.__cover_file = "%s/cover.png" % self.get_cache_dir()
 
@@ -151,10 +151,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # =========================================================================
     # client side player control
     # =========================================================================
-    
-    def get_rating_max(self):
-        
-        return 5
     
     def jump_in_playlist(self, position):
         
