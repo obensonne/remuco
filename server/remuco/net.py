@@ -62,13 +62,13 @@ class ClientConnection():
     PROTO_VERSION = '\x08'
     IO_HELLO = "%s%s%s" % (IO_PREFIX, PROTO_VERSION, IO_SUFFIX) # hello message
     
-    def __init__(self, sock, addr, clients, player_info_msg, msg_handler_fn):
+    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn):
         
         self.__sock = sock
         self.__addr = addr
         self.__addr_str = str(addr)
         self.__clients = clients
-        self.__player_info_msg = player_info_msg
+        self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
         
         # the following fields are used for iterative receiving on message data
@@ -192,7 +192,7 @@ class ClientConnection():
 
         log.debug("incoming message (id %d, payload %d)" % (msg_id, len(msg_data)))
         
-        if msg_id == message.MSG_ID_IFC_CINFO:
+        if msg_id == message.MSG_ID_CINFO:
             
             log.debug("received client info from %s" % self.__addr_str)
             
@@ -200,9 +200,9 @@ class ClientConnection():
             
             log.debug("sending player info to %s" % self.__addr_str)
             
-            self.send(self.__player_info_msg)
+            self.send(self.__pinfo_msg)
             
-            self.__msg_handler_fn(message.MSG_ID_PRIV_REQ_INITIAL_DATA, None,
+            self.__msg_handler_fn(message.MSG_ID_REQ_INITIAL, None,
                                   self)
             
         else:
@@ -305,7 +305,7 @@ class ClientConnection():
         
         if send_bye_msg:
             log.info("send 'bye' to %s" % self.__addr_str)
-            msg = build_message(message.MSG_ID_IFS_SRVDOWN, None)
+            msg = build_message(message.MSG_ID_BYE, None)
             sent = 0
             retry = 0
             while sent < len(msg) and retry < 10:
@@ -364,20 +364,19 @@ class Server():
     
     SOCKET_TIMEOUT = 2.5
     
-    def __init__(self, clients, player_info, msg_handler_fn):
+    def __init__(self, clients, pinfo, msg_handler_fn):
         """ Create a new server.
         
         @param clients: a list to add connected clients to
-        @param player_info: player_info (type data.PlayerInfo)
+        @param pinfo: player info (type data.PlayerInfo)
         @param msg_handler_fn: callback function for passing received messages to
                                  
         """
         
         self.__clients = clients
         self.__msg_handler_fn = msg_handler_fn
-        self._player_info = player_info # needed by derived classes
-        self.__player_info_msg = build_message(message.MSG_ID_IFS_PINFO,
-                                               player_info)
+        self._pinfo = pinfo # needed by derived classes
+        self.__pinfo_msg = build_message(message.MSG_ID_PINFO, pinfo)
         self._sock = None # needed by derived classes
         self.__sid = None
         
@@ -416,7 +415,7 @@ class Server():
                 log.debug("connection request accepted")
                 client_sock.setblocking(0)
                 ClientConnection(client_sock, addr, self.__clients,
-                                 self.__player_info_msg, self.__msg_handler_fn)
+                                 self.__pinfo_msg, self.__msg_handler_fn)
             except IOError, e:
                 log.error("accepting %s client failed: %s" %
                               (self._get_type(), e))
@@ -479,7 +478,7 @@ class BluetoothServer(Server):
         sock.bind(("", bluetooth.PORT_ANY))
         sock.listen(1)
         
-        bluetooth.advertise_service(sock, self._player_info.get_name(),
+        bluetooth.advertise_service(sock, self._pinfo.get_name(),
             service_id = BluetoothServer.UUID,
             service_classes = [ BluetoothServer.UUID, bluetooth.SERIAL_PORT_CLASS ],
             profiles = [ bluetooth.SERIAL_PORT_PROFILE ])

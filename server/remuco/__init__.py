@@ -772,7 +772,7 @@ class PlayerAdapter:
         
     def __sync_state(self):
         
-        msg = net.build_message(message.MSG_ID_SYN_STATE, self.__state)
+        msg = net.build_message(message.MSG_ID_STATE, self.__state)
         
         self.__sync(msg, self.__sync_state)
         
@@ -780,7 +780,7 @@ class PlayerAdapter:
     
     def __sync_plob(self):
 
-        msg = net.build_message(message.MSG_ID_SYN_PLOB, self.__plob)
+        msg = net.build_message(message.MSG_ID_PLOB, self.__plob)
         
         self.__sync(msg, self.__sync_plob)
         
@@ -802,7 +802,7 @@ class PlayerAdapter:
     
     def __handle_message_from_client(self, id, bindata, client):
         
-        if id == message.MSG_ID_CTL:
+        if id == message.MSG_ID_CTRL:
 
             self.__handle_message_control(bindata)
             
@@ -814,12 +814,12 @@ class PlayerAdapter:
             
             self.__handle_message_request_list(bindata, client)
             
-        elif id == message.MSG_ID_PRIV_REQ_INITIAL_DATA:
+        elif id == message.MSG_ID_REQ_INITIAL:
             
-            msg = net.build_message(message.MSG_ID_SYN_STATE, self.__state)
+            msg = net.build_message(message.MSG_ID_STATE, self.__state)
             client.send(msg)
             
-            msg = net.build_message(message.MSG_ID_SYN_PLOB, self.__plob)
+            msg = net.build_message(message.MSG_ID_PLOB, self.__plob)
             client.send(msg)
             
         else:
