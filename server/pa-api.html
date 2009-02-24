@@ -8,28 +8,59 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big></font></td
 ><td align=right valign=bottom
-></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
 &nbsp;<br>
-The&nbsp;module&nbsp;'remuco'&nbsp;is&nbsp;the&nbsp;interface&nbsp;between&nbsp;a&nbsp;media&nbsp;player&nbsp;and&nbsp;the&nbsp;Remuco<br>
-system.&nbsp;It&nbsp;provides&nbsp;one&nbsp;class&nbsp;and&nbsp;several&nbsp;constants.<br>
+This&nbsp;module&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
 &nbsp;<br>
-The&nbsp;class&nbsp;<a href="#Player">Player</a>&nbsp;is&nbsp;supposed&nbsp;to&nbsp;be&nbsp;sub&nbsp;classed&nbsp;by&nbsp;Remuco&nbsp;adapters&nbsp;for&nbsp;specific<br>
-media&nbsp;players.<br>
+Class&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Base&nbsp;class&nbsp;for&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-Some&nbsp;notes&nbsp;on&nbsp;logging:<br>
+Class&nbsp;<a href="#DBusManager">DBusManager</a>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;using&nbsp;DBus&nbsp;for&nbsp;player&nbsp;communication.<br>
 &nbsp;<br>
-Remuco&nbsp;uses&nbsp;the&nbsp;module&nbsp;'logging'&nbsp;for&nbsp;all&nbsp;its&nbsp;logging&nbsp;messages.&nbsp;By&nbsp;default<br>
-logging&nbsp;is&nbsp;configured&nbsp;to&nbsp;log&nbsp;into&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file&nbsp;(usually<br>
-~/.cache/remuco/PLAYER/log).&nbsp;The&nbsp;log&nbsp;level&nbsp;is&nbsp;defined&nbsp;in&nbsp;the&nbsp;player&nbsp;specific<br>
-configuration&nbsp;file&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).<br>
+Class&nbsp;<a href="#ScriptManager">ScriptManager</a>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;running&nbsp;as&nbsp;scripts.<br>
 &nbsp;<br>
-To&nbsp;use&nbsp;the&nbsp;remuco&nbsp;logging&nbsp;system&nbsp;within&nbsp;a&nbsp;player&nbsp;adapter,&nbsp;import&nbsp;the&nbsp;module<br>
-'remuco.log'&nbsp;and&nbsp;use&nbsp;the&nbsp;functions&nbsp;log.debug(),&nbsp;log.info(),&nbsp;log.warning()&nbsp;and<br>
-log.error().&nbsp;Then&nbsp;all&nbsp;messages&nbsp;of&nbsp;the&nbsp;player&nbsp;adapter&nbsp;will&nbsp;be&nbsp;written&nbsp;into&nbsp;the<br>
-same&nbsp;file&nbsp;as&nbsp;used&nbsp;internally&nbsp;by&nbsp;the&nbsp;remuco&nbsp;module&nbsp;-&nbsp;that&nbsp;makes&nbsp;debugging&nbsp;a&nbsp;lot<br>
-easier.</tt></p>
+Constants:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'INFO'&nbsp;are&nbsp;the&nbsp;keys&nbsp;to&nbsp;use&nbsp;for&nbsp;the&nbsp;dictionary<br>
+&nbsp;&nbsp;&nbsp;&nbsp;describing&nbsp;a&nbsp;PLOB&nbsp;(PLOB&nbsp;means&nbsp;playable&nbsp;object&nbsp;-&nbsp;a&nbsp;song,&nbsp;video,&nbsp;slide&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;whatever&nbsp;may&nbsp;be&nbsp;played&nbsp;in&nbsp;that&nbsp;spirit).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'PLAYBACK'&nbsp;are&nbsp;the&nbsp;values&nbsp;used&nbsp;by&nbsp;Remuco&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;describe&nbsp;a&nbsp;playback&nbsp;state.<br>
+&nbsp;<br>
+Logging:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;It&nbsp;is&nbsp;recommended&nbsp;to&nbsp;use&nbsp;the&nbsp;remuco&nbsp;logging&nbsp;system&nbsp;within&nbsp;player&nbsp;adapters.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;To&nbsp;do&nbsp;so,&nbsp;import&nbsp;the&nbsp;module&nbsp;'remuco.log'&nbsp;and&nbsp;use&nbsp;the&nbsp;functions<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;remuco.log.debug(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;remuco.log.info(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;remuco.log.warning()&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;remuco.log.error().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Then&nbsp;all&nbsp;messages&nbsp;of&nbsp;the&nbsp;player&nbsp;adapter&nbsp;will&nbsp;be&nbsp;written&nbsp;into&nbsp;the&nbsp;same&nbsp;file<br>
+&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;used&nbsp;internally&nbsp;by&nbsp;the&nbsp;remuco&nbsp;module&nbsp;-&nbsp;that&nbsp;makes&nbsp;debugging&nbsp;a&nbsp;lot&nbsp;easier.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Internally&nbsp;Remuco&nbsp;uses&nbsp;the&nbsp;module&nbsp;'logging'&nbsp;for&nbsp;all&nbsp;its&nbsp;logging&nbsp;messages.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Messages&nbsp;go&nbsp;into&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file&nbsp;(usually<br>
+&nbsp;&nbsp;&nbsp;&nbsp;~/.cache/remuco/PLAYER/log).&nbsp;The&nbsp;log&nbsp;level&nbsp;is&nbsp;defined&nbsp;in&nbsp;a&nbsp;player&nbsp;specific<br>
+&nbsp;&nbsp;&nbsp;&nbsp;configuration&nbsp;file&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).</tt></p>
 <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="remuco.command.html">command</a><br>
+<a href="remuco.config.html">config</a><br>
+</td><td width="25%" valign=top><a href="remuco.data.html">data</a><br>
+<a href="remuco.log.html">log</a><br>
+</td><td width="25%" valign=top><a href="remuco.message.html">message</a><br>
+<a href="remuco.net.html">net</a><br>
+</td><td width="25%" valign=top><a href="remuco.serial.html">serial</a><br>
+</td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -37,166 +68,203 @@ easier.</tt></p>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="remuco.html#Player">Player</a>
+<dt><font face="helvetica, arial"><a href="remuco.html#DBusManager">DBusManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="remuco.html#PlayerAdapter">PlayerAdapter</a>
+</font></dt><dt><font face="helvetica, arial"><a href="remuco.html#ScriptManager">ScriptManager</a>
 </font></dt></dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Player">class <strong>Player</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="DBusManager">class <strong>DBusManager</strong></a></font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Class&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters&nbsp;to&nbsp;derive&nbsp;from.&nbsp;<br>
+<td colspan=2><tt>Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;talking&nbsp;to&nbsp;media&nbsp;players&nbsp;via&nbsp;DBus.<br>
 &nbsp;<br>
-<a href="#Player">Player</a>&nbsp;is&nbsp;a&nbsp;class&nbsp;any&nbsp;media&nbsp;player&nbsp;adapter&nbsp;is&nbsp;supposed&nbsp;to&nbsp;derive&nbsp;from.<br>
-It&nbsp;provides&nbsp;some&nbsp;methods&nbsp;media&nbsp;player&nbsp;adapters&nbsp;can&nbsp;use&nbsp;to&nbsp;interact&nbsp;with<br>
-Remuco&nbsp;clients&nbsp;and&nbsp;some&nbsp;methods&nbsp;which&nbsp;must&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes<br>
-in&nbsp;order&nbsp;to&nbsp;implement&nbsp;player&nbsp;specific&nbsp;behavior.<br>
-&nbsp;<br>
-The&nbsp;following&nbsp;methods&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;interact&nbsp;with&nbsp;clients:<br>
-&nbsp;<br>
-*&nbsp;<a href="#Player-update_play_position">update_play_position</a>()<br>
-*&nbsp;<a href="#Player-update_playback">update_playback</a>()<br>
-*&nbsp;<a href="#Player-update_repeat_mode">update_repeat_mode</a>()<br>
-*&nbsp;<a href="#Player-update_shuffle_mode">update_shuffle_mode</a>()<br>
-*&nbsp;<a href="#Player-update_plob">update_plob</a>()<br>
-&nbsp;<br>
-*&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()<br>
-*&nbsp;<a href="#Player-reply_playlist_request">reply_playlist_request</a>()<br>
-*&nbsp;<a href="#Player-reply_queue_request">reply_queue_request</a>()<br>
-*&nbsp;<a href="#Player-reply_library_request">reply_library_request</a>()<br>
-&nbsp;<br>
-The&nbsp;term&nbsp;PLOB&nbsp;means&nbsp;playable&nbsp;object&nbsp;and&nbsp;simply&nbsp;refers&nbsp;to&nbsp;a&nbsp;song,&nbsp;a&nbsp;video<br>
-or&nbsp;whatever&nbsp;you&nbsp;can&nbsp;imagine&nbsp;as&nbsp;a&nbsp;playable&nbsp;object.&nbsp;<br>
-&nbsp;<br>
-The&nbsp;following&nbsp;methods&nbsp;may&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;to&nbsp;implement<br>
-media&nbsp;player&nbsp;specific&nbsp;behavior:<br>
-&nbsp;<br>
-*&nbsp;<a href="#Player-get_rating_max">get_rating_max</a>()<br>
-*&nbsp;<a href="#Player-jump_in_playlist">jump_in_playlist</a>()<br>
-*&nbsp;<a href="#Player-jump_in_queue">jump_in_queue</a>()<br>
-*&nbsp;<a href="#Player-load_playlist">load_playlist</a>()<br>
-*&nbsp;<a href="#Player-play_next">play_next</a>()<br>
-*&nbsp;<a href="#Player-play_previous">play_previous</a>()<br>
-*&nbsp;<a href="#Player-rate_current">rate_current</a>()<br>
-*&nbsp;<a href="#Player-toggle_play_pause">toggle_play_pause</a>()<br>
-*&nbsp;<a href="#Player-toggle_repeat">toggle_repeat</a>()<br>
-*&nbsp;<a href="#Player-toggle_shuffle">toggle_shuffle</a>()<br>
-*&nbsp;<a href="#Player-seek_backward">seek_backward</a>()<br>
-*&nbsp;<a href="#Player-seek_forward">seek_forward</a>()<br>
-*&nbsp;<a href="#Player-set_tags">set_tags</a>()<br>
-*&nbsp;<a href="#Player-set_volume">set_volume</a>()<br>
-&nbsp;<br>
-*&nbsp;<a href="#Player-request_plob">request_plob</a>()<br>
-*&nbsp;<a href="#Player-request_playlist">request_playlist</a>()<br>
-*&nbsp;<a href="#Player-request_queue">request_queue</a>()<br>
-*&nbsp;<a href="#Player-request_library">request_library</a>()<br>
-&nbsp;<br>
-Not&nbsp;all&nbsp;methods&nbsp;must&nbsp;be&nbsp;overwritten.&nbsp;Some&nbsp;even&nbsp;do&nbsp;not&nbsp;make&nbsp;sense&nbsp;for<br>
-certain&nbsp;players,&nbsp;e.g.&nbsp;<a href="#Player-get_rating_max">get_rating_max</a>()&nbsp;only&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;if&nbsp;the<br>
-media&nbsp;player&nbsp;supports&nbsp;rating.&nbsp;Do&nbsp;not&nbsp;overwrite&nbsp;methods&nbsp;you&nbsp;finally&nbsp;do&nbsp;not<br>
-implement&nbsp;because&nbsp;Remuco&nbsp;checks&nbsp;which&nbsp;methods&nbsp;has&nbsp;been&nbsp;overwritten&nbsp;and&nbsp;uses<br>
-this&nbsp;information&nbsp;to&nbsp;notify&nbsp;Remuco&nbsp;clients&nbsp;about&nbsp;capabilities&nbsp;of&nbsp;player<br>
-adapters.<br>
-&nbsp;<br>
-If&nbsp;a&nbsp;player&nbsp;adapter&nbsp;needs&nbsp;a&nbsp;cache&nbsp;directory,&nbsp;it&nbsp;can&nbsp;get&nbsp;one&nbsp;via<br>
-<a href="#Player-get_cache_dir">get_cache_dir</a>().&nbsp;If&nbsp;a&nbsp;player&nbsp;adapter&nbsp;wants&nbsp;to&nbsp;integrate&nbsp;log&nbsp;information<br>
-into&nbsp;the&nbsp;media&nbsp;player&nbsp;UI,&nbsp;it&nbsp;has&nbsp;to&nbsp;call&nbsp;<a href="#Player-get_log_file">get_log_file</a>()&nbsp;to&nbsp;get&nbsp;the&nbsp;name<br>
-of&nbsp;the&nbsp;log&nbsp;file&nbsp;used&nbsp;within&nbsp;remuco&nbsp;to&nbsp;log&nbsp;messages.<br>&nbsp;</tt></td></tr>
+A&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;automatically&nbsp;starts&nbsp;and&nbsp;stops&nbsp;a&nbsp;player&nbsp;adapter&nbsp;if&nbsp;the<br>
+corresponding&nbsp;media&nbsp;player&nbsp;starts&nbsp;or&nbsp;stops.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Player-__init__"><strong>__init__</strong></a>(self, name)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player.<br>
+<dl><dt><a name="DBusManager-__init__"><strong>__init__</strong></a>(self, pa, dbus_name)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#DBusManager">DBusManager</a>.<br>
+&nbsp;<br>
+@param&nbsp;pa:&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;automatically&nbsp;start&nbsp;and&nbsp;stop<br>
+@param&nbsp;dbus_name:&nbsp;the&nbsp;bus&nbsp;name&nbsp;used&nbsp;by&nbsp;the&nbsp;adapter's&nbsp;media&nbsp;player</tt></dd></dl>
+
+<dl><dt><a name="DBusManager-start"><strong>start</strong></a>(self)</dt><dd><tt>This&nbsp;does&nbsp;nothing.<br>
+&nbsp;<br>
+Only&nbsp;defined&nbsp;to&nbsp;handle&nbsp;a&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;like&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;in&nbsp;the<br>
+<a href="#ScriptManager">ScriptManager</a>.</tt></dd></dl>
+
+<dl><dt><a name="DBusManager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Shut&nbsp;down&nbsp;the&nbsp;<a href="#DBusManager">DBusManager</a>.<br>
+&nbsp;<br>
+This&nbsp;also&nbsp;shuts&nbsp;down&nbsp;the&nbsp;player&nbsp;adapter.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="PlayerAdapter">class <strong>PlayerAdapter</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
+&nbsp;<br>
+Remuco&nbsp;player&nbsp;adapters&nbsp;must&nbsp;subclass&nbsp;this&nbsp;class&nbsp;and&nbsp;overwrite&nbsp;certain<br>
+methods&nbsp;to&nbsp;implement&nbsp;player&nbsp;specific&nbsp;behavior.&nbsp;Additionally&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a><br>
+provides&nbsp;methods&nbsp;to&nbsp;interact&nbsp;with&nbsp;Remuco&nbsp;clients.&nbsp;<br>
+&nbsp;<br>
+Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;manage&nbsp;life&nbsp;cycle:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-start">start</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-stop">stop</a>()<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;can&nbsp;be&nbsp;started&nbsp;and&nbsp;stopped&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>()&nbsp;and&nbsp;<a href="#PlayerAdapter-stop">stop</a>().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Subclasses&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;may&nbsp;override&nbsp;these&nbsp;methods&nbsp;as&nbsp;needed&nbsp;but<br>
+&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;always&nbsp;call&nbsp;the&nbsp;super&nbsp;class&nbsp;implementations&nbsp;too!&nbsp;The&nbsp;same&nbsp;instance<br>
+&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;should&nbsp;be&nbsp;startable&nbsp;and&nbsp;stoppable&nbsp;multiple&nbsp;times.<br>
+&nbsp;<br>
+Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;player:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-jump_in_playlist">jump_in_playlist</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-jump_in_queue">jump_in_queue</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-load_playlist">load_playlist</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-play_next">play_next</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-play_previous">play_previous</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-rate_current">rate_current</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-toggle_play_pause">toggle_play_pause</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-toggle_repeat">toggle_repeat</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-toggle_shuffle">toggle_shuffle</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-seek_backward">seek_backward</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-seek_forward">seek_forward</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-set_tags">set_tags</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-set_volume">set_volume</a>()<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;all&nbsp;methods&nbsp;must&nbsp;be&nbsp;overwritten.&nbsp;Some&nbsp;even&nbsp;do&nbsp;not&nbsp;make&nbsp;sense&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;certain&nbsp;players,&nbsp;e.g.&nbsp;<a href="#PlayerAdapter-jump_in_queue">jump_in_queue</a>()&nbsp;only&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;if&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;media&nbsp;player&nbsp;has&nbsp;a&nbsp;play&nbsp;queue.&nbsp;Do&nbsp;not&nbsp;overwrite&nbsp;methods&nbsp;you&nbsp;finally&nbsp;do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;not&nbsp;implement&nbsp;because&nbsp;Remuco&nbsp;checks&nbsp;which&nbsp;methods&nbsp;has&nbsp;been&nbsp;overwritten<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;uses&nbsp;this&nbsp;information&nbsp;to&nbsp;notify&nbsp;Remuco&nbsp;clients&nbsp;about&nbsp;capabilities<br>
+&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;player&nbsp;adapters.<br>
+&nbsp;<br>
+Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nbsp;the&nbsp;media&nbsp;player:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_plob">request_plob</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;As&nbsp;above,&nbsp;only&nbsp;overwrite&nbsp;the&nbsp;methods&nbsp;that&nbsp;makes&nbsp;sense&nbsp;for&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.&nbsp;<br>
+&nbsp;<br>
+Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;send&nbsp;media&nbsp;player&nbsp;information&nbsp;to&nbsp;clients:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_play_position">update_play_position</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_playback">update_playback</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_repeat_mode">update_repeat_mode</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_shuffle_mode">update_shuffle_mode</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_plob">update_plob</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;methods&nbsp;should&nbsp;be&nbsp;called&nbsp;whenever&nbsp;the&nbsp;corresponding&nbsp;information<br>
+&nbsp;&nbsp;&nbsp;&nbsp;has&nbsp;changed&nbsp;in&nbsp;the&nbsp;media&nbsp;player.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_library_request">reply_library_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;methods&nbsp;should&nbsp;be&nbsp;called&nbsp;to&nbsp;reply&nbsp;to&nbsp;calls&nbsp;to&nbsp;one&nbsp;of&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;request&nbsp;methods&nbsp;above.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Finally&nbsp;some&nbsp;not&nbsp;so&nbsp;important&nbsp;utility&nbsp;methods:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_cache_dir">get_cache_dir</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_log_file">get_log_file</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_clients">get_clients</a>()<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, max_rating<font color="#909090">=0</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player.<br>
+&nbsp;<br>
+Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbsp;starts&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
 @param&nbsp;name:&nbsp;name&nbsp;of&nbsp;the&nbsp;player<br>
+@keyword&nbsp;max_rating:&nbsp;maximum&nbsp;rating&nbsp;value&nbsp;of&nbsp;the&nbsp;player&nbsp;(default&nbsp;is&nbsp;0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;means&nbsp;the&nbsp;player&nbsp;does&nbsp;not&nbsp;support&nbsp;rating)<br>
 &nbsp;<br>
-@attention:&nbsp;If&nbsp;sub&nbsp;classes&nbsp;overwrite&nbsp;the&nbsp;constructor,&nbsp;they&nbsp;must&nbsp;call<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;constructor&nbsp;in&nbsp;the&nbsp;overwritten&nbsp;constructor!</tt></dd></dl>
+@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
-<dl><dt><a name="Player-down"><strong>down</strong></a>(self)</dt><dd><tt>Shutdown&nbsp;Remuco.<br>
-&nbsp;<br>
-Disconnects&nbsp;all&nbsp;clients&nbsp;and&nbsp;shuts&nbsp;down&nbsp;the&nbsp;Bluetooth&nbsp;and&nbsp;WiFi&nbsp;server.<br>
-Also&nbsp;ignores&nbsp;any&nbsp;subsequent&nbsp;calls&nbsp;to&nbsp;an&nbsp;update&nbsp;method&nbsp;(e.g.<br>
-<a href="#Player-update_volume">update_volume</a>(),&nbsp;...).&nbsp;<br>
-&nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;(e.g.<br>
-if&nbsp;the&nbsp;music&nbsp;player&nbsp;goes&nbsp;down&nbsp;or&nbsp;the&nbsp;Remuco&nbsp;plugin&nbsp;shall&nbsp;be&nbsp;disabled).</tt></dd></dl>
-
-<dl><dt><a name="Player-get_cache_dir"><strong>get_cache_dir</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;cache&nbsp;directory.<br>
+<dl><dt><a name="PlayerAdapter-get_cache_dir"><strong>get_cache_dir</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;cache&nbsp;directory.<br>
 &nbsp;<br>
 In&nbsp;most&nbsp;cases&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER<br>
 &nbsp;<br>
 @return:&nbsp;cache&nbsp;dir&nbsp;name</tt></dd></dl>
 
-<dl><dt><a name="Player-get_clients"><strong>get_clients</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
+<dl><dt><a name="PlayerAdapter-get_clients"><strong>get_clients</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;may&nbsp;be&nbsp;called&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;to&nbsp;integrate<br>
-connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;UI.<br>
+May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;media&nbsp;player&nbsp;UI.<br>
 &nbsp;<br>
 @return:&nbsp;a&nbsp;list&nbsp;of&nbsp;client&nbsp;names&nbsp;(or&nbsp;addresses)</tt></dd></dl>
 
-<dl><dt><a name="Player-get_log_file"><strong>get_log_file</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file.<br>
+<dl><dt><a name="PlayerAdapter-get_log_file"><strong>get_log_file</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file.<br>
 &nbsp;<br>
 @return:&nbsp;log&nbsp;file&nbsp;name<br>
 &nbsp;<br>
 @note:&nbsp;Do&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;to&nbsp;write&nbsp;log&nbsp;messages&nbsp;into.&nbsp;This&nbsp;should&nbsp;be<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;done&nbsp;with&nbsp;the&nbsp;module&nbsp;log&nbsp;(contained&nbsp;within&nbsp;Remuco).&nbsp;The&nbsp;idea<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;the&nbsp;method&nbsp;is&nbsp;that&nbsp;it&nbsp;can&nbsp;be&nbsp;used&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;integrate&nbsp;log&nbsp;information&nbsp;in&nbsp;the&nbsp;media&nbsp;player&nbsp;UI</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;the&nbsp;method&nbsp;is&nbsp;to&nbsp;integrate&nbsp;log&nbsp;information&nbsp;in&nbsp;the&nbsp;media<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;UI.</tt></dd></dl>
 
-<dl><dt><a name="Player-get_name"><strong>get_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;player.<br>
+<dl><dt><a name="PlayerAdapter-get_name"><strong>get_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;player.<br>
 &nbsp;<br>
 Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;(used&nbsp;internally).</tt></dd></dl>
 
-<dl><dt><a name="Player-get_rating_max"><strong>get_rating_max</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;maximum&nbsp;possible&nbsp;rating&nbsp;value.<br>
-&nbsp;<br>
-@return:&nbsp;the&nbsp;player's&nbsp;maximum&nbsp;rating&nbsp;value<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>&nbsp;if&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;player&nbsp;supports&nbsp;rating.</tt></dd></dl>
-
-<dl><dt><a name="Player-jump_in_playlist"><strong>jump_in_playlist</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
+<dl><dt><a name="PlayerAdapter-jump_in_playlist"><strong>jump_in_playlist</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
 &nbsp;<br>
 @param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-jump_in_queue"><strong>jump_in_queue</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;queue.<br>
+<dl><dt><a name="PlayerAdapter-jump_in_queue"><strong>jump_in_queue</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;queue.<br>
 &nbsp;<br>
 @param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-load_playlist"><strong>load_playlist</strong></a>(self, path)</dt><dd><tt>Load&nbsp;a&nbsp;playlist.<br>
+<dl><dt><a name="PlayerAdapter-load_playlist"><strong>load_playlist</strong></a>(self, path)</dt><dd><tt>Load&nbsp;a&nbsp;playlist.<br>
 &nbsp;<br>
 For&nbsp;some&nbsp;players&nbsp;this&nbsp;means&nbsp;'switch&nbsp;to&nbsp;another&nbsp;playlist',&nbsp;for&nbsp;others<br>
 it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist&nbsp;into&nbsp;the&nbsp;active&nbsp;playlist'.<br>
 &nbsp;<br>
 @param&nbsp;path:&nbsp;the&nbsp;path&nbsp;of&nbsp;the&nbsp;playlist&nbsp;to&nbsp;load&nbsp;(path&nbsp;is&nbsp;a&nbsp;library<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;as&nbsp;described&nbsp;in&nbsp;<a href="#Player-request_library">request_library</a>()&nbsp;)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;as&nbsp;described&nbsp;in&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()&nbsp;)&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-play_next"><strong>play_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-play_next"><strong>play_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-play_previous"><strong>play_previous</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;previous&nbsp;item.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-play_previous"><strong>play_previous</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;previous&nbsp;item.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-rate_current"><strong>rate_current</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-rate_current"><strong>rate_current</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;rating:&nbsp;rating&nbsp;value&nbsp;(int)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-reply_library_request"><strong>reply_library_request</strong></a>(self, client, path, nested, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_library_request"><strong>reply_library_request</strong></a>(self, client, path, nested, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
 @param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level&nbsp;(string&nbsp;list)<br>
@@ -204,33 +272,33 @@ it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist
 @param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
 @param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-request_library">request_library</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
 @param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
 @param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-request_playlist">request_playlist</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-reply_plob_request"><strong>reply_plob_request</strong></a>(self, client, id, info)</dt><dd><tt>Send&nbsp;a&nbsp;reply&nbsp;to&nbsp;a&nbsp;PLOB&nbsp;request&nbsp;back&nbsp;to&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_plob_request"><strong>reply_plob_request</strong></a>(self, client, id, info)</dt><dd><tt>Send&nbsp;a&nbsp;reply&nbsp;to&nbsp;a&nbsp;PLOB&nbsp;request&nbsp;back&nbsp;to&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
 @param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB<br>
-@param&nbsp;info:&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;(see&nbsp;<a href="#Player-update_plob">update_plob</a>())<br>
+@param&nbsp;info:&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;(see&nbsp;<a href="#PlayerAdapter-update_plob">update_plob</a>())<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;<a href="#Player-request_plob">request_plob</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-request_plob">request_plob</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
 @param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
 @param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-request_queue">request_queue</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()</tt></dd></dl>
 
-<dl><dt><a name="Player-request_library"><strong>request_library</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;library.<br>
+<dl><dt><a name="PlayerAdapter-request_library"><strong>request_library</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 @param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
@@ -259,51 +327,56 @@ it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player.<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;specific&nbsp;level&nbsp;of&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
-<dl><dt><a name="Player-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;current&nbsp;playlist.<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-reply_playlist_request">reply_playlist_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
-<dl><dt><a name="Player-request_plob"><strong>request_plob</strong></a>(self, client, id)</dt><dd><tt>Request&nbsp;information&nbsp;about&nbsp;a&nbsp;specific&nbsp;PLOB.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-request_plob"><strong>request_plob</strong></a>(self, client, id)</dt><dd><tt>Request&nbsp;information&nbsp;about&nbsp;a&nbsp;specific&nbsp;PLOB.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 @param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB&nbsp;(string)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;information&nbsp;about&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-reply_plob_request">reply_plob_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
-<dl><dt><a name="Player-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;current&nbsp;queue.<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#Player-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
-<dl><dt><a name="Player-seek_backward"><strong>seek_backward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-seek_backward"><strong>seek_backward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-seek_forward"><strong>seek_forward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-seek_forward"><strong>seek_forward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-set_tags"><strong>set_tags</strong></a>(self, id, tags)</dt><dd><tt>Attach&nbsp;some&nbsp;tags&nbsp;to&nbsp;a&nbsp;PLOB.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-set_tags"><strong>set_tags</strong></a>(self, id, tags)</dt><dd><tt>Attach&nbsp;some&nbsp;tags&nbsp;to&nbsp;a&nbsp;PLOB.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;to&nbsp;attach&nbsp;the&nbsp;tags&nbsp;to<br>
 @param&nbsp;tags:&nbsp;a&nbsp;list&nbsp;of&nbsp;tags<br>
@@ -311,32 +384,52 @@ it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist
 @note:&nbsp;Tags&nbsp;does&nbsp;not&nbsp;mean&nbsp;ID3&nbsp;tags&nbsp;or&nbsp;similar.&nbsp;It&nbsp;means&nbsp;the&nbsp;general<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idea&nbsp;of&nbsp;tags&nbsp;(e.g.&nbsp;like&nbsp;used&nbsp;at&nbsp;last.fm).&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-set_volume"><strong>set_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;volume.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-set_volume"><strong>set_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;volume.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;volume:&nbsp;the&nbsp;new&nbsp;volume&nbsp;in&nbsp;percent<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
 
-<dl><dt><a name="Player-toggle_play_pause"><strong>toggle_play_pause</strong></a>(self)</dt><dd><tt>Toggle&nbsp;play&nbsp;and&nbsp;pause.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-start"><strong>start</strong></a>(self)</dt><dd><tt>Start&nbsp;the&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
-<dl><dt><a name="Player-toggle_repeat"><strong>toggle_repeat</strong></a>(self)</dt><dd><tt>Toggle&nbsp;repeat&nbsp;mode.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Shutdown&nbsp;the&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
-
-<dl><dt><a name="Player-toggle_shuffle"><strong>toggle_shuffle</strong></a>(self)</dt><dd><tt>Toggle&nbsp;shuffle&nbsp;mode.&nbsp;<br>
+Disconnects&nbsp;all&nbsp;clients&nbsp;and&nbsp;shuts&nbsp;down&nbsp;the&nbsp;Bluetooth&nbsp;and&nbsp;WiFi&nbsp;server.<br>
+Also&nbsp;ignores&nbsp;any&nbsp;subsequent&nbsp;calls&nbsp;to&nbsp;an&nbsp;update&nbsp;or&nbsp;reply&nbsp;method&nbsp;(e.g.<br>
+<a href="#PlayerAdapter-update_volume">update_volume</a>(),&nbsp;...,&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>(),&nbsp;...).&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of&nbsp;<a href="#Player">Player</a>.&nbsp;It<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;The&nbsp;same&nbsp;player&nbsp;adapter&nbsp;instance&nbsp;can&nbsp;be&nbsp;started&nbsp;again&nbsp;with<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
+&nbsp;<br>
+@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
-<dl><dt><a name="Player-update_play_position"><strong>update_play_position</strong></a>(self, position, queue<font color="#909090">=False</font>)</dt><dd><tt>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;current&nbsp;PLOB.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-toggle_play_pause"><strong>toggle_play_pause</strong></a>(self)</dt><dd><tt>Toggle&nbsp;play&nbsp;and&nbsp;pause.&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-toggle_repeat"><strong>toggle_repeat</strong></a>(self)</dt><dd><tt>Toggle&nbsp;repeat&nbsp;mode.&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-toggle_shuffle"><strong>toggle_shuffle</strong></a>(self)</dt><dd><tt>Toggle&nbsp;shuffle&nbsp;mode.&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-update_play_position"><strong>update_play_position</strong></a>(self, position, queue<font color="#909090">=False</font>)</dt><dd><tt>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;current&nbsp;PLOB.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
@@ -345,14 +438,14 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 @keyword&nbsp;queue:&nbsp;True&nbsp;if&nbsp;currently&nbsp;played&nbsp;item&nbsp;is&nbsp;from&nbsp;the&nbsp;queue,&nbsp;False<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;it&nbsp;is&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist&nbsp;(default)</tt></dd></dl>
 
-<dl><dt><a name="Player-update_playback"><strong>update_playback</strong></a>(self, playback)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;playback&nbsp;state.<br>
+<dl><dt><a name="PlayerAdapter-update_playback"><strong>update_playback</strong></a>(self, playback)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;playback&nbsp;state.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;playback:&nbsp;playback&nbsp;mode&nbsp;(see&nbsp;constants)</tt></dd></dl>
 
-<dl><dt><a name="Player-update_plob"><strong>update_plob</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;current&nbsp;PLOB.<br>
+<dl><dt><a name="PlayerAdapter-update_plob"><strong>update_plob</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;current&nbsp;PLOB.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;the<br>
 currently&nbsp;played&nbsp;item&nbsp;with&nbsp;remote&nbsp;clients.<br>
@@ -365,26 +458,56 @@ currently&nbsp;played&nbsp;item&nbsp;with&nbsp;remote&nbsp;clients.<br>
 @note:&nbsp;For&nbsp;the&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;dictionary&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;constants<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starting&nbsp;with&nbsp;'INFO_'&nbsp;(e.g.&nbsp;INFO_ARTIST)&nbsp;as&nbsp;keys.</tt></dd></dl>
 
-<dl><dt><a name="Player-update_repeat_mode"><strong>update_repeat_mode</strong></a>(self, repeat)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;repeat&nbsp;mode.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-update_repeat_mode"><strong>update_repeat_mode</strong></a>(self, repeat)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;repeat&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;repeat:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
 
-<dl><dt><a name="Player-update_shuffle_mode"><strong>update_shuffle_mode</strong></a>(self, shuffle)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;shuffle&nbsp;mode.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-update_shuffle_mode"><strong>update_shuffle_mode</strong></a>(self, shuffle)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;shuffle&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;shuffle:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
 
-<dl><dt><a name="Player-update_volume"><strong>update_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;volume.<br>
+<dl><dt><a name="PlayerAdapter-update_volume"><strong>update_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;volume.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ScriptManager">class <strong>ScriptManager</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;working&nbsp;as&nbsp;scripts.<br>
+&nbsp;<br>
+A&nbsp;<a href="#ScriptManager">ScriptManager</a>&nbsp;is&nbsp;intended&nbsp;for&nbsp;player&nbsp;adapters&nbsp;which&nbsp;run&nbsp;as&nbsp;scripts&nbsp;(in<br>
+contrast&nbsp;to&nbsp;e.g.&nbsp;player&nbsp;adapters&nbsp;implemented&nbsp;as&nbsp;plugins&nbsp;for&nbsp;their<br>
+corresponding&nbsp;media&nbsp;players).&nbsp;It&nbsp;automatically&nbsp;sets&nbsp;up&nbsp;a&nbsp;main&nbsp;loop,&nbsp;starts<br>
+the&nbsp;player&nbsp;adapter&nbsp;when&nbsp;calling&nbsp;<a href="#ScriptManager-run">run</a>()&nbsp;and&nbsp;stops&nbsp;it&nbsp;on&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.<br>
+Additionally&nbsp;the&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter&nbsp;can&nbsp;be&nbsp;stopped&nbsp;manually<br>
+with&nbsp;<a href="#ScriptManager-stop">stop</a>().<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ScriptManager-__init__"><strong>__init__</strong></a>(self, pa_dm)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#ScriptManager">ScriptManager</a>.<br>
+&nbsp;<br>
+@param&nbsp;pa_dm:&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;or&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="ScriptManager-run"><strong>run</strong></a>(self)</dt><dd><tt>Run&nbsp;the&nbsp;script&nbsp;manager.<br>
+&nbsp;<br>
+This&nbsp;method&nbsp;blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#ScriptManager-stop">stop</a>()&nbsp;has<br>
+been&nbsp;called.&nbsp;Then&nbsp;it&nbsp;stops&nbsp;the&nbsp;player&nbsp;adapter&nbsp;and&nbsp;returns.</tt></dd></dl>
+
+<dl><dt><a name="ScriptManager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;stop&nbsp;the&nbsp;script&nbsp;manager.<br>
+&nbsp;<br>
+Stops&nbsp;the&nbsp;manager's&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter.</tt></dd></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -393,8 +516,7 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>INFO_ABSTRACT</strong> = '__abstract__'<br>
-<strong>INFO_ALBUM</strong> = 'album'<br>
+<td width="100%"><strong>INFO_ALBUM</strong> = 'album'<br>
 <strong>INFO_ARTIST</strong> = 'artist'<br>
 <strong>INFO_BITRATE</strong> = 'bitrate'<br>
 <strong>INFO_COMMENT</strong> = 'comment'<br>
