@@ -12,6 +12,7 @@ if len(sys.argv) > 1 and "install" in sys.argv:
         import Image
         import logging
         import bluetooth
+        import dbus
     except ImportError, e:
         print("Missing a required python module: %s" % str(e))
         sys.exit(1)
