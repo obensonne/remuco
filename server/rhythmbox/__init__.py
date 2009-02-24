@@ -26,8 +26,6 @@ SECTION_LIBRARY = "Library"
 COVER_FILE_NAMES = ("folder", "front", "album", "cover")
 COVER_FILE_TYPES = ("png", "jpeg", "jpg")
 
-RATING_MAX = 5
-
 SEEK_STEP = 5
 
 # =============================================================================
@@ -38,59 +36,63 @@ class RemucoPlugin(rb.Plugin):
     
     def __init__(self):
         
-        try:
-            
-            print("initialize Remuco plugin ..")
-
-            rb.Plugin.__init__(self)
+        print("initialize Remuco plugin ..")
         
-            self.__remrb = None
-            
+        rb.Plugin.__init__(self)
+        try:
+            self.__rba = RhythmboxAdapter()
         except Exception, e:
-            
             print("failed to init plugin (%s)" % e)
+            traceback.print_exc()
         
     def activate(self, shell):
         
-        print("activate Remuco plugin ..")
-
-        if self.__remrb is not None:
-            print("Remuco plugin already active!")
-            return
-
         try:
-            self.__remrb = Rhythmbox(shell)
-            print("see remuco-rhythmbox log file for further logging")
+            log.info("start RhythmboxAdapter")
+            self.__rba.start(shell)
+            log.info("start RhythmboxAdapter .. done")
         except Exception, e:
-            print("failed to init Rhythmbox player object (%s)" % e)
+            print("failed to start RhythmboxAdapter (%s)" % e)
             traceback.print_exc()
         
-        print("activate Remuco plugin .. done")
-
     def deactivate(self, shell):
     
-        print("deactivate Remuco plugin ..")
-
-        if self.__remrb is not None:
-            self.__remrb.down()
-            self.__remrb = None
-
-        print("deactivate Remuco plugin .. done")
+        log.info("stop RhythmboxAdapter")
+        self.__rba.stop()
+        log.info("stop RhythmboxAdapter .. done")
         
 # =============================================================================
 # player adapter
 # =============================================================================
 
-class Rhythmbox(remuco.Player):
+class RhythmboxAdapter(remuco.PlayerAdapter):
 
-    def __init__(self, shell):
+    def __init__(self):
         
-        remuco.Player.__init__(self, "Rhythmbox")
+        self.__shell = None
         
-        self.__shell = shell
+        remuco.PlayerAdapter.__init__(self, "Rhythmbox")
         
         self.__cover_file = "%s/cover.png" % self.get_cache_dir()
 
+        self.__plob_id = None
+        self.__plob_entry = None
+        self.__playlist_sc = None
+        self.__queue_sc = None
+        
+        self.__cb_ids_sp = ()
+        self.__cb_id_mc_poll_misc = 0
+
+    def start(self, shell):
+        
+        if self.__shell is not None:
+            log.warning("already started")
+            return
+        
+        remuco.PlayerAdapter.start(self)
+        
+        self.__shell = shell
+        
         sp = self.__shell.get_player()
         
         ###### shortcuts to RB data ###### 
@@ -120,13 +122,39 @@ class Rhythmbox(remuco.Player):
         
         log.debug("Remythm.__init__() done")
 
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+
+        if self.__shell is None:
+            return
+
+        ###### disconnect from shell player signals ######
+
+        sp = self.__shell.get_player()
+
+        for cb_id in self.__cb_ids_sp:
+            
+            sp.disconnect(cb_id)
+            
+        self.__cb_ids_sp = ()
+
+        ###### remove gobject sources ######
+        
+        if self.__cb_id_mc_poll_misc > 0:
+            gobject.source_remove(self.__cb_id_mc_poll_misc)
+            self.__cb_id_mc_poll_misc = 0
+
+        # release shell
+        self.__shell = None
+        
     # =========================================================================
     # client side player control
     # =========================================================================
     
     def get_rating_max(self):
         
-        return RATING_MAX
+        return 5
     
     def jump_in_playlist(self, position):
         
@@ -233,21 +261,11 @@ class Rhythmbox(remuco.Player):
                 
     
     def toggle_repeat(self):
-        """ Toggle repeat mode. 
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         log.warning("toggle_repeat() not yet implemented")
         # TODO: implement
         
     
     def toggle_shuffle(self):
-        """ Toggle shuffle mode. 
-        
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
-        """
         log.warning("toggle_shuffle() not yet implemented")
         # TODO: implement
     
@@ -366,31 +384,6 @@ class Rhythmbox(remuco.Player):
         gobject.idle_add(self.reply_library_request, client, path, nested,
                          plob_ids, plob_names)
 
-        
-    def down(self):
-        
-        remuco.Player.down(self)
-
-        if self.__shell is None:
-            return
-
-        ###### disconnect from shell player signals ######
-
-        sp = self.__shell.get_player()
-
-        for cb_id in self.__cb_ids_sp:
-            
-            sp.disconnect(cb_id)
-            
-        self.__cb_ids_sp = ()
-
-        ###### remove gobject sources ######
-        
-        if self.__cb_id_mc_poll_misc > 0:
-            gobject.source_remove(self.__cb_id_mc_poll_misc)
-
-        # release shell
-        self.__shell = None
         
     # ==========================================================================
     # callbacks
