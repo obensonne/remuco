@@ -3,27 +3,40 @@
 import sys
 import dircache
 import signal
+
 import gobject
 
 import remuco
 from remuco import log
 
-class MPRIS(remuco.Player):
+class MPRIS(remuco.PlayerAdapter):
     
     def __init__(self, name):
         
-        # important: this must be called first:
-        remuco.Player.__init__(self, name)
+        remuco.PlayerAdapter.__init__(self, name)
         
-        # example: periodic player state update function:
-        sid = gobject.timeout_add(5000, self.__update_state)
+        self.__name = name
+        self.__gobject_source_ids = ()
         
-        # important: remember source ids (for shutting down):
-        self.__gobject_source_ids = (sid,)
+        log.debug("init done")
+
+    def start(self):
         
-        # example: logging
-        log.debug("FooPlay.__init__() done")
+        remuco.PlayerAdapter.start(self)
         
+        self.__gobject_source_ids = (
+            gobject.timeout_add(5000, self.__update_state),
+            )
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+        
+        for source_id in self.__gobject_source_ids:
+            gobject.source_remove(source_id)
+            
+        self.__gobject_source_ids = ()
+
     def request_playlist(self, client):
         
         # example: 2 tracks in the playlist
@@ -35,15 +48,6 @@ class MPRIS(remuco.Player):
         # example: empty queue
         self.reply_queue_request(client, [], [])
 
-    def down(self):
-        
-        # important: call super class implementation:
-        remuco.Player.down(self)
-        
-        # example: remove sources we've added to the gobject main loop:
-        for source_id in self.__gobject_source_ids:
-            gobject.source_remove(source_id)
-
     def __update_state(self):
         
         # example: update current volume
@@ -52,50 +56,16 @@ class MPRIS(remuco.Player):
         return True
 
 # =============================================================================
-# main (example startup)
+# main
 # =============================================================================
-
-ml = None
-
-def sighandler(signum, frame):
-    
-    global ml
-    
-    log.info("received signal %i" % signum)
-    
-    if ml != None:
-        ml.quit()
-        
-def main(name):
-    
-    signal.signal(signal.SIGINT, sighandler)
-    signal.signal(signal.SIGTERM, sighandler)
-
-    try:
-        pa = MPRIS(name)
-    except Exception, e:
-        print("Failed to set up FooPlay player adapter: %s" % str(e))
-        print("See remuco-fooplay log file for details.")
-        return
-    
-    global ml
-    
-    ml = gobject.MainLoop()
-    
-    try:
-        ml.run() # Remuco always needs a main loop to run
-    except Exception, e:
-        print("exception in main loop: %s" % str(e))
-    
-    # main loop has been stopped
-    
-    pa.down()
-
-# -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
     
     if len(sys.argv) >= 2:
-        main(sys.argv[1])
+        name = sys.argv
+        pa = MPRISAdapter(name)
+        dm = remuco.DBusManager(pa, "org.mpris.%s", name)
+        sm = remuco.ScriptManager(dm)
+        sm.run()
     else:
         print "Need a player name!"
