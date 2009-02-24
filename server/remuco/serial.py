@@ -19,8 +19,6 @@ class Bin:
     NET_ENCODING_ALT = ("UTF-8", "UTF8", "utf-8", "utf8") # synonyms
     HOST_ENCODING = NET_ENCODING # will be updated with value from config file
     
-    TYPE_UC = type(u'dummy')
-    
     def __init__(self, buff=None):
         
         if not buff:
@@ -150,7 +148,7 @@ class Bin:
         converted from Bin.HOST_ENCODING to Bin.NET_ENCODING.
         """
         
-        if type(s) == Bin.TYPE_UC:
+        if isinstance(s, unicode):
             
             try:
                 s = s.encode(Bin.NET_ENCODING)
