@@ -1,33 +1,51 @@
 # -*- coding: UTF-8 -*-
 """ Remuco player adapter module.
 
-The module 'remuco' is the interface between a media player and the Remuco
-system. It provides one class and several constants.
+This module provides classes and constants for Remuco player adapters.
 
-The class Player is supposed to be sub classed by Remuco adapters for specific
-media players.
+Class PlayerAdapter:
+    Base class for player adapter.
 
-Some notes on logging:
+Class DBusManager:
+    Helper class for player adapters using DBus for player communication.
 
-Remuco uses the module 'logging' for all its logging messages. By default
-logging is configured to log into a player specific log file (usually
-~/.cache/remuco/PLAYER/log). The log level is defined in the player specific
-configuration file (usually ~/.config/remuco/PLAYER/conf).
+Class ScriptManager:
+    Helper class for player adapters running as scripts.
 
-To use the remuco logging system within a player adapter, import the module
-'remuco.log' and use the functions log.debug(), log.info(), log.warning() and
-log.error(). Then all messages of the player adapter will be written into the
-same file as used internally by the remuco module - that makes debugging a lot
-easier.
+Constants:
+    The constants starting with 'INFO' are the keys to use for the dictionary
+    describing a PLOB (PLOB means playable object - a song, video, slide or
+    whatever may be played in that spirit).
+    
+    The constants starting with 'PLAYBACK' are the values used by Remuco to
+    describe a playback state.
+
+Logging:
+    It is recommended to use the remuco logging system within player adapters.
+    To do so, import the module 'remuco.log' and use the functions
+    
+    * remuco.log.debug(),
+    * remuco.log.info(),
+    * remuco.log.warning() and
+    * remuco.log.error().
+    
+    Then all messages of the player adapter will be written into the same file
+    as used internally by the remuco module - that makes debugging a lot easier.
+    
+    Internally Remuco uses the module 'logging' for all its logging messages.
+    Messages go into a player specific log file (usually
+    ~/.cache/remuco/PLAYER/log). The log level is defined in a player specific
+    configuration file (usually ~/.config/remuco/PLAYER/conf).
 
 """
 #===============================================================================
 # imports
 #===============================================================================
 
-import gobject
 import subprocess
 import os
+
+import gobject
 
 import log
 import message
@@ -47,7 +65,7 @@ PLAYBACK_PAUSE = 1
 PLAYBACK_PLAY = 2
 PLAYBACK_STOP = 0
 
-INFO_ABSTRACT = "__abstract__"
+__INFO_ABSTRACT = "__abstract__"
 INFO_ALBUM = "album"
 INFO_ARTIST = "artist"
 INFO_BITRATE = "bitrate"
@@ -70,66 +88,83 @@ INFO_TYPE_OTHER = 3
 # player class
 #===============================================================================
 
-class Player:
+class PlayerAdapter:
     
-    """ Class for Remuco player adapters to derive from. 
+    """ Base class for Remuco player adapters.
     
-    Player is a class any media player adapter is supposed to derive from.
-    It provides some methods media player adapters can use to interact with
-    Remuco clients and some methods which must be overwritten by sub classes
-    in order to implement player specific behavior.
+    Remuco player adapters must subclass this class and overwrite certain
+    methods to implement player specific behavior. Additionally PlayerAdapter
+    provides methods to interact with Remuco clients. 
     
-    The following methods can be used to interact with clients:
+    Methods to overwrite to manage life cycle:
     
-    * update_play_position()
-    * update_playback()
-    * update_repeat_mode()
-    * update_shuffle_mode()
-    * update_plob()
+        * start()
+        * stop()
     
-    * reply_plob_request()
-    * reply_playlist_request()
-    * reply_queue_request()
-    * reply_library_request()
+        A PlayerAdapter can be started and stopped with start() and stop().
+        Subclasses of PlayerAdapter may override these methods as needed but
+        must always call the super class implementations too! The same instance
+        of a PlayerAdapter should be startable and stoppable multiple times.
     
-    The term PLOB means playable object and simply refers to a song, a video
-    or whatever you can imagine as a playable object. 
+    Methods to overwrite to control the media player:
+    
+        * jump_in_playlist()
+        * jump_in_queue()
+        * load_playlist()
+        * play_next()
+        * play_previous()
+        * rate_current()
+        * toggle_play_pause()
+        * toggle_repeat()
+        * toggle_shuffle()
+        * seek_backward()
+        * seek_forward()
+        * set_tags()
+        * set_volume()
+    
+        Not all methods must be overwritten. Some even do not make sense for
+        certain players, e.g. jump_in_queue() only should be overwritten if the
+        media player has a play queue. Do not overwrite methods you finally do
+        not implement because Remuco checks which methods has been overwritten
+        and uses this information to notify Remuco clients about capabilities
+        of player adapters.
 
-    The following methods may be overwritten by sub classes to implement
-    media player specific behavior:
+    Methods to overwrite to provide information from the media player:
     
-    * get_rating_max()
-    * jump_in_playlist()
-    * jump_in_queue()
-    * load_playlist()
-    * play_next()
-    * play_previous()
-    * rate_current()
-    * toggle_play_pause()
-    * toggle_repeat()
-    * toggle_shuffle()
-    * seek_backward()
-    * seek_forward()
-    * set_tags()
-    * set_volume()
+        * get_rating_max()
+        * request_plob()
+        * request_playlist()
+        * request_queue()
+        * request_library()
     
-    * request_plob()
-    * request_playlist()
-    * request_queue()
-    * request_library()
+        As above, only overwrite the methods that makes sense for the
+        corresponding media player. 
     
-    Not all methods must be overwritten. Some even do not make sense for
-    certain players, e.g. get_rating_max() only should be overwritten if the
-    media player supports rating. Do not overwrite methods you finally do not
-    implement because Remuco checks which methods has been overwritten and uses
-    this information to notify Remuco clients about capabilities of player
-    adapters.
+    Methods to call to send media player information to clients:
     
-    If a player adapter needs a cache directory, it can get one via
-    get_cache_dir(). If a player adapter wants to integrate log information
-    into the media player UI, it has to call get_log_file() to get the name
-    of the log file used within remuco to log messages.
+        * update_play_position()
+        * update_playback()
+        * update_repeat_mode()
+        * update_shuffle_mode()
+        * update_plob()
+        
+        These methods should be called whenever the corresponding information
+        has changed in the media player.
+        
+        * reply_plob_request()
+        * reply_playlist_request()
+        * reply_queue_request()
+        * reply_library_request()
+        
+        These methods should be called to reply to calls to one of the
+        request methods above.
+        
+    Finally some not so important utility methods:
     
+        * get_cache_dir()
+        * get_log_file()
+        * get_clients()
+        
     """
 
     #==========================================================================
@@ -139,10 +174,11 @@ class Player:
     def __init__(self, name):
         """Create a new player.
         
+        Just does some early initializations. Real job starts with start().
+        
         @param name: name of the player
         
-        @attention: If sub classes overwrite the constructor, they must call
-                    this constructor in the overwritten constructor! 
+        @attention: When overwriting, call super class implementation first! 
         """
         
         self.__name = name
@@ -166,9 +202,27 @@ class Player:
         self.__plob = Plob()
         self.__info = PlayerInfo(name, self.__get_flags(), self.get_rating_max())
         
-        self.__sync_trigger_ids = {}
+        self.__sync_trigger_source_ids = {}
+        self.__ping_source_id = 0
         
-        self.__shutting_down = False
+        self.__stopped = True
+        
+        self.__server_bluetooth = None
+        self.__server_wifi = None
+            
+        log.debug("PlayerAdapter.__init__() done")
+    
+    def start(self):
+        """ Start the player adapter.
+        
+        @attention: When overwriting, call super class implementation first! 
+        """
+        
+        if not self.__stopped:
+            log.debug("ignore start, already running")
+            return
+        
+        self.__stopped = False
         
         # set up server
         
@@ -184,22 +238,57 @@ class Player:
         else:
             self.__server_wifi = None
             
-        # client ping
+        # set up client ping
         
-        self.__ping_msg = net.build_message(message.MSG_ID_IGNORE, None)
+        ping_msg = net.build_message(message.MSG_ID_IGNORE, None)
         ping = self.__config.get_ping()
         if ping > 0:
             log.debug("ping clients every %d seconds" % ping)
-            self.__ping_sid = gobject.timeout_add(ping * 1000, self.__ping)
+            self.__ping_source_id = gobject.timeout_add(ping * 1000, self.__ping,
+                                                  ping_msg)
         else:
-            self.__ping_sid = 0
+            self.__ping_source_id = 0
         
-        # done
+    
+    def stop(self):
+        """Shutdown the player adapter.
         
-        log.debug("Player.__init__() done")
+        Disconnects all clients and shuts down the Bluetooth and WiFi server.
+        Also ignores any subsequent calls to an update or reply method (e.g.
+        update_volume(), ..., reply_plob_request(), ...). 
+        
+        @note: The same player adapter instance can be started again with
+               start().
+
+        @attention: When overwriting, call super class implementation first! 
+        """
+
+        if self.__stopped: return
+        
+        self.__stopped = True
+        
+        for c in self.__clients:
+            c.disconnect(remove_from_list=False, send_bye_msg=True)
+            
+        self.__clients = []
+        
+        if self.__server_bluetooth is not None:
+            self.__server_bluetooth.down()
+            self.__server_bluetooth = None
+        if self.__server_wifi is not None:
+            self.__server_wifi.down()
+            self.__server_wifi = None
+            
+        for id in self.__sync_trigger_source_ids.values():
+            if id is not None:
+                gobject.source_remove(id)
+        self.__sync_trigger_source_ids = {}
+
+        if self.__ping_source_id > 0:
+            gobject.source_remove(self.__ping_source_id)
         
     #==========================================================================
-    # configuration
+    # some utility functions which may be useful for player adapters
     #==========================================================================
     
     def get_cache_dir(self):
@@ -219,12 +308,32 @@ class Player:
         
         @note: Do not use this file to write log messages into. This should be
                done with the module log (contained within Remuco). The idea
-               of the method is that it can be used by player adapters to
-               integrate log information in the media player UI
+               of the method is to integrate log information in the media
+               player UI.
         """
         
         return self.__config.get_log_file()
 
+    def get_name(self):
+        """ Get the name of the player.
+        
+        Probably not that useful for player adapters (used internally).
+        """
+        return self.__name
+    
+    def get_clients(self):
+        """ Get a descriptive list of connected clients.
+        
+        May be useful to integrate connected clients in a media player UI.
+
+        @return: a list of client names (or addresses)
+        """ 
+        
+        l = []
+        for c in self.__clients:
+            l.append(c.get_address())
+        return l
+    
     #==========================================================================
     # client side player control (to be implemented by sub classes) 
     #==========================================================================
@@ -234,8 +343,8 @@ class Player:
         
         @return: the player's maximum rating value
         
-        @note: This method should be overwritten by sub classes of Player if the
-               corresponding player supports rating.
+        @note: This method should be overwritten by sub classes of PlayerAdapter
+               if the corresponding player supports rating.
         """
         return 0
     
@@ -244,8 +353,9 @@ class Player:
         
         @param postion: the position (starting form 0) 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("jump_in_playlist() not yet implemented")
         
@@ -254,8 +364,9 @@ class Player:
         
         @param postion: the position (starting form 0) 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("jump_in_queue() not yet implemented")
     
@@ -268,24 +379,27 @@ class Player:
         @param path: the path of the playlist to load (path is a library
                      level as described in request_library() ) 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("load_playlist() not yet implemented")
     
     def play_next(self):
         """ Play the next item. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("play_next() not yet implemented")
     
     def play_previous(self):
         """ Play the previous item. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("play_previous() not yet implemented")
     
@@ -294,48 +408,54 @@ class Player:
         
         @param rating: rating value (int)
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("rate_current() not yet implemented")
     
     def toggle_play_pause(self):
         """ Toggle play and pause. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("toggle_play_pause() not yet implemented")
     
     def toggle_repeat(self):
         """ Toggle repeat mode. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("toggle_repeat() not yet implemented")
     
     def toggle_shuffle(self):
         """ Toggle shuffle mode. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("toggle_shuffle() not yet implemented")
     
     def seek_forward(self):
         """ Seek forward some seconds. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("seek_forward() not yet implemented")
     
     def seek_backward(self):
         """ Seek forward some seconds. 
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("seek_backward() not yet implemented")
     
@@ -348,8 +468,9 @@ class Player:
         @note: Tags does not mean ID3 tags or similar. It means the general
                idea of tags (e.g. like used at last.fm). 
 
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("set_tags() not yet implemented")
     
@@ -358,8 +479,9 @@ class Player:
         
         @param volume: the new volume in percent
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client wants to control the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client wants to
+               control the player.
         """
         log.warning("set_volume() not yet implemented")
         
@@ -368,8 +490,9 @@ class Player:
         
         @param client: the requesting client (needed for reply)
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client requests a PLOB from the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client requests the
+               player's current playlist.
 
         @see: reply_playlist_request() for sending back the result
         """
@@ -380,8 +503,9 @@ class Player:
         
         @param client: the requesting client (needed for reply)
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client requests a PLOB from the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client requests the
+               player's current queue.
 
         @see: reply_queue_request() for sending back the result
         """
@@ -393,8 +517,9 @@ class Player:
         @param client: the requesting client (needed for reply)
         @param id: ID of the requested PLOB (string)
         
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client requests a PLOB from the player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client requests
+               information about a PLOB from the player.
 
         @see: reply_plob_request() for sending back the result
         """
@@ -430,9 +555,9 @@ class Player:
                Here possibles values for path are [ "Radio" ] or
                [ "Playlists", "Party", "Sue's b-day" ] or ...
                
-        @note: This method should be overwritten by sub classes of Player. It
-               gets called if a remote client requests a playlist from the
-               player.
+        @note: This method should be overwritten by sub classes of
+               PlayerAdapter. It gets called if a remote client requests a
+               specific level of the player's media library.
                
         @see: reply_list_request() for sending back the result
         """
@@ -554,6 +679,9 @@ class Player:
         @see: request_playlist()        
         """ 
         
+        if self.__stopped:
+            return
+
         playlist = Library(Library.PATH_PLAYLIST, [], plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, playlist)
@@ -570,6 +698,9 @@ class Player:
         @see: request_queue()        
         """ 
         
+        if self.__stopped:
+            return
+
         queue = Library(Library.PATH_QUEUE, [], plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, queue)
@@ -588,9 +719,9 @@ class Player:
         @see: request_library()
         """ 
         
-        log.debug("library reply: %s %s %s %s" %
-                  (str(path), str(nested), str(plob_ids), str(plob_names)))
-        
+        if self.__stopped:
+            return
+
         library = Library(path, nested, plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, library)
@@ -607,6 +738,9 @@ class Player:
         @see: request_plob()
         """
         
+        if self.__stopped:
+            return
+        
         plob = Plob()
         plob.set_id(id)
         plob.set_info(info)
@@ -615,51 +749,17 @@ class Player:
         
         client.send(msg)
     
-    def down(self):
-        """Shutdown Remuco.
-        
-        Disconnects all clients and shuts down the Bluetooth and WiFi server.
-        Also ignores any subsequent calls to an update method (e.g.
-        update_volume(), ...). 
-        
-        This method is intended to be called by sub classes of Player (e.g.
-        if the music player goes down or the Remuco plugin shall be disabled).
-        """
-
-        if self.__shutting_down: return
-        
-        self.__shutting_down = True
-        
-        for c in self.__clients:
-            c.disconnect(remove_from_list=False)
-            
-        self.__clients = []
-        
-        if self.__server_bluetooth is not None:
-            self.__server_bluetooth.down()
-        if self.__server_wifi is not None:
-            self.__server_wifi.down()
-            
-        for id in self.__sync_trigger_ids.values():
-            if id is not None:
-                gobject.source_remove(id)
-                
-        self.__sync_trigger_ids = {}
-
-        if self.__ping_sid > 0:
-            gobject.source_remove(self.__ping_sid)
-        
     #==========================================================================
     # synchronization (outbound communication)
     #==========================================================================
     
     def __trigger_sync(self, sync_fn):
         
-        if self.__shutting_down:
+        if self.__stopped:
             return
         
         try:
-            id = self.__sync_trigger_ids[sync_fn]
+            id = self.__sync_trigger_source_ids[sync_fn]
         except KeyError:
             id = None
         
@@ -667,7 +767,7 @@ class Player:
             log.debug("trigger for %s already active" % sync_fn.func_name)
             return
         
-        self.__sync_trigger_ids[sync_fn] = \
+        self.__sync_trigger_source_ids[sync_fn] = \
             gobject.idle_add(sync_fn, priority=gobject.PRIORITY_LOW)
         
     def __sync_state(self):
@@ -688,7 +788,7 @@ class Player:
     
     def __sync(self, msg, calling_sync_fn):
         
-        self.__sync_trigger_ids[calling_sync_fn] = None
+        self.__sync_trigger_source_ids[calling_sync_fn] = None
         
         if msg is None: return
         
@@ -812,27 +912,6 @@ class Player:
     # miscellaneous 
     #==========================================================================
     
-    def get_name(self):
-        """ Get the name of the player.
-        
-        Probably not that useful for player adapters (used internally).
-        """
-        return self.__name
-    
-    def get_clients(self):
-        """ Get a descriptive list of connected clients.
-        
-        This method may be called by sub classes of Player to integrate
-        connected clients in a UI.
-
-        @return: a list of client names (or addresses)
-        """ 
-        
-        l = []
-        for c in self.__clients:
-            l.append(c.get_address())
-        return l
-    
     def __shutdown_system(self):
         
         shutdown_cmd = self.__config.get_shutdown_system_command()
@@ -843,7 +922,7 @@ class Player:
             except OSError, e:
                 log.warning("failed to run shutdown command (%s)", e)
                 return
-            self.down()
+            self.stop()
 
     def __get_flags(self):
         """ Check player adapter capabilities.
@@ -881,11 +960,148 @@ class Player:
         
         return flags
 
-    def __ping(self):
+    def __ping(self, msg):
         """ Ping clients to keep connection alive."""
         
         for c in self.__clients:
             log.debug("ping client %s" % c.get_address())
-            c.send(self.__ping_msg)
+            c.send(msg)
             
         return True
+
+# =============================================================================
+# dbus stuff
+# =============================================================================
+
+import dbus
+import dbus.exceptions
+import dbus.mainloop.glib
+
+class DBusManager():
+    """ Helper class for player adapters talking to media players via DBus.
+    
+    A DBusManager automatically starts and stops a player adapter if the
+    corresponding media player starts or stops.
+    """
+    
+    def __init__(self, pa, dbus_name):
+        """ Create a new DBusManager.
+        
+        @param pa: the PlayerAdapter to automatically start and stop
+        @param dbus_name: the bus name used by the adapter's media player
+        """
+
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+        self.__pa = pa
+        self.__dbus_name = dbus_name
+        
+        bus = dbus.SessionBus()
+
+        proxy = bus.get_object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+        self.__dbus = dbus.Interface(proxy, "org.freedesktop.DBus")
+
+        self.__handlers = (
+            self.__dbus.connect_to_signal("NameOwnerChanged",
+                                          self.__notify_owner_change,
+                                          arg0=self.__dbus_name)
+            ,
+        )
+
+        self.__dbus.NameHasOwner(self.__dbus_name,
+                                 reply_handler=self.__set_has_owner,
+                                 error_handler=self.__dbus_error)
+        
+    def __notify_owner_change(self, name, old, new):
+        
+        log.info("dbus name owner change: '%s' -> '%s'" % (old, new))
+        
+        self.__pa.stop()
+        
+        if new is not None and len(new) > 0:
+            try:
+                self.__pa.start()
+            except Exception, e:
+                pass
+    
+    def __set_has_owner(self, has_owner):
+        
+        if has_owner:
+            self.__pa.start()
+    
+    def __dbus_error(self, error):
+        log.error("dbus error: %s" % error)
+        
+    def start(self):
+        """ This does nothing.
+        
+        Only defined to handle a DBusManager like a PlayerAdapter in the
+        ScriptManager.
+        """
+    
+    def stop(self):
+        """ Shut down the DBusManager.
+        
+        This also shuts down the player adapter.
+        """
+        
+        if self.__pa is not None:
+            self.__pa.stop()
+        
+        for handler in self.__handlers:
+            handler.remove()
+        self.__dbus_handlers = ()
+        
+        self.__dbus = None
+            
+# =============================================================================
+# script stuff
+# =============================================================================
+
+import signal
+
+_ml = gobject.MainLoop()
+
+def _sighandler(signum, frame):
+    """ Used internally by the ScriptManager. """
+    
+    log.info("received signal %i" % signum)
+    global _ml
+    _ml.quit()
+
+class ScriptManager():
+    """ Helper class for player adapters working as scripts.
+    
+    A ScriptManager is intended for player adapters which run as scripts (in
+    contrast to e.g. player adapters implemented as plugins for their
+    corresponding media players). It automatically sets up a main loop, starts
+    the player adapter and stops it on SIGINT or SIGTERM.
+    """
+    
+    def __init__(self, pa_dm):
+        """ Create a new ScriptManager.
+        
+        @param pa_dm: a PlayerAdapter or DBusManager instance
+        """
+        
+        self.__pa_dm = pa_dm
+
+        signal.signal(signal.SIGINT, _sighandler)
+        signal.signal(signal.SIGTERM, _sighandler)
+
+    def run(self):
+        """ Run the script manager.
+        
+        This method blocks until SIGINT or SIGTERM arrives. Then it stops the
+        player adapter and returns .. you are done :).
+        """
+    
+        self.__pa_dm.start()
+
+        global _ml
+        log.info("start main loop")
+        _ml.run()
+        log.info("stopped main loop")
+
+        self.__pa_dm.stop()
+        
