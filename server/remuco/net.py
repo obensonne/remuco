@@ -1,7 +1,9 @@
-import bluetooth
 import socket
-import gobject
 import struct
+import time
+
+import bluetooth
+import gobject
 
 import log
 import message
@@ -290,12 +292,38 @@ class ClientConnection():
 #            log.warning("failed to send message to client (%s)" % e)
 #            self.disconnect()
             
-    def disconnect(self, remove_from_list=True):
+    def disconnect(self, remove_from_list=True, send_bye_msg=False):
         """ Disconnect the client.
         
         @keyword remove_from_list: whether to remove the client from the client
                                    list or not (default is true)
+        @keyword send_bye_msg: whether to send a bye message before
+                               disconnecting                                       
         """
+        
+        # send bye message
+        
+        if send_bye_msg:
+            log.info("send 'bye' to %s" % self.__addr_str)
+            msg = build_message(message.MSG_ID_IFS_SRVDOWN, None)
+            sent = 0
+            retry = 0
+            while sent < len(msg) and retry < 10:
+                try:
+                    sent += self.__sock.send(msg)
+                except socket.error, e:
+                    log.warning("failed to send 'bye' to %s (%s)" %
+                                (self.__addr_str, e))
+                    break
+                time.sleep(0.02)
+                retry += 1
+            if sent < len(msg):
+                log.warning("failed to send 'bye' to %s" % self.__addr_str)
+            else:
+                # give client some time to close connection:
+                time.sleep(0.1)
+        
+        # disconnect
         
         log.debug("disconnect %s" % self.__addr_str)
         
