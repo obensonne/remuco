@@ -379,7 +379,7 @@ public final class Connection implements Runnable {
 					"There was an IO error while receiving data.", e);
 		}
 
-		if (m.id == Message.ID_IFS_SRVDOWN) {
+		if (m.id == Message.ID_BYE) {
 			downPrivate();
 			throw new UserException("Disconnected.", "Remote player said bye.");
 		}
@@ -490,7 +490,7 @@ public final class Connection implements Runnable {
 
 		final Message msg = new Message();
 
-		msg.id = Message.ID_IFC_CINFO;
+		msg.id = Message.ID_CINFO;
 		msg.bytes = Serial.out(ClientInfo.ci);
 
 		try {

@@ -13,12 +13,12 @@ import remuco.util.Log;
 public final class Message {
 
 	public static final int ID_IGNORE = 0;
-	public static final int ID_IFS_PINFO = 2;
-	public static final int ID_SYN_STATE = 3;
-	public static final int ID_SYN_PLOB = 4;
-	public static final int ID_IFS_SRVDOWN = 7;
-	public static final int ID_IFC_CINFO = 8;
-	public static final int ID_CTL = 10;
+	public static final int ID_PINFO = 2;
+	public static final int ID_STATE = 3;
+	public static final int ID_PLOB = 4;
+	public static final int ID_BYE = 7;
+	public static final int ID_CINFO = 8;
+	public static final int ID_CTRL = 10;
 	public static final int ID_REQ_PLOB = 11;
 	public static final int ID_REQ_PLOBLIST = 12;
 

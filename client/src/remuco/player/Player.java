@@ -166,7 +166,7 @@ public final class Player {
 
 		switch (m.id) {
 
-		case Message.ID_SYN_PLOB:
+		case Message.ID_PLOB:
 
 			Serial.in(plob, m.bytes);
 
@@ -176,7 +176,7 @@ public final class Player {
 
 			break;
 			
-		case Message.ID_SYN_STATE:
+		case Message.ID_STATE:
 
 			Serial.in(state, m.bytes);
 
@@ -308,7 +308,7 @@ public final class Player {
 
 		ctl.set(cmd, paramI, paramS);
 
-		conn.send(new Message(Message.ID_CTL, Serial.out(ctl)));
+		conn.send(new Message(Message.ID_CTRL, Serial.out(ctl)));
 	}
 
 	private void ctrlVolume(int direction) {

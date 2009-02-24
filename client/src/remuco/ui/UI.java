@@ -227,7 +227,7 @@ public final class UI implements CommandListener, IConnectionListener,
 
 			break;
 
-		case Message.ID_IFS_SRVDOWN:
+		case Message.ID_BYE:
 
 			Log.ln("[UI] rxed server down");
 			disposePlayerScreen();
