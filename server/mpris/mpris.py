@@ -9,7 +9,7 @@ import gobject
 import remuco
 from remuco import log
 
-class MPRIS(remuco.PlayerAdapter):
+class MPRISAdapter(remuco.PlayerAdapter):
     
     def __init__(self, name):
         
