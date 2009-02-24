@@ -311,6 +311,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         LibraryRequest(client, self, path)
         
     def _set_script_manager(self, sm):
+        """ Set the script manager to stop manually when XMMS2 disconnects. """
         
         self.__sm = sm
         
