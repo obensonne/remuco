@@ -176,12 +176,15 @@ class Plob(serial.Serializable):
             self.__info = []
             for key in info_dict.keys():
                 self.__info.append(key)
-                self.__info.append(str(info_dict.get(key)))
+                val = info_dict.get(key)
+                if not isinstance(val, str) and not isinstance(val, unicode):
+                    val = str(val)
+                self.__info.append(val)
                 
     def __scale_image(self, img_in):
     
         size = 300,300
-
+        
         try:
             if isinstance(img_in, Image.Image):
                 img_obj = img_in
@@ -194,7 +197,7 @@ class Plob(serial.Serializable):
             img_out = outfile.read()
             outfile.close()
         except IOError, e:
-            log.warning("failed to thumbnail %s (%s)" % (infile, e))
+            log.warning("failed to thumbnail %s (%s)" % (img_in, e))
             img_out = None
             
         return img_out
