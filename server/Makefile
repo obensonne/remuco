@@ -39,7 +39,7 @@ clean:
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
 
-dist: clean
+dist: clean pydoc
 	#[ -z "`svn st`" ] || { echo "ERROR: working copy has local changes" ; exit 1 ; }
 	mkdir -p build/$(PKG)
 	cp -r test remuco $(ADAPTERS) build/$(PKG)
@@ -53,6 +53,7 @@ pydoc: pa-api.html
 pa-api.html: remuco/__init__.py
 	pydoc -w remuco
 	mv remuco.html pa-api.html
+	sed -i pa-api.html -e "s/remuco.html/pa-api.html/g"
 
 check:
 	@cd /; echo "import remuco" | python 2>/dev/null || \
