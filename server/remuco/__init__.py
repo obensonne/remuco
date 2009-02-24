@@ -131,7 +131,6 @@ class PlayerAdapter:
 
     Methods to overwrite to provide information from the media player:
     
-        * get_rating_max()
         * request_plob()
         * request_playlist()
         * request_queue()
@@ -171,12 +170,14 @@ class PlayerAdapter:
     # constructor 
     #==========================================================================
     
-    def __init__(self, name):
+    def __init__(self, name, max_rating=0):
         """Create a new player.
         
         Just does some early initializations. Real job starts with start().
         
         @param name: name of the player
+        @keyword max_rating: maximum rating value of the player (default is 0
+                             which means the player does not support rating)
         
         @attention: When overwriting, call super class implementation first! 
         """
@@ -200,7 +201,7 @@ class PlayerAdapter:
         
         self.__state = PlayerState()
         self.__plob = Plob()
-        self.__info = PlayerInfo(name, self.__get_flags(), self.get_rating_max())
+        self.__info = PlayerInfo(name, self.__get_flags(), max_rating)
         
         self.__sync_trigger_source_ids = {}
         self.__ping_source_id = 0
@@ -337,16 +338,6 @@ class PlayerAdapter:
     #==========================================================================
     # client side player control (to be implemented by sub classes) 
     #==========================================================================
-    
-    def get_rating_max(self):
-        """ Get the maximum possible rating value.
-        
-        @return: the player's maximum rating value
-        
-        @note: This method should be overwritten by sub classes of PlayerAdapter
-               if the corresponding player supports rating.
-        """
-        return 0
     
     def jump_in_playlist(self, position):
         """ Jump to a specific position in the currently active playlist.
@@ -1059,15 +1050,28 @@ class DBusManager():
 # =============================================================================
 
 import signal
+import traceback
 
-_ml = gobject.MainLoop()
+_ml = None
 
 def _sighandler(signum, frame):
     """ Used internally by the ScriptManager. """
     
     log.info("received signal %i" % signum)
     global _ml
-    _ml.quit()
+    if _ml is not None:
+        _ml.quit()
+
+def _init_loop():
+    
+    global _ml
+    
+    if _ml is None:
+        _ml = gobject.MainLoop()
+        signal.signal(signal.SIGINT, _sighandler)
+        signal.signal(signal.SIGTERM, _sighandler)
+    
+    return _ml
 
 class ScriptManager():
     """ Helper class for player adapters working as scripts.
@@ -1075,7 +1079,9 @@ class ScriptManager():
     A ScriptManager is intended for player adapters which run as scripts (in
     contrast to e.g. player adapters implemented as plugins for their
     corresponding media players). It automatically sets up a main loop, starts
-    the player adapter and stops it on SIGINT or SIGTERM.
+    the player adapter when calling run() and stops it on SIGINT or SIGTERM.
+    Additionally the main loop and player adapter can be stopped manually
+    with stop(). 
     """
     
     def __init__(self, pa_dm):
@@ -1085,23 +1091,31 @@ class ScriptManager():
         """
         
         self.__pa_dm = pa_dm
-
-        signal.signal(signal.SIGINT, _sighandler)
-        signal.signal(signal.SIGTERM, _sighandler)
+        
+        self.__ml = _init_loop()
 
     def run(self):
         """ Run the script manager.
         
-        This method blocks until SIGINT or SIGTERM arrives. Then it stops the
-        player adapter and returns .. you are done :).
+        This method blocks until SIGINT or SIGTERM arrives or until stop() has
+        been called. Then it stops the player adapter and returns.
         """
     
-        self.__pa_dm.start()
-
-        global _ml
-        log.info("start main loop")
-        _ml.run()
-        log.info("stopped main loop")
-
-        self.__pa_dm.stop()
+        try:
+            self.__pa_dm.start()
+            log.info("start main loop")
+            self.__ml.run()
+            log.info("main loop stopped")
+            self.__pa_dm.stop()
+        except:
+            log.error("** BUG ** \n%s" % traceback.format_exc())
+        
+    def stop(self):
+        """ Manually stop the script manager.
+        
+        Stops the manager's main loop and player adapter.
+        """
+        
+        log.info("stop script manager manually")
+        self.__ml.quit()
         
