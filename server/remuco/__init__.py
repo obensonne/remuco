@@ -108,26 +108,26 @@ class PlayerAdapter:
     
     Methods to overwrite to control the media player:
     
-        * jump_in_playlist()
-        * jump_in_queue()
-        * load_playlist()
-        * play_next()
-        * play_previous()
-        * rate_current()
-        * toggle_play_pause()
-        * toggle_repeat()
-        * toggle_shuffle()
-        * seek_backward()
-        * seek_forward()
-        * set_tags()
-        * set_volume()
+        * ctrl_jump_in_playlist()
+        * ctrl_jump_in_queue()
+        * ctrl_load_playlist()
+        * ctrl_next()
+        * ctrl_previous()
+        * ctrl_rate()
+        * ctrl_toggle_playing()
+        * ctrl_toggle_repeat()
+        * ctrl_toggle_shuffle()
+        * ctrl_seek_backward()
+        * ctrl_seek_forward()
+        * ctrl_tag()
+        * ctrl_volume()
     
         Not all methods must be overwritten. Some even do not make sense for
-        certain players, e.g. jump_in_queue() only should be overwritten if the
-        media player has a play queue. Do not overwrite methods you finally do
-        not implement because Remuco checks which methods has been overwritten
-        and uses this information to notify Remuco clients about capabilities
-        of player adapters.
+        certain players, e.g. ctrl_jump_in_queue() only should be overwritten
+        if the media player has a play queue. Do not overwrite methods you
+        finally do not implement because Remuco checks which methods has been
+        overwritten and uses this information to notify Remuco clients about
+        capabilities of player adapters.
 
     Methods to overwrite to provide information from the media player:
     
@@ -141,10 +141,10 @@ class PlayerAdapter:
     
     Methods to call to send media player information to clients:
     
-        * update_play_position()
+        * update_position()
         * update_playback()
-        * update_repeat_mode()
-        * update_shuffle_mode()
+        * update_repeat()
+        * update_shuffle()
         * update_plob()
         
         These methods should be called whenever the corresponding information
@@ -339,7 +339,7 @@ class PlayerAdapter:
     # client side player control (to be implemented by sub classes) 
     #==========================================================================
     
-    def jump_in_playlist(self, position):
+    def ctrl_jump_in_playlist(self, position):
         """ Jump to a specific position in the currently active playlist.
         
         @param postion: the position (starting form 0) 
@@ -348,9 +348,9 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("jump_in_playlist() not yet implemented")
+        log.warning("ctrl_jump_in_playlist() not yet implemented")
         
-    def jump_in_queue(self, position):
+    def ctrl_jump_in_queue(self, position):
         """ Jump to a specific position in the queue.
         
         @param postion: the position (starting form 0) 
@@ -359,9 +359,9 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("jump_in_queue() not yet implemented")
+        log.warning("ctrl_jump_in_queue() not yet implemented")
     
-    def load_playlist(self, path):
+    def ctrl_load_playlist(self, path):
         """ Load a playlist.
         
         For some players this means 'switch to another playlist', for others
@@ -374,27 +374,27 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("load_playlist() not yet implemented")
+        log.warning("ctrl_load_playlist() not yet implemented")
     
-    def play_next(self):
+    def ctrl_next(self):
         """ Play the next item. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("play_next() not yet implemented")
+        log.warning("ctrl_next() not yet implemented")
     
-    def play_previous(self):
+    def ctrl_previous(self):
         """ Play the previous item. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("play_previous() not yet implemented")
+        log.warning("ctrl_previous() not yet implemented")
     
-    def rate_current(self, rating):
+    def ctrl_rate(self, rating):
         """ Rate the currently played item. 
         
         @param rating: rating value (int)
@@ -403,55 +403,55 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("rate_current() not yet implemented")
+        log.warning("ctrl_rate() not yet implemented")
     
-    def toggle_play_pause(self):
+    def ctrl_toggle_playing(self):
         """ Toggle play and pause. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("toggle_play_pause() not yet implemented")
+        log.warning("ctrl_toggle_playing() not yet implemented")
     
-    def toggle_repeat(self):
+    def ctrl_toggle_repeat(self):
         """ Toggle repeat mode. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("toggle_repeat() not yet implemented")
+        log.warning("ctrl_toggle_repeat() not yet implemented")
     
-    def toggle_shuffle(self):
+    def ctrl_toggle_shuffle(self):
         """ Toggle shuffle mode. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("toggle_shuffle() not yet implemented")
+        log.warning("ctrl_toggle_shuffle() not yet implemented")
     
-    def seek_forward(self):
+    def ctrl_seek_forward(self):
         """ Seek forward some seconds. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("seek_forward() not yet implemented")
+        log.warning("ctrl_seek_forward() not yet implemented")
     
-    def seek_backward(self):
+    def ctrl_seek_backward(self):
         """ Seek forward some seconds. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("seek_backward() not yet implemented")
+        log.warning("ctrl_seek_backward() not yet implemented")
     
-    def set_tags(self, id, tags):
-        """ Attach some tags to a PLOB. 
+    def ctrl_tag(self, id, tags):
+        """ Attach some tags to a PLOB.
         
         @param id: ID of the PLOB to attach the tags to
         @param tags: a list of tags
@@ -463,9 +463,9 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("set_tags() not yet implemented")
+        log.warning("ctrl_tag() not yet implemented")
     
-    def set_volume(self, volume):
+    def ctrl_volume(self, volume):
         """ Set volume. 
         
         @param volume: the new volume in percent
@@ -474,7 +474,7 @@ class PlayerAdapter:
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
         """
-        log.warning("set_volume() not yet implemented")
+        log.warning("ctrl_volume() not yet implemented")
         
     def request_playlist(self, client):
         """ Request the content of the currently active playlist. 
@@ -558,8 +558,8 @@ class PlayerAdapter:
     # player side synchronization
     #==========================================================================    
 
-    def update_play_position(self, position, queue=False):
-        """Set the position of the current PLOB. 
+    def update_position(self, position, queue=False):
+        """Set the current PLOB's position in the playlist or queue. 
         
         This method is intended to be called by player adapters to sync player
         state with remote clients.
@@ -592,7 +592,7 @@ class PlayerAdapter:
             self.__state.set_playback(playback)
             self.__trigger_sync(self.__sync_state)
     
-    def update_repeat_mode(self, repeat):
+    def update_repeat(self, repeat):
         """Set the current repeat mode. 
         
         This method is intended to be called by player adapters to sync player
@@ -607,7 +607,7 @@ class PlayerAdapter:
             self.__state.set_repeat(repeat)
             self.__trigger_sync(self.__sync_state)
     
-    def update_shuffle_mode(self, shuffle):
+    def update_shuffle(self, shuffle):
         """Set the current shuffle mode. 
         
         This method is intended to be called by player adapters to sync player
@@ -832,41 +832,41 @@ class PlayerAdapter:
         if cmd == command.CMD_IGNORE:
             return
         elif cmd == command.CMD_PLAYPAUSE:
-            self.toggle_play_pause()
+            self.ctrl_toggle_playing()
         elif cmd == command.CMD_VOLUME:
-            self.set_volume(param_i)
+            self.ctrl_volume(param_i)
         elif cmd == command.CMD_NEXT:
-            self.play_next()
+            self.ctrl_next()
         elif cmd == command.CMD_PREV:
-            self.play_previous()
+            self.ctrl_previous()
         elif cmd == command.CMD_JUMP:
             self.__handle_message_control_jump(param_s.split("/"), param_i)
         elif cmd == command.CMD_RATE:
-            self.rate_current(param_i)
+            self.ctrl_rate(param_i)
         elif cmd == command.CMD_REPEAT:
-            self.toggle_repeat()
+            self.ctrl_toggle_repeat()
         elif cmd == command.CMD_SHUFFLE:
-            self.toggle_shuffle()
+            self.ctrl_toggle_shuffle()
         elif cmd == command.CMD_SETTAGS:
             id, tags = param_s.split(":")
             tags = tags.split(",")
-            self.set_tags(id, tags)
+            self.ctrl_tag(id, tags)
         elif cmd == command.CMD_SEEK_FWD:
-            self.seek_forward()
+            self.ctrl_seek_forward()
         elif cmd == command.CMD_SEEK_BWD:
-            self.seek_backward()
+            self.ctrl_seek_backward()
         elif cmd == command.CMD_SHUTDOWN:
             self.__shutdown_system()
             
     def __handle_message_control_jump(self, path, position):
         
         if path == Library.PATH_PLAYLIST:
-            self.jump_in_playlist(position)
+            self.ctrl_jump_in_playlist(position)
         elif path == Library.PATH_QUEUE:
-            self.jump_in_queue(position)
+            self.ctrl_jump_in_queue(position)
         else:
-            self.load_playlist(path)
-            self.jump_in_playlist(position)
+            self.ctrl_load_playlist(path)
+            self.ctrl_jump_in_playlist(position)
 
     def __handle_message_request_plob(self, bindata, client):
     
@@ -934,13 +934,13 @@ class PlayerAdapter:
             flags |= PlayerInfo.FEATURE_LIBRARY
         if str(self.request_plob.__module__) != me:
             flags |= PlayerInfo.FEATURE_PLOBINFO
-        if str(self.set_tags.__module__) != me:
+        if str(self.ctrl_tag.__module__) != me:
             flags |= PlayerInfo.FEATURE_TAGS
-        if str(self.jump_in_playlist.__module__) != me:
+        if str(self.ctrl_jump_in_playlist.__module__) != me:
             flags |= PlayerInfo.FEATURE_JUMP_PLAYLIST
-        if str(self.jump_in_queue.__module__) != me:
+        if str(self.ctrl_jump_in_queue.__module__) != me:
             flags |= PlayerInfo.FEATURE_JUMP_QUEUE
-        if str(self.load_playlist.__module__) != me:
+        if str(self.ctrl_load_playlist.__module__) != me:
             flags |= PlayerInfo.FEATURE_LOAD_PLAYLIST
              
         shutdown_cmd = self.__config.get_shutdown_system_command()
@@ -1091,7 +1091,7 @@ class ScriptManager():
         """
         
         self.__pa_dm = pa_dm
-        
+        self.__stopped = False
         self.__ml = _init_loop()
 
     def run(self):
@@ -1100,12 +1100,13 @@ class ScriptManager():
         This method blocks until SIGINT or SIGTERM arrives or until stop() has
         been called. Then it stops the player adapter and returns.
         """
-    
+        
         try:
             self.__pa_dm.start()
-            log.info("start main loop")
-            self.__ml.run()
-            log.info("main loop stopped")
+            if not self.__stopped:
+                log.info("start main loop")
+                self.__ml.run()
+                log.info("main loop stopped")
             self.__pa_dm.stop()
         except:
             log.error("** BUG ** \n%s" % traceback.format_exc())
@@ -1117,5 +1118,6 @@ class ScriptManager():
         """
         
         log.info("stop script manager manually")
+        self.__stopped = True
         self.__ml.quit()
         

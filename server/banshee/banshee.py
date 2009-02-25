@@ -85,7 +85,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         self.__bsc = None
         self.__bse = None
 
-    def toggle_play_pause(self):
+    def ctrl_toggle_playing(self):
         
         try:
             self.__bse.TogglePlaying(reply_handler=self.__dbus_ignore,
@@ -93,7 +93,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
 
-    def play_next(self):
+    def ctrl_next(self):
         
         try:
             self.__bsc.Next(False,
@@ -102,7 +102,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
     
-    def play_previous(self):
+    def ctrl_previous(self):
         
         try:
             self.__bsc.Previous(False,
@@ -112,7 +112,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             log.warning("dbus error: %s" % e)
     
     
-    def set_volume(self, volume):
+    def ctrl_volume(self, volume):
         
         try:
             self.__bse.SetVolume(dbus.UInt16(volume),
@@ -124,7 +124,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         self.__poll()
         
 
-    def toggle_repeat(self):
+    def ctrl_toggle_repeat(self):
         
         try:
             self.__bsc.SetRepeatMode(int(not self.__repeat),
@@ -135,7 +135,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             
         self.__poll()
             
-    def toggle_shuffle(self):
+    def ctrl_toggle_shuffle(self):
 
         try:
             self.__bsc.SetShuffleMode(int(not self.__shuffle),
@@ -206,17 +206,17 @@ class BansheeAdapter(remuco.PlayerAdapter):
     def __notify_repeat(self, repeat):
         
         self.__repeat = repeat > 0
-        self.update_repeat_mode(self.__repeat)
+        self.update_repeat(self.__repeat)
     
     def __notify_shuffle(self, shuffle):
         
         self.__shuffle = shuffle > 0
-        self.update_shuffle_mode(self.__shuffle)
+        self.update_shuffle(self.__shuffle)
 
     def __dbus_error(self, error):
         """ DBus error handler. """
         
-        log.error("dbus error: %s" % error)
+        log.warning("dbus error: %s" % error)
         
     def __dbus_ignore(self):
         """ DBus reply handler for methods without reply. """

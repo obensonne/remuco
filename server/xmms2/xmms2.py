@@ -219,32 +219,32 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2 = None
         self.__x2_gc = None
         
-    def jump_in_playlist(self, position):
+    def ctrl_jump_in_playlist(self, position):
         
         self._x2.playlist_set_next(position, cb=self.__x2cb_ignore)
         self._x2.playback_tickle(cb=self.__x2cb_ignore)
         if self.__state_playback != remuco.PLAYBACK_PLAY:
             self._x2.playback_start(cb=self.__x2cb_ignore)
         
-    def load_playlist(self, path):
+    def ctrl_load_playlist(self, path):
         
         if len(path) == 1:
             self._x2.playlist_load(path[0], cb=self.__x2cb_ignore)
         else:
             log.error("** BUG ** bad path: %s" % str(path))
     
-    def play_next(self):
+    def ctrl_next(self):
         
         self._x2.playlist_set_next_rel(1, cb=self.__x2cb_ignore)
         self._x2.playback_tickle(cb=self.__x2cb_ignore)
     
-    def play_previous(self):
+    def ctrl_previous(self):
         
         if self.__state_position > 0:
             self._x2.playlist_set_next_rel(-1, cb=self.__x2cb_ignore)
             self._x2.playback_tickle(cb=self.__x2cb_ignore)
     
-    def rate_current(self, rating):
+    def ctrl_rate(self, rating):
         
         if self.__plob_id_int == 0:
             return
@@ -253,7 +253,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                                         XMMS2Adapter.MINFO_KEY_RATING, rating,
                                         cb=self.__x2cb_ignore)
              
-    def toggle_play_pause(self):
+    def ctrl_toggle_playing(self):
         
             if self.__state_playback == remuco.PLAYBACK_STOP or \
                self.__state_playback == remuco.PLAYBACK_PAUSE:
@@ -261,23 +261,23 @@ class XMMS2Adapter(remuco.PlayerAdapter):
             else:
                 self._x2.playback_pause(cb=self.__x2cb_ignore)
                     
-    def toggle_repeat(self):
+    def ctrl_toggle_repeat(self):
         
         log.info("repeat mode cannot be set for XMMS2")
     
-    def toggle_shuffle(self):
+    def ctrl_toggle_shuffle(self):
         
         self._x2.playlist_shuffle(cb=self.__x2cb_ignore)
             
-    def seek_forward(self):
+    def ctrl_seek_forward(self):
         
         self._x2.playback_seek_ms_rel(5000, cb=self.__x2cb_ignore)
              
-    def seek_backward(self):
+    def ctrl_seek_backward(self):
         
         self._x2.playback_seek_ms_rel(-5000, cb=self.__x2cb_ignore)
     
-    def set_tags(self, id, tags):
+    def ctrl_tag(self, id, tags):
         
         try:
             id_int = int(id)
@@ -292,7 +292,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2.medialib_property_set(id_int, XMMS2Adapter.MINFO_KEY_TAGS, s,
                                         cb=self.__x2cb_ignore)
     
-    def set_volume(self, volume):
+    def ctrl_volume(self, volume):
         # TODO: currently this fails, problem relates to xmms2 installation
         for chan in ("right", "left"):
             self._x2.playback_volume_set(chan, volume, cb=self.__x2cb_ignore)
@@ -448,7 +448,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         self.__state_position = result.value()['position']
         
-        self.update_play_position(self.__state_position)
+        self.update_position(self.__state_position)
     
     def __x2cb_playlist(self, result):
         

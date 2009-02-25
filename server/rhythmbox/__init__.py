@@ -1,11 +1,10 @@
-import gobject
-import os
 import os.path
-import sys
 import traceback
 import urllib
 import urlparse
 import time
+
+import gobject
 
 import rb, rhythmdb
 
@@ -36,6 +35,8 @@ class RemucoPlugin(rb.Plugin):
     
     def __init__(self):
         
+        self.__rba = None
+        
         print("initialize Remuco plugin ..")
         
         rb.Plugin.__init__(self)
@@ -47,19 +48,27 @@ class RemucoPlugin(rb.Plugin):
         
     def activate(self, shell):
         
+        if not self.__rba:
+            return
+        
         try:
             log.info("start RhythmboxAdapter")
             self.__rba.start(shell)
-            log.info("start RhythmboxAdapter .. done")
+            log.info("RhythmboxAdapter started")
         except Exception, e:
-            print("failed to start RhythmboxAdapter (%s)" % e)
-            traceback.print_exc()
+            log.error("** BUG ** \n%s" % traceback.format_exc())
         
     def deactivate(self, shell):
     
-        log.info("stop RhythmboxAdapter")
-        self.__rba.stop()
-        log.info("stop RhythmboxAdapter .. done")
+        if not self.__rba:
+            return
+        
+        try:
+            log.info("stop RhythmboxAdapter")
+            self.__rba.stop()
+            log.info("RhythmboxAdapter stopped")
+        except Exception, e:
+            log.error("** BUG ** \n%s" % traceback.format_exc())
         
 # =============================================================================
 # player adapter
@@ -105,20 +114,20 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         ###### connect to shell player signals ######
 
         self.__cb_ids_sp = (
-            sp.connect("playing_changed", self.__cb_sp_playing_changed),
-            sp.connect("playing_uri_changed", self.__cb_sp_playing_uri_changed),
-            sp.connect("playing-source-changed", self.__cb_sp_playlist_changed)
+            sp.connect("playing_changed", self.__notify_playing_changed),
+            sp.connect("playing_uri_changed", self.__notify_playing_uri_changed),
+            sp.connect("playing-source-changed", self.__notify_source_changed)
         )
 
         ###### periodically check for changes which have no signals ######
 
         self.__cb_id_mc_poll_misc = \
-            gobject.timeout_add(3000, self.__cb_mc_poll_misc)
+            gobject.timeout_add(3000, self.__poll)
 
         ###### initially trigger server synchronization ######
         
         # state sync will happen by timeout
-        self.__cb_sp_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
+        self.__notify_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
         
         log.debug("Remythm.__init__() done")
 
@@ -152,14 +161,14 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # client side player control
     # =========================================================================
     
-    def jump_in_playlist(self, position):
+    def ctrl_jump_in_playlist(self, position):
         
         try:
             self.__jump_in_plq(self.__playlist_sc, position)
         except Exception, e:
             log.debug("playlist jump failed: %s" % str(e))
         
-    def jump_in_queue(self, position):
+    def ctrl_jump_in_queue(self, position):
 
         try:
             self.__jump_in_plq(self.__queue_sc, position)
@@ -198,7 +207,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             log.debug("remove %s from queue" % id_to_remove_from_queue)
             self.__shell.remove_from_queue(id_to_remove_from_queue)
 
-    def load_playlist(self, path):
+    def ctrl_load_playlist(self, path):
         
         sc = self.__get_source_from_path(path)
         
@@ -217,7 +226,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                 log.debug("switching source failed: %s" % str(e))
             
             
-    def play_next(self):
+    def ctrl_next(self):
         
         sp = self.__shell.get_player()
         
@@ -226,7 +235,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except Exception, e:
             log.debug("do next failed: %s" % str(e))
     
-    def play_previous(self):
+    def ctrl_previous(self):
         
         sp = self.__shell.get_player()
         
@@ -237,7 +246,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except Exception, e:
             log.debug("do previous failed: %s" % str(e))
     
-    def rate_current(self, rating):
+    def ctrl_rate(self, rating):
         
         if self.__plob_entry is not None:
             db = self.__shell.props.db
@@ -246,7 +255,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             except Exception, e:
                 log.debug("rating failed: %s" % str(e))
     
-    def toggle_play_pause(self):
+    def ctrl_toggle_playing(self):
         
         sp = self.__shell.get_player()
         
@@ -256,16 +265,16 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             log.debug("toggle play pause failed: %s" % str(e))
                 
     
-    def toggle_repeat(self):
-        log.warning("toggle_repeat() not yet implemented")
-        # TODO: implement
+    def ctrl_toggle_repeat(self):
+        # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
+        log.warning("toggle repeat mode not possible")
         
     
-    def toggle_shuffle(self):
-        log.warning("toggle_shuffle() not yet implemented")
-        # TODO: implement
+    def ctrl_toggle_shuffle(self):
+        # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
+        log.warning("toggle shuffle mode not possible")
     
-    def seek_forward(self):
+    def ctrl_seek_forward(self):
         
         sp = self.__shell.get_player()
 
@@ -274,7 +283,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except Exception, e:
             log.debug("seek fwd failed: %s" % str(e))
     
-    def seek_backward(self):
+    def ctrl_seek_backward(self):
 
         sp = self.__shell.get_player()
         
@@ -283,7 +292,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except Exception, e:
             log.debug("seek bwd failed: %s" % str(e))
     
-    def set_volume(self, volume):
+    def ctrl_volume(self, volume):
         
         sp = self.__shell.get_player()
 
@@ -385,10 +394,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # callbacks
     # ==========================================================================
     
-    def __cb_sp_playing_uri_changed(self, sp, uri):
+    def __notify_playing_uri_changed(self, sp, uri):
         """Shell player signal callback to handle a plob change."""
         
-        log.debug("rb_playing_uri_changed: %s" % uri)
+        log.debug("playing uri changed: %s" % uri)
         
         db = self.__shell.props.db
 
@@ -429,26 +438,27 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         self.update_plob(id, info, img_file)
         
         # a new plob may result in a new position:
-        self.__update_position()
+        pfq = self.__shell.get_player().props.playing_from_queue
+        self.update_position(self.__get_position(), queue=pfq)
 
-    def __cb_sp_playing_changed(self, sp, b):
+    def __notify_playing_changed(self, sp, b):
         """Shell player signal callback to handle a change in playback."""
         
-        log.debug("sp_playing_changed: %s" % str(b))
+        log.debug("playing changed: %s" % str(b))
         
         if b:
             self.update_playback(remuco.PLAYBACK_PLAY)
         else:
             self.update_playback(remuco.PLAYBACK_PAUSE)
 
-    def __cb_sp_playlist_changed(self, sp, source_new):
+    def __notify_source_changed(self, sp, source_new):
         """Shell player signal callback to handle a playlist switch."""
         
-        log.debug("sp_playlist_changed: %s" % str(source_new))
+        log.debug("source changed: %s" % str(source_new))
         
         self.__playlist_sc = source_new
         
-    def __cb_mc_poll_misc(self):
+    def __poll(self):
         """Periodic callback to poll for state information without signals.""" 
         
         sp = self.__shell.get_player()
@@ -460,12 +470,12 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         repeat = order == PLAYORDER_REPEAT or \
                  order.startswith(PLAYORDER_SHUFFLE_ALT)
                  
-        self.update_repeat_mode(repeat)
+        self.update_repeat(repeat)
         
         shuffle = order == PLAYORDER_SHUFFLE or \
                   order.startswith(PLAYORDER_SHUFFLE_ALT)
                   
-        self.update_shuffle_mode(shuffle)
+        self.update_shuffle(shuffle)
         
         ###### check volume ######
 
@@ -473,8 +483,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         self.update_volume(volume)
         
-        # TODO: test if __update_position() should be called here 
-
         return True
 
     # =========================================================================
@@ -619,15 +627,4 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         log.debug ("position: %i" % position)
         
         return position
-
-    # =========================================================================
-    # update wrapper
-    # =========================================================================
-
-    def __update_position(self):
-        """Determine the current position and update."""
-
-        pfq = self.__shell.get_player().props.playing_from_queue
-
-        self.update_play_position(self.__get_position(), queue=pfq)
 
