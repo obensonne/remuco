@@ -64,8 +64,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         name = sys.argv
         pa = MPRISAdapter(name)
-        dm = remuco.DBusManager(pa, "org.mpris.%s", name)
-        sm = remuco.ScriptManager(dm)
-        sm.run()
+        mg = remuco.Manager(pa, "org.mpris.%s", name)
+        mg.run()
     else:
         print "Need a player name!"
