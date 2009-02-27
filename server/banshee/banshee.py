@@ -216,6 +216,9 @@ class BansheeAdapter(remuco.PlayerAdapter):
     def __dbus_error(self, error):
         """ DBus error handler. """
         
+        if self.__bsc is None:
+            return # do not log errors when not stopped already
+        
         log.warning("dbus error: %s" % error)
         
     def __dbus_ignore(self):
@@ -243,7 +246,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
 if __name__ == '__main__':
 
     ba = BansheeAdapter()
-    dm = remuco.DBusManager(ba, DBUS_NAME)
-    sm = remuco.ScriptManager(dm)
+    mg = remuco.Manager(ba, need_dbus=DBUS_NAME)
     
-    sm.run()
+    mg.run()
