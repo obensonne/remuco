@@ -97,8 +97,8 @@ if __name__ == '__main__':
     # create the player adapter
     pa = FooPlayAdapter()
     
-    # pass it to a script manager
-    sm = remuco.ScriptManager(pa)
+    # pass it to a manager
+    mg = remuco.Manager(pa)
     
-    # run the script manager (blocks until interrupt signal)
-    sm.run()
+    # run the manager (blocks until interrupt signal)
+    mm.run()
