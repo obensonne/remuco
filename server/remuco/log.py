@@ -16,7 +16,7 @@ class config:
     
     handler = None
     
-    FORMATTER = logging.Formatter("%(asctime)s [%(levelname)7s] [%(filename)11s %(lineno)3d] %(message)s")
+    FORMATTER = logging.Formatter("%(asctime)s [%(levelname)7s] [%(filename)11s %(lineno)4d] %(message)s")
     
 debug = config.logga.debug
 info = config.logga.info
@@ -49,7 +49,7 @@ def set_file(file):
         config.logga.removeHandler(config.handler)
     
     if file is None:
-        new_handler = logging.StreamHandler(sys.stdout)
+        new_handler = logging.StreamHandler()
     else:
         try:
             new_handler = logging.FileHandler(file, 'w')
