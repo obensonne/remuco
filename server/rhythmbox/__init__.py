@@ -35,40 +35,33 @@ class RemucoPlugin(rb.Plugin):
     
     def __init__(self):
         
-        self.__rba = None
-        
-        print("initialize Remuco plugin ..")
-        
         rb.Plugin.__init__(self)
-        try:
-            self.__rba = RhythmboxAdapter()
-        except Exception, e:
-            print("failed to init plugin (%s)" % e)
-            traceback.print_exc()
+        
+        self.__rba = None
         
     def activate(self, shell):
         
-        if not self.__rba:
+        if self.__rba is not None:
             return
         
-        try:
-            log.info("start RhythmboxAdapter")
-            self.__rba.start(shell)
-            log.info("RhythmboxAdapter started")
-        except Exception, e:
-            log.error("** BUG ** \n%s" % traceback.format_exc())
+        print("create RhythmboxAdapter")
+        self.__rba = RhythmboxAdapter()
+        print("RhythmboxAdapter created")
+
+        print("start RhythmboxAdapter")
+        self.__rba.start(shell)
+        print("RhythmboxAdapter started")
         
     def deactivate(self, shell):
     
-        if not self.__rba:
+        if self.__rba is None:
             return
         
-        try:
-            log.info("stop RhythmboxAdapter")
-            self.__rba.stop()
-            log.info("RhythmboxAdapter stopped")
-        except Exception, e:
-            log.error("** BUG ** \n%s" % traceback.format_exc())
+        print("stop RhythmboxAdapter")
+        self.__rba.stop()
+        print("RhythmboxAdapter stopped")
+        
+        self.__rba = None
         
 # =============================================================================
 # player adapter
@@ -89,8 +82,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         self.__playlist_sc = None
         self.__queue_sc = None
         
-        self.__cb_ids_sp = ()
-        self.__cb_id_mc_poll_misc = 0
+        self.__signal_ids = ()
+        self.__poll_source_id = 0
+        
+        log.debug("init done")
 
     def start(self, shell):
         
@@ -113,7 +108,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         ###### connect to shell player signals ######
 
-        self.__cb_ids_sp = (
+        self.__signal_ids = (
             sp.connect("playing_changed", self.__notify_playing_changed),
             sp.connect("playing_uri_changed", self.__notify_playing_uri_changed),
             sp.connect("playing-source-changed", self.__notify_source_changed)
@@ -121,7 +116,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         ###### periodically check for changes which have no signals ######
 
-        self.__cb_id_mc_poll_misc = \
+        self.__poll_source_id = \
             gobject.timeout_add(3000, self.__poll)
 
         ###### initially trigger server synchronization ######
@@ -129,7 +124,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         # state sync will happen by timeout
         self.__notify_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
         
-        log.debug("Remythm.__init__() done")
+        log.debug("start done")
 
     def stop(self):
         
@@ -142,20 +137,22 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         sp = self.__shell.get_player()
 
-        for cb_id in self.__cb_ids_sp:
+        for sid in self.__signal_ids:
             
-            sp.disconnect(cb_id)
+            sp.disconnect(sid)
             
-        self.__cb_ids_sp = ()
+        self.__signal_ids = ()
 
         ###### remove gobject sources ######
         
-        if self.__cb_id_mc_poll_misc > 0:
-            gobject.source_remove(self.__cb_id_mc_poll_misc)
-            self.__cb_id_mc_poll_misc = 0
+        if self.__poll_source_id > 0:
+            gobject.source_remove(self.__poll_source_id)
+            self.__poll_source_id = 0
 
         # release shell
         self.__shell = None
+        
+        log.debug("stop done")
         
     # =========================================================================
     # client side player control
