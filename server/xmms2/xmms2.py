@@ -169,7 +169,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         remuco.PlayerAdapter.__init__(self, "XMMS2", max_rating=5)
         
-        self.__sm = None
+        self.__lcmgr = None
         
         self.__state_playback = remuco.PLAYBACK_STOP
         self.__state_volume = 0
@@ -193,7 +193,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                               disconnect_func=self.__x2cb_disconnect)
         except IOError, e:
             log.error("failed to connect to XMMS2: %s" % str(e))
-            self.__sm.stop()
+            self.__lcmgr.stop()
             return
         
         self.__x2_gc = xmmsclient.glib.GLibConnector(self._x2)
@@ -310,10 +310,10 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         LibraryRequest(client, self, path)
         
-    def _set_script_manager(self, sm):
-        """ Set the script manager to stop manually when XMMS2 disconnects. """
+    def _set_lcmgr(self, lcmgr):
+        """ Set the life cycle manager to stop when XMMS2 disconnects. """
         
-        self.__sm = sm
+        self.__lcmgr = lcmgr
         
     def _x2_result_to_plob(self, result):
         """ Convert a medialib info result to a plob. """
@@ -366,7 +366,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         if err.lower() == XMMS2Adapter.ERROR_DISCONNECTED:
             log.warning("lost connection to XMMS2")
-            self.__sm.stop()
+            self.__lcmgr.stop()
         else:
             log.warning("error result: %s" % err)
         
@@ -467,7 +467,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         log.info("xmms2 disconnected")
         
-        self.__sm.stop()
+        self.__lcmgr.stop()
     
 # =============================================================================
 # main
@@ -476,7 +476,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
 if __name__ == '__main__':
     
     pa = XMMS2Adapter()
-    sm = remuco.ScriptManager(pa)
-    pa._set_script_manager(sm) # pa stops sm manually on xmms2 disconnect
-    sm.run()
+    mg = remuco.Manager(pa)
+    pa._set_lcmgr(mg) # pa stops mg manually on xmms2 disconnect
+    mg.run()
     
