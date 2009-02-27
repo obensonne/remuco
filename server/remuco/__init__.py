@@ -4,13 +4,10 @@
 This module provides classes and constants for Remuco player adapters.
 
 Class PlayerAdapter:
-    Base class for player adapter.
+    Base class for player adapters.
 
-Class DBusManager:
-    Helper class for player adapters using DBus for player communication.
-
-Class ScriptManager:
-    Helper class for player adapters running as scripts.
+Class Manager:
+    Helper class for managing the life cycle of a player adapter.
 
 Constants:
     The constants starting with 'INFO' are the keys to use for the dictionary
@@ -211,7 +208,7 @@ class PlayerAdapter:
         self.__server_bluetooth = None
         self.__server_wifi = None
             
-        log.debug("PlayerAdapter.__init__() done")
+        log.debug("init done")
     
     def start(self):
         """ Start the player adapter.
@@ -250,6 +247,7 @@ class PlayerAdapter:
         else:
             self.__ping_source_id = 0
         
+        log.debug("start done")
     
     def stop(self):
         """Shutdown the player adapter.
@@ -287,6 +285,8 @@ class PlayerAdapter:
 
         if self.__ping_source_id > 0:
             gobject.source_remove(self.__ping_source_id)
+            
+        log.debug("stop done")
         
     #==========================================================================
     # some utility functions which may be useful for player adapters
@@ -961,17 +961,41 @@ class PlayerAdapter:
         return True
 
 # =============================================================================
-# dbus stuff
+# player adapter life cycle management
 # =============================================================================
+
+import signal
+import traceback
 
 import dbus
 import dbus.exceptions
 import dbus.mainloop.glib
 
-class DBusManager():
-    """ Helper class for player adapters talking to media players via DBus.
+_ml = None
+
+def _sighandler(signum, frame):
+    """ Used internally by the ScriptManager. """
     
-    A DBusManager automatically starts and stops a player adapter if the
+    log.info("received signal %i" % signum)
+    global _ml
+    if _ml is not None:
+        _ml.quit()
+
+def _init_loop():
+    
+    global _ml
+    
+    if _ml is None:
+        _ml = gobject.MainLoop()
+        signal.signal(signal.SIGINT, _sighandler)
+        signal.signal(signal.SIGTERM, _sighandler)
+    
+    return _ml
+
+class _DBusObserver():
+    """ Helper class.
+    
+    A DBus observer automatically starts and stops a player adapter if the
     corresponding media player starts or stops.
     """
     
@@ -1005,119 +1029,128 @@ class DBusManager():
         
     def __notify_owner_change(self, name, old, new):
         
-        log.info("dbus name owner change: '%s' -> '%s'" % (old, new))
+        log.debug("dbus name owner changed: '%s' -> '%s'" % (old, new))
         
+        log.info("stop player adapter")
         self.__pa.stop()
+        log.info("player adapter stopped")
         
         if new is not None and len(new) > 0:
             try:
+                log.info("start player adapter")
                 self.__pa.start()
+                log.info("player adapter started")
             except Exception, e:
                 pass
     
     def __set_has_owner(self, has_owner):
         
+        log.debug("dbus name has owner: %s" % has_owner)
+
         if has_owner:
+            log.info("start player adapter")
             self.__pa.start()
+            log.info("player adapter started")
     
     def __dbus_error(self, error):
-        log.error("dbus error: %s" % error)
+        log.warning("dbus error: %s" % error)
         
-    def start(self):
-        """ This does nothing.
-        
-        Only defined to handle a DBusManager like a PlayerAdapter in the
-        ScriptManager.
-        """
-    
-    def stop(self):
-        """ Shut down the DBusManager.
-        
-        This also shuts down the player adapter.
-        """
-        
-        if self.__pa is not None:
-            self.__pa.stop()
+    def disconnect(self):
         
         for handler in self.__handlers:
             handler.remove()
         self.__dbus_handlers = ()
         
         self.__dbus = None
-            
-# =============================================================================
-# script stuff
-# =============================================================================
 
-import signal
-import traceback
-
-_ml = None
-
-def _sighandler(signum, frame):
-    """ Used internally by the ScriptManager. """
+class Manager():
+    """ Manages life cycle of a player adapter.
     
-    log.info("received signal %i" % signum)
-    global _ml
-    if _ml is not None:
-        _ml.quit()
-
-def _init_loop():
+    A Manager cares about calling PlayerAdapter's start and stop methods.
     
-    global _ml
+    It is intended for player adapters running stand-alone, outside the players
+    they adapt. A Manager is not needed for player adapters realized as a
+    plugin for a media player. In that case the player's plugin interface
+    should care about the life cycle of a player adapter (see the Rhythmbox
+    player adapter as an example).
     
-    if _ml is None:
-        _ml = gobject.MainLoop()
-        signal.signal(signal.SIGINT, _sighandler)
-        signal.signal(signal.SIGTERM, _sighandler)
+    To activate a manager call run().
     
-    return _ml
-
-class ScriptManager():
-    """ Helper class for player adapters working as scripts.
-    
-    A ScriptManager is intended for player adapters which run as scripts (in
-    contrast to e.g. player adapters implemented as plugins for their
-    corresponding media players). It automatically sets up a main loop, starts
-    the player adapter when calling run() and stops it on SIGINT or SIGTERM.
-    Additionally the main loop and player adapter can be stopped manually
-    with stop(). 
     """
     
-    def __init__(self, pa_dm):
-        """ Create a new ScriptManager.
+    def __init__(self, pa, need_dbus=None):
+        """ Create a new Manager.
         
-        @param pa_dm: a PlayerAdapter or DBusManager instance
+        @param pa: the PlayerAdapter to manage
+        @keyword need_dbus: if the player adapter uses DBus to communicate with
+                            its player set this to the player's well known bus
+                            name (see run() for for more information)
         """
+
+        self.__pa = pa
         
-        self.__pa_dm = pa_dm
         self.__stopped = False
+        
         self.__ml = _init_loop()
 
-    def run(self):
-        """ Run the script manager.
+        if need_dbus is None:
+            self.__dbus_observer = None
+        else:
+            log.info("start dbus observer")
+            self.__dbus_observer = _DBusObserver(pa, need_dbus)
+            log.info("dbus observer started")
         
-        This method blocks until SIGINT or SIGTERM arrives or until stop() has
-        been called. Then it stops the player adapter and returns.
+    def run(self):
+        """ Activate the manager.
+        
+        This method starts the player adapter, runs a main loop (GLib) and
+        blocks until SIGINT or SIGTERM arrives or until stop() gets called. If
+        this happens the player adapter gets stopped and this method returns.
+        
+        @note: If 'need_dbus' has been set in the constructor the player adapter
+               does not get started until an application owns the bus name given
+               by 'need_dbus'. It automatically gets started whenever the DBus
+               name has an owner (which means the adapter's player is running)
+               and it gets stopped when it has no owner. Obvisously here the
+               player adapter may get started and stopped repeatedly while this
+               method is running.
+        
         """
         
         try:
-            self.__pa_dm.start()
+            
+            if self.__dbus_observer is None:
+                log.info("start player adapter")
+                self.__pa.start()
+                log.info("player adapter started")
+                
             if not self.__stopped:
+                
                 log.info("start main loop")
                 self.__ml.run()
                 log.info("main loop stopped")
-            self.__pa_dm.stop()
+                
+            if self.__dbus_observer is not None:
+                log.info("stop dbus observer")
+                self.__dbus_observer.disconnect()
+                log.info("dbus observer stopped")
+                    
+            log.info("stop player adapter")
+            self.__pa.stop()
+            log.info("player adapter stopped")
+                
         except:
             log.error("** BUG ** \n%s" % traceback.format_exc())
         
     def stop(self):
-        """ Manually stop the script manager.
+        """ Manually shut down the manager.
         
-        Stops the manager's main loop and player adapter.
+        Stops the manager's main loop and player adapter. As a result a
+        previous call to run() will return now.
         """
         
-        log.info("stop script manager manually")
+        log.info("stop manager manually")
         self.__stopped = True
         self.__ml.quit()
-        
+    
+

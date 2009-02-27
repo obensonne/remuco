@@ -14,13 +14,10 @@
 This&nbsp;module&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
 &nbsp;<br>
 Class&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Base&nbsp;class&nbsp;for&nbsp;player&nbsp;adapter.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Base&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters.<br>
 &nbsp;<br>
-Class&nbsp;<a href="#DBusManager">DBusManager</a>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;using&nbsp;DBus&nbsp;for&nbsp;player&nbsp;communication.<br>
-&nbsp;<br>
-Class&nbsp;<a href="#ScriptManager">ScriptManager</a>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;running&nbsp;as&nbsp;scripts.<br>
+Class&nbsp;<a href="#Manager">Manager</a>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;managing&nbsp;the&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
 Constants:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'INFO'&nbsp;are&nbsp;the&nbsp;keys&nbsp;to&nbsp;use&nbsp;for&nbsp;the&nbsp;dictionary<br>
@@ -68,36 +65,54 @@ Logging:<br>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="pa-api.html#DBusManager">DBusManager</a>
+<dt><font face="helvetica, arial"><a href="pa-api.html#Manager">Manager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="pa-api.html#PlayerAdapter">PlayerAdapter</a>
-</font></dt><dt><font face="helvetica, arial"><a href="pa-api.html#ScriptManager">ScriptManager</a>
 </font></dt></dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="DBusManager">class <strong>DBusManager</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Manager">class <strong>Manager</strong></a></font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;talking&nbsp;to&nbsp;media&nbsp;players&nbsp;via&nbsp;DBus.<br>
+<td colspan=2><tt>Manages&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-A&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;automatically&nbsp;starts&nbsp;and&nbsp;stops&nbsp;a&nbsp;player&nbsp;adapter&nbsp;if&nbsp;the<br>
-corresponding&nbsp;media&nbsp;player&nbsp;starts&nbsp;or&nbsp;stops.<br>&nbsp;</tt></td></tr>
+A&nbsp;<a href="#Manager">Manager</a>&nbsp;cares&nbsp;about&nbsp;calling&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
+&nbsp;<br>
+It&nbsp;is&nbsp;intended&nbsp;for&nbsp;player&nbsp;adapters&nbsp;running&nbsp;stand-alone,&nbsp;outside&nbsp;the&nbsp;players<br>
+they&nbsp;adapt.&nbsp;A&nbsp;<a href="#Manager">Manager</a>&nbsp;is&nbsp;not&nbsp;needed&nbsp;for&nbsp;player&nbsp;adapters&nbsp;realized&nbsp;as&nbsp;a<br>
+plugin&nbsp;for&nbsp;a&nbsp;media&nbsp;player.&nbsp;In&nbsp;that&nbsp;case&nbsp;the&nbsp;player's&nbsp;plugin&nbsp;interface<br>
+should&nbsp;care&nbsp;about&nbsp;the&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter&nbsp;(see&nbsp;the&nbsp;Rhythmbox<br>
+player&nbsp;adapter&nbsp;as&nbsp;an&nbsp;example).<br>
+&nbsp;<br>
+To&nbsp;activate&nbsp;a&nbsp;manager&nbsp;call&nbsp;<a href="#Manager-run">run</a>().<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="DBusManager-__init__"><strong>__init__</strong></a>(self, pa, dbus_name)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#DBusManager">DBusManager</a>.<br>
+<dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, need_dbus<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#Manager">Manager</a>.<br>
 &nbsp;<br>
-@param&nbsp;pa:&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;automatically&nbsp;start&nbsp;and&nbsp;stop<br>
-@param&nbsp;dbus_name:&nbsp;the&nbsp;bus&nbsp;name&nbsp;used&nbsp;by&nbsp;the&nbsp;adapter's&nbsp;media&nbsp;player</tt></dd></dl>
+@param&nbsp;pa:&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;manage<br>
+@keyword&nbsp;need_dbus:&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to&nbsp;communicate&nbsp;with<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;player&nbsp;set&nbsp;this&nbsp;to&nbsp;the&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for&nbsp;for&nbsp;more&nbsp;information)</tt></dd></dl>
 
-<dl><dt><a name="DBusManager-start"><strong>start</strong></a>(self)</dt><dd><tt>This&nbsp;does&nbsp;nothing.<br>
+<dl><dt><a name="Manager-run"><strong>run</strong></a>(self)</dt><dd><tt>Activate&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
-Only&nbsp;defined&nbsp;to&nbsp;handle&nbsp;a&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;like&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;in&nbsp;the<br>
-<a href="#ScriptManager">ScriptManager</a>.</tt></dd></dl>
+This&nbsp;method&nbsp;starts&nbsp;the&nbsp;player&nbsp;adapter,&nbsp;runs&nbsp;a&nbsp;main&nbsp;loop&nbsp;(GLib)&nbsp;and<br>
+blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#Manager-stop">stop</a>()&nbsp;gets&nbsp;called.&nbsp;If<br>
+this&nbsp;happens&nbsp;the&nbsp;player&nbsp;adapter&nbsp;gets&nbsp;stopped&nbsp;and&nbsp;this&nbsp;method&nbsp;returns.<br>
+&nbsp;<br>
+@note:&nbsp;If&nbsp;'need_dbus'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;the&nbsp;constructor&nbsp;the&nbsp;player&nbsp;adapter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name&nbsp;given<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;'need_dbus'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started&nbsp;whenever&nbsp;the&nbsp;DBus<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's&nbsp;player&nbsp;is&nbsp;running)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.&nbsp;Obvisously&nbsp;here&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped&nbsp;repeatedly&nbsp;while&nbsp;this<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
 
-<dl><dt><a name="DBusManager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Shut&nbsp;down&nbsp;the&nbsp;<a href="#DBusManager">DBusManager</a>.<br>
+<dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;shut&nbsp;down&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
-This&nbsp;also&nbsp;shuts&nbsp;down&nbsp;the&nbsp;player&nbsp;adapter.</tt></dd></dl>
+Stops&nbsp;the&nbsp;manager's&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter.&nbsp;As&nbsp;a&nbsp;result&nbsp;a<br>
+previous&nbsp;call&nbsp;to&nbsp;<a href="#Manager-run">run</a>()&nbsp;will&nbsp;return&nbsp;now.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -478,36 +493,6 @@ This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;
 state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 &nbsp;<br>
 @param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ScriptManager">class <strong>ScriptManager</strong></a></font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Helper&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters&nbsp;working&nbsp;as&nbsp;scripts.<br>
-&nbsp;<br>
-A&nbsp;<a href="#ScriptManager">ScriptManager</a>&nbsp;is&nbsp;intended&nbsp;for&nbsp;player&nbsp;adapters&nbsp;which&nbsp;run&nbsp;as&nbsp;scripts&nbsp;(in<br>
-contrast&nbsp;to&nbsp;e.g.&nbsp;player&nbsp;adapters&nbsp;implemented&nbsp;as&nbsp;plugins&nbsp;for&nbsp;their<br>
-corresponding&nbsp;media&nbsp;players).&nbsp;It&nbsp;automatically&nbsp;sets&nbsp;up&nbsp;a&nbsp;main&nbsp;loop,&nbsp;starts<br>
-the&nbsp;player&nbsp;adapter&nbsp;when&nbsp;calling&nbsp;<a href="#ScriptManager-run">run</a>()&nbsp;and&nbsp;stops&nbsp;it&nbsp;on&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.<br>
-Additionally&nbsp;the&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter&nbsp;can&nbsp;be&nbsp;stopped&nbsp;manually<br>
-with&nbsp;<a href="#ScriptManager-stop">stop</a>().<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="ScriptManager-__init__"><strong>__init__</strong></a>(self, pa_dm)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#ScriptManager">ScriptManager</a>.<br>
-&nbsp;<br>
-@param&nbsp;pa_dm:&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;or&nbsp;<a href="#DBusManager">DBusManager</a>&nbsp;instance</tt></dd></dl>
-
-<dl><dt><a name="ScriptManager-run"><strong>run</strong></a>(self)</dt><dd><tt>Run&nbsp;the&nbsp;script&nbsp;manager.<br>
-&nbsp;<br>
-This&nbsp;method&nbsp;blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#ScriptManager-stop">stop</a>()&nbsp;has<br>
-been&nbsp;called.&nbsp;Then&nbsp;it&nbsp;stops&nbsp;the&nbsp;player&nbsp;adapter&nbsp;and&nbsp;returns.</tt></dd></dl>
-
-<dl><dt><a name="ScriptManager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;stop&nbsp;the&nbsp;script&nbsp;manager.<br>
-&nbsp;<br>
-Stops&nbsp;the&nbsp;manager's&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter.</tt></dd></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
