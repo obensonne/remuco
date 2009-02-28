@@ -25,7 +25,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
         remuco.PlayerAdapter.__init__(self, "Banshee")
         
         self.__dbus_signal_handler = ()
-        self.__sid_poll = 0
     
         self.__repeat = False
         self.__shuffle = False
@@ -53,8 +52,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
                                                self.__notify_playback),
         )
         
-        self.__sid_poll = gobject.timeout_add(2500, self.__poll)
-
         # initial state query
 
         try:
@@ -78,13 +75,21 @@ class BansheeAdapter(remuco.PlayerAdapter):
             
         self.__dbus_signal_handler = ()
         
-        if self.__sid_poll > 0:
-            gobject.source_remove(self.__sid_poll)
-            self.__sid_poll = 0
-        
         self.__bsc = None
         self.__bse = None
 
+    def poll(self):
+        
+        try:
+            self.__bsc.GetRepeatMode(reply_handler=self.__notify_repeat,
+                                     error_handler=self.__dbus_error)
+            self.__bsc.GetShuffleMode(reply_handler=self.__notify_shuffle,
+                                      error_handler=self.__dbus_error)
+        except dbus.exceptions.DBusException, e:
+            log.warning("dbus error: %s" % e)
+        
+        return True
+        
     def ctrl_toggle_playing(self):
         
         try:
@@ -225,19 +230,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
         """ DBus reply handler for methods without reply. """
         
         pass
-        
-    def __poll(self):
-        """ GObject timeout callback for repeat and shuffle mode sync. """
-        
-        try:
-            self.__bsc.GetRepeatMode(reply_handler=self.__notify_repeat,
-                                     error_handler=self.__dbus_error)
-            self.__bsc.GetShuffleMode(reply_handler=self.__notify_shuffle,
-                                      error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
-            log.warning("dbus error: %s" % e)
-        
-        return True
         
 # =============================================================================
 # main
