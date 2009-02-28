@@ -17,7 +17,7 @@ all: help
 	@echo -n ""
 
 install:
-	python setup.py install
+	python setup.py install --root=$(DESTDIR)/
 	@echo
 	@echo "Installed Remuco module."
 	@echo "You can now install a player adapter with one of the following:"

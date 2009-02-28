@@ -9,8 +9,8 @@ check:
 	done
 
 install: check
-	mkdir -p $(X2_STARTUP_DIR)
-	install -T xmms2.py $(X2_STARTUP_DIR)/remuco-xmms2
+	mkdir -p $(DESTDIR)$(X2_STARTUP_DIR)
+	install -T xmms2.py $(DESTDIR)$(X2_STARTUP_DIR)/remuco-xmms2
 	
 uninstall:
-	rm -f $(X2_STARTUP_DIR)/remuco-xmms2
+	rm -f $(DESTDIR)$(X2_STARTUP_DIR)/remuco-xmms2

@@ -1,8 +1,8 @@
 PREFIX ?= /usr/local
 
 install:
-	mkdir -p $(PREFIX)/bin
-	install -T fooplay.py $(PREFIX)/bin/remuco-fooplay
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	install -T fooplay.py $(DESTDIR)$(PREFIX)/bin/remuco-fooplay
 	
 uninstall:
-	rm -f $(PREFIX)/bin/remuco-fooplay
+	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-fooplay

@@ -1,8 +1,8 @@
 PREFIX ?= /usr/local
 
 install:
-	mkdir -p $(PREFIX)/bin
-	install -T mpris.py $(PREFIX)/bin/remuco-mpris
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	install -T mpris.py $(DESTDIR)$(PREFIX)/bin/remuco-mpris
 	
 uninstall:
-	rm -f $(PREFIX)/bin/remuco-mpris
+	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-mpris
