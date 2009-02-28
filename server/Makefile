@@ -1,4 +1,4 @@
-ADAPTERS := fooplay rhythmbox xmms2
+ADAPTERS := $(shell cd adapter; ls)
 
 VERSION_BASE := 0.8
 REVISION := $(shell svn info -R | grep "^Revision" | sed -e "s/^Revision: //" | sort -n | tail -n 1)
@@ -7,35 +7,43 @@ PKG := remuco-source-$(VERSION)
 
 
 help:
-	@echo "To install the Remuco module, run 'make install'."
-	@echo "Subsequent install a player adapter with one of the following:"
-	@for PA in $(ADAPTERS); do \
-		echo "make install-$$PA"; \
-		done
+	@echo
+	@echo "Run 'make install-core' to install the Remuco python module."
+	@echo
+	@echo "Subsequent install one or more player adapters of your choice with:"
+	@for PA in $(ADAPTERS); do echo "make install-$$PA"; done
+	@echo
+	@echo "To uninstall, do a 'make uninstall-...' for each component."
+	@echo
+	@echo "Of course, use 'sudo' where needed."
+	@echo
 
 all: help
 	@echo -n ""
 
-install:
-	python setup.py install --root=$(DESTDIR)/
+install: help
+	@echo -n ""
+
+uninstall: help
+	@echo -n ""
+
+install-core:
+	make -C core install 
 	@echo
 	@echo "Installed Remuco module."
 	@echo "You can now install a player adapter with one of the following:"
-	@for PA in $(ADAPTERS); do \
-		echo "make install-$$PA"; \
-		done
+	@for PA in $(ADAPTERS); do echo "make install-$$PA"; done
 	@echo
 
-uninstall:
-	@echo "Please uninstall the Remuco module manually. Delete the files "
-	@echo "listed in 'install.log'. To uninstall a player adapter, run one of"
-	@echo "the following:"
-	@for PA in $(ADAPTERS); do \
-		echo "make uninstall-$$PA"; \
-		done
+uninstall-core:
+	make -C core uninstall
+	@echo
+	@echo "Player adapters should get uninstalled too, they won't work anymore."
 	@echo
 
 clean:
+	make -C core clean
+	@for PA in $(ADAPTERS); do make -C adapter/$$PA clean; done
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
 
@@ -48,12 +56,12 @@ dist: clean pydoc
 	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
-pydoc: pa-api.html
+pydoc: adapter-api.html
 
-pa-api.html: remuco/__init__.py
-	pydoc -w remuco
-	mv remuco.html pa-api.html
-	sed -i pa-api.html -e "s/remuco.html/pa-api.html/g"
+adapter-api.html: core/remuco/__init__.py
+	cd core; pydoc -w remuco
+	mv core/remuco.html $@
+	sed -i $@ -e "s/remuco.html/$@/g"
 
 check:
 	@cd /; echo "import remuco" | python 2>/dev/null || \
@@ -61,10 +69,10 @@ check:
 		exit 1; } \
 
 install-%: check
-	@[ -d $(subst install-,,$@) ] || { echo "bad player name"; exit 1; }
-	make -C $(subst install-,,$@) install
+	@[ -d adapter/$(subst install-,,$@) ] || { echo "no such adapter"; exit 1; }
+	make -C adapter/$(subst install-,,$@) install
 
 uninstall-%:
-	@[ -d $(subst uninstall-,,$@) ] || { echo "bad player name"; exit 1; }
-	make -C $(subst uninstall-,,$@) uninstall
+	@[ -d adapter/$(subst uninstall-,,$@) ] || { echo "bad player name"; exit 1; }
+	make -C adapter/$(subst uninstall-,,$@) uninstall
 	

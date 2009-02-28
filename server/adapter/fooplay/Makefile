@@ -6,3 +6,5 @@ install:
 	
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/remuco-fooplay
+
+clean:

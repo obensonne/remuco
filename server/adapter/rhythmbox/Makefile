@@ -8,3 +8,5 @@ install: uninstall
 	
 uninstall:
 	rm -rf $(DESTDIR)$(RB_PLUGIN_DIR)/$(RB_MODULE)
+
+clean:
