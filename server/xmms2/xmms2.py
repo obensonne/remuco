@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
-import sys
 import os
-import signal
-import gobject
 
 import xmmsclient
 import xmmsclient.glib
