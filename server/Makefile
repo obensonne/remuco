@@ -56,9 +56,9 @@ dist: clean pydoc
 	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
-pydoc: adapter-api.html
+pydoc: api.html
 
-adapter-api.html: core/remuco/__init__.py
+api.html: core/remuco/__init__.py
 	cd core; pydoc -w remuco
 	mv core/remuco.html $@
 	sed -i $@ -e "s/remuco.html/$@/g"
