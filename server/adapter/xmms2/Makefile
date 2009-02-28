@@ -14,3 +14,5 @@ install: check
 	
 uninstall:
 	rm -f $(DESTDIR)$(X2_STARTUP_DIR)/remuco-xmms2
+
+clean:
