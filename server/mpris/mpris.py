@@ -216,7 +216,7 @@ if __name__ == '__main__':
             pa = MPRISAdapter(name, display_name=sys.argv[2])
         else:
             pa = MPRISAdapter(name)
-        mg = remuco.Manager(pa, need_dbus="org.mpris.%s" % name)
+        mg = remuco.Manager(pa, player_dbus_name="org.mpris.%s" % name)
         mg.run()
     else:
         usage()

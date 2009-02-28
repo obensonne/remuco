@@ -1140,13 +1140,14 @@ class Manager():
     
     """
     
-    def __init__(self, pa, need_dbus=None):
+    def __init__(self, pa, player_dbus_name=None):
         """ Create a new Manager.
         
         @param pa: the PlayerAdapter to manage
-        @keyword need_dbus: if the player adapter uses DBus to communicate with
-                            its player set this to the player's well known bus
-                            name (see run() for for more information)
+        @keyword player_dbus_name: if the player adapter uses DBus to
+                                   communicate with its player set this to the
+                                   player's well known bus name (see run() for
+                                   more information)
         """
 
         self.__pa = pa
@@ -1155,11 +1156,11 @@ class Manager():
         
         self.__ml = _init_loop()
 
-        if need_dbus is None:
+        if player_dbus_name is None:
             self.__dbus_observer = None
         else:
             log.info("start dbus observer")
-            self.__dbus_observer = _DBusObserver(pa, need_dbus)
+            self.__dbus_observer = _DBusObserver(pa, player_dbus_name)
             log.info("dbus observer started")
         
     def run(self):
@@ -1169,13 +1170,13 @@ class Manager():
         blocks until SIGINT or SIGTERM arrives or until stop() gets called. If
         this happens the player adapter gets stopped and this method returns.
         
-        @note: If 'need_dbus' has been set in the constructor the player adapter
-               does not get started until an application owns the bus name given
-               by 'need_dbus'. It automatically gets started whenever the DBus
-               name has an owner (which means the adapter's player is running)
-               and it gets stopped when it has no owner. Obvisously here the
-               player adapter may get started and stopped repeatedly while this
-               method is running.
+        @note: If 'player_dbus_name' has been set in the constructor the player
+               adapter does not get started until an application owns the bus
+               name given by 'player_dbus_name'. It automatically gets started
+               whenever the DBus name has an owner (which means the adapter's
+               player is running) and it gets stopped when it has no owner.
+               Obvisously here the player adapter may get started and stopped
+               repeatedly while this method is running.
         
         """
         

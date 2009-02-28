@@ -235,6 +235,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
 if __name__ == '__main__':
 
     ba = BansheeAdapter()
-    mg = remuco.Manager(ba, need_dbus=DBUS_NAME)
+    mg = remuco.Manager(ba, player_dbus_name=DBUS_NAME)
     
     mg.run()
