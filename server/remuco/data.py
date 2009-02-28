@@ -34,6 +34,11 @@ class PlayerState(serial.Serializable):
         
         return True
         
+    def __str__(self):
+        
+        return "(%d, %d, %d, %s, %s, %s)" % (self.__playback, self.__volume,
+                                             self.__position, self.__repeat,
+                                             self.__shuffle, self.__queue)
         
     def get_fmt(self):
         return (serial.TYPE_I, serial.TYPE_I, serial.TYPE_B,
@@ -145,6 +150,11 @@ class Plob(serial.Serializable):
             return False
         
         return True
+    
+    def __str__(self):
+        
+        return "(%s, %s, %s)" % (self.__id, str(self.__info),
+                                 self.__img_data is not None)
 
     def get_fmt(self):
         return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AY)
