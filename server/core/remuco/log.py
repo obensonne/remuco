@@ -56,11 +56,12 @@ def set_file(file):
         except IOError, e:
             print("failed to set up log handler (%s)" % e)
             return
+        print("Log output will be stored in %s" % file)
     
     new_handler.setFormatter(config.FORMATTER)
     config.handler = new_handler
     config.logga.addHandler(new_handler)
-
+    
 def set_level(level):
     """ Set log level.
     
