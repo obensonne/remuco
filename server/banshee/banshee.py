@@ -75,6 +75,8 @@ class BansheeAdapter(remuco.PlayerAdapter):
         self.__bsc = None
         self.__bse = None
 
+        log.debug("stop done")
+        
     def poll(self):
         
         try:
