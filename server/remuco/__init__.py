@@ -39,17 +39,22 @@ Logging:
 # imports
 #===============================================================================
 
-import subprocess
 import os
+import signal
+import subprocess
+import traceback
 
+import dbus
+import dbus.exceptions
+import dbus.mainloop.glib
 import gobject
 
-import log
-import message
 import command
 import config
-import serial
+import log
+import message
 import net
+import serial
 
 from data import PlayerState, Library, Control, Plob, \
                  SerialString, PlayerInfo
@@ -87,7 +92,7 @@ INFO_TYPE_OTHER = 3
 
 class PlayerAdapter:
     
-    """ Base class for Remuco player adapters.
+    """Base class for Remuco player adapters.
     
     Remuco player adapters must subclass this class and overwrite certain
     methods to implement player specific behavior. Additionally PlayerAdapter
@@ -167,7 +172,7 @@ class PlayerAdapter:
     # constructor 
     #==========================================================================
     
-    def __init__(self, name, max_rating=0):
+    def __init__(self, name, max_rating=0, poll=2.5):
         """Create a new player.
         
         Just does some early initializations. Real job starts with start().
@@ -175,8 +180,12 @@ class PlayerAdapter:
         @param name: name of the player
         @keyword max_rating: maximum rating value of the player (default is 0
                              which means the player does not support rating)
+        @keyword poll: interval in seconds to call poll(), default is 2.5
+                       (note that poll() only gets called periodically if
+                       overwritten by player adapters)
         
-        @attention: When overwriting, call super class implementation first! 
+        @attention: When overwriting, call super class implementation first!
+        
         """
         
         self.__name = name
@@ -200,8 +209,14 @@ class PlayerAdapter:
         self.__plob = Plob()
         self.__info = PlayerInfo(name, self.__get_flags(), max_rating)
         
-        self.__sync_trigger_source_ids = {}
-        self.__ping_source_id = 0
+        self.__sync_triggers = {}
+        
+        self.__ping_msg = net.build_message(message.MSG_ID_IGNORE, None)
+        self.__ping_ival = self.__config.get_ping() * 1000
+        self.__ping_sid = 0
+        
+        self.__poll_ival = int(poll * 1000)
+        self.__poll_sid = 0
         
         self.__stopped = True
         
@@ -211,9 +226,10 @@ class PlayerAdapter:
         log.debug("init done")
     
     def start(self):
-        """ Start the player adapter.
+        """Start the player adapter.
         
-        @attention: When overwriting, call super class implementation first! 
+        @attention: When overwriting, call super class implementation first!
+        
         """
         
         if not self.__stopped:
@@ -238,14 +254,17 @@ class PlayerAdapter:
             
         # set up client ping
         
-        ping_msg = net.build_message(message.MSG_ID_IGNORE, None)
-        ping = self.__config.get_ping()
-        if ping > 0:
-            log.debug("ping clients every %d seconds" % ping)
-            self.__ping_source_id = gobject.timeout_add(ping * 1000, self.__ping,
-                                                  ping_msg)
-        else:
-            self.__ping_source_id = 0
+        if self.__ping_ival > 0:
+            log.debug("ping clients every %d milli seconds" % self.__ping_ival)
+            self.__ping_sid = gobject.timeout_add(self.__ping_ival, self.__ping,
+                                                  self.__ping_msg)
+            
+        # set up polling
+        
+        if self.__poll_ival > 0:
+            log.debug("poll every %d milli seconds" % self.__poll_ival)
+            self.__poll_sid = gobject.timeout_add(self.__poll_ival, self.poll)
+            
         
         log.debug("start done")
     
@@ -259,7 +278,8 @@ class PlayerAdapter:
         @note: The same player adapter instance can be started again with
                start().
 
-        @attention: When overwriting, call super class implementation first! 
+        @attention: When overwriting, call super class implementation first!
+        
         """
 
         if self.__stopped: return
@@ -278,32 +298,48 @@ class PlayerAdapter:
             self.__server_wifi.down()
             self.__server_wifi = None
             
-        for id in self.__sync_trigger_source_ids.values():
-            if id is not None:
-                gobject.source_remove(id)
-        self.__sync_trigger_source_ids = {}
+        for sid in self.__sync_triggers.values():
+            if sid is not None:
+                gobject.source_remove(sid)
+                
+        self.__sync_triggers = {}
 
-        if self.__ping_source_id > 0:
-            gobject.source_remove(self.__ping_source_id)
+        if self.__ping_sid > 0:
+            gobject.source_remove(self.__ping_sid)
+            
+        if self.__poll_sid > 0:
+            gobject.source_remove(self.__poll_sid)
             
         log.debug("stop done")
+    
+    def poll(self):
+        """Does nothing by default.
         
+        If player adapters overwrite this method, it gets called periodically
+        in the interval specified by the keyword 'poll' in the constructor
+        (default is 2500 ms).
+        
+        @note: This method must return True to be called again.
+        
+        """
+        return False
+    
     #==========================================================================
     # some utility functions which may be useful for player adapters
     #==========================================================================
     
     def get_cache_dir(self):
-        """ Get a player specific cache directory.
+        """Get a player specific cache directory.
         
         In most cases this is ~/.cache/remuco/PLAYER
 
         @return: cache dir name
-        """
         
+        """   
         return self.__config.get_cache_dir()
     
     def get_log_file(self):
-        """ Get a player specific log file.
+        """Get a player specific log file.
         
         @return: log file name
         
@@ -311,23 +347,25 @@ class PlayerAdapter:
                done with the module log (contained within Remuco). The idea
                of the method is to integrate log information in the media
                player UI.
+               
         """
-        
         return self.__config.get_log_file()
 
     def get_name(self):
-        """ Get the name of the player.
+        """Get the name of the player.
         
         Probably not that useful for player adapters (used internally).
+        
         """
         return self.__name
     
     def get_clients(self):
-        """ Get a descriptive list of connected clients.
+        """Get a descriptive list of connected clients.
         
         May be useful to integrate connected clients in a media player UI.
 
         @return: a list of client names (or addresses)
+        
         """ 
         
         l = []
@@ -340,29 +378,31 @@ class PlayerAdapter:
     #==========================================================================
     
     def ctrl_jump_in_playlist(self, position):
-        """ Jump to a specific position in the currently active playlist.
+        """Jump to a specific position in the currently active playlist.
         
         @param postion: the position (starting form 0) 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_jump_in_playlist() not yet implemented")
         
     def ctrl_jump_in_queue(self, position):
-        """ Jump to a specific position in the queue.
+        """Jump to a specific position in the queue.
         
         @param postion: the position (starting form 0) 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_jump_in_queue() not yet implemented")
     
     def ctrl_load_playlist(self, path):
-        """ Load a playlist.
+        """Load a playlist.
         
         For some players this means 'switch to another playlist', for others
         it means 'put the content of another playlist into the active playlist'.
@@ -373,85 +413,94 @@ class PlayerAdapter:
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_load_playlist() not yet implemented")
     
     def ctrl_next(self):
-        """ Play the next item. 
+        """Play the next item. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_next() not yet implemented")
     
     def ctrl_previous(self):
-        """ Play the previous item. 
+        """Play the previous item. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_previous() not yet implemented")
     
     def ctrl_rate(self, rating):
-        """ Rate the currently played item. 
+        """Rate the currently played item. 
         
         @param rating: rating value (int)
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_rate() not yet implemented")
     
     def ctrl_toggle_playing(self):
-        """ Toggle play and pause. 
+        """Toggle play and pause. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_toggle_playing() not yet implemented")
     
     def ctrl_toggle_repeat(self):
-        """ Toggle repeat mode. 
+        """Toggle repeat mode. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_toggle_repeat() not yet implemented")
     
     def ctrl_toggle_shuffle(self):
-        """ Toggle shuffle mode. 
+        """Toggle shuffle mode. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_toggle_shuffle() not yet implemented")
     
     def ctrl_seek_forward(self):
-        """ Seek forward some seconds. 
+        """Seek forward some seconds. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_seek_forward() not yet implemented")
     
     def ctrl_seek_backward(self):
-        """ Seek forward some seconds. 
+        """Seek forward some seconds. 
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_seek_backward() not yet implemented")
     
     def ctrl_tag(self, id, tags):
-        """ Attach some tags to a PLOB.
+        """Attach some tags to a PLOB.
         
         @param id: ID of the PLOB to attach the tags to
         @param tags: a list of tags
@@ -462,22 +511,24 @@ class PlayerAdapter:
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_tag() not yet implemented")
     
     def ctrl_volume(self, volume):
-        """ Set volume. 
+        """Set volume. 
         
         @param volume: the new volume in percent
         
         @note: This method should be overwritten by sub classes of
                PlayerAdapter. It gets called if a remote client wants to
                control the player.
+               
         """
         log.warning("ctrl_volume() not yet implemented")
         
     def request_playlist(self, client):
-        """ Request the content of the currently active playlist. 
+        """Request the content of the currently active playlist. 
         
         @param client: the requesting client (needed for reply)
         
@@ -486,11 +537,12 @@ class PlayerAdapter:
                player's current playlist.
 
         @see: reply_playlist_request() for sending back the result
+        
         """
         log.warning("request_playlist() not yet implemented")
 
     def request_queue(self, client):
-        """ Request the content of the play queue. 
+        """Request the content of the play queue. 
         
         @param client: the requesting client (needed for reply)
         
@@ -499,11 +551,12 @@ class PlayerAdapter:
                player's current queue.
 
         @see: reply_queue_request() for sending back the result
+        
         """
         log.warning("request_queue() not yet implemented")
 
     def request_plob(self, client, id):
-        """ Request information about a specific PLOB. 
+        """Request information about a specific PLOB. 
         
         @param client: the requesting client (needed for reply)
         @param id: ID of the requested PLOB (string)
@@ -513,11 +566,12 @@ class PlayerAdapter:
                information about a PLOB from the player.
 
         @see: reply_plob_request() for sending back the result
+        
         """
         log.warning("request_plob() not yet implemented")
         
     def request_library(self, client, path):
-        """ Request contents of a specific level from the player's library.
+        """Request contents of a specific level from the player's library.
         
         @param client: the requesting client (needed for reply)
         @param path: path of the requested level (string list)
@@ -551,6 +605,7 @@ class PlayerAdapter:
                specific level of the player's media library.
                
         @see: reply_list_request() for sending back the result
+        
         """
         log.warning("request_library() not yet implemented")
         
@@ -567,8 +622,8 @@ class PlayerAdapter:
         @param position: position of the currently player item (starting from 0)
         @keyword queue: True if currently played item is from the queue, False
                         if it is from the currently active playlist (default)
+                        
         """
-        
         change = self.__state.get_queue() != queue
         change |= self.__state.get_position() != position
         
@@ -584,8 +639,8 @@ class PlayerAdapter:
         state with remote clients.
         
         @param playback: playback mode (see constants)
-        """
         
+        """
         change = self.__state.get_playback() != playback
         
         if change:
@@ -599,8 +654,8 @@ class PlayerAdapter:
         state with remote clients.
         
         @param repeat: true means on, false means off
-        """
         
+        """
         change = self.__state.get_repeat() != repeat
         
         if change:
@@ -614,8 +669,8 @@ class PlayerAdapter:
         state with remote clients.
         
         @param shuffle: true means on, false means off
-        """
         
+        """
         change = self.__state.get_shuffle() != shuffle
         
         if change:
@@ -629,8 +684,8 @@ class PlayerAdapter:
         state with remote clients.
         
         @param volume: the volume in percent
-        """
         
+        """
         change = self.__state.get_volume() != volume
         
         if change:
@@ -649,9 +704,9 @@ class PlayerAdapter:
                     instance of Image.Image)
         
         @note: For the PLOB meta information dictionary use one of the constants
-               starting with 'INFO_' (e.g. INFO_ARTIST) as keys. 
+               starting with 'INFO_' (e.g. INFO_ARTIST) as keys.
+               
         """
-        
         change = self.__plob.get_id() != id
         
         if change:
@@ -667,17 +722,17 @@ class PlayerAdapter:
         @param plob_ids: IDs of the PLOBs contained in the playlist
         @param plob_names: names of the PLOBs contained in the playlist
         
-        @see: request_playlist()        
-        """ 
+        @see: request_playlist()
         
+        """ 
         if self.__stopped:
             return
-
+        
         playlist = Library(Library.PATH_PLAYLIST, [], plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, playlist)
         
-        client.send(msg)
+        gobject.idle_add(self.__reply, client, msg, "playlist")
     
     def reply_queue_request(self, client, plob_ids, plob_names):
         """Send the reply to a queue request back to the client.
@@ -686,17 +741,17 @@ class PlayerAdapter:
         @param plob_ids: IDs of the PLOBs contained in the queue
         @param plob_names: names of the PLOBs contained in the queue
         
-        @see: request_queue()        
-        """ 
+        @see: request_queue()
         
+        """ 
         if self.__stopped:
             return
-
+        
         queue = Library(Library.PATH_QUEUE, [], plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, queue)
         
-        client.send(msg)
+        gobject.idle_add(self.__reply, client, msg, "queue")
     
     def reply_library_request(self, client, path, nested, plob_ids, plob_names):
         """Send the reply to a library request back to the client.
@@ -708,17 +763,17 @@ class PlayerAdapter:
         @param plob_names: names of the PLOBs contained in the requested library level
         
         @see: request_library()
-        """ 
         
+        """ 
         if self.__stopped:
             return
-
+        
         library = Library(path, nested, plob_ids, plob_names)
         
         msg = net.build_message(message.MSG_ID_REQ_LIBRARY, library)
         
-        client.send(msg)
-    
+        gobject.idle_add(self.__reply, client, msg, "library")
+        
     def reply_plob_request(self, client, id, info):
         """Send a reply to a PLOB request back to client.
         
@@ -727,8 +782,8 @@ class PlayerAdapter:
         @param info: a dictionary with PLOB meta information (see update_plob())
                      
         @see: request_plob()
-        """
         
+        """
         if self.__stopped:
             return
         
@@ -737,6 +792,12 @@ class PlayerAdapter:
         plob.set_info(info)
 
         msg = net.build_message(message.MSG_ID_REQ_PLOB, plob)
+        
+        gobject.idle_add(self.__reply, client, msg, "plob")
+        
+    def __reply(self, client, msg, name):
+
+        log.debug("send %s reply to %s" % (name, client.get_address()))
         
         client.send(msg)
     
@@ -749,23 +810,18 @@ class PlayerAdapter:
         if self.__stopped:
             return
         
-        try:
-            id = self.__sync_trigger_source_ids[sync_fn]
-        except KeyError:
-            id = None
-        
-        if id is not None:
+        if sync_fn in self.__sync_triggers:
             log.debug("trigger for %s already active" % sync_fn.func_name)
             return
         
-        self.__sync_trigger_source_ids[sync_fn] = \
+        self.__sync_triggers[sync_fn] = \
             gobject.idle_add(sync_fn, priority=gobject.PRIORITY_LOW)
         
     def __sync_state(self):
         
         msg = net.build_message(message.MSG_ID_STATE, self.__state)
         
-        self.__sync(msg, self.__sync_state)
+        self.__sync(msg, self.__sync_state, "state", self.__state)
         
         return False
     
@@ -773,17 +829,18 @@ class PlayerAdapter:
 
         msg = net.build_message(message.MSG_ID_PLOB, self.__plob)
         
-        self.__sync(msg, self.__sync_plob)
+        self.__sync(msg, self.__sync_plob, "plob", self.__plob)
         
         return False
     
-    def __sync(self, msg, calling_sync_fn):
+    def __sync(self, msg, sync_fn, name, data):
         
-        self.__sync_trigger_source_ids[calling_sync_fn] = None
+        del self.__sync_triggers[sync_fn]
         
-        if msg is None: return
+        if msg is None:
+            return
         
-        log.debug("broadcast new %s to clients" % calling_sync_fn.func_name[7:])
+        log.debug("broadcast new %s to clients: %s" % (name, str(data)))
         
         for c in self.__clients: c.send(msg)
         
@@ -814,7 +871,7 @@ class PlayerAdapter:
             client.send(msg)
             
         else:
-            log.warning("unsupported message id: %d" % id)
+            log.error("** BUG ** unsupported message id: %d" % id)
     
     def __handle_message_control(self, bindata):
     
@@ -824,14 +881,16 @@ class PlayerAdapter:
         if not ok: return
         
         cmd = control.get_cmd()
+        
+        if cmd == command.CMD_IGNORE:
+            return
+        
         param_i = control.get_param_i()
         param_s = control.get_param_s()
         if param_s is None:
             param_s = ""
         
-        if cmd == command.CMD_IGNORE:
-            return
-        elif cmd == command.CMD_PLAYPAUSE:
+        if cmd == command.CMD_PLAYPAUSE:
             self.ctrl_toggle_playing()
         elif cmd == command.CMD_VOLUME:
             self.ctrl_volume(param_i)
@@ -870,15 +929,23 @@ class PlayerAdapter:
 
     def __handle_message_request_plob(self, bindata, client):
     
+        log.debug("client %s requests a plob" % client.get_address())
+
         ss = SerialString()
         
         ok = serial.unpack(ss, bindata)
         if not ok: return
         
-        self.request_plob(client, ss.get())
+        id = ss.get()
+        
+        log.debug("requested plob: %s" % id)
+        
+        self.request_plob(client, id)
         
     def __handle_message_request_list(self, bindata, client):
 
+        log.debug("client %s requests a list" % client.get_address())
+        
         ss = SerialString()
         
         ok = serial.unpack(ss, bindata)
@@ -889,8 +956,8 @@ class PlayerAdapter:
             path = []
         else:
             path = s.split("/")
-        
-        log.debug("list request: %s" % str(path))
+            
+        log.debug("requested list: %s" % str(path))
         
         if path == Library.PATH_PLAYLIST:
             self.request_playlist(client)
@@ -963,13 +1030,6 @@ class PlayerAdapter:
 # =============================================================================
 # player adapter life cycle management
 # =============================================================================
-
-import signal
-import traceback
-
-import dbus
-import dbus.exceptions
-import dbus.mainloop.glib
 
 _ml = None
 
