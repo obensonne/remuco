@@ -24,10 +24,12 @@ uninstall: uninstall.files
 		rm -f $$FILE || exit 1; \
 	done;
 	rm -f install.log
+	rm -f uninstall.files
 	
 clean:
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
+	rm -f uninstall.files
 	@if [ -e install.log ] ; then \
 		echo "Keep file 'install.log' for uninstallation."; \
 	fi

@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/remuco/__init__.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/core/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/core/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
 &nbsp;<br>
 This&nbsp;module&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
@@ -65,8 +65,8 @@ Logging:<br>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="pa-api.html#Manager">Manager</a>
-</font></dt><dt><font face="helvetica, arial"><a href="pa-api.html#PlayerAdapter">PlayerAdapter</a>
+<dt><font face="helvetica, arial"><a href="adapter-api.html#Manager">Manager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="adapter-api.html#PlayerAdapter">PlayerAdapter</a>
 </font></dt></dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -88,12 +88,13 @@ player&nbsp;adapter&nbsp;as&nbsp;an&nbsp;example).<br>
 To&nbsp;activate&nbsp;a&nbsp;manager&nbsp;call&nbsp;<a href="#Manager-run">run</a>().<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, need_dbus<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#Manager">Manager</a>.<br>
+<dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, player_dbus_name<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#Manager">Manager</a>.<br>
 &nbsp;<br>
 @param&nbsp;pa:&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;manage<br>
-@keyword&nbsp;need_dbus:&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to&nbsp;communicate&nbsp;with<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;player&nbsp;set&nbsp;this&nbsp;to&nbsp;the&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for&nbsp;for&nbsp;more&nbsp;information)</tt></dd></dl>
+@keyword&nbsp;player_dbus_name:&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;communicate&nbsp;with&nbsp;its&nbsp;player&nbsp;set&nbsp;this&nbsp;to&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;more&nbsp;information)</tt></dd></dl>
 
 <dl><dt><a name="Manager-run"><strong>run</strong></a>(self)</dt><dd><tt>Activate&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
@@ -101,13 +102,13 @@ This&nbsp;method&nbsp;starts&nbsp;the&nbsp;player&nbsp;adapter,&nbsp;runs&nbsp;a
 blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#Manager-stop">stop</a>()&nbsp;gets&nbsp;called.&nbsp;If<br>
 this&nbsp;happens&nbsp;the&nbsp;player&nbsp;adapter&nbsp;gets&nbsp;stopped&nbsp;and&nbsp;this&nbsp;method&nbsp;returns.<br>
 &nbsp;<br>
-@note:&nbsp;If&nbsp;'need_dbus'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;the&nbsp;constructor&nbsp;the&nbsp;player&nbsp;adapter<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name&nbsp;given<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;'need_dbus'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started&nbsp;whenever&nbsp;the&nbsp;DBus<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's&nbsp;player&nbsp;is&nbsp;running)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.&nbsp;Obvisously&nbsp;here&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped&nbsp;repeatedly&nbsp;while&nbsp;this<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
+@note:&nbsp;If&nbsp;'player_dbus_name'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;the&nbsp;constructor&nbsp;the&nbsp;player<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;whenever&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;is&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
 
 <dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;shut&nbsp;down&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
@@ -125,7 +126,8 @@ previous&nbsp;call&nbsp;to&nbsp;<a href="#Manager-run">run</a>()&nbsp;will&nbsp;
 &nbsp;<br>
 Remuco&nbsp;player&nbsp;adapters&nbsp;must&nbsp;subclass&nbsp;this&nbsp;class&nbsp;and&nbsp;overwrite&nbsp;certain<br>
 methods&nbsp;to&nbsp;implement&nbsp;player&nbsp;specific&nbsp;behavior.&nbsp;Additionally&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a><br>
-provides&nbsp;methods&nbsp;to&nbsp;interact&nbsp;with&nbsp;Remuco&nbsp;clients.&nbsp;<br>
+provides&nbsp;methods&nbsp;to&nbsp;interact&nbsp;with&nbsp;Remuco&nbsp;clients.&nbsp;Following&nbsp;is&nbsp;a&nbsp;summary<br>
+of&nbsp;all&nbsp;relevant&nbsp;methods,&nbsp;grouped&nbsp;by&nbsp;functionality.&nbsp;<br>
 &nbsp;<br>
 Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;manage&nbsp;life&nbsp;cycle:<br>
 &nbsp;<br>
@@ -179,7 +181,8 @@ Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;send&nbsp;media&nbsp;player&nbsp;informat
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_plob">update_plob</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;methods&nbsp;should&nbsp;be&nbsp;called&nbsp;whenever&nbsp;the&nbsp;corresponding&nbsp;information<br>
-&nbsp;&nbsp;&nbsp;&nbsp;has&nbsp;changed&nbsp;in&nbsp;the&nbsp;media&nbsp;player.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;has&nbsp;changed&nbsp;in&nbsp;the&nbsp;media&nbsp;player.&nbsp;Subclasses&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;may<br>
+&nbsp;&nbsp;&nbsp;&nbsp;overwrite&nbsp;the&nbsp;method&nbsp;<a href="#PlayerAdapter-poll">poll</a>()&nbsp;to&nbsp;periodically&nbsp;check&nbsp;a&nbsp;player's&nbsp;state.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
@@ -196,13 +199,16 @@ Finally&nbsp;some&nbsp;not&nbsp;so&nbsp;important&nbsp;utility&nbsp;methods:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_clients">get_clients</a>()<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, max_rating<font color="#909090">=0</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player.<br>
+<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player.<br>
 &nbsp;<br>
 Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbsp;starts&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
 @param&nbsp;name:&nbsp;name&nbsp;of&nbsp;the&nbsp;player<br>
-@keyword&nbsp;max_rating:&nbsp;maximum&nbsp;rating&nbsp;value&nbsp;of&nbsp;the&nbsp;player&nbsp;(default&nbsp;is&nbsp;0<br>
+@keyword&nbsp;max_rating:&nbsp;maximum&nbsp;rating&nbsp;value&nbsp;of&nbsp;the&nbsp;player&nbsp;(default&nbsp;is&nbsp;0,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;means&nbsp;the&nbsp;player&nbsp;does&nbsp;not&nbsp;support&nbsp;rating)<br>
+@keyword&nbsp;poll:&nbsp;interval&nbsp;in&nbsp;seconds&nbsp;to&nbsp;call&nbsp;<a href="#PlayerAdapter-poll">poll</a>(),&nbsp;default&nbsp;is&nbsp;2.5<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(note&nbsp;that&nbsp;<a href="#PlayerAdapter-poll">poll</a>()&nbsp;only&nbsp;gets&nbsp;called&nbsp;periodically&nbsp;if<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;overwritten&nbsp;by&nbsp;player&nbsp;adapters)<br>
 &nbsp;<br>
 @attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
@@ -328,6 +334,14 @@ May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;
 <dl><dt><a name="PlayerAdapter-get_name"><strong>get_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;player.<br>
 &nbsp;<br>
 Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;(used&nbsp;internally).</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-poll"><strong>poll</strong></a>(self)</dt><dd><tt>Does&nbsp;nothing&nbsp;by&nbsp;default.<br>
+&nbsp;<br>
+If&nbsp;player&nbsp;adapters&nbsp;overwrite&nbsp;this&nbsp;method,&nbsp;it&nbsp;gets&nbsp;called&nbsp;periodically<br>
+in&nbsp;the&nbsp;interval&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'poll'&nbsp;in&nbsp;the&nbsp;constructor<br>
+(default&nbsp;is&nbsp;2500&nbsp;ms).<br>
+&nbsp;<br>
+@note:&nbsp;This&nbsp;method&nbsp;must&nbsp;return&nbsp;True&nbsp;to&nbsp;be&nbsp;called&nbsp;again.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-reply_library_request"><strong>reply_library_request</strong></a>(self, client, path, nested, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
@@ -518,5 +532,6 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 <strong>INFO_YEAR</strong> = 'year'<br>
 <strong>PLAYBACK_PAUSE</strong> = 1<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
-<strong>PLAYBACK_STOP</strong> = 0</td></tr></table>
+<strong>PLAYBACK_STOP</strong> = 0<br>
+<strong>version</strong> = '0.8.0'</td></tr></table>
 </body></html>
