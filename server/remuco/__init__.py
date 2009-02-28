@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-""" Remuco player adapter module.
+"""Remuco player adapter module.
 
 This module provides classes and constants for Remuco player adapters.
 
@@ -56,12 +56,13 @@ import message
 import net
 import serial
 
-from data import PlayerState, Library, Control, Plob, \
-                 SerialString, PlayerInfo
+from data import PlayerState, Library, Control, Plob, SerialString, PlayerInfo
 
 #===============================================================================
 # remuco constants
 #===============================================================================
+
+version = "0.8.0"
 
 PLAYBACK_PAUSE = 1
 PLAYBACK_PLAY = 2
@@ -91,12 +92,12 @@ INFO_TYPE_OTHER = 3
 #===============================================================================
 
 class PlayerAdapter:
-    
     """Base class for Remuco player adapters.
     
     Remuco player adapters must subclass this class and overwrite certain
     methods to implement player specific behavior. Additionally PlayerAdapter
-    provides methods to interact with Remuco clients. 
+    provides methods to interact with Remuco clients. Following is a summary
+    of all relevant methods, grouped by functionality. 
     
     Methods to overwrite to manage life cycle:
     
@@ -150,7 +151,8 @@ class PlayerAdapter:
         * update_plob()
         
         These methods should be called whenever the corresponding information
-        has changed in the media player.
+        has changed in the media player. Subclasses of PlayerAdapter may
+        overwrite the method poll() to periodically check a player's state. 
         
         * reply_plob_request()
         * reply_playlist_request()
@@ -178,7 +180,7 @@ class PlayerAdapter:
         Just does some early initializations. Real job starts with start().
         
         @param name: name of the player
-        @keyword max_rating: maximum rating value of the player (default is 0
+        @keyword max_rating: maximum rating value of the player (default is 0,
                              which means the player does not support rating)
         @keyword poll: interval in seconds to call poll(), default is 2.5
                        (note that poll() only gets called periodically if
