@@ -4,8 +4,6 @@ import urllib
 import urlparse
 import time
 
-import gobject
-
 import rb, rhythmdb
 
 import remuco
@@ -83,7 +81,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         self.__queue_sc = None
         
         self.__signal_ids = ()
-        self.__poll_source_id = 0
         
         log.debug("init done")
 
@@ -114,11 +111,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             sp.connect("playing-source-changed", self.__notify_source_changed)
         )
 
-        ###### periodically check for changes which have no signals ######
-
-        self.__poll_source_id = \
-            gobject.timeout_add(3000, self.__poll)
-
         ###### initially trigger server synchronization ######
         
         # state sync will happen by timeout
@@ -138,22 +130,42 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         sp = self.__shell.get_player()
 
         for sid in self.__signal_ids:
-            
             sp.disconnect(sid)
             
         self.__signal_ids = ()
 
-        ###### remove gobject sources ######
+        ###### release shell ######
         
-        if self.__poll_source_id > 0:
-            gobject.source_remove(self.__poll_source_id)
-            self.__poll_source_id = 0
-
-        # release shell
         self.__shell = None
         
         log.debug("stop done")
         
+    def poll(self):
+        
+        sp = self.__shell.get_player()
+        
+        ###### check repeat and shuffle ######
+        
+        order = sp.props.play_order
+        
+        repeat = order == PLAYORDER_REPEAT or \
+                 order.startswith(PLAYORDER_SHUFFLE_ALT)
+                 
+        self.update_repeat(repeat)
+        
+        shuffle = order == PLAYORDER_SHUFFLE or \
+                  order.startswith(PLAYORDER_SHUFFLE_ALT)
+                  
+        self.update_shuffle(shuffle)
+        
+        ###### check volume ######
+
+        volume = int(sp.get_volume() * 100)
+        
+        self.update_volume(volume)
+        
+        return True
+
     # =========================================================================
     # client side player control
     # =========================================================================
@@ -174,7 +186,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
     def __jump_in_plq(self, sc, position):
 
-        if not sc:
+        if sc is None:
             return
         
         qm = sc.get_entry_view().props.model
@@ -208,7 +220,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         sc = self.__get_source_from_path(path)
         
-        if not sc:
+        if sc is None:
             return
         
         qm = sc.get_entry_view().props.model
@@ -304,8 +316,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     
     def request_plob(self, client, id):
         
-        log.debug("called request_plob(%s)" % id)
-                
         try:
             db = self.__shell.props.db
             entry = db.entry_lookup_by_location(id)
@@ -315,7 +325,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             
         info = self.__get_plob_info(entry)
         
-        gobject.idle_add(self.reply_plob_request, client, id, info)
+        self.reply_plob_request(client, id, info)
         
     def request_playlist(self, client):
         
@@ -325,7 +335,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except:
             ids, names = [], []
         
-        gobject.idle_add(self.reply_playlist_request, client, ids, names)
+        self.reply_playlist_request(client, ids, names)
 
     def request_queue(self, client):
         
@@ -334,25 +344,23 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         ids, names = self.__get_tracks_from_qmodel(qm)
         
-        gobject.idle_add(self.reply_queue_request, client, ids, names)
+        self.reply_queue_request(client, ids, names)
 
     def request_library(self, client, path):
 
         nested = []
-        plob_ids = []
-        plob_names = []
+        ids = []
+        names = []
         
         slm = self.__shell.props.sourcelist_model
         
         ### root ? ###
         
-        # TODO: include Library/* here in root
         if path is None or len(path) == 0:
             for group in slm:
                 group_name = group[2]
                 nested.append(group_name)
-            gobject.idle_add(self.reply_library_request, client, path,
-                             nested, plob_ids, plob_names)
+            self.reply_library_request(client, path, nested, ids, names)
             return
         
         ### group ? ### Library, Playlists
@@ -366,26 +374,23 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                         log.debug("append %s" % source_name)
                         nested.append(source_name)
                     break
-            gobject.idle_add(self.reply_library_request, client, path, nested,
-                             plob_ids, plob_names)
+            self.reply_library_request(client, path, nested, ids, names)
             return
             
         ### regular playlist (source) ! ### Library/???, Playlists/???
         
         sc = self.__get_source_from_path(path)
 
-        if not sc:
-            gobject.idle_add(self.reply_library_request, client, path, nested,
-                             plob_ids, plob_names)
+        if sc is None:
+            
+            self.reply_library_request(client, path, nested, ids, names)
             return
-
+        
         qm = sc.get_entry_view().props.model
+            
+        ids, names = self.__get_tracks_from_qmodel(qm)
         
-        plob_ids, plob_names = self.__get_tracks_from_qmodel(qm)
-        
-        gobject.idle_add(self.reply_library_request, client, path, nested,
-                         plob_ids, plob_names)
-
+        self.reply_library_request(client, path, nested, ids, names)
         
     # ==========================================================================
     # callbacks
@@ -455,33 +460,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         self.__playlist_sc = source_new
         
-    def __poll(self):
-        """Periodic callback to poll for state information without signals.""" 
-        
-        sp = self.__shell.get_player()
-        
-        ###### check repeat and shuffle ######
-        
-        order = sp.props.play_order
-        
-        repeat = order == PLAYORDER_REPEAT or \
-                 order.startswith(PLAYORDER_SHUFFLE_ALT)
-                 
-        self.update_repeat(repeat)
-        
-        shuffle = order == PLAYORDER_SHUFFLE or \
-                  order.startswith(PLAYORDER_SHUFFLE_ALT)
-                  
-        self.update_shuffle(shuffle)
-        
-        ###### check volume ######
-
-        volume = int(sp.get_volume() * 100)
-        
-        self.update_volume(volume)
-        
-        return True
-
     # =========================================================================
     # helper methods
     # =========================================================================
@@ -497,7 +475,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         ids = []
         names = []
 
-        if not qmodel:
+        if qmodel is None:
             return (ids, names)
 
         for row in qmodel:
@@ -525,7 +503,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                  case dummy information is returned)
         """
         
-        if not entry:
+        if entry is None:
             return { remuco.INFO_TITLE : "No information" }
         
         db = self.__shell.props.db
@@ -584,7 +562,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         group_name, source_name = path
         
-        if not group_name or not source_name:
+        if group_name is None or source_name is None:
             return None
         
         slm = self.__shell.props.sourcelist_model
