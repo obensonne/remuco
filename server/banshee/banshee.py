@@ -1,11 +1,8 @@
 #!/usr/bin/python
 
 import os
-import sys
-import dircache
 
-import gobject
-import xdg.BaseDirectory
+import xdg.BaseDirectory # to get banshee's album art location
 import dbus
 import dbus.exceptions
 
