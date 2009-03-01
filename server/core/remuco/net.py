@@ -5,10 +5,9 @@ import time
 import bluetooth
 import gobject
 
-import log
-import message
-import remuco
-import serial
+from remuco import log
+from remuco import message
+from remuco import serial
 
 def build_message(id, serializable):
     """ Create a message ready to send on a socket.

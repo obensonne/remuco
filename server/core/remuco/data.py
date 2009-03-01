@@ -1,16 +1,15 @@
 import tempfile
 import Image
 
-import log
-import serial
-import remuco
-import command
+from remuco import command
+from remuco import log
+from remuco import serial
 
 class PlayerState(serial.Serializable):
     
     def __init__(self):
         
-        self.__playback = remuco.PLAYBACK_STOP
+        self.__playback = 0
         self.__volume = 0
         self.__position = 0
         self.__repeat = False

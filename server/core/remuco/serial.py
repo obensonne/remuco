@@ -2,7 +2,7 @@ import struct
 import array
 import types
 
-import log
+from remuco import log
 
 TYPE_NONE = 0
 TYPE_Y = 1

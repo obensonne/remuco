@@ -49,13 +49,13 @@ import dbus.exceptions
 import dbus.mainloop.glib
 import gobject
 
-import art
-import command
-import config
-import log
-import message
-import net
-import serial
+from remuco import art
+from remuco import command
+from remuco import config
+from remuco import log
+from remuco import message
+from remuco import net
+from remuco import serial
 
 from data import PlayerState, Library, Control, Plob, SerialString, PlayerInfo
 

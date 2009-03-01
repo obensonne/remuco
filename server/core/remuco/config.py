@@ -3,8 +3,7 @@ import types
 import os.path
 import xdg.BaseDirectory
 
-import log
-import remuco
+from remuco import log
 
 class Config:
     

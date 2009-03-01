@@ -4,7 +4,7 @@ import os.path
 import urllib
 import urlparse
 
-import log
+from remuco import log
 
 TN_DIR = "%s/.thumbnails" % os.getenv("HOME")
 TN_SUBDIRS = ("large", "normal")
