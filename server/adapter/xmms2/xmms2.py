@@ -322,11 +322,12 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                 return ""
             if key == "duration":
                 val = val / 1000
-            if not isinstance(val, str) and not isinstance(val, unicode):
+            if not isinstance(val, basestring):
                 val = str(val)
             return val
     
         minfo = result.value()
+        
         meta = {}
         meta[remuco.INFO_ARTIST] = get_meta("artist")
         meta[remuco.INFO_ALBUM] = get_meta("album")
@@ -339,7 +340,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         meta[remuco.INFO_RATING] = get_meta(XMMS2Adapter.MINFO_KEY_RATING)
         meta[remuco.INFO_TAGS] = get_meta(XMMS2Adapter.MINFO_KEY_TAGS)
     
-        img = None
+        img = ""
         for img_key in XMMS2Adapter.MINFO_KEYS_ART:
             img = get_meta(img_key)
             if img != "":
@@ -347,7 +348,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                 break
         
         if img == "":
-            img = None
+            url = get_meta("url").replace("+", "%20")
+            img = self.get_image(url)
         
         log.debug("image: %s" % img)
         
