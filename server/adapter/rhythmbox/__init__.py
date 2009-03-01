@@ -218,7 +218,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
     def ctrl_load_playlist(self, path):
         
-        sc = self.__get_source_from_path(path)
+        sc = self.__library_path_to_source(path)
         
         if sc is None:
             return
@@ -379,7 +379,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             
         ### regular playlist (source) ! ### Library/???, Playlists/???
         
-        sc = self.__get_source_from_path(path)
+        sc = self.__library_path_to_source(path)
 
         if sc is None:
             
@@ -421,8 +421,9 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     
             img_data = db.entry_request_extra_metadata(entry, "rb:coverArt")
             if img_data is None:
-                img_file = self.__get_plob_img_from_id(id)
+                img_file = self.get_image(id)
             else:
+                log.debug("image type: %s" % type(img_data))
                 try:
                     img_data.save(self.__cover_file, "png")
                     img_file = self.__cover_file
@@ -522,36 +523,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         return meta 
     
-    def __get_plob_img_from_id(self, id):
-        """Get the full path to a cover file related to 'id'.
-        
-        This looks for image files in the directory where the plob is located.
-        
-        @return: image path or 'None' if no cover has been found in the plob's
-                 folder
-        """
-        
-        elems = urlparse.urlparse(id)
-        
-        if elems[0] != "file":
-            return None
-        
-        path = urllib.url2pathname(elems[2])
-        path = os.path.dirname(path)
-        
-        for name in COVER_FILE_NAMES:
-            for type in COVER_FILE_TYPES:
-                file = os.path.join(path, "%s.%s" % (name, type))
-                if os.path.isfile(file):
-                    return file
-                file = os.path.join(path, "%s.%s" % (name.capitalize(), type))
-                if os.path.isfile(file):
-                    return file
-                
-        return None
-
-    def __get_source_from_path(self, path):
-        """Get the source object of source 'id'.
+    def __library_path_to_source(self, path):
+        """Get the source object related to a library path.
         
         'path' contains the source' group and name (2 element list).
         """
