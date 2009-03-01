@@ -49,6 +49,7 @@ import dbus.exceptions
 import dbus.mainloop.glib
 import gobject
 
+import art
 import command
 import config
 import log
@@ -57,6 +58,7 @@ import net
 import serial
 
 from data import PlayerState, Library, Control, Plob, SerialString, PlayerInfo
+
 
 #===============================================================================
 # remuco constants
@@ -68,7 +70,7 @@ PLAYBACK_PAUSE = 1
 PLAYBACK_PLAY = 2
 PLAYBACK_STOP = 0
 
-__INFO_ABSTRACT = "__abstract__"
+INFO_ABSTRACT = "__abstract__"
 INFO_ALBUM = "album"
 INFO_ARTIST = "artist"
 INFO_BITRATE = "bitrate"
@@ -162,8 +164,9 @@ class PlayerAdapter:
         These methods should be called to reply to calls to one of the
         request methods above.
         
-    Finally some not so important utility methods:
+    Finally some utility methods:
     
+        * get_image()
         * get_cache_dir()
         * get_log_file()
         * get_clients()
@@ -375,6 +378,29 @@ class PlayerAdapter:
             l.append(c.get_address())
         return l
     
+    def get_image(self, resource, prefer_thumbnail=False):
+        """Find a local art image file related to a resource.
+        
+        This function first looks in the resource' folder for typical art image
+        files (e.g. 'cover.png', 'front,jpg', ...). If there is no such file it
+        then looks into the user's thumbnail directory (~/.thumbnails).
+        
+        @param resource: resource to find an art image for (may be a file name
+                         or URL)
+        @keyword prefer_thumbnail: if True, first look for thumbnails (default
+                                   is False)
+                                   
+        @return: an image file name (which can be used for update_plob()) or
+                 None if no image file has been found or if 'resource' is an
+                 URL but not a file URI (everything else than 'file://...' is
+                 ignored)
+        
+        """
+        
+        file = art.get_art(resource, prefer_thumbnail=prefer_thumbnail)
+        log.debug("image for '%s': %s" % (resource, file))
+        return file
+
     #==========================================================================
     # client side player control (to be implemented by sub classes) 
     #==========================================================================
@@ -702,11 +728,13 @@ class PlayerAdapter:
         
         @param id: PLOB ID (string)
         @param info: PLOB meta information (dict)
-        @param img: image / cover art file (either a file name or an
-                    instance of Image.Image)
+        @param img: image / cover art (either a file name or an instance of
+                    Image.Image)
         
         @note: For the PLOB meta information dictionary use one of the constants
                starting with 'INFO_' (e.g. INFO_ARTIST) as keys.
+               
+        @note: get_image() may be used to find image files for a plob.
                
         """
         change = self.__plob.get_id() != id
