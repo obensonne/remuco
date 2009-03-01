@@ -15,7 +15,7 @@ ART_FILE_TYPES = ("png", "jpeg", "jpg")
 def __resource_to_file_uri(resource):
     """Convert a resource to a file URI (file://...).
     
-    @param resource: a local path or an URL (string)
+    @param resource: a local path or an URI (string)
     
     @return: the resource as a file URI string or None if resource is not local
     """
@@ -38,12 +38,12 @@ def __resource_to_file_uri(resource):
     return None
 
 def __get_art_in_folder(uri):
-    """Try to find art images in the given resource' folder.
+    """Try to find art images in the given URI's folder.
     
-    @param resource: a file uri ('file://...')
+    @param uri: a file URI ('file://...')
     
     @return: path to an image file or None if there is no matching image file
-             in the resource' folder
+             in the URI's folder
     """
     
     elems = urlparse.urlparse(uri)
@@ -68,10 +68,10 @@ def __get_art_in_folder(uri):
 def __get_art_from_thumbnails(uri):
     """Try to find a thumbnail for the given resource.
     
-    @param resource: a local path or an URL (string)
+    @param uri: a file URI ('file://...')
     
-    @return: path to a thumbnail file or None if resource is not local or
-             if there is no thumbnail for that resource
+    @return: path to a thumbnail file or None if URI is not local or if there
+             is no thumbnail for that URI
     """
     
     if not os.path.isdir(TN_DIR):

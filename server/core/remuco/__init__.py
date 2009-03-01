@@ -386,14 +386,13 @@ class PlayerAdapter:
         then looks into the user's thumbnail directory (~/.thumbnails).
         
         @param resource: resource to find an art image for (may be a file name
-                         or URL)
+                         or URI)
         @keyword prefer_thumbnail: if True, first look for thumbnails (default
                                    is False)
                                    
         @return: an image file name (which can be used for update_plob()) or
-                 None if no image file has been found or if 'resource' is an
-                 URL but not a file URI (everything else than 'file://...' is
-                 ignored)
+                 None if no image file has been found or if 'resource' is not
+                 local
         
         """
         
