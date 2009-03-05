@@ -12,10 +12,13 @@ public class SerialAtom {
 	public static final int TYPE_AY = 5;
 	public static final int TYPE_AI = 6;
 	public static final int TYPE_AS = 7;
+	public static final int TYPE_L = 8;
 
-	public int type;
+	public final int type;
 
 	public int i;
+	
+	public long l;
 
 	public String s;
 
@@ -46,6 +49,9 @@ public class SerialAtom {
 			break;
 		case TYPE_I:
 			sa.i = i;			
+			break;
+		case TYPE_L:
+			sa.l = l;			
 			break;
 		case TYPE_S:
 			sa.s = new String(s);

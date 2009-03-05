@@ -122,7 +122,7 @@ public final class BaIn extends ByteArrayInputStream {
 	}
 
 	/**
-	 * Read the next for bytes as an int (in net byte order).
+	 * Read the next 4 bytes as an int (in net byte order).
 	 * 
 	 * @see BaOut#writeI(int)
 	 * 
@@ -144,6 +144,30 @@ public final class BaIn extends ByteArrayInputStream {
 			throw new BinaryDataExecption("not enough data");
 
 		return (((read() & 0xff) << 24) | ((read() & 0xff) << 16)
+				| ((read() & 0xff) << 8) | (read() & 0xff));
+
+	}
+
+	/**
+	 * Read the next 8 bytes as a long (in net byte order).
+	 * 
+	 * @see BaOut#writeL(long)
+	 * 
+	 * @return the long
+	 * @throws BinaryDataExecption
+	 *             if the long could not be read because there is not enough
+	 *             data
+	 */
+	public int readL() throws BinaryDataExecption {
+
+		checkType(SerialAtom.TYPE_L);
+
+		if (pos + 8 > count)
+			throw new BinaryDataExecption("not enough data");
+
+		return (((read() & 0xff) << 56) | ((read() & 0xff) << 48)
+				| ((read() & 0xff) << 40) | ((read() & 0xff) << 32)
+				| ((read() & 0xff) << 24) | ((read() & 0xff) << 16)
 				| ((read() & 0xff) << 8) | (read() & 0xff));
 
 	}

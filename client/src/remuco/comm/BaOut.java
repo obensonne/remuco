@@ -157,6 +157,28 @@ public final class BaOut extends ByteArrayOutputStream {
 	}
 
 	/**
+	 * Writes a long (in net byte order) prefixed by a type code.
+	 * 
+	 * @param l
+	 *            the long to write
+	 * 
+	 * @see BaIn#readL()
+	 */
+	public void writeL(long l) {
+
+		write(SerialAtom.TYPE_L);
+		
+		write((int) (l >> 56) & 0xff);
+		write((int) (l >> 48) & 0xff);
+		write((int) (l >> 40) & 0xff);
+		write((int) (l >> 32) & 0xff);
+		write((int) (l >> 24) & 0xff);
+		write((int) (l >> 16) & 0xff);
+		write((int) (l >> 8) & 0xff);
+		write((int) l & 0xff);
+	}
+
+	/**
 	 * Writes a string prefixed by a type code and an encoding string.
 	 * 
 	 * @param s
