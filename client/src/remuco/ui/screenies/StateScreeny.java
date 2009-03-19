@@ -23,10 +23,10 @@ public class StateScreeny extends Screeny {
 		screenyRepeat = new SimpleScreeny(player, SimpleScreeny.TYPE_REPEAT);
 		screenyShuffle = new SimpleScreeny(player, SimpleScreeny.TYPE_SHUFFLE);
 
-		screenyVolume = new SliderScreeny(player);
-
+		screenyVolume = new SliderScreeny(player, SliderScreeny.TYPE_VOLUME);
 		sliderStateVolume = new SliderState();
 		sliderStateVolume.setLength(100);
+
 	}
 
 	protected void dataUpdated() {
@@ -44,45 +44,69 @@ public class StateScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		int w, x, wSpacer;
-		Image borderLeft, borderRight, spacer;
+		final Image spacer = theme.getImg(Theme.RTE_STATE_SPACER);
 
-		borderLeft = theme.getImg(Theme.IMGID_STATE_BORDER_LEFT);
-		borderRight = theme.getImg(Theme.IMGID_STATE_BORDER_RIGHT);
-		spacer = theme.getImg(Theme.IMGID_STATE_SPACER);
+		final int h = theme.getImg(Theme.RTE_STATE_BORDER_N).getHeight()
+				+ spacer.getHeight()
+				+ theme.getImg(Theme.RTE_STATE_BORDER_S).getHeight();
 
-		setImage(Image.createImage(width, borderLeft.getHeight()));
+		setImage(Image.createImage(width, h));
+
+		final int clip[] = drawBorders(theme.getImg(Theme.RTE_STATE_BORDER_NW),
+			theme.getImg(Theme.RTE_STATE_BORDER_N),
+			theme.getImg(Theme.RTE_STATE_BORDER_NE),
+			theme.getImg(Theme.RTE_STATE_BORDER_W),
+			theme.getImg(Theme.RTE_STATE_BORDER_E),
+			theme.getImg(Theme.RTE_STATE_BORDER_SW),
+			theme.getImg(Theme.RTE_STATE_BORDER_S),
+			theme.getImg(Theme.RTE_STATE_BORDER_SE),
+			theme.getColor(Theme.RTC_BG_ALL));
+
+		int xOff = clip[0]; // x offset for elements
+		final int yOff = clip[1]; // y offset for elements
 
 		// ////// initially fill everything with spacer ////// //
 
-		wSpacer = spacer.getWidth();
-		for (x = 0; x < width; x += wSpacer) {
-			g.drawImage(spacer, x, 0, TOP_LEFT);
+		final int wSpacer = spacer.getWidth();
+		for (int x = xOff; x < clip[2]; x += wSpacer) {
+			g.drawImage(spacer, x, yOff, TOP_LEFT);
 		}
-
-		// ////// draw left and right border ////// //
-
-		g.drawImage(borderLeft, 0, 0, TOP_LEFT);
-		g.drawImage(borderRight, width, 0, TOP_RIGHT);
 
 		// ////// draw state elements ////// //
 
-		w = width - borderLeft.getWidth() - borderRight.getWidth();
+		int wRest = clip[2]; // available width for elements
+		final int hRest = clip[3]; // available height for elements
+		int wGap;;
 
-		x = borderLeft.getWidth();
-		screenyPlayback.initRepresentation(x, 0, TOP_LEFT, w, height);
-		w -= screenyPlayback.getWidth();
-
-		x = width - borderRight.getWidth();
-		screenyShuffle.initRepresentation(x, 0, TOP_RIGHT, w, height);
-		w -= screenyShuffle.getWidth();
-
-		x = screenyShuffle.getPreviousX();
-		screenyRepeat.initRepresentation(x, 0, TOP_RIGHT, w, height);
-		w -= screenyRepeat.getWidth();
-
-		x = screenyPlayback.getNextX();
-		screenyVolume.initRepresentation(x, 0, TOP_LEFT, w, height);
+		xOff = clip[0];
+		screenyPlayback.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
+		
+		if (screenyPlayback.getWidth() > 0) {
+			wGap = wSpacer;
+		} else {
+			wGap = 0;
+		}
+		wRest -= wGap + screenyPlayback.getWidth();
+		xOff = screenyPlayback.getNextX() + wGap;
+		screenyRepeat.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
+		
+		if (screenyRepeat.getWidth() > 0) {
+			wGap = wSpacer;
+		} else {
+			wGap = 0;
+		}
+		wRest -= wGap + screenyRepeat.getWidth();
+		xOff = screenyRepeat.getNextX() + wGap;
+		screenyShuffle.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
+		
+		if (screenyShuffle.getWidth() > 0) {
+			wGap = wSpacer;
+		} else {
+			wGap = 0;
+		}
+		wRest -= wGap + screenyShuffle.getWidth();
+		xOff = screenyShuffle.getNextX() + wGap;
+		screenyVolume.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
 
 	}
 

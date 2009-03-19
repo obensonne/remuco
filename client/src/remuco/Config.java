@@ -51,7 +51,7 @@ public final class Config {
 
 	private static final String APP_PROP_THEMES = "Remuco-themes";
 
-	private static final String DEVICE_SPLITTER = ",";
+	private static final char DEVICE_SPLITTER = ',';
 
 	private static final int FIRST_RECORD_ID = 1;
 
@@ -305,7 +305,7 @@ public final class Config {
 
 		final String list = getProperty(APP_PROP_THEMES);
 		if (list != null) {
-			return Tools.splitString(list, ",");
+			return Tools.splitString(list, ',', true);
 		} else {
 			Log.bug("Feb 22, 2009.5:37:00 PM");
 			return null;
@@ -476,7 +476,7 @@ public final class Config {
 		if (val == null)
 			return;
 
-		devs = Tools.splitString(val, DEVICE_SPLITTER);
+		devs = Tools.splitString(val, DEVICE_SPLITTER, true);
 
 		if (devs.length == 0)
 			return;

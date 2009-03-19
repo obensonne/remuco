@@ -2,14 +2,19 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
+import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
 import remuco.ui.Theme;
 
 public final class SliderScreeny extends Screeny {
 
+	public static final int TYPE_VOLUME = 0;
+
 	/** The images that make up the slider */
 	private Image imgLeft, imgOn, imgOff, imgRight;
+
+	private final int imgLeftID, imgOnID, imgOffID, imgRightID;
 
 	private int length = -1;
 
@@ -18,18 +23,42 @@ public final class SliderScreeny extends Screeny {
 	/** Number of steps (pixel) displayable in the progress bar */
 	private int resolution;
 
+	private final int type;
+
+	// private final boolean displayLength;
+
 	/** x position for first use of ({@link #imgOn} or {@link #imgOff}) */
 	private int xBar;
 
-	public SliderScreeny(PlayerInfo player) {
+	public SliderScreeny(PlayerInfo player, int type) {
 
 		super(player);
+
+		switch (type) {
+
+		case TYPE_VOLUME:
+			imgLeftID = Theme.RTE_STATE_VOLUME_LEFT;
+			imgOnID = Theme.RTE_STATE_VOLUME_ON;
+			imgOffID = Theme.RTE_STATE_VOLUME_OFF;
+			imgRightID = Theme.RTE_STATE_VOLUME_RIGHT;
+			break;
+
+		default:
+			throw new IllegalArgumentException();
+		}
+
+		this.type = type;
+
 	}
 
 	protected void dataUpdated() {
 
-		position = ((SliderState) data).getPosition();
-		length = ((SliderState) data).getLength();
+		final SliderState ss = (SliderState) data;
+		position = ss.getPosition();
+		length = ss.getLength();
+		if (length <= 0) {
+			length = 1;
+		}
 
 	}
 
@@ -37,19 +66,18 @@ public final class SliderScreeny extends Screeny {
 
 		int w, h;
 
-		if (!player.supportsVolumeStatus()) {
+		if (type == TYPE_VOLUME && !player.supports(Feature.KNOWN_VOLUME)) {
 			setImage(INVISIBLE);
 			return;
 		}
 
-		imgLeft = theme.getImg(Theme.IMGID_STATE_VOLUME_LEFT);
-		imgOn = theme.getImg(Theme.IMGID_STATE_VOLUME_ON);
-		imgOff = theme.getImg(Theme.IMGID_STATE_VOLUME_OFF);
-		imgRight = theme.getImg(Theme.IMGID_STATE_VOLUME_RIGHT);
+		imgLeft = theme.getImg(imgLeftID);
+		imgOn = theme.getImg(imgOnID);
+		imgOff = theme.getImg(imgOffID);
+		imgRight = theme.getImg(imgRightID);
 
 		xBar = imgLeft.getWidth();
-
-		resolution = width - imgRight.getWidth() - xBar;
+		resolution = width - imgLeft.getWidth() - imgRight.getWidth();
 
 		w = imgLeft.getWidth() + resolution + imgRight.getWidth();
 		h = imgLeft.getHeight();

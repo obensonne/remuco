@@ -5,24 +5,27 @@ import javax.microedition.lcdui.Image;
 
 import remuco.player.PlayerInfo;
 import remuco.ui.Theme;
+import remuco.ui.screens.PlayerScreen;
+import remuco.util.Log;
 
 /**
- * Screenies represent some data in form of an image (so called
- * <i>representation image</i>). Screenies know their position and size so they
- * can draw themselves (i.e. their representation images) into a
- * {@link Graphics} object via {@link #draw(Graphics)} and give information
- * where to place adjacent screenies (see {@link #getNextX()} and
- * {@link #getNextY()} etc.).
+ * Screenies are the pieces which compose the {@link PlayerScreen}.
  * <p>
- * Screenies create their representation images using graphical data from
+ * A screeny represents some data in form of an image (so called
+ * <i>representation image</i>). It knows its position and size so it can draw
+ * itself (i.e. its representation images) into a {@link Graphics} object via
+ * {@link #draw(Graphics)} and give information where to place adjacent
+ * screenies (see {@link #getNextX()} and {@link #getNextY()} etc.).
+ * <p>
+ * A screeny creates its <em>representation image</em> using graphical data from
  * {@link Theme}. So when ever the {@link Theme} changes,
  * {@link #initRepresentation(int, int, int, int)} must get called by classes
- * which use screenies. This method must also get called when a screenies
+ * which use screenies. This method must also get called when a screeny's
  * position or the available screen size changes. This is mostly a consequence
  * of a change in {@link Theme}. Screeny implementations must ensure that the
- * size of their representation images does <i>not</i> change between two calls
- * to {@link #initRepresentation(int, int, int, int)}. On the other side,
- * screeny users must ensure that this method gets called before the above
+ * size of their representation images does <em>not</em> change between two
+ * calls to {@link #initRepresentation(int, int, int, int)}. On the other side,
+ * a screeny user must ensure that this method gets called before the above
  * mentioned <code>update(..)</code> method gets called the first time.
  * <p>
  * Simple summary: The input of a screeny is some data and the output is a
@@ -40,10 +43,19 @@ import remuco.ui.Theme;
  */
 public abstract class Screeny {
 
-	/** Used often .. */
+	/** Combination of {@link Graphics#BOTTOM} and {@link Graphics#HCENTER} */
+	public static final int BOTTOM_CENTER = Graphics.BOTTOM | Graphics.HCENTER;
+
+	/** Combination of {@link Graphics#BOTTOM} and {@link Graphics#LEFT} */
+	public static final int BOTTOM_LEFT = Graphics.BOTTOM | Graphics.LEFT;
+
+	/** Combination of {@link Graphics#BOTTOM} and {@link Graphics#RIGHT} */
+	public static final int BOTTOM_RIGHT = Graphics.BOTTOM | Graphics.RIGHT;
+
+	/** Combination of {@link Graphics#TOP} and {@link Graphics#LEFT} */
 	public static final int TOP_LEFT = Graphics.TOP | Graphics.LEFT;
 
-	/** Used often .. */
+	/** Combination of {@link Graphics#TOP} and {@link Graphics#RIGHT} */
 	public static final int TOP_RIGHT = Graphics.TOP | Graphics.RIGHT;
 
 	/**
@@ -93,11 +105,7 @@ public abstract class Screeny {
 	 * 
 	 * @param player
 	 *            the player reference may be used by the screeny to adjust its
-	 *            representation according to characteristics of the player -
-	 *            this player reference must be valid the whole lifetime of the
-	 *            screeny, but its contents may change (in this case the class
-	 *            that uses the screeny must call
-	 *            {@link #initRepresentation(int, int, int, int, int)})
+	 *            representation according to characteristics of the player
 	 */
 	public Screeny(PlayerInfo player) {
 		this.player = player;
@@ -119,7 +127,10 @@ public abstract class Screeny {
 	 */
 	public final void draw(Graphics g) {
 
-		checkState();
+		if (img == null) {
+			Log.bug("Mar 19, 2009.8:37:19 PM");
+			return;
+		}
 
 		if (img == INVISIBLE)
 			return;
@@ -300,10 +311,13 @@ public abstract class Screeny {
 		this.width = width;
 		this.height = height;
 
+		img = null;
 		initRepresentation();
+		if (img == null) {
+			Log.bug("Mar 19, 2009.8:42:06 PM");
+		}
 
-		representationUpdated = false; // to enforce representation update on
-		// next call to #draw(..)
+		representationUpdated = false; // enforce update on next call to draw()
 
 	}
 
@@ -322,9 +336,13 @@ public abstract class Screeny {
 
 	public final void updateData(Object data) {
 
-		this.data = data;
-		dataUpdated();
-		representationUpdated = false;
+		try {
+			this.data = data;
+			dataUpdated();
+			representationUpdated = false;
+		} catch (Exception e) {
+			Log.bug("Mar 16, 2009.9:29:20 PM", e);
+		}
 
 	}
 
@@ -342,6 +360,82 @@ public abstract class Screeny {
 	}
 
 	/**
+	 * Draw border images in this screeny. Uses {@link #width} and
+	 * {@link #height} for that task, so these values should be up to date.
+	 * 
+	 * @param bNW
+	 * @param bN
+	 * @param bNE
+	 * @param bW
+	 * @param bE
+	 * @param bSW
+	 * @param bS
+	 * @param bSE
+	 * @param fill
+	 * 
+	 * @return a 4 element integer array describing the area which may be used
+	 *         for content inside the borders (first 2 elements are x and y
+	 *         position, second 2 elements are width and height)
+	 */
+	protected int[] drawBorders(Image bNW, Image bN, Image bNE, Image bW,
+			Image bE, Image bSW, Image bS, Image bSE, int bgColor) {
+
+		int xStep, yStep;
+
+		// fill with background color
+
+		g.setColor(bgColor);
+		g.fillRect(0, 0, width, height);
+
+		// draw top border and corners
+
+		g.drawImage(bNW, 0, 0, TOP_LEFT);
+
+		xStep = bN.getWidth();
+
+		for (int x = bNW.getWidth(); x < width; x += xStep) {
+			g.drawImage(bN, x, 0, TOP_LEFT);
+		}
+
+		g.drawImage(bNE, width, 0, TOP_RIGHT);
+
+		// draw side borders
+
+		yStep = bW.getHeight();
+
+		for (int y = bNW.getHeight(); y < height; y += yStep) {
+			g.drawImage(bW, 0, y, TOP_LEFT);
+		}
+
+		yStep = bE.getHeight();
+
+		for (int y = bNE.getHeight(); y < height; y += yStep) {
+			g.drawImage(bE, width, y, TOP_RIGHT);
+		}
+
+		// draw bottom border and corners
+
+		g.drawImage(bSW, 0, height, BOTTOM_LEFT);
+
+		xStep = bS.getWidth();
+
+		for (int x = bSW.getWidth(); x < width; x += xStep) {
+			g.drawImage(bS, x, height, BOTTOM_LEFT);
+		}
+
+		g.drawImage(bSE, width, height, BOTTOM_RIGHT);
+
+		final int clip[] = new int[4];
+
+		clip[0] = bW.getWidth();
+		clip[1] = bN.getHeight();
+		clip[2] = width - bW.getWidth() - bE.getWidth();
+		clip[3] = height - bN.getHeight() - bS.getHeight();
+
+		return clip;
+	}
+
+	/**
 	 * Called by {@link #initRepresentation(int, int, int, int, int)} to trigger
 	 * a screeny implementation to update its representation due to changes in
 	 * position, possible size or theme.
@@ -356,17 +450,22 @@ public abstract class Screeny {
 	protected abstract void initRepresentation() throws ScreenyException;
 
 	/**
-	 * To be used by {@link Screeny} implementations to set their representation
-	 * image once they have updated it due to a call to
-	 * {@link #initRepresentation()} or an update of the data they represent.
+	 * To be used by {@link Screeny} implementations to set their
+	 * <em>representation
+	 * image</em>. This must be called at least once in the implemenation of
+	 * {@link #initRepresentation()}. Subsequent, implementations can call this
+	 * to update their <em>representation image</em> (in this case <em>i</em>
+	 * must have the same widht and height as the image set within
+	 * {@link #initRepresentation()}). Alternatively, if <em>i</em> is mutable,
+	 * implementations can make use of {@link #g}, which is the {@link Graphics}
+	 * object of <em>i</em>, to update the <em>representation image</em>
 	 * 
 	 * @param i
 	 *            the screeny's representation image
 	 * 
 	 * @throws ScreenyException
-	 *             if the image is too large, i.e. it exceeds its possible
-	 *             maximum witdth and/or height previously specified via
-	 *             {@link #initRepresentation(int, int, int, int, int)}.
+	 *             if the image is too large, i.e. it exceeds {@link #width} and
+	 *             {@link #height}
 	 */
 	protected final void setImage(Image i) throws ScreenyException {
 
@@ -388,8 +487,12 @@ public abstract class Screeny {
 			width = i.getWidth();
 			height = i.getHeight();
 
-			if (img.isMutable())
+			if (img.isMutable()) {
 				g = img.getGraphics();
+			} else {
+				g = null;
+			}
+
 		}
 	}
 
@@ -403,20 +506,5 @@ public abstract class Screeny {
 	 * 
 	 */
 	protected abstract void updateRepresentation();
-
-	/**
-	 * Checks if the screeny has been initialized, i.e.
-	 * {@link #initRepresentation(int, int, int, int)} has been called at least
-	 * once.
-	 * 
-	 * @throws IllegalStateException
-	 *             if the screeny has not yet been initialized
-	 */
-	private final void checkState() {
-
-		if (img == null)
-			throw new IllegalStateException("screeny not yet intialized");
-
-	}
 
 }

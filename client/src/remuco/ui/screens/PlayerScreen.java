@@ -1,5 +1,9 @@
 package remuco.ui.screens;
 
+import java.util.Timer;
+
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -9,21 +13,24 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.List;
 
 import remuco.Config;
+import remuco.Remuco;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.Connection;
 import remuco.comm.Message;
-import remuco.player.IPlobListener;
+import remuco.player.Feature;
+import remuco.player.IItemListener;
+import remuco.player.IProgressListener;
 import remuco.player.IStateListener;
+import remuco.player.Item;
 import remuco.player.Player;
 import remuco.player.PlayerInfo;
-import remuco.player.Plob;
-import remuco.ui.Adjuster;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.KeyBindings;
 import remuco.ui.MediaBrowser;
+import remuco.ui.RepeatedControl;
 import remuco.ui.Theme;
-import remuco.ui.screenies.PlobScreeny;
+import remuco.ui.screenies.ItemScreeny;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.ui.screenies.StateScreeny;
@@ -34,8 +41,8 @@ import remuco.util.Log;
  * eine Klasse, die die ganzen Kommandos, KeyEvents und SubScreens handhabt
  * (PlayerHandler).
  */
-public final class PlayerScreen extends Canvas implements IPlobListener,
-		IStateListener, CommandListener {
+public final class PlayerScreen extends Canvas implements IItemListener,
+		IStateListener, IProgressListener, CommandListener {
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
@@ -63,6 +70,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	private static final int SEEK_DELAY = 600;
 
+	private final Alert alertFeature;
+
 	private final Config config;
 
 	private final Connection conn;
@@ -76,12 +85,16 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	private final Player player;
 
+	private RepeatedControl recoSeek;
+
+	private RepeatedControl recoVolume = null;
+
 	/** Screen to configure key setup */
 	private final KeyBindingsScreen screenKeyConfig;
 
 	private final CommandList screenOptions;
 
-	/** Screen to edit the meta information of a plob */
+	/** Screen to edit the meta information of a item */
 	private final TagEditorScreen screenTagEditor;
 
 	/** Screen to select a theme */
@@ -89,18 +102,13 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	private boolean screenTooSmall = false;
 
-	private final PlobScreeny screenyPlob;
+	private final ItemScreeny screenyPlob;
 
 	private final StateScreeny screenyState;
 
 	private final Theme theme;
 
-	/**
-	 * Thread responsible for adjusting the volume/progress in the time between
-	 * the key volume up/down respectively seek forward/backward has been
-	 * pressed and released again.
-	 */
-	private final Adjuster volumeAdjuster, progressAdjuster;
+	private final Timer timer;
 
 	/**
 	 * Create a new player screen.
@@ -119,27 +127,29 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		config = Config.getInstance();
 
+		timer = Remuco.getGlobalTimer();
+
 		theme = Theme.getInstance();
 
 		theme.load(config.getOption(CONFIG_OPTION_THEME));
 
 		player = new Player(conn, pinfo);
 
-		player.registerStateListener(this);
-		player.registerCurrentPlobListener(this);
+		player.setStateListener(this);
+		player.setItemListener(this);
+		player.setProgressListener(this);
 
-		volumeAdjuster = new Adjuster(player, Adjuster.VOLUME);
-		progressAdjuster = new Adjuster(player, Adjuster.PROGRESS);
-
-		super.addCommand(CMD_MEDIA);
+		if (pinfo.supportsMediaBrowser()) {
+			super.addCommand(CMD_MEDIA);
+		}
 		super.addCommand(CMD_OPTIONS);
 		super.setCommandListener(this);
 
 		screenOptions = new CommandList("Options");
-		screenOptions.addCommand(CMD_THEMES, theme.LIST_ICON_THEMES);
-		screenOptions.addCommand(CMD_KEYS, theme.LIST_ICON_KEYS);
-		if (pinfo.supportsShutdownHost()) {
-			screenOptions.addCommand(CMD_SHUTDOWN_HOST, theme.LIST_ICON_OFF);
+		screenOptions.addCommand(CMD_THEMES, theme.licThemes);
+		screenOptions.addCommand(CMD_KEYS, theme.licKeys);
+		if (pinfo.supports(Feature.SHUTDOWN)) {
+			screenOptions.addCommand(CMD_SHUTDOWN_HOST, theme.licOff);
 		}
 		screenOptions.addCommand(CMD.BACK);
 		screenOptions.setCommandListener(this);
@@ -147,15 +157,14 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenThemeSelection = new List("Themes", List.IMPLICIT);
 		final String[] themes = config.getThemeList();
 		for (int i = 0; i < themes.length; i++) {
-			screenThemeSelection.append(themes[i], theme.LIST_ICON_THEMES);
+			screenThemeSelection.append(themes[i], theme.licThemes);
 		}
-		screenThemeSelection.addCommand(CMD.BACK);
-		screenThemeSelection.addCommand(CMD.SELECT);
 		screenThemeSelection.setSelectCommand(CMD.SELECT);
+		screenThemeSelection.addCommand(CMD.BACK);
 		screenThemeSelection.setCommandListener(this);
 
 		screenyState = new StateScreeny(player.info);
-		screenyPlob = new PlobScreeny(player.info);
+		screenyPlob = new ItemScreeny(player.info);
 
 		screenKeyConfig = new KeyBindingsScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
@@ -164,6 +173,8 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		screenTagEditor.addCommand(CMD.BACK);
 		screenTagEditor.addCommand(CMD.OK);
 		screenTagEditor.setCommandListener(this);
+
+		alertFeature = new Alert("", "", null, AlertType.INFO);
 
 		mediaBrowser = new MediaBrowser(this, display, player);
 
@@ -184,20 +195,19 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		if (cmd == CMD.BACK) {
 
-			screenOptions
-					.addCommand(CMD_DISCONNECT, theme.LIST_ICON_DISCONNECT);
+			screenOptions.addCommand(CMD_DISCONNECT, theme.licDisconnect);
 
 		} else if (cmd == CMD.EXIT) {
 
-			screenOptions.addCommand(cmd, theme.LIST_ICON_OFF);
+			screenOptions.addCommand(cmd, theme.licOff);
 
 		} else if (cmd == CMD.LOG) {
 
-			screenOptions.addCommand(cmd, theme.LIST_ICON_LOG);
+			screenOptions.addCommand(cmd, theme.licLog);
 
 		} else {
 
-			screenOptions.addCommand(cmd, theme.LIST_ICON_PLOB);
+			screenOptions.addCommand(cmd, theme.licItem);
 		}
 
 	}
@@ -246,8 +256,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		} else if (c == CMD.SELECT && d == screenThemeSelection) { // THEMES
 			// //
 
-			final String name = screenThemeSelection
-					.getString(screenThemeSelection.getSelectedIndex());
+			final String name = screenThemeSelection.getString(screenThemeSelection.getSelectedIndex());
 			theme.load(name);
 			initScreenies(); // let new theme take effect
 			config.setOption(CONFIG_OPTION_THEME, name);
@@ -272,9 +281,9 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			player.ctrlSetTags(pid, tags);
 
-			// if edited plob is still current plob, update current plob
-			if (player.plob.getId().equals(pid)) {
-				player.plob.setTags(tags);
+			// if edited item is still current item, update current item
+			if (player.item.getId().equals(pid)) {
+				player.item.setTags(tags);
 			}
 
 			display.setCurrent(this);
@@ -289,16 +298,11 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		}
 	}
 
-	public void currentPlobChanged() {
-
-		screenyPlob.updateData(player.plob);
-		repaint(screenyPlob);
-	}
-
 	/** Do some clean up before this player screen gets finally disposed. */
 	public void dispose() {
 
-		volumeAdjuster.interrupt();
+		stopVolumeControl();
+		stopSeek();
 		conn.down();
 
 	}
@@ -307,15 +311,28 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		player.handleMessage(msg);
 	}
 
-	/** Set an <em>external</em> command listener. */
-	public void setCommandListener(CommandListener l) {
-		externalCommandListener = l;
+	public void notifyItemChanged() {
+
+		screenyPlob.updateData(player.item);
+		repaint(screenyPlob);
 	}
 
-	public void stateChanged() {
+	public void notifyProgressChanged() {
+
+		screenyPlob.updateData(player.progress);
+		repaint(screenyPlob);
+
+	}
+
+	public void notifyStateChanged() {
 
 		screenyState.updateData(player.state);
 		repaint(screenyState);
+	}
+
+	/** Set an <em>external</em> command listener. */
+	public void setCommandListener(CommandListener l) {
+		externalCommandListener = l;
 	}
 
 	protected void keyPressed(int key) {
@@ -335,12 +352,20 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		switch (action) {
 		case KeyBindings.ACTION_VOLUP:
 
-			volumeAdjuster.startAdjust(true, 0);
+			if (!checkFeature(Feature.CTRL_VOLUME)) {
+				break;
+			}
+
+			startVolumeControl(1);
 			break;
 
 		case KeyBindings.ACTION_VOLDOWN:
 
-			volumeAdjuster.startAdjust(false, 0);
+			if (!checkFeature(Feature.CTRL_VOLUME)) {
+				break;
+			}
+
+			startVolumeControl(-1);
 			break;
 
 		case KeyBindings.ACTION_PLAYPAUSE:
@@ -350,78 +375,100 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		case KeyBindings.ACTION_NEXT:
 
-			progressAdjuster.startAdjust(true, SEEK_DELAY);
+			startSeek(1);
 			break;
 
 		case KeyBindings.ACTION_PREV:
 
-			progressAdjuster.startAdjust(false, SEEK_DELAY);
+			startSeek(-1);
 			break;
 
 		case KeyBindings.ACTION_RATEDOWN:
 
-			rating = player.plob.getRating() - 1;
+			if (!checkFeature(Feature.CTRL_RATE)) {
+				break;
+			}
+
+			rating = player.item.getRating() - 1;
 			ratingMax = player.info.getMaxRating();
-			if (player.plob.isNone() || ratingMax == 0 || rating < 0)
+			if (player.item.isNone() || ratingMax == 0 || rating < 0)
 				break;
 
-			player.plob.setRating(rating);
+			player.item.setRating(rating);
 			player.ctrlRate(rating);
 
-			currentPlobChanged();
+			notifyItemChanged();
 
 			break;
 
 		case KeyBindings.ACTION_RATEUP:
 
-			rating = player.plob.getRating() + 1;
+			if (!checkFeature(Feature.CTRL_RATE)) {
+				break;
+			}
+
+			rating = player.item.getRating() + 1;
 			ratingMax = player.info.getMaxRating();
-			if (player.plob.isNone() || ratingMax == 0 || rating > ratingMax)
+			if (player.item.isNone() || ratingMax == 0 || rating > ratingMax)
 				break;
 
-			player.plob.setRating(rating);
+			player.item.setRating(rating);
 			player.ctrlRate(rating);
 
-			currentPlobChanged();
+			notifyItemChanged();
 
 			break;
 
 		case KeyBindings.ACTION_VOLMUTE:
 
-			player.ctrlVolumeMute();
+			if (!checkFeature(Feature.CTRL_VOLUME)) {
+				break;
+			}
+
+			player.ctrlVolume(0);
 			break;
 
 		case KeyBindings.ACTION_IMAGE:
 
-			if (player.plob.getImg() != null) {
+			if (player.item.getImg() != null) {
 
-				screenyPlob.updateData(PlobScreeny.ToogleImageFullScreen);
+				screenyPlob.updateData(ItemScreeny.ToogleImageFullScreen);
 
-				repaint(screenyPlob.getX(), screenyPlob.getY(), screenyPlob
-						.getWidth(), screenyPlob.getHeight());
+				repaint(screenyPlob.getX(), screenyPlob.getY(),
+					screenyPlob.getWidth(), screenyPlob.getHeight());
 			}
 
 			break;
 
 		case KeyBindings.ACTION_EDITTAGS:
 
-			if (player.plob.hasTags()) {
-
-				screenTagEditor.set(player.plob.getId(), player.plob
-						.getMeta(Plob.META_TAGS));
-
-				display.setCurrent(screenTagEditor);
+			if (!checkFeature(Feature.CTRL_TAG)) {
+				break;
 			}
+
+			final String currentTags = player.item.getMeta(Item.META_TAGS);
+
+			screenTagEditor.set(player.item.getId(), currentTags);
+
+			display.setCurrent(screenTagEditor);
 
 			break;
 
 		case KeyBindings.ACTION_REPEAT:
+
+			if (!checkFeature(Feature.CTRL_REPEAT)) {
+				break;
+			}
 
 			player.ctrlToggleRepeat();
 
 			break;
 
 		case KeyBindings.ACTION_SHUFFLE:
+
+			if (!checkFeature(Feature.CTRL_SHUFFLE)) {
+				break;
+			}
 
 			player.ctrlToggleShuffle();
 
@@ -441,32 +488,38 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 	protected void keyReleased(int key) {
 
-		final boolean stillInDelay;
-
 		final int action = KeyBindings.getInstance().getActionForKey(key);
 
 		switch (action) {
 
 		case KeyBindings.ACTION_VOLUP:
-			volumeAdjuster.stopAdjust();
+			stopVolumeControl();
 			break;
 
 		case KeyBindings.ACTION_VOLDOWN:
-			volumeAdjuster.stopAdjust();
+			stopVolumeControl();
 			break;
 
-		case KeyBindings.ACTION_NEXT:
-			stillInDelay = progressAdjuster.stopAdjust();
-			if (stillInDelay) { // key pressed for a short time -> no seek
-				player.ctrlNext();
-			} // else: progress adjuster did some seeks, we are done already
+		case KeyBindings.ACTION_NEXT: {
+			final boolean notSeeked = stopSeek();
+			if (notSeeked) { // key pressed for a short time -> no seek
+				if (checkFeature(Feature.CTRL_NEXT)) {
+					player.ctrlNext();
+				}
+			} else { // progress adjuster did some seeks, we are done already
+				checkFeature(Feature.CTRL_SEEK);
+			}
 			break;
-
+		}
 		case KeyBindings.ACTION_PREV:
-			stillInDelay = progressAdjuster.stopAdjust();
-			if (stillInDelay) { // key pressed for a short time -> no seek
-				player.ctrlPrev();
-			} // else: progress adjuster did some seeks, we are done already
+			final boolean notSeeked = stopSeek();
+			if (notSeeked) { // key pressed for a short time -> no seek
+				if (checkFeature(Feature.CTRL_PREV)) {
+					player.ctrlPrev();
+				}
+			} else { // progress adjuster did some seeks, we are done already
+				checkFeature(Feature.CTRL_SEEK);
+			}
 			break;
 
 		default:
@@ -497,11 +550,11 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 			y = getHeight() / 2 - Theme.FONT_SMALL.getHeight();
 			g.drawString("The screen is too small", getWidth() / 2, y,
-					Graphics.HCENTER | Graphics.BASELINE);
+				Graphics.HCENTER | Graphics.BASELINE);
 
 			y += Theme.FONT_SMALL.getHeight() * 2;
 			g.drawString("for the theme " + theme.getName() + "!",
-					getWidth() / 2, y, Graphics.HCENTER | Graphics.BASELINE);
+				getWidth() / 2, y, Graphics.HCENTER | Graphics.BASELINE);
 
 		} else {
 			screenyState.draw(g);
@@ -516,6 +569,59 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 		initScreenies();
 
 		repaint(); // guess we need this
+	}
+
+	private boolean checkFeature(int feature) {
+
+		final boolean enabled = player.info.supports(feature);
+
+		if (!enabled) {
+
+			final String msg;
+
+			switch (feature) {
+
+			case Feature.CTRL_FULLSCREEN:
+				msg = "Sorry, toggling full screen mode is not possible.";
+				break;
+			case Feature.CTRL_NEXT:
+				msg = "Sorry, skipping to the next item is not possible.";
+				break;
+			case Feature.CTRL_PREV:
+				msg = "Sorry, skipping to the previous item is not possible.";
+				break;
+			case Feature.CTRL_PLAYBACK:
+				msg = "Sorry, controlling playback is not possible.";
+				break;
+			case Feature.CTRL_REPEAT:
+				msg = "Sorry, toggling repeat mode is not possible.";
+				break;
+			case Feature.CTRL_SHUFFLE:
+				msg = "Sorry, toggling shuffle mode is not possible.";
+				break;
+			case Feature.CTRL_SEEK:
+				msg = "Sorry, seeking is not possible.";
+				break;
+			case Feature.CTRL_RATE:
+				msg = "Sorry, rating is not possible.";
+				break;
+			case Feature.CTRL_VOLUME:
+				msg = "Sorry, volume control is not possible.";
+				break;
+			case Feature.CTRL_TAG:
+				msg = "Sorry, tagging items is not possible.";
+				break;
+			default:
+				Log.bug("unexpected feature check: " + feature);
+				msg = "Sorry, this is not possible.";
+				break;
+			}
+
+			alertFeature.setString(msg);
+			display.setCurrent(alertFeature);
+		}
+
+		return enabled;
 	}
 
 	private void initScreenies() {
@@ -535,7 +641,7 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 			y = 0;
 			screenyState.initRepresentation(x, y, anchor, w, h);
 
-			// ////// plob ////// //
+			// ////// item ////// //
 
 			anchor = Screeny.TOP_LEFT;
 			x = 0;
@@ -558,4 +664,50 @@ public final class PlayerScreen extends Canvas implements IPlobListener,
 
 		repaint(s.getX(), s.getY(), s.getWidth(), s.getHeight());
 	}
+
+	private void startSeek(int direction) {
+
+		if (recoSeek != null) {
+			recoSeek.cancel();
+		}
+		recoSeek = new RepeatedControl(RepeatedControl.SEEK, player, direction);
+		timer.schedule(recoSeek, SEEK_DELAY, 321);
+	}
+
+	private void startVolumeControl(int direction) {
+
+		if (recoVolume != null) {
+			recoVolume.cancel();
+		}
+		recoVolume = new RepeatedControl(RepeatedControl.VOLUME, player,
+				direction);
+		timer.schedule(recoVolume, 0, 253);
+	}
+
+	/**
+	 * Stop repeated seek task.
+	 * 
+	 * @return <code>true</code> if no seek done yet (see
+	 *         {@link RepeatedControl#cancel()})
+	 */
+	private boolean stopSeek() {
+
+		final boolean ret;
+		if (recoSeek != null) {
+			ret = recoSeek.cancel();
+			recoSeek = null;
+		} else {
+			ret = true;
+		}
+		return ret;
+	}
+
+	private void stopVolumeControl() {
+
+		if (recoVolume != null) {
+			recoVolume.cancel();
+			recoVolume = null;
+		}
+	}
+
 }

@@ -2,6 +2,6 @@ package remuco.player;
 
 public interface IStateListener {
 
-	public void stateChanged();
+	public void notifyStateChanged();
 	
 }

@@ -1,26 +1,27 @@
 package remuco.ui;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
-import remuco.player.IPlobRequestor;
-import remuco.player.IPloblistRequestor;
+import remuco.player.ActionParam;
+import remuco.player.Feature;
+import remuco.player.IRequester;
+import remuco.player.Item;
+import remuco.player.ItemList;
 import remuco.player.Player;
-import remuco.player.Plob;
-import remuco.player.PlobList;
-import remuco.ui.screens.PlobInfoScreen;
-import remuco.ui.screens.PloblistScreen;
+import remuco.ui.screens.ItemlistScreen;
 import remuco.ui.screens.WaitingScreen;
 import remuco.util.Log;
 
-public final class MediaBrowser implements CommandListener, IPloblistRequestor,
-		IPlobRequestor {
+public final class MediaBrowser implements CommandListener, IRequester,
+		IItemListController {
 
-	private static final Command CMD_LIBRARY = new Command("Library",
+	private static final Command CMD_FILES = new Command("File Browser",
+			Command.ITEM, 40);
+
+	private static final Command CMD_MLIB = new Command("Library",
 			Command.ITEM, 30);
 
 	private static final Command CMD_PLAYLIST = new Command("Playlist",
@@ -28,8 +29,6 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 	private static final Command CMD_QUEUE = new Command("Queue", Command.ITEM,
 			20);
-
-	private static final Command CMD_UP = new Command("Up", Command.BACK, 2);
 
 	private final Display display;
 
@@ -39,17 +38,6 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 	private final Displayable parent;
 
 	private final Player player;
-
-	/**
-	 * Specifies the last requested item (is either a plob id or a ploblist path
-	 * or <code>null</code>). Used to check if incoming plobs or ploblists are
-	 * the one we've requested at last.
-	 */
-	private String requestedItem = null;
-
-	private final PlobInfoScreen screenPlobInfo;
-
-	private final PloblistScreen screenPloblist;
 
 	private final CommandList screenRoot;
 
@@ -61,8 +49,6 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 	private final Theme theme;
 
-	private final Alert alertSelect;
-
 	public MediaBrowser(Displayable parent, Display display, Player player) {
 
 		this.display = display;
@@ -71,33 +57,23 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 		theme = Theme.getInstance();
 
-		screenPlobInfo = new PlobInfoScreen();
-		screenPlobInfo.addCommand(CMD.BACK);
-		screenPlobInfo.setCommandListener(this);
-
 		screenWaiting = new WaitingScreen();
 		screenWaiting.setTitle("Updating");
+		screenWaiting.setImage(theme.aicRefresh);
 		screenWaiting.setCommandListener(this);
 
-		alertSelect = new Alert("", "", null, AlertType.INFO);
-
-		screenPloblist = new PloblistScreen();
-		screenPloblist.addCommand(CMD_UP);
-		screenPloblist.addCommand(CMD.BACK);
-		screenPloblist.addCommand(CMD.INFO);
-		screenPloblist.addCommand(CMD.SELECT);
-		screenPloblist.setSelectCommand(CMD.SELECT);
-		screenPloblist.setCommandListener(this);
-
 		screenRoot = new CommandList("Media Browser");
-		if (player.info.supportsPlaylist()) {
-			screenRoot.addCommand(CMD_PLAYLIST, theme.LIST_ICON_PLOBLIST);
+		if (player.info.supports(Feature.REQ_PL)) {
+			screenRoot.addCommand(CMD_PLAYLIST, theme.licNested);
 		}
-		if (player.info.supportsQueue()) {
-			screenRoot.addCommand(CMD_QUEUE, theme.LIST_ICON_PLOBLIST);
+		if (player.info.supports(Feature.REQ_QU)) {
+			screenRoot.addCommand(CMD_QUEUE, theme.licNested);
 		}
-		if (player.info.supportsLibrary()) {
-			screenRoot.addCommand(CMD_LIBRARY, theme.LIST_ICON_PLOBLIST);
+		if (player.info.supports(Feature.REQ_MLIB)) {
+			screenRoot.addCommand(CMD_MLIB, theme.licNested);
+		}
+		if (player.info.getFileActions().size() > 0) {
+			screenRoot.addCommand(CMD_FILES, theme.licNested);
 		}
 		screenRoot.addCommand(CMD.BACK);
 		screenRoot.setCommandListener(this);
@@ -111,127 +87,33 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 
 			displayableBeforeRequest = d;
 			display.setCurrent(screenWaiting);
-			player.reqPloblist(PlobList.PATH_PLAYLIST_S, this);
-			requestedItem = PlobList.PATH_PLAYLIST_S;
+			player.reqPlaylist(this);
 
 		} else if (c == CMD_QUEUE) {
 
 			displayableBeforeRequest = d;
 			display.setCurrent(screenWaiting);
-			player.reqPloblist(PlobList.PATH_QUEUE_S, this);
-			requestedItem = PlobList.PATH_QUEUE_S;
+			player.reqQueue(this);
 
-		} else if (c == CMD_LIBRARY) {
+		} else if (c == CMD_MLIB) {
 
 			displayableBeforeRequest = d;
 			display.setCurrent(screenWaiting);
-			player.reqPloblist("", this);
-			requestedItem = "";
+			player.reqMLib(this, null);
 
-		} else if (c == CMD.SELECT && d == screenPloblist) {
+		} else if (c == CMD_FILES) {
 
-			final int index = screenPloblist.getSelectedIndex();
-
-			if (index < 0) {
-				return;
-			}
-
-			final PlobList pl = screenPloblist.getPloblist();
-
-			if (screenPloblist.getImage(index) == theme.LIST_ICON_PLOBLIST) {
-				displayableBeforeRequest = d;
-				display.setCurrent(screenWaiting);
-				final String path = pl.getPathForNested(index);
-				player.reqPloblist(path, this);
-				requestedItem = path;
-			} else {
-
-				if (pl.isPlaylist() && !player.info.supportsJumpPlaylist()) {
-					alertSelect.setString("Sorry, playlist jumps are not "
-							+ "possible with the current player.");
-					display.setCurrent(alertSelect);
-				} else if (pl.isQueue() && !player.info.supportsJumpQueue()) {
-					alertSelect.setString("Sorry, queue jumps are not "
-							+ "possible with the current player.");
-					display.setCurrent(alertSelect);
-				} else if (!player.info.supportsLoadPlaylist()) {
-					alertSelect.setString("Sorry, switching the playlist is "
-							+ "not possible with the current player.");
-					display.setCurrent(alertSelect);
-				} else {
-					player.ctrlJump(pl.getPath(), index - pl.getNumNested());
-					display.setCurrent(parent);
-				}
-			}
-
-		} else if (c == CMD.INFO && d == screenPloblist) {
-
-			final int index = screenPloblist.getSelectedIndex();
-
-			if (index < 0) {
-				return;
-			}
-
-			final PlobList pl = screenPloblist.getPloblist();
-
-			if (screenPloblist.getImage(index) == theme.LIST_ICON_PLOBLIST) {
-
-				displayableBeforeRequest = d;
-				display.setCurrent(screenWaiting);
-				final String path = pl.getPathForNested(index);
-				player.reqPloblist(path, this);
-				requestedItem = path;
-
-			} else { // PLOB item
-
-				if (player.info.supportsPlobInfo()) {
-
-					displayableBeforeRequest = d;
-					display.setCurrent(screenWaiting);
-					final String id = pl.getPlobID(index - pl.getNumNested());
-					player.reqPlob(id, this);
-					requestedItem = id;
-
-				} else {
-
-					screenPlobInfo.setPlob(pl.getPlobName(index
-							- pl.getNumNested()));
-					display.setCurrent(screenPlobInfo);
-				}
-			}
-
-		} else if (c == CMD_UP && d == screenPloblist) {
-
-			final PlobList pl = screenPloblist.getPloblist();
-
-			if (pl == null) {
-				display.setCurrent(screenRoot);
-				return;
-			}
-
-			final String parentPath = pl.getParentPath();
-
-			if (parentPath == null) {
-				display.setCurrent(screenRoot);
-				return;
-			}
-
-			requestedItem = parentPath;
 			displayableBeforeRequest = d;
+			display.setCurrent(screenWaiting);
+			player.reqFiles(this, null);
 
-			player.reqPloblist(parentPath, this);
-
-		} else if (c == CMD.BACK && d == screenPlobInfo) {
-
-			display.setCurrent(screenPloblist);
-
-		} else if (c == CMD.BACK && (d == screenRoot || d == screenPloblist)) {
+		} else if (c == CMD.BACK && d == screenRoot) {
 
 			display.setCurrent(parent);
 
 		} else if (c == WaitingScreen.CMD_CANCEL) {
 
-			requestedItem = null;
+			player.reqCancel();
 
 			display.setCurrent(displayableBeforeRequest);
 
@@ -241,56 +123,107 @@ public final class MediaBrowser implements CommandListener, IPloblistRequestor,
 		}
 	}
 
-	public void handlePlob(Plob p) {
+	public void handleFiles(ItemList files) {
 
-		if (requestedItem == null || !requestedItem.equals(p.getId())) {
-			return;
-		}
+		display.setCurrent(new ItemlistScreen(display, this, files));
 
-		screenPlobInfo.setPlob(p);
-
-		display.setCurrent(screenPlobInfo);
 	}
 
-	public void handlePloblist(PlobList pl) {
+	public void handleItem(Item item) {
+		// currently disabled
+	}
 
-		if (requestedItem == null || !requestedItem.equals(pl.getPath())) {
-			return;
+	public void handleLibrary(ItemList library) {
+		display.setCurrent(new ItemlistScreen(display, this, library));
+	}
+
+	public void handlePlaylist(ItemList playlist) {
+
+		final ItemlistScreen ils = new ItemlistScreen(display, this, playlist);
+
+		if (!player.state.isPlayingFromQueue()) {
+			ils.setSelectedItem(player.state.getPosition());
 		}
 
-		screenPloblist.setPloblist(pl);
+		display.setCurrent(ils);
+	}
 
-		final boolean pfq = player.state.isPlayingFromQueue();
-		final int position = player.state.getPosition();
+	public void handleQueue(ItemList queue) {
 
-		if (pl.isPlaylist() && !pfq) {
-			try {
-				screenPloblist.setSelectedIndex(position, true);
-			} catch (IndexOutOfBoundsException e) {
-			}
-		} else if (pl.isQueue() && pfq) {
-			try {
-				screenPloblist.setSelectedIndex(position, true);
-			} catch (ArrayIndexOutOfBoundsException e) {
+		final ItemlistScreen ils = new ItemlistScreen(display, this, queue);
+
+		if (player.state.isPlayingFromQueue()) {
+			ils.setSelectedItem(player.state.getPosition());
+		}
+
+		display.setCurrent(ils);
+	}
+
+	public void ilcAction(ItemlistScreen ils, ActionParam a) {
+
+		final ItemList list = ils.getItemList();
+
+		if (list.isPlaylist()) {
+			player.actionPlaylist(a);
+		} else if (list.isQueue()) {
+			player.actionQueue(a);
+		} else if (list.isMediaLib()) {
+			player.actionMediaLib(a);
+		} else if (list.isFiles()) {
+			player.actionFiles(a);
+		} else {
+			Log.bug("Mar 13, 2009.10:55:05 PM");
+		}
+
+		display.setCurrent(parent);
+	}
+
+	public void ilcBack(ItemlistScreen ils) {
+
+		final ItemList list = ils.getItemList();
+
+		if (list.isRoot()) {
+			display.setCurrent(screenRoot);
+		} else {
+			final String path[] = ils.getItemList().getPathForParent();
+			if (list.isMediaLib()) {
+				display.setCurrent(screenWaiting);
+				player.reqMLib(this, path);
+			} else if (list.isFiles()) {
+				display.setCurrent(screenWaiting);
+				player.reqFiles(this, path);
+			} else {
+				Log.bug("Mar 13, 2009.10:58:36 PM");
 			}
 		}
 
-		display.setCurrent(screenPloblist);
+	}
+
+	public void ilcRoot(ItemlistScreen ils) {
+
+		display.setCurrent(screenRoot);
+
+	}
+
+	public void ilcShowNested(ItemlistScreen ils, String[] path) {
+
+		final ItemList list = ils.getItemList();
+
+		if (list.isMediaLib()) {
+			display.setCurrent(screenWaiting);
+			player.reqMLib(this, path);
+		} else if (list.isFiles()) {
+			display.setCurrent(screenWaiting);
+			player.reqFiles(this, path);
+		} else {
+			Log.bug("Mar 13, 2009.10:58:36 PM");
+		}
+
 	}
 
 	public void showYourself() {
 
-		if (!player.info.supportsPlaylist() && !player.info.supportsQueue()
-				&& !player.info.supportsLibrary()) {
-
-			display.setCurrent(new Alert("Media Browsing",
-					"Media browsing not supported.", null, AlertType.INFO),
-					parent);
-
-		} else {
-
-			display.setCurrent(screenRoot);
-		}
+		display.setCurrent(screenRoot);
 	}
 
 }

@@ -4,7 +4,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.player.PlayerInfo;
-import remuco.player.Plob;
+import remuco.player.Item;
 import remuco.ui.Theme;
 
 public final class RateScreeny extends Screeny {
@@ -35,18 +35,16 @@ public final class RateScreeny extends Screeny {
 
 	protected void dataUpdated() {
 
-		Plob plob = (Plob) data;
+		Item item = (Item) data;
 
-		if (plob == null)
+		if (item == null)
 			rating = player.getMaxRating();
 		else
-			rating = plob.getRating();
+			rating = item.getRating();
 
 	}
 
 	protected void initRepresentation() throws ScreenyException {
-
-		Image i;
 
 		ratingMax = player.getMaxRating();
 
@@ -55,8 +53,8 @@ public final class RateScreeny extends Screeny {
 			return;
 		}
 
-		ratingOn = theme.getImg(Theme.IMGID_PLOB_RATE_ON);
-		ratingOff = theme.getImg(Theme.IMGID_PLOB_RATE_OFF);
+		ratingOn = theme.getImg(Theme.RTE_ITEM_RATING_ON);
+		ratingOff = theme.getImg(Theme.RTE_ITEM_RATING_OFF);
 
 		// scale rate images if needed (may happen if the remote player has a
 		// wide rating range)
@@ -68,11 +66,9 @@ public final class RateScreeny extends Screeny {
 		ratingWidth = ratingOn.getWidth();
 		ratingHeight = ratingOn.getHeight();
 
-		i = Image.createImage(ratingMax * ratingWidth, ratingHeight);
+		setImage(Image.createImage(ratingMax * ratingWidth, ratingHeight));
 
-		setImage(i);
-
-		g.setColor(theme.getColor(Theme.COLOR_BG));
+		g.setColor(theme.getColor(Theme.RTC_BG_ITEM));
 		g.fillRect(0, 0, width, height);
 
 	}

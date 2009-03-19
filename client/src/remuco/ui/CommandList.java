@@ -59,7 +59,6 @@ public class CommandList extends List implements CommandListener {
 
 		this.select = select == null ? CMD.SELECT : select;
 
-		addCommand(this.select);
 		setSelectCommand(this.select);
 
 		super.setCommandListener(this);

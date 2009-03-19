@@ -1,30 +1,66 @@
 package remuco.comm;
 
-import remuco.util.Log;
-
 public class SerialAtom {
 
-	public static final int TYPE_NONE = 0;
+	/** Data type: byte **/
 	public static final int TYPE_Y = 1;
+
+	/** Data type: integer **/
 	public static final int TYPE_I = 2;
+
+	/** Data type: boolean **/
 	public static final int TYPE_B = 3;
+
+	/** Data type: string **/
 	public static final int TYPE_S = 4;
+
+	/** Data type: array of data **/
 	public static final int TYPE_AY = 5;
+
+	/** Data type: array of integers **/
 	public static final int TYPE_AI = 6;
+
+	/** Data type: array of strings **/
 	public static final int TYPE_AS = 7;
-	public static final int TYPE_L = 8;
+
+	/** Data type: long **/
+	public static final int TYPE_X = 8;
+
+	/** Data type: short **/
+	public static final int TYPE_N = 9;
+
+	/** Data type: array of shorts **/
+	public static final int TYPE_AN = 10;
+
+	/** Data type: array of boolean **/
+	public static final int TYPE_AB = 11;
+
+	public static SerialAtom[] build(int fmt[]) {
+
+		final SerialAtom atoms[] = new SerialAtom[fmt.length];
+
+		for (int i = 0; i < atoms.length; i++) {
+			atoms[i] = new SerialAtom(fmt[i]);
+		}
+
+		return atoms;
+	}
 
 	public final int type;
 
 	public int i;
-	
-	public long l;
+
+	public short n;
+
+	public long x;
 
 	public String s;
 
 	public String[] as;
-	
+
 	public int[] ai;
+
+	public short[] an;
 
 	public byte y;
 
@@ -32,56 +68,10 @@ public class SerialAtom {
 
 	public byte[] ay;
 
-	public SerialAtom(int type) {
+	public boolean[] ab;
+
+	private SerialAtom(int type) {
 		this.type = type;
 	}
-	
-	public final SerialAtom copy() {
-		
-		SerialAtom sa = new SerialAtom(type);
-		
-		switch (type) {
-		case TYPE_Y:
-			sa.y = y;
-			break;
-		case TYPE_B:
-			sa.b = b;			
-			break;
-		case TYPE_I:
-			sa.i = i;			
-			break;
-		case TYPE_L:
-			sa.l = l;			
-			break;
-		case TYPE_S:
-			sa.s = new String(s);
-			break;
-		case TYPE_AY:
-			sa.ay = new byte[ay.length];
-			for (int j = 0; j < ay.length; j++) {
-				sa.ay[j] = ay[j];
-			}
-			break;
-		case TYPE_AI:
-			sa.ai = new int[ai.length];
-			for (int j = 0; j < ai.length; j++) {
-				sa.ai[j] = ai[j];
-			}
-			break;
-		case TYPE_AS:
-			sa.as = new String[as.length];
-			for (int j = 0; j < as.length; j++) {
-				sa.as[j] = new String(as[j]);
-			}			
-			break;
-		default:
-			
-			Log.bug("Feb 5, 2009.11:04:32 PM");
-			
-			break;
-		}
-		
-		return sa;
-	}
-	
+
 }

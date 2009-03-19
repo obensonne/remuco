@@ -2,12 +2,15 @@ package remuco.player;
 
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
-import remuco.util.Log;
 
 /**
  * Class to represent all relevant state information of a music player.
  */
 public final class State implements ISerializable {
+
+	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_Y,
+			SerialAtom.TYPE_Y, SerialAtom.TYPE_I, SerialAtom.TYPE_B,
+			SerialAtom.TYPE_B, SerialAtom.TYPE_B };
 
 	public static final byte PLAYBACK_PAUSE = 1;
 
@@ -23,25 +26,18 @@ public final class State implements ISerializable {
 
 	public State() {
 
-		atoms = new SerialAtom[6];
-
-		atoms[0] = new SerialAtom(SerialAtom.TYPE_I);
-		atoms[1] = new SerialAtom(SerialAtom.TYPE_I);
-		atoms[2] = new SerialAtom(SerialAtom.TYPE_B);
-		atoms[3] = new SerialAtom(SerialAtom.TYPE_B);
-		atoms[4] = new SerialAtom(SerialAtom.TYPE_I);
-		atoms[5] = new SerialAtom(SerialAtom.TYPE_B);
+		atoms = SerialAtom.build(ATOMS_FMT);
 
 		reset();
 	}
 
-	public void atomsHasBeenUpdated() {
+	public void notifyAtomsUpdated() {
 
-		playback = atoms[0].i;
-		volume = atoms[1].i;
-		repeat = atoms[2].b;
-		shuffle = atoms[3].b;
-		position = atoms[4].i;
+		playback = atoms[0].y;
+		volume = atoms[1].y;
+		position = atoms[2].i;
+		repeat = atoms[3].b;
+		shuffle = atoms[4].b;
 		queue = atoms[5].b;
 	}
 
@@ -55,7 +51,7 @@ public final class State implements ISerializable {
 
 	/**
 	 * Get playlist or queue position. Whatever is currently active. Use
-	 * {@link #isPlayingFromQueue()} to check if the current plob is played form
+	 * {@link #isPlayingFromQueue()} to check if the current item is played form
 	 * the playlist or the queue.
 	 * 
 	 * @return position
@@ -87,6 +83,7 @@ public final class State implements ISerializable {
 		repeat = false;
 		shuffle = false;
 		position = 0;
+		queue = false;
 	}
 
 	public String toString() {
@@ -99,10 +96,6 @@ public final class State implements ISerializable {
 		sb.append(position).append("|");
 
 		return sb.toString();
-	}
-
-	public void updateAtoms() {
-		Log.bug("Feb 22, 2009.6:26:40 PM");
 	}
 
 	protected void setRepeat(boolean repeat) {

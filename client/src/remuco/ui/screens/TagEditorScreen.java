@@ -4,7 +4,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
- * A Form to edit the tags of a {@link Plob}.
+ * A Form to edit the tags of a {@link Item}.
  * 
  * @author Oben Sonne
  * 
@@ -25,7 +25,7 @@ public final class TagEditorScreen extends Form {
 	}
 
 	/**
-	 * Get the PID of the plob this screen edits the tags of (previously set
+	 * Get the PID of the item this screen edits the tags of (previously set
 	 * with {@link #set(String, String)}).
 	 * 
 	 * @return the PID
@@ -45,7 +45,7 @@ public final class TagEditorScreen extends Form {
 	}
 
 	/**
-	 * Set the PID of the plob to be edit the tag of and the tags of this plob.
+	 * Set the PID of the item to be edit the tag of and the tags of this item.
 	 * 
 	 * @param pid
 	 * @param tags

@@ -122,19 +122,16 @@ public final class Tools {
 
 	}
 
-	/**
-	 * Get a random number.
-	 * <p>
-	 * This is a very bad random number generator, but it is enough if just a
-	 * <em>taste</em> of random is needed. Not good to get a <em>sequence</em>
-	 * of random numbers!
-	 * 
-	 * @param upper
-	 * @return a number <code>y</code> with <code>0 &le; y &lt; upper</code>
-	 */
-	public static long random(long upper) {
-		return (long) ((double) (System.currentTimeMillis() % 2141)
-				/ (double) 2141 * upper);
+	/** Format a time in seconds to something like 'mm:ss'. */
+	public static String formatTime(int seconds) {
+		final StringBuffer sb = new StringBuffer();
+		if (seconds < 0) {
+			return "";
+		}
+		final int s = seconds % 60;
+		sb.append((int) (seconds / 60)).append(":");
+		sb.append(s < 10 ? "0" : "").append(s);
+		return sb.toString();
 	}
 
 	/**
@@ -152,37 +149,21 @@ public final class Tools {
 	}
 
 	/**
-	 * Sleep some random time. {@link InterruptedException} gets caught but
-	 * sleeping won't be continued.
-	 * 
-	 * @param ms
-	 *            maximum time to sleep
-	 * 
-	 * @see #random(long)
-	 * @see #sleep(long)
-	 */
-	public static void sleepRandom(long ms) {
-		sleep(random(ms));
-	}
-
-	/**
 	 * Splits a string into a string array.
 	 * 
 	 * @param s
 	 * @param splitter
 	 * @return
 	 */
-	public static String[] splitString(String s, String splitter) {
-		
-		int first, last, sal;
+	public static String[] splitString(String s, char splitter, boolean trim) {
 
-		final int spl = splitter.length();
+		int first, last, sal;
 
 		first = s.indexOf(splitter);
 		sal = 1;
 		while (first >= 0) {
 			sal++;
-			first = s.indexOf(splitter, first + spl);
+			first = s.indexOf(splitter, first + 1);
 		}
 		final String ret[] = new String[sal];
 
@@ -193,7 +174,10 @@ public final class Tools {
 				last = s.length();
 			}
 			ret[i] = s.substring(first, last);
-			first = last + spl;
+			if (trim) {
+				ret[i].trim();
+			}
+			first = last + 1;
 		}
 		return ret;
 	}

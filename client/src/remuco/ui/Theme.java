@@ -1,7 +1,6 @@
 package remuco.ui;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Display;
@@ -9,69 +8,82 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.Remuco;
 import remuco.util.Log;
 
 public final class Theme {
 
-	/** Color ID */
-	public static final byte COLOR_BG = 0, COLOR_TEXT = 1, COLOR_TITLE = 2,
-			COLOR_ARTIST = 3, COLOR_ALBUM = 4, COLORS_COUNT = 5;
-
 	/** Large font */
 	public static final Font FONT_LARGE = Font.getFont(Font.FACE_PROPORTIONAL,
-			Font.STYLE_PLAIN, Font.SIZE_LARGE);
+		Font.STYLE_PLAIN, Font.SIZE_LARGE);
 
 	/** Normal font */
 	public static final Font FONT_NORMAL = Font.getFont(Font.FACE_PROPORTIONAL,
-			Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
+		Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
 
 	/** Small font */
 	public static final Font FONT_SMALL = Font.getFont(Font.FACE_PROPORTIONAL,
-			Font.STYLE_PLAIN, Font.SIZE_SMALL);
+		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
-	/** Font for a plob's album */
 	public static final Font FONT_ALBUM = FONT_SMALL;
 
-	/** Font for a plob's artist */
+	/** Font for a item's artist */
 	public static final Font FONT_ARTIST = FONT_NORMAL;
 
-	/** Font for a plob's title */
+	/** Font for a item's title */
 	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
-			Font.STYLE_BOLD, Font.SIZE_LARGE);
+		Font.STYLE_BOLD, Font.SIZE_LARGE);
 
-	/** Image ID */
-	public static final byte IMGID_PLOB_BORDER_TOP = 0,
-			IMGID_PLOB_BORDER_BOTTOM = 1, IMGID_PLOB_BORDER_LEFT = 2,
-			IMGID_PLOB_BORDER_RIGHT = 3, IMGID_PLOB_CORNER_TOP_LEFT = 4,
-			IMGID_PLOB_CORNER_TOP_RIGHT = 5, IMGID_PLOB_CORNER_BOTTOM_LEFT = 6,
-			IMGID_PLOB_CORNER_BOTTOM_RIGHT = 7, IMGID_STATE_REPEAT_OFF = 8,
-			IMGID_STATE_REPEAT_ON = 9, IMGID_STATE_SHUFFLE_OFF = 10,
-			IMGID_STATE_SHUFFLE_ON = 11, IMGID_STATE_VOLUME_LEFT = 12,
-			IMGID_STATE_VOLUME_RIGHT = 13, IMGID_STATE_VOLUME_OFF = 14,
-			IMGID_STATE_VOLUME_ON = 15, IMGID_STATE_PLAYBACK_PLAY = 16,
-			IMGID_STATE_PLAYBACK_PAUSE = 17, IMGID_STATE_PLAYBACK_STOP = 18,
-			IMGID_STATE_SPACER = 19, IMGID_STATE_BORDER_LEFT = 20,
-			IMGID_STATE_BORDER_RIGHT = 21, IMGID_PLOB_RATE_OFF = 22,
-			IMGID_PLOB_RATE_ON = 23, IMGID_COLORS = 24;
+	/** Font for progress value */
+	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
+		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
-	private static final String DEFAULT = "Korama";
+	/** Font for a volume level */
+	public static final Font FONT_VOLUME = Font.getFont(Font.FACE_MONOSPACE,
+		Font.STYLE_PLAIN, Font.SIZE_LARGE);
+
+	/** Theme color ID */
+	public static final byte RTC_BG_ALL = 0, RTC_BG_ITEM = 1,
+			RTC_TEXT_ALBUM = 2, RTC_TEXT_ARTIST = 3, RTC_TEXT_OTHER = 4,
+			RTC_TEXT_TITLE = 5;
+
+	/** Theme element ID */
+	public static final byte RTE_ITEM_BORDER_E = 6, RTE_ITEM_BORDER_N = 7,
+			RTE_ITEM_BORDER_NE = 8, RTE_ITEM_BORDER_NW = 9,
+			RTE_ITEM_BORDER_S = 10, RTE_ITEM_BORDER_SE = 11,
+			RTE_ITEM_BORDER_SW = 12, RTE_ITEM_BORDER_W = 13,
+			RTE_ITEM_RATING_OFF = 14, RTE_ITEM_RATING_ON = 15,
+			RTE_STATE_BORDER_E = 16, RTE_STATE_BORDER_N = 17,
+			RTE_STATE_BORDER_NE = 18, RTE_STATE_BORDER_NW = 19,
+			RTE_STATE_BORDER_S = 20, RTE_STATE_BORDER_SE = 21,
+			RTE_STATE_BORDER_SW = 22, RTE_STATE_BORDER_W = 23,
+			RTE_STATE_PLAYBACK_PAUSE = 24, RTE_STATE_PLAYBACK_PLAY = 25,
+			RTE_STATE_PLAYBACK_STOP = 26, RTE_STATE_REPEAT_OFF = 27,
+			RTE_STATE_REPEAT_ON = 28, RTE_STATE_SHUFFLE_OFF = 29,
+			RTE_STATE_SHUFFLE_ON = 30, RTE_STATE_SPACER = 31,
+			RTE_STATE_VOLUME_LEFT = 32, RTE_STATE_VOLUME_OFF = 33,
+			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35;
+
+	private static final String DEFAULT = "Emong";
 
 	private static final Image IMG_FALLBACK;
 
-	private static final String[] IMG_NAME = { "plob.border-top.png",
-			"plob.border-bottom.png", "plob.border-left.png",
-			"plob.border-right.png", "plob.corner-top-left.png",
-			"plob.corner-top-right.png", "plob.corner-bottom-left.png",
-			"plob.corner-bottom-right.png", "state.repeat-off.png",
-			"state.repeat-on.png", "state.shuffle-off.png",
-			"state.shuffle-on.png", "state.volume-left.png",
-			"state.volume-right.png", "state.volume-off.png",
-			"state.volume-on.png", "state.playback-play.png",
-			"state.playback-pause.png", "state.playback-stop.png",
-			"state.spacer.png", "state.border-left.png",
-			"state.border-right.png", "plob.rate-off.png", "plob.rate-on.png",
-			"colors.png" };
+	/** Theme element file name (without extension) */
+	private static final String[] IMG_NAME = { "rte.color.bg.all",
+			"rte.color.bg.item", "rte.color.text.album",
+			"rte.color.text.artist", "rte.color.text.other",
+			"rte.color.text.title", "rte.item.border.e", "rte.item.border.n",
+			"rte.item.border.ne", "rte.item.border.nw", "rte.item.border.s",
+			"rte.item.border.se", "rte.item.border.sw", "rte.item.border.w",
+			"rte.item.rating.off", "rte.item.rating.on", "rte.state.border.e",
+			"rte.state.border.n", "rte.state.border.ne", "rte.state.border.nw",
+			"rte.state.border.s", "rte.state.border.se", "rte.state.border.sw",
+			"rte.state.border.w", "rte.state.playback.pause",
+			"rte.state.playback.play", "rte.state.playback.stop",
+			"rte.state.repeat.off", "rte.state.repeat.on",
+			"rte.state.shuffle.off", "rte.state.shuffle.on",
+			"rte.state.spacer", "rte.state.volume.left",
+			"rte.state.volume.off", "rte.state.volume.on",
+			"rte.state.volume.right" };
 
 	private static Theme instance = null;
 
@@ -196,8 +208,8 @@ public final class Theme {
 
 			final int rgb[] = new int[img.getWidth() * img.getHeight()];
 
-			img.getRGB(rgb, 0, img.getWidth(), 0, 0, img.getWidth(), img
-					.getHeight());
+			img.getRGB(rgb, 0, img.getWidth(), 0, 0, img.getWidth(),
+				img.getHeight());
 
 			final int wOrig = img.getWidth();
 			final int w = wOrig * numerator / denominator;
@@ -316,52 +328,6 @@ public final class Theme {
 	}
 
 	/**
-	 * @emulator Only used for testing!
-	 * @param imgs
-	 * @param checkWidth
-	 * @param checkHeight
-	 */
-	private static boolean checkSizesEqual(Vector imgs, boolean checkWidth,
-			boolean checkHeight) {
-
-		final Enumeration enu;
-
-		enu = imgs.elements();
-
-		if (!enu.hasMoreElements())
-			return true;
-
-		Image i;
-		int w1, w2, h1, h2;
-		boolean ok = true;
-
-		i = (Image) enu.nextElement();
-		w1 = i.getWidth();
-		h1 = i.getHeight();
-
-		while (enu.hasMoreElements()) {
-
-			i = (Image) enu.nextElement();
-			w2 = i.getWidth();
-			h2 = i.getHeight();
-
-			if (checkWidth && w1 != w2) {
-				Log.ln("[TH] VALIDATION:     width differs");
-				ok = false;
-			}
-			if (checkHeight && h1 != h2) {
-				Log.ln("[TH] VALIDATION:     height differs");
-				ok = false;
-			}
-
-			w1 = w2;
-			h1 = h2;
-		}
-
-		return ok;
-	}
-
-	/**
 	 * Load an image file.
 	 * 
 	 * @param file
@@ -383,38 +349,38 @@ public final class Theme {
 				final Image img = Image.createImage(fallBackSize, fallBackSize);
 				img.getGraphics().setColor(0);
 				img.getGraphics().drawString("X", 2, 2,
-						Graphics.TOP | Graphics.LEFT);
+					Graphics.TOP | Graphics.LEFT);
 				return img;
 			}
 		}
 	}
 
 	/** Alert icon */
-	public final Image ALERT_ICON_BLUETOOTH, ALERT_ICON_WIFI,
-			ALERT_ICON_CONNECTING, ALERT_ICON_REFRESH;
+	public final Image aicBluetooth, aicWifi, aicConnecting, aicRefresh,
+			aicHmpf;
 
 	/** List icon */
-	public final Image LIST_ICON_BLUETOOTH, LIST_ICON_WIFI, LIST_ICON_PLOB,
-			LIST_ICON_PLOBLIST, LIST_ICON_ADD, LIST_ICON_THEMES,
-			LIST_ICON_KEYS, LIST_ICON_OFF, LIST_ICON_LOG, LIST_ICON_DISCONNECT;
-
-	private final int[] colors;
+	public final Image licBluetooth, licWifi, licItem, licItemMarked,
+			licNested, licAdd, licThemes, licKeys, licOff, licLog,
+			licDisconnect;
 
 	private String current = null;
 
 	private final Image[] img;
 
+	private final Image logos[];
+
 	private Theme(Display display) {
 
 		img = new Image[IMG_NAME.length];
-		colors = new int[COLORS_COUNT];
 
 		// alert icons //
 
-		ALERT_ICON_BLUETOOTH = loadImage("/bluetooth_48.png", 48);
-		ALERT_ICON_WIFI = loadImage("/wifi_48.png", 48);
-		ALERT_ICON_CONNECTING = loadImage("/connecting_48.png", 48);
-		ALERT_ICON_REFRESH = loadImage("/refresh_48.png", 48);
+		aicBluetooth = loadImage("/icons/bluetooth_48.png", 48);
+		aicWifi = loadImage("/icons/wifi_48.png", 48);
+		aicConnecting = loadImage("/icons/connecting_48.png", 48);
+		aicRefresh = loadImage("/icons/refresh_48.png", 48);
+		aicHmpf = loadImage("/icons/hmpf_48.png", 48);
 
 		// list icons //
 
@@ -432,19 +398,35 @@ public final class Theme {
 			size = LIST_ICON_SIZES[LIST_ICON_SIZES.length - 1];
 		}
 
-		LIST_ICON_BLUETOOTH = loadImage("/bluetooth_" + size + ".png", size);
-		LIST_ICON_WIFI = loadImage("/wifi_" + size + ".png", size);
-		// TODO provide multiple size icons for plob and ploblist
-		LIST_ICON_PLOB = loadImage("/plob.png", size);
-		// LIST_ICON_PLOB = loadImage("/plob_" + size + ".png", size);
-		LIST_ICON_PLOBLIST = loadImage("/ploblist.png", size);
-		// LIST_ICON_PLOBLIST = loadImage("/ploblist_" + size + ".png", size);
-		LIST_ICON_ADD = loadImage("/add_" + size + ".png", size);
-		LIST_ICON_THEMES = loadImage("/theme_" + size + ".png", size);
-		LIST_ICON_KEYS = loadImage("/keys_" + size + ".png", size);
-		LIST_ICON_OFF = loadImage("/off_" + size + ".png", size);
-		LIST_ICON_DISCONNECT = loadImage("/disconnect_" + size + ".png", size);
-		LIST_ICON_LOG = loadImage("/ploblist.png", size);
+		licBluetooth = loadImage("/icons/bluetooth_" + size + ".png", size);
+		licWifi = loadImage("/icons/wifi_" + size + ".png", size);
+		// TODO provide multiple size icons for item and ploblist
+		licItem = loadImage("/icons/item.png", size);
+		// LIC_ITEM_GREEN = loadImage("/item_green.png", size);
+		licItemMarked = loadImage("/icons/item_blue.png", size);
+		// LIC_ITEM = loadImage("/plob_" + size + ".png", size);
+		licNested = loadImage("/icons/list.png", size);
+		// LIC_NESTED = loadImage("/ploblist_" + size + ".png", size);
+		licAdd = loadImage("/icons/add_" + size + ".png", size);
+		licThemes = loadImage("/icons/theme_" + size + ".png", size);
+		licKeys = loadImage("/icons/keys_" + size + ".png", size);
+		licOff = loadImage("/icons/off_" + size + ".png", size);
+		licDisconnect = loadImage("/icons/disconnect_" + size + ".png", size);
+		licLog = licNested;
+
+		// logo icons
+
+		final int sizes[] = { 128, 96, 64, 48, 0 };
+
+		logos = new Image[sizes.length];
+
+		for (int i = 0; i < sizes.length - 1; i++) {
+			logos[i] = loadImage("/icons/remuco_" + sizes[i] + ".png", sizes[i]);
+
+		}
+		logos[sizes.length - 1] = loadImage("/icons/tp.png", 1);
+
+		// load default theme
 
 		loadPrivate(DEFAULT);
 
@@ -454,11 +436,13 @@ public final class Theme {
 	 * Get a specific color of this theme.
 	 * 
 	 * @param id
-	 *            the color id, one of <code>COLOR_...</code>
+	 *            the color id, one of <code>RTC_...</code>
 	 * @return the color value
 	 */
 	public int getColor(int id) {
-		return colors[id];
+		final int rgb[] = new int[1];
+		img[id].getRGB(rgb, 0, 1, 0, 0, 1, 1);
+		return rgb[0];
 	}
 
 	/**
@@ -470,6 +454,25 @@ public final class Theme {
 	 */
 	public Image getImg(int id) {
 		return img[id];
+	}
+
+	/** Get a logo image which has a maximum height of <em>maxHeight</em>. */
+	public Image getLogo(int maxHeight) {
+
+		if (maxHeight <= 0) {
+			return logos[0];
+		}
+
+		for (int i = 0; i < logos.length; i++) {
+			if (maxHeight >= logos[i].getHeight()) {
+				return logos[i];
+			}
+		} // last logo has size 1x1
+
+		Log.bug("Mar 19, 2009.11:01:07 PM");
+
+		return logos[logos.length - 1];
+
 	}
 
 	/**
@@ -498,131 +501,14 @@ public final class Theme {
 		}
 	}
 
-	/**
-	 * @emulator Only used for testing!
-	 */
-	private boolean checkSizes() {
-
-		final Vector v = new Vector(30);
-		boolean ok = true;
-
-		Log.ln("[TH] VALIDATION: "
-				+ "check plob area borders/corners for same size");
-
-		v.addElement(img[IMGID_PLOB_BORDER_BOTTOM]);
-		v.addElement(img[IMGID_PLOB_BORDER_LEFT]);
-		v.addElement(img[IMGID_PLOB_BORDER_RIGHT]);
-		v.addElement(img[IMGID_PLOB_BORDER_TOP]);
-		v.addElement(img[IMGID_PLOB_CORNER_BOTTOM_LEFT]);
-		v.addElement(img[IMGID_PLOB_CORNER_BOTTOM_RIGHT]);
-		v.addElement(img[IMGID_PLOB_CORNER_TOP_LEFT]);
-		v.addElement(img[IMGID_PLOB_CORNER_TOP_RIGHT]);
-
-		ok &= checkSizesEqual(v, true, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check state area images for same height");
-
-		v.addElement(img[IMGID_STATE_BORDER_LEFT]);
-		v.addElement(img[IMGID_STATE_BORDER_RIGHT]);
-		v.addElement(img[IMGID_STATE_PLAYBACK_PAUSE]);
-		v.addElement(img[IMGID_STATE_PLAYBACK_PLAY]);
-		v.addElement(img[IMGID_STATE_PLAYBACK_STOP]);
-		v.addElement(img[IMGID_STATE_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATE_REPEAT_ON]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_OFF]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_ON]);
-		v.addElement(img[IMGID_STATE_VOLUME_LEFT]);
-		v.addElement(img[IMGID_STATE_VOLUME_OFF]);
-		v.addElement(img[IMGID_STATE_VOLUME_ON]);
-		v.addElement(img[IMGID_STATE_VOLUME_RIGHT]);
-
-		ok &= checkSizesEqual(v, false, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check state-gps images for same width");
-
-		v.addElement(img[IMGID_STATE_PLAYBACK_PAUSE]);
-		v.addElement(img[IMGID_STATE_PLAYBACK_PLAY]);
-		v.addElement(img[IMGID_STATE_PLAYBACK_STOP]);
-
-		ok &= checkSizesEqual(v, false, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check state-repeat images for same width");
-
-		v.addElement(img[IMGID_STATE_REPEAT_OFF]);
-		v.addElement(img[IMGID_STATE_REPEAT_ON]);
-
-		ok &= checkSizesEqual(v, false, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check state-shuffle images for same width");
-
-		v.addElement(img[IMGID_STATE_SHUFFLE_OFF]);
-		v.addElement(img[IMGID_STATE_SHUFFLE_ON]);
-
-		ok &= checkSizesEqual(v, false, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check state-volume-bar images");
-
-		if (img[IMGID_STATE_VOLUME_OFF].getWidth() != 1) {
-			Log.ln("[TH] VALIDATION:     "
-					+ "volume bar image (on/off) must have 1px width!");
-			ok = false;
-		}
-		v.addElement(img[IMGID_STATE_VOLUME_OFF]);
-		v.addElement(img[IMGID_STATE_VOLUME_ON]);
-
-		ok &= checkSizesEqual(v, false, true);
-
-		v.removeAllElements();
-
-		Log.ln("[TH] VALIDATION: check size of color image");
-
-		if (img[IMGID_COLORS].getWidth() != COLORS_COUNT) {
-			Log.ln("[TH] VALIDATION:     color image must have" + COLORS_COUNT
-					+ "px width!");
-			ok = false;
-		}
-		if (img[IMGID_COLORS].getHeight() != 1) {
-			Log.ln("[TH] VALIDATION:     color image must have 1px width!");
-			ok = false;
-		}
-
-		return ok;
-
-	}
-
 	private void loadPrivate(String name) {
-
-		boolean ok = true;
 
 		current = name;
 
 		final String themeDir = "/themes/" + current + "/";
 
 		for (int i = 0; i < img.length; i++) {
-			img[i] = loadImage(themeDir + IMG_NAME[i], 0);
-			ok &= img[i] != IMG_FALLBACK;
-		}
-
-		if (ok && Remuco.EMULATION) {
-			ok &= checkSizes();
-		}
-
-		if (ok)
-			img[IMGID_COLORS].getRGB(colors, 0, COLORS_COUNT, 0, 0,
-					COLORS_COUNT, 1);
-		else {
-			Log.ln("[TH] VALIDATION FAILED !!!");
-			colors[COLOR_BG] = 0xFF33AA;
+			img[i] = loadImage(themeDir + IMG_NAME[i] + ".png", 0);
 		}
 
 		Log.ln("[TH] loaded theme " + name);

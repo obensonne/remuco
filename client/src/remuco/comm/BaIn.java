@@ -8,9 +8,8 @@ import java.io.UnsupportedEncodingException;
  * Extends {@link ByteArrayInputStream} by some methods for convinient reading
  * of Remuco specific basic data types.
  * <p>
- * The string related parts only works if the VM's default encoding is ASCII
- * compatible since encoding strings are in ASCII and get read with default
- * character encoding (see {@link #readS()} and {@link #readAS()}).
+ * The string related parts may fail if {@link Serial#ENCODING} is not
+ * supported.
  * 
  * @see Serial
  * @see BaOut
@@ -25,35 +24,104 @@ public final class BaIn extends ByteArrayInputStream {
 	}
 
 	/**
-	 * Read a string vector which is prefixed by an encoding string and a length
+	 * Reads a boolean array which is prefixed by a type code and a length
 	 * value.
 	 * 
-	 * @see BaOut#write(String[], boolean)
+	 * @see BaOut#writeAB(boolean[])
+	 * 
+	 * @return the boolean array (never <code>null</code>)
+	 * @throws BinaryDataExecption
+	 */
+	public boolean[] readAB() throws BinaryDataExecption {
+
+		checkType(SerialAtom.TYPE_AB);
+
+		final byte ay[] = readBytes();
+
+		final boolean ab[] = new boolean[ay.length];
+
+		for (int i = 0; i < ab.length; i++) {
+			ab[i] = ay[i] == 0 ? false : true;
+		}
+
+		return ab;
+	}
+
+	/**
+	 * Read an integer array which is prefixed by a type code and a length
+	 * value.
+	 * 
+	 * @see BaOut#writeAI(int[])
 	 * @see Serial
 	 * 
-	 * @return the string vector (never <code>null</code>)
+	 * @return the integer array (never <code>null</code>)
+	 * @throws BinaryDataExecption
+	 */
+	public int[] readAI() throws BinaryDataExecption {
+
+		checkType(SerialAtom.TYPE_AI);
+
+		final int len = readInt(); // num ints
+
+		final int ai[] = new int[len];
+
+		for (int i = 0; i < len; i++) {
+			ai[i] = readInt();
+		}
+
+		return ai;
+	}
+
+	/**
+	 * Read a short array which is prefixed by a type code and a length value.
+	 * 
+	 * @see BaOut#writeAN(short[])
+	 * @see Serial
+	 * 
+	 * @return the short array (never <code>null</code>)
+	 * @throws BinaryDataExecption
+	 */
+	public short[] readAN() throws BinaryDataExecption {
+
+		checkType(SerialAtom.TYPE_AN);
+
+		final int len = readInt(); // num shorts
+
+		final short an[] = new short[len];
+
+		for (int i = 0; i < len; i++) {
+			an[i] = readShort();
+		}
+
+		return an;
+	}
+
+	/**
+	 * Read a string array which is prefixed by a type code and a length value.
+	 * 
+	 * @see BaOut#writeAS(String[])
+	 * @see Serial
+	 * 
+	 * @return the string array (never <code>null</code>)
 	 * @throws BinaryDataExecption
 	 */
 	public String[] readAS() throws BinaryDataExecption {
 
-		int num;
-		String[] sv;
-
 		checkType(SerialAtom.TYPE_AS);
 
-		num = readInt(); // num strings
+		final int len = readInt(); // num strings
 
-		sv = new String[num];
+		final String as[] = new String[len];
 
-		for (int i = 0; i < num; i++) {
-			sv[i] = readString();
+		for (int i = 0; i < len; i++) {
+			as[i] = readString();
 		}
 
-		return sv;
+		return as;
 	}
 
 	/**
-	 * Reads a byte array which is prefixed by a length value.
+	 * Reads a byte array which is prefixed by a type code and a length value.
 	 * 
 	 * @see BaOut#writeAY(byte[])
 	 * 
@@ -62,35 +130,9 @@ public final class BaIn extends ByteArrayInputStream {
 	 */
 	public byte[] readAY() throws BinaryDataExecption {
 
-		int len;
-		byte[] ba;
-
 		checkType(SerialAtom.TYPE_AY);
 
-		// check if size can be read
-
-		if (pos + 4 > count)
-			throw new BinaryDataExecption("not enough data");
-
-		len = readInt();
-
-		// check if there is enough data
-
-		if (pos + len > count)
-			throw new BinaryDataExecption("not enough data");
-
-		// read the byte array
-
-		ba = new byte[len];
-
-		try {
-			read(ba);
-		} catch (IOException e) {
-			// should not happen on a ByteArrayInputStream
-		}
-
-		return ba;
-
+		return readBytes();
 	}
 
 	/**
@@ -105,16 +147,14 @@ public final class BaIn extends ByteArrayInputStream {
 	 */
 	public boolean readB() throws BinaryDataExecption {
 
-		int i;
-
 		checkType(SerialAtom.TYPE_B);
 
 		if (pos + 1 > count)
 			throw new BinaryDataExecption("not enough data");
 
-		i = read();
+		final int b = read();
 
-		if (i == 0)
+		if (b == 0)
 			return false;
 		else
 			return true;
@@ -122,7 +162,7 @@ public final class BaIn extends ByteArrayInputStream {
 	}
 
 	/**
-	 * Read the next 4 bytes as an int (in net byte order).
+	 * Read the next 4 data as an int (in net byte order).
 	 * 
 	 * @see BaOut#writeI(int)
 	 * 
@@ -137,39 +177,21 @@ public final class BaIn extends ByteArrayInputStream {
 		return readInt();
 	}
 
-	/** Like {@link #readI()} but without reading a type code before. */
-	public int readInt() throws BinaryDataExecption {
-
-		if (pos + 4 > count)
-			throw new BinaryDataExecption("not enough data");
-
-		return (((read() & 0xff) << 24) | ((read() & 0xff) << 16)
-				| ((read() & 0xff) << 8) | (read() & 0xff));
-
-	}
-
 	/**
-	 * Read the next 8 bytes as a long (in net byte order).
+	 * Read the next 2 data as a short (in net byte order).
 	 * 
-	 * @see BaOut#writeL(long)
+	 * @see BaOut#writeN(int)
 	 * 
-	 * @return the long
+	 * @return the short
 	 * @throws BinaryDataExecption
-	 *             if the long could not be read because there is not enough
+	 *             if the short could not be read because there is not enough
 	 *             data
 	 */
-	public int readL() throws BinaryDataExecption {
+	public short readN() throws BinaryDataExecption {
 
-		checkType(SerialAtom.TYPE_L);
+		checkType(SerialAtom.TYPE_N);
 
-		if (pos + 8 > count)
-			throw new BinaryDataExecption("not enough data");
-
-		return (((read() & 0xff) << 56) | ((read() & 0xff) << 48)
-				| ((read() & 0xff) << 40) | ((read() & 0xff) << 32)
-				| ((read() & 0xff) << 24) | ((read() & 0xff) << 16)
-				| ((read() & 0xff) << 8) | (read() & 0xff));
-
+		return readShort();
 	}
 
 	/**
@@ -184,12 +206,35 @@ public final class BaIn extends ByteArrayInputStream {
 
 		checkType(SerialAtom.TYPE_S);
 
-		final String s = readString();
-		return s;
+		return readString();
 	}
 
 	/**
-	 * Read the next for bytes as a byte.
+	 * Read the next 8 data as a long (in net byte order).
+	 * 
+	 * @see BaOut#writeX(long)
+	 * 
+	 * @return the long
+	 * @throws BinaryDataExecption
+	 *             if the long could not be read because there is not enough
+	 *             data
+	 */
+	public int readX() throws BinaryDataExecption {
+
+		checkType(SerialAtom.TYPE_X);
+
+		if (pos + 8 > count)
+			throw new BinaryDataExecption("not enough data");
+
+		return (((read() & 0xff) << 56) | ((read() & 0xff) << 48)
+				| ((read() & 0xff) << 40) | ((read() & 0xff) << 32)
+				| ((read() & 0xff) << 24) | ((read() & 0xff) << 16)
+				| ((read() & 0xff) << 8) | (read() & 0xff));
+
+	}
+
+	/**
+	 * Read the next for data as a byte.
 	 * 
 	 * @see BaOut#writeY(int)
 	 * 
@@ -219,20 +264,67 @@ public final class BaIn extends ByteArrayInputStream {
 	 */
 	private void checkType(int exptected) throws BinaryDataExecption {
 
-		int real;
-
 		if (pos + 1 > count)
 			throw new BinaryDataExecption("not enough data");
 
-		real = read();
+		final int real = read();
 
 		if (real != exptected)
 			throw new BinaryDataExecption("type mismatch (exp: " + exptected
 					+ ", real: " + real + ")");
 	}
 
+	/** Same as {@link #readAY()} but without reading a type code. */
+	private byte[] readBytes() throws BinaryDataExecption {
+
+		// check if size can be read
+
+		if (pos + 4 > count)
+			throw new BinaryDataExecption("not enough data");
+
+		final int len = readInt();
+
+		// check if there is enough data
+
+		if (pos + len > count)
+			throw new BinaryDataExecption("not enough data");
+
+		// read the byte array
+
+		final byte ay[] = new byte[len];
+
+		try {
+			read(ay);
+		} catch (IOException e) {
+			// should not happen on a ByteArrayInputStream
+		}
+
+		return ay;
+	}
+
+	/** Like {@link #readI()} but without reading a type code before. */
+	private int readInt() throws BinaryDataExecption {
+
+		if (pos + 4 > count)
+			throw new BinaryDataExecption("not enough data");
+
+		return (((read() & 0xff) << 24) | ((read() & 0xff) << 16)
+				| ((read() & 0xff) << 8) | (read() & 0xff));
+
+	}
+
+	/** Like {@link #readN()} but without reading a type code before. */
+	private short readShort() throws BinaryDataExecption {
+
+		if (pos + 2 > count)
+			throw new BinaryDataExecption("not enough data");
+
+		return (short) (((read() & 0xff) << 8) | (read() & 0xff));
+
+	}
+
 	/**
-	 * Reads a string without reading a type code and encoding string first.
+	 * Reads a string without reading a type code first.
 	 * 
 	 * @return the string (never <code>null</code>)
 	 * 
@@ -240,13 +332,12 @@ public final class BaIn extends ByteArrayInputStream {
 	 */
 	private String readString() throws BinaryDataExecption {
 
-		String s = null;
-		int len;
-
-		len = readInt(); // len string
+		final int len = readShort(); // len string
 
 		if (pos + len > count)
 			throw new BinaryDataExecption("not enough data");
+
+		String s = null;
 
 		try {
 			s = new String(buf, pos, len, Serial.ENCODING); // string

@@ -7,34 +7,36 @@ import remuco.util.Log;
 
 public final class ClientInfo implements ISerializable {
 
+	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
+			SerialAtom.TYPE_I, SerialAtom.TYPE_S };
+
+	private static ClientInfo instance = null;
+
+	public static ClientInfo getInstance() {
+		if (instance == null) {
+			instance = new ClientInfo();
+		}
+		return instance;
+	}
+
 	private final SerialAtom[] atoms;
 
-	public static final ClientInfo ci = new ClientInfo();
-	
 	private ClientInfo() {
 
-		atoms = new SerialAtom[3];
-		atoms[0] = new SerialAtom(SerialAtom.TYPE_I);
-		atoms[1] = new SerialAtom(SerialAtom.TYPE_I);
-		atoms[2] = new SerialAtom(SerialAtom.TYPE_S);
+		atoms = SerialAtom.build(ATOMS_FMT);
 
 		atoms[0].i = Config.SCREEN_WIDTH;
 		atoms[1].i = Config.SCREEN_HEIGHT;
-		
 		atoms[2].s = Serial.ENCODING;
-		
-	}
 
-	public void atomsHasBeenUpdated() {
-		Log.bug("Feb 22, 2009.6:25:29 PM");
 	}
 
 	public SerialAtom[] getAtoms() {
 		return atoms;
 	}
 
-	public void updateAtoms() {
-		// always up2date
+	public void notifyAtomsUpdated() {
+		Log.bug("Feb 22, 2009.6:25:29 PM");
 	}
 
 }

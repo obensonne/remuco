@@ -31,17 +31,10 @@ public final class DeviceSelectorScreen extends List implements
 	private static final Command CMD_ADD_INET = new Command("WiFi",
 			Command.SCREEN, 20);
 
-	private static final Command CMD_CONNECT = new Command("Select",
-			Command.SCREEN, 1);
+	private static final Command CMD_REMOVE_DEVICE = new Command("Remove",
+			Command.SCREEN, 30);
 
-	private static final Command CMD_REMOVE_DEVICE = new Command(
-			"Remove Connection", Command.SCREEN, 30);
-
-	/** Add command for the scan result list. */
-	private static final Command CMD_SCAN_RESULT_ADD = new Command("Add",
-			Command.SCREEN, 1);
-
-	private final Alert alertScanProblem, alertForgetDevice;
+	private final Alert alertScanProblem, alertConfirmRemove;
 
 	private final IScanner bluetoothScanner;
 
@@ -97,13 +90,13 @@ public final class DeviceSelectorScreen extends List implements
 		alertScanProblem.setTimeout(Alert.FOREVER);
 		alertScanProblem.setCommandListener(this);
 
-		alertForgetDevice = new Alert("Confirmation");
-		alertForgetDevice.setString("Please confirm ..");
-		alertForgetDevice.setType(AlertType.WARNING);
-		alertForgetDevice.setTimeout(Alert.FOREVER);
-		alertForgetDevice.addCommand(CMD.NO);
-		alertForgetDevice.addCommand(CMD.YES);
-		alertForgetDevice.setCommandListener(this);
+		alertConfirmRemove = new Alert("Confirmation");
+		alertConfirmRemove.setString("Please confirm ..");
+		alertConfirmRemove.setType(AlertType.WARNING);
+		alertConfirmRemove.setTimeout(Alert.FOREVER);
+		alertConfirmRemove.addCommand(CMD.NO);
+		alertConfirmRemove.addCommand(CMD.YES);
+		alertConfirmRemove.setCommandListener(this);
 
 		screenAddInetDevice = new AddInetDeviceScreen();
 		screenAddInetDevice.addCommand(CMD.BACK);
@@ -114,35 +107,31 @@ public final class DeviceSelectorScreen extends List implements
 		screenDeviceTypeSelection.addCommand(CMD.BACK);
 		if (bluetoothScanner != null) {
 			screenDeviceTypeSelection.addCommand(CMD_ADD_BLUETOOTH,
-					theme.LIST_ICON_BLUETOOTH);
+				theme.licBluetooth);
 		}
-		screenDeviceTypeSelection
-				.addCommand(CMD_ADD_INET, theme.LIST_ICON_WIFI);
+		screenDeviceTypeSelection.addCommand(CMD_ADD_INET, theme.licWifi);
 		screenDeviceTypeSelection.setCommandListener(this);
 
 		screenScanning = new WaitingScreen();
 		screenScanning.setTitle("Scanning");
-		screenScanning.setImage(theme.ALERT_ICON_BLUETOOTH);
+		screenScanning.setImage(theme.aicBluetooth);
 		screenScanning.setMessage("Searching for Bluetooth devices.");
 		screenScanning.setCommandListener(this);
 
 		screenScanResults = new List("Scan Results", List.IMPLICIT);
+		screenScanResults.setSelectCommand(CMD.SELECT);
 		screenScanResults.addCommand(CMD.BACK);
-		screenScanResults.addCommand(CMD_SCAN_RESULT_ADD);
-		screenScanResults.setSelectCommand(CMD_SCAN_RESULT_ADD);
 		screenScanResults.setCommandListener(this);
 
-		addCommand(CMD_CONNECT);
-		setSelectCommand(CMD_CONNECT);
+		setSelectCommand(CMD.SELECT);
 		setCommandListener(this);
 	}
 
 	public void commandAction(Command c, Displayable d) {
 
-		if (c.equals(CMD_CONNECT)) { // DEVICE SELECTED //
+		if (c.equals(CMD.SELECT) && d == this) { // DEVICE SELECTED //
 
 			final int index = getSelectedIndex();
-
 			if (index < 0) {
 				return;
 			}
@@ -157,8 +146,8 @@ public final class DeviceSelectorScreen extends List implements
 			final String name = devices[3 * index + 1];
 			final String type = devices[3 * index + 2];
 
-			// remember the device
 			config.addKnownDevice(addr, name, type);
+			update();
 
 			listener.notifySelectedDevice(type, addr);
 
@@ -179,8 +168,7 @@ public final class DeviceSelectorScreen extends List implements
 				display.setCurrent(screenScanning);
 			} catch (UserException e) {
 				alertScanProblem.setTitle("Scan Error");
-				alertScanProblem
-						.setString(e.getError() + ": " + e.getDetails());
+				alertScanProblem.setString(e.getError() + ": " + e.getDetails());
 				alertScanProblem.setType(AlertType.ERROR);
 				display.setCurrent(alertScanProblem, this);
 			}
@@ -201,7 +189,6 @@ public final class DeviceSelectorScreen extends List implements
 			}
 
 			config.addKnownDevice(address, null, Config.DEVICE_TYPE_INET);
-
 			update();
 
 			display.setCurrent(this);
@@ -214,10 +201,9 @@ public final class DeviceSelectorScreen extends List implements
 
 			display.setCurrent(this);
 
-		} else if (c == CMD_SCAN_RESULT_ADD) {
+		} else if (c == CMD.SELECT && d == screenScanResults) {
 
 			final int index = screenScanResults.getSelectedIndex();
-
 			if (index == -1) {
 				return;
 			}
@@ -227,23 +213,28 @@ public final class DeviceSelectorScreen extends List implements
 			final String type = scanResults[3 * index + 2];
 
 			config.addKnownDevice(addr, name, type);
-
 			update();
 
-			display.setCurrent(this);
+			listener.notifySelectedDevice(type, addr);
+			// display.setCurrent(this);
 
 		} else if (c == CMD_REMOVE_DEVICE) {
 
-			alertForgetDevice.setString("Remove connection "
-					+ getString(getSelectedIndex()) + " ?");
+			final int index = getSelectedIndex();
+			if (index == -1 || index == size() - 1) {
+				return;
+			}
 
-			display.setCurrent(alertForgetDevice);
+			alertConfirmRemove.setString("Remove connection "
+					+ getString(index) + " ?");
 
-		} else if (c == CMD.NO && d == alertForgetDevice) {
+			display.setCurrent(alertConfirmRemove);
+
+		} else if (c == CMD.NO && d == alertConfirmRemove) {
 
 			display.setCurrent(this);
 
-		} else if (c == CMD.YES && d == alertForgetDevice) {
+		} else if (c == CMD.YES && d == alertConfirmRemove) {
 
 			final int index = getSelectedIndex();
 
@@ -252,7 +243,6 @@ public final class DeviceSelectorScreen extends List implements
 			}
 
 			config.deleteKnownDevice(devices[3 * index]);
-
 			update();
 
 			display.setCurrent(this);
@@ -289,9 +279,9 @@ public final class DeviceSelectorScreen extends List implements
 			final Image icon;
 
 			if (devs[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
-				icon = theme.LIST_ICON_BLUETOOTH;
+				icon = theme.licBluetooth;
 			} else if (devs[i + 2].equals(Config.DEVICE_TYPE_INET)) {
-				icon = theme.LIST_ICON_WIFI;
+				icon = theme.licWifi;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
@@ -307,7 +297,7 @@ public final class DeviceSelectorScreen extends List implements
 	 * On first time display, use this method instead of
 	 * {@link Display#setCurrent(Displayable)}.
 	 */
-	public void showYourself() {
+	public void show() {
 
 		update();
 
@@ -318,7 +308,7 @@ public final class DeviceSelectorScreen extends List implements
 				final Alert alert = new Alert("No Bluetooth",
 						"Bluetooth is not available. "
 								+ "Only Wifi connections are possible.",
-						theme.ALERT_ICON_WIFI, AlertType.INFO);
+						theme.aicWifi, AlertType.INFO);
 				display.setCurrent(alert, screenAddInetDevice);
 			}
 		} else
@@ -354,9 +344,9 @@ public final class DeviceSelectorScreen extends List implements
 			final Image icon;
 
 			if (devices[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
-				icon = theme.LIST_ICON_BLUETOOTH;
+				icon = theme.licBluetooth;
 			} else if (devices[i + 2].equals(Config.DEVICE_TYPE_INET)) {
-				icon = theme.LIST_ICON_WIFI;
+				icon = theme.licWifi;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
@@ -365,7 +355,7 @@ public final class DeviceSelectorScreen extends List implements
 			append(name, icon);
 		}
 
-		append("Add", theme.LIST_ICON_ADD);
+		append("Add", theme.licAdd);
 
 		setSelectedIndex(0, true);
 	}

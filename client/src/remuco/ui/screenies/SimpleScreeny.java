@@ -2,6 +2,7 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
+import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.State;
 import remuco.ui.Theme;
@@ -26,14 +27,14 @@ public final class SimpleScreeny extends Screeny {
 	private static final int VALUE_SHUFFLE_ON = 1;
 
 	private static final int[] IMGIDS_REPEAT = new int[] {
-			Theme.IMGID_STATE_REPEAT_OFF, Theme.IMGID_STATE_REPEAT_ON };
+			Theme.RTE_STATE_REPEAT_OFF, Theme.RTE_STATE_REPEAT_ON };
 
 	private static final int[] IMGIDS_SHUFFLE = new int[] {
-			Theme.IMGID_STATE_SHUFFLE_OFF, Theme.IMGID_STATE_SHUFFLE_ON };
+			Theme.RTE_STATE_SHUFFLE_OFF, Theme.RTE_STATE_SHUFFLE_ON };
 
 	private static final int[] IMGIDS_PLAYBACK = new int[] {
-			Theme.IMGID_STATE_PLAYBACK_STOP, Theme.IMGID_STATE_PLAYBACK_PAUSE,
-			Theme.IMGID_STATE_PLAYBACK_PLAY };
+			Theme.RTE_STATE_PLAYBACK_STOP, Theme.RTE_STATE_PLAYBACK_PAUSE,
+			Theme.RTE_STATE_PLAYBACK_PLAY };
 
 	private static final int[] VALUES_REPEAT = new int[] { VALUE_REPEAT_OFF,
 			VALUE_REPEAT_ON };
@@ -142,7 +143,17 @@ public final class SimpleScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		if (type == TYPE_PLAYBACK && !player.supportsPlaybackStatus()) {
+		if (type == TYPE_PLAYBACK && !player.supports(Feature.KNOWN_PLAYBACK)) {
+			setImage(INVISIBLE);
+			return;
+		}
+
+		if (type == TYPE_REPEAT && !player.supports(Feature.KNOWN_REPEAT)) {
+			setImage(INVISIBLE);
+			return;
+		}
+
+		if (type == TYPE_SHUFFLE && !player.supports(Feature.KNOWN_SHUFFLE)) {
 			setImage(INVISIBLE);
 			return;
 		}

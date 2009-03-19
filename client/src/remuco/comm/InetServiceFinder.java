@@ -4,42 +4,30 @@ import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import remuco.Remuco;
 import remuco.UserException;
 
 public final class InetServiceFinder implements IServiceFinder {
 
-	private class Notifier extends TimerTask {
-
-		private final IServiceListener listener;
-
-		private Notifier(IServiceListener listener) {
-			this.listener = listener;
-		}
-
-		public void run() {
-			synchronized (services) {
-				listener.notifyServices(services, null);
-			}
-		}
-	}
-
 	public static final String PORT = "34271";
 
-	private static final Timer HELPER_THREAD = new Timer();
+	private final Object lock;
 
-	private Notifier notifier = null;
+	private TimerTask notifier = null;
 
-	private final Hashtable services;
+	private final Timer timer;
 
 	public InetServiceFinder() {
 
-		services = new Hashtable(1);
+		lock = new Object();
+
+		timer = Remuco.getGlobalTimer();
 
 	}
 
 	public void cancelServiceSearch() {
 
-		synchronized (services) {
+		synchronized (lock) {
 			if (notifier != null) {
 				notifier.cancel();
 				notifier = null;
@@ -48,7 +36,7 @@ public final class InetServiceFinder implements IServiceFinder {
 
 	}
 
-	public void findServices(String addr, IServiceListener listener)
+	public void findServices(String addr, final IServiceListener listener)
 			throws UserException {
 
 		final String url;
@@ -58,16 +46,25 @@ public final class InetServiceFinder implements IServiceFinder {
 		else
 			url = "socket://" + addr + ":" + PORT;
 
-		synchronized (services) {
-			if (notifier != null)
+		final Hashtable services = new Hashtable(1);
+		services.put("Player", url);
+		
+		synchronized (lock) {
+
+			if (notifier != null) {
 				return;
-			notifier = new Notifier(listener);
+			}
+			
+			notifier = new TimerTask() {
+				public void run() {
+					listener.notifyServices(services, null);
+				}
+			};
 		}
 
-		services.put("Player", url);
-
 		// fake a service search:
-		HELPER_THREAD.schedule(notifier, 1000);
+		timer.schedule(notifier, 1000);
+
 	}
 
 }

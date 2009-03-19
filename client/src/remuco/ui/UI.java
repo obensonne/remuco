@@ -1,6 +1,8 @@
 package remuco.ui;
 
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
@@ -11,6 +13,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import remuco.Config;
+import remuco.Remuco;
 import remuco.UserException;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.BluetoothFactory;
@@ -31,6 +34,9 @@ import remuco.util.Log;
 
 /**
  * Central screen manager.
+ * <p>
+ * <em>Note:</em> All the <em>notify..</em> methods are expected to be called
+ * only by the global timer thread.
  * 
  * @author Oben Sonne
  * 
@@ -48,30 +54,16 @@ public final class UI implements CommandListener, IConnectionListener,
 	/**
 	 * Screen to show progress while connecting.
 	 * <p>
-	 * This object is also used as a mutex for synchronous connection state
-	 * handling in
-	 * <ul>
-	 * <li>{@link #notifyConnected(Connection, PlayerInfo)},
-	 * <li>{@link #notifyServices(Hashtable, UserException)} and
-	 * <li>handling of {@link WaitingScreen#CMD_CANCEL} in
-	 * {@link #commandAction(Command, Displayable)}.
-	 * </ul>
+	 * This waiting screen's property is used for synchronizing connection state
+	 * handling between the UI event thread and the global timer thread.
 	 * */
 	private final WaitingScreen screenConnecting;
-	// private final WaitingAlert screenConnecting;
 
 	/** Screen to select a device to connect to */
 	private final DeviceSelectorScreen screenDeviceSelector;
 
 	/** Main player interaction screen */
 	private PlayerScreen screenPlayer = null;
-
-	/**
-	 * A mutex to synchronize actions related to the player screen. The player
-	 * screen itself ({@link #screenPlayer}) cannot be used because it may be
-	 * <code>null</code>.
-	 */
-	private final Object screenPlayerLock = new Object();
 
 	/** Screen to select a service (media player) */
 	private final ServiceSelectorScreen screenServiceSelector;
@@ -83,9 +75,10 @@ public final class UI implements CommandListener, IConnectionListener,
 		this.parent = parent;
 		this.display = display;
 
+		timer = Remuco.getGlobalTimer();
+
 		if (BluetoothFactory.BLUETOOTH) {
-			serviceFinderBluetooth = BluetoothFactory
-					.createBluetoothServiceFinder();
+			serviceFinderBluetooth = BluetoothFactory.createBluetoothServiceFinder();
 		} else {
 			serviceFinderBluetooth = null;
 		}
@@ -103,7 +96,7 @@ public final class UI implements CommandListener, IConnectionListener,
 		screenConnecting = new WaitingScreen();
 		// screenConnecting = new WaitingAlert();
 		screenConnecting.setTitle("Connecting");
-		screenConnecting.setImage(Theme.getInstance().ALERT_ICON_CONNECTING);
+		screenConnecting.setImage(Theme.getInstance().aicConnecting);
 		screenConnecting.setCommandListener(this);
 
 		screenDeviceSelector = new DeviceSelectorScreen(this, display, this);
@@ -128,23 +121,20 @@ public final class UI implements CommandListener, IConnectionListener,
 
 			final Object property;
 
-			synchronized (screenConnecting) {
-				property = screenConnecting.detachProperty();
-			}
+			property = screenConnecting.detachProperty();
 
 			if (property == null) {
-				// already connected
-				return;
+				return; // already connected
 			}
 
 			if (property instanceof IServiceFinder) {
 				// currently searching for services
-				final IServiceFinder dev = (IServiceFinder) property;
-				dev.cancelServiceSearch();
+				((IServiceFinder) property).cancelServiceSearch();
 			} else if (property instanceof Connection) {
 				// currently waiting for player description
-				final Connection conn = (Connection) property;
-				conn.down();
+				((Connection) property).down();
+			} else {
+				Log.bug("Mar 17, 2009.9:40:43 PM");
 			}
 
 			display.setCurrent(screenDeviceSelector);
@@ -171,44 +161,26 @@ public final class UI implements CommandListener, IConnectionListener,
 
 	public void notifyConnected(Connection conn, PlayerInfo pinfo) {
 
-		Log.debug("got conn notification");
-		
-		synchronized (screenConnecting) {
-			if (screenConnecting.detachProperty() == null) {
-				// already canceled
-				Log.debug("canceled");
-				return;
-			}
+		if (screenConnecting.detachProperty() == null) {
+			// connection set up already canceled by user
+			return;
 		}
 
-		Log.debug("ok");
-		
-		synchronized (screenPlayerLock) {
-
-			if (screenPlayer != null) {
-				Log.bug("Jan 27, 2009.10:54:54 PM");
-				screenPlayer.dispose();
-				screenPlayer = null;
-			}
-
-			Log.debug("new player screen");
-
-			try {
-				screenPlayer = new PlayerScreen(display, conn, pinfo);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			screenPlayer.addCommand(CMD.BACK);
-			screenPlayer.addCommand(CMD.LOG);
-			screenPlayer.addCommand(CMD.EXIT);
-			screenPlayer.setCommandListener(this);
-
-			Log.ln("[UI] show player screen");
-			
-			display.setCurrent(screenPlayer);
+		if (screenPlayer != null) {
+			Log.bug("Jan 27, 2009.10:54:54 PM");
+			screenPlayer.dispose();
+			screenPlayer = null;
 		}
 
+		screenPlayer = new PlayerScreen(display, conn, pinfo);
+		screenPlayer.addCommand(CMD.BACK);
+		screenPlayer.addCommand(CMD.LOG);
+		screenPlayer.addCommand(CMD.EXIT);
+		screenPlayer.setCommandListener(this);
+
+		Log.ln("[UI] show player screen");
+
+		display.setCurrent(screenPlayer);
 	}
 
 	public void notifyDisconnected(UserException reason) {
@@ -219,44 +191,22 @@ public final class UI implements CommandListener, IConnectionListener,
 
 	public void notifyMessage(Connection conn, Message m) {
 
-		// called by connection thread
-
-		switch (m.id) {
-
-		case Message.ID_IGNORE:
-
-			break;
-
-		case Message.ID_BYE:
-
-			Log.ln("[UI] rxed server down");
-			disposePlayerScreen();
-			alert("Server Down", "The Remuco server said bye.", null,
-					screenDeviceSelector);
-
-			break;
-
-		default: // forward all other to the player
-
-			try {
-				synchronized (screenPlayerLock) {
-					if (screenPlayer != null) {
-						screenPlayer.handleMessageForPlayer(m);
-					}
-				}
-			} catch (BinaryDataExecption e) {
-				Log.ln("[UI] rxed malformed data", e);
-				disposePlayerScreen();
-				alert("Connection Error", "Received malformed data.", e,
-						screenDeviceSelector);
-			} catch (OutOfMemoryError e) {
-				Log.ln("[UI] rxed data too big, not enough memory");
-				disposePlayerScreen();
-				alert("Memory Error", "Recevied data too big.", null,
-						screenDeviceSelector);
+		try {
+			if (screenPlayer != null) {
+				screenPlayer.handleMessageForPlayer(m);
 			}
-
-			break;
+		} catch (BinaryDataExecption e) {
+			Log.ln("[UI] rxed malformed data", e);
+			disposePlayerScreen();
+			alert("Connection Error", "Received malformed data.", e,
+				screenDeviceSelector);
+		} catch (OutOfMemoryError e) {
+			m.data = null;
+			m = null;
+			Log.ln("[UI] rxed data too big, not enough memory");
+			disposePlayerScreen();
+			alert("Memory Error", "Recevied data too big.", null,
+				screenDeviceSelector);
 		}
 
 	}
@@ -300,11 +250,9 @@ public final class UI implements CommandListener, IConnectionListener,
 
 	public void notifyServices(Hashtable services, UserException ex) {
 
-		synchronized (screenConnecting) {
-
-			if (screenConnecting.detachProperty() == null) {
-				return;
-			}
+		if (screenConnecting.detachProperty() == null) {
+			// connection set up already canceled by user
+			return;
 		}
 
 		if (ex != null) {
@@ -323,9 +271,7 @@ public final class UI implements CommandListener, IConnectionListener,
 			screenServiceSelector.setServices(services);
 
 			display.setCurrent(screenServiceSelector);
-
 		}
-
 	}
 
 	/**
@@ -333,9 +279,9 @@ public final class UI implements CommandListener, IConnectionListener,
 	 * work i.e. the user interaction.
 	 * 
 	 */
-	public void showYourself() {
+	public void show() {
 
-		screenDeviceSelector.showYourself();
+		screenDeviceSelector.show();
 	}
 
 	/**
@@ -391,18 +337,24 @@ public final class UI implements CommandListener, IConnectionListener,
 		screenConnecting.attachProperty(conn);
 		screenConnecting.setMessage("Connecting to player.");
 		display.setCurrent(screenConnecting);
-
 	}
 
-	/** Dispose the player screen and nullify its reference synchronized. */
+	private final Timer timer;
+
+	/**
+	 * Dispose the player screen and nullify its reference synchronized.
+	 */
 	private void disposePlayerScreen() {
 
-		synchronized (screenPlayerLock) {
-			if (screenPlayer != null) {
-				screenPlayer.dispose();
-				screenPlayer = null;
+		// ensure disposing is done by the global timer thread:
+		timer.schedule(new TimerTask() {
+			public void run() {
+				if (screenPlayer != null) {
+					screenPlayer.dispose();
+					screenPlayer = null;
+				}
 			}
-		}
+		}, 200);
 	}
 
 }

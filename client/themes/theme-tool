@@ -1,0 +1,253 @@
+#!/usr/bin/python
+
+import Image
+import os
+import os.path
+import shutil
+import subprocess
+import sys
+
+ELEMENTS = (
+    "rte.color.bg.all", "rte.color.bg.item", "rte.color.text.album",
+    "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title",
+    "rte.item.border.e", "rte.item.border.n", "rte.item.border.ne",
+    "rte.item.border.nw", "rte.item.border.s", "rte.item.border.se",
+    "rte.item.border.sw", "rte.item.border.w", "rte.item.rating.off",
+    "rte.item.rating.on", "rte.state.border.e", "rte.state.border.n",
+    "rte.state.border.ne", "rte.state.border.nw", "rte.state.border.s",
+    "rte.state.border.se", "rte.state.border.sw", "rte.state.border.w",
+    "rte.state.playback.pause", "rte.state.playback.play",
+    "rte.state.playback.stop", "rte.state.repeat.off", "rte.state.repeat.on",
+    "rte.state.shuffle.off", "rte.state.shuffle.on", "rte.state.spacer",
+    "rte.state.volume.left", "rte.state.volume.off", "rte.state.volume.on",
+    "rte.state.volume.right"
+)
+
+SAME_WIDTH = (
+    ( "rte.item.border.e", "rte.item.border.ne", "rte.item.border.se" ),
+    ( "rte.item.border.w", "rte.item.border.nw", "rte.item.border.sw" ),
+    ( "rte.state.border.e", "rte.state.border.ne", "rte.state.border.se" ),
+    ( "rte.state.border.w", "rte.state.border.nw", "rte.state.border.sw" ),
+    ( "rte.item.rating.on", "rte.item.rating.off" ),
+    ( "rte.state.playback.pause", "rte.state.playback.play",
+      "rte.state.playback.stop" ),
+    ( "rte.state.repeat.off", "rte.state.repeat.on" ),
+    ( "rte.state.shuffle.off", "rte.state.shuffle.on" ),
+    ( "rte.state.volume.off", "rte.state.volume.on" )
+    
+)
+
+SAME_HEIGHT = (
+    ( "rte.item.border.n", "rte.item.border.ne", "rte.item.border.nw" ),
+    ( "rte.item.border.s", "rte.item.border.se", "rte.item.border.sw" ),
+    ( "rte.state.border.n", "rte.state.border.ne", "rte.state.border.nw" ),
+    ( "rte.state.border.s", "rte.state.border.se", "rte.state.border.sw" ),
+    ( "rte.state.playback.pause", "rte.state.playback.play",
+      "rte.state.playback.stop", "rte.state.repeat.off",
+      "rte.state.repeat.on", "rte.state.shuffle.off",
+      "rte.state.shuffle.on", "rte.state.spacer", "rte.state.volume.left",
+      "rte.state.volume.on", "rte.state.volume.off", "rte.state.volume.right" ),
+    ( "rte.item.rating.on", "rte.item.rating.off" )
+)
+
+ONE_PIXEL = (
+    "rte.color.bg.all", "rte.color.bg.item", "rte.color.text.album",
+    "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title"
+)
+
+WIDTH_SPANNING_ELEMENTS = (
+    "rte.state.border.w", "rte.state.playback.pause", "rte.state.spacer",
+    "rte.state.repeat.off", "rte.state.spacer", "rte.state.shuffle.off",
+    "rte.state.spacer", "rte.state.volume.left",
+    10, 10, "rte.state.volume.right", "rte.state.border.e"
+)
+
+HEIGHT_SPANNING_ELEMENTS = (
+    "rte.state.border.n", "rte.state.playback.pause", "rte.state.border.s",
+    "rte.item.border.n", 60, "rte.item.rating.on", "rte.item.border.s"
+)
+
+def exit_err(msg):
+    print(msg)
+    print("FAILED")
+    sys.exit(1)
+
+def get_size(dir, elem):
+    """Get the size of the theme element 'elem' located in 'dir'."""
+
+    file = os.path.join(dir, "%s.png" % elem)
+    try:
+        return Image.open(file).size
+    except IOError, e:
+        exit_err("--| could not open '%s' (%s)" % (file, e))
+
+def get_available_theme_elements(svg):
+    """Inspects 'svg' for alvailable theme elements."""
+
+    p = subprocess.Popen(["inkscape", "--query-all", svg],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         universal_newlines=True)
+    r = p.wait()
+    
+    out, err = p.communicate()
+    
+    if (r != os.EX_OK):
+        exit_err("--| failed to list theme elements in '%s'\n%s" % (svg, err))
+    
+    elems = []
+    lines = out.split('\n')
+    for line in lines:
+        if line.startswith("rte."):
+            elem = line.split(',')[0]
+            elems.append(elem)
+    elems.sort()
+    return tuple(elems)
+    
+def export_theme_elements(svg, dir):
+    """Exports all theme elements from 'svg' into 'dir'."""
+
+    for elem in ELEMENTS:
+        elem_file = os.path.join(dir, "%s.png" % elem)
+        print("    %s" % elem)        
+        p = subprocess.Popen(["inkscape", "-i", elem, "-f", svg, "-d", "90",
+                              "-e", elem_file],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             universal_newlines=True)
+        r = p.wait()
+        
+        out, err = p.communicate()
+        
+        if (r != os.EX_OK):
+            exit_err("--| failed to export theme element '%s' from '%s'\n%s" %
+                     (elem, svg, err))
+        
+
+def main(svg):
+
+    dir, ext = os.path.splitext(svg)
+    
+    if os.path.exists(dir):
+        print("--> remove old theme dir '%s'" % dir)
+        try:
+            shutil.rmtree(dir)
+        except OSError, e:
+            exit_err("--| failed to remove '%s' (%s)" % (dir, e))
+        
+    print("--> create new theme dir '%s'" % dir)
+    try:
+        os.mkdir(dir)
+    except OSError, e:
+        exit_err("--| failed to create '%s' (%s)" % (dir, e))
+        
+    print("--> inspect svg")
+
+    elems = get_available_theme_elements(svg)
+
+    print("--> check list of theme elements")
+    
+    ok = True
+    
+    for need in ELEMENTS:
+        if not need in elems:
+            print("    missing    : %s" % need)
+            ok = False
+    for have in elems:
+        if not have in ELEMENTS:
+            print("    unexpected : %s" % have)
+            ok = False
+
+    if not ok:
+        exit_err("--| list of expected and actual theme elements differ")
+
+    print("--> export theme elements")
+
+    export_theme_elements(svg, dir)
+
+    print("--> validate size of theme elements")
+
+    for tuple in SAME_WIDTH:
+        first = get_size(dir, tuple[0])[0]
+        for elem in tuple[1:]:
+            current = get_size(dir, elem)[0]
+            if current != first:
+                print("    %s and %s must have the same width, but %d != %d" %
+                      (tuple[0], elem, first, current))
+                ok = False
+
+    for tuple in SAME_HEIGHT:
+        first = get_size(dir, tuple[0])[1]
+        for elem in tuple[1:]:
+            current = get_size(dir, elem)[1]
+            if current != first:
+                print("    %s and %s must have the same height, but %d != %d" %
+                      (tuple[0], elem, first, current))
+                ok = False
+
+    for elem in ONE_PIXEL:
+        size = get_size(dir, elem)
+        if size != (1, 1):
+            print("    %s is not a one pixel element (size: %dx%d)" %
+                  (elem, size[0], size[1]))
+            ok = False
+            
+
+    if not ok:
+        exit_err("--| validation failed")
+
+    minw = 0
+    for elem in WIDTH_SPANNING_ELEMENTS:
+        if isinstance(elem, int):
+            minw += elem
+        else:
+            size = get_size(dir, elem)
+            minw += size[0]
+            
+    minh = 0
+    for elem in WIDTH_SPANNING_ELEMENTS:
+        if isinstance(elem, int):
+            minh += elem
+        else:
+            size = get_size(dir, elem)
+            minh += size[1]
+            
+    print("--> recommended minimum screen size: %dx%d" % (minw, minh))
+    
+    info_filename = os.path.join(dir, "info.txt")
+    
+    print("--> generate theme info file (%s)" % info_filename)
+    
+    try:
+        template = open("info.txt", 'r')
+        text = template.read()
+        template.close()
+    except IOError, e:
+        exit_err("--| failed to read info template: %s", e)
+    
+    name = os.path.basename(dir).capitalize()
+    text = text.replace("<NAME>", name)
+    text = text.replace("<SW>", str(minw))
+    text = text.replace("<SH>", str(minh))
+    
+    info = open(info_filename, 'w')
+    info.write(text)
+    info.close()
+    
+    print("--> finished, good job :)")
+
+
+if __name__ == "__main__":
+
+    try:
+        svg = sys.argv[1]
+    except IndexError:
+        svg = None
+        
+    if not os.path.isfile(svg):
+        exit_err("--| no such file: '%s'" % svg)
+
+    print("--> here we go")
+    print("    just to remind you .. have you hidden the mask layer?")
+    
+    main(svg)
+
+

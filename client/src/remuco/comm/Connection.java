@@ -13,77 +13,35 @@ import javax.microedition.io.SocketConnection;
 import javax.microedition.io.StreamConnection;
 
 import remuco.ClientInfo;
+import remuco.Remuco;
 import remuco.UserException;
 import remuco.player.PlayerInfo;
 import remuco.util.Log;
 import remuco.util.Tools;
 
 /**
- * Connection offers methods to comfortably use a {@link StreamConnection} for
- * {@link Message} exchange.
- * 
- * To create a connection, first create a connector with the
- * {@link ConnectorFactory} and then use the connector to create the connection.
+ * Send and receive messages.
+ * <p>
+ * All connection related events (state change and incoming data) are passed to
+ * the global timer thread for delivering to event listener.
  * 
  * @author Oben Sonne
  * 
  */
 public final class Connection implements Runnable {
 
-	/**
-	 * A task for notifying a disconnection with another thread as the one
-	 * calling {@link #send(Message)}.
-	 */
-	private class NotifyDisconnectTask extends TimerTask {
-
-		private final UserException e;
-
-		public NotifyDisconnectTask(UserException e) {
-			this.e = e;
-		}
-
-		public void run() {
-			connectionListener.notifyDisconnected(e);
-		}
-
-	}
-
-	/**
-	 * This task is used to delay the start of the receiver thread. The delay
-	 * shall ensure, that the UI is able to update before the receiver thread
-	 * raises new updates.
-	 */
-	private class StartReceiveThreadTask extends TimerTask {
-
-		private final Connection conn;
-
-		public StartReceiveThreadTask(Connection conn) {
-			this.conn = conn;
-		}
-
-		public void run() {
-			new Thread(conn).run();
-		}
-
-	}
-
-	private static final Timer HELPER_THREAD = new Timer();
-
 	private static final int HELLO_TIMEOUT = 2000;
 
-	private static final byte[] IO_PREFIX = { (byte) 0xFF, (byte) 0xFF,
+	private static final byte[] PREFIX = { (byte) 0xFF, (byte) 0xFF,
 			(byte) 0xFF, (byte) 0xFF };
 
-	private static final byte[] IO_SUFFIX = { (byte) 0xFE, (byte) 0xFE,
+	private static final byte[] PROTO_VERSION = { (byte) 0x08 };
+
+	private static final byte[] SUFFIX = { (byte) 0xFE, (byte) 0xFE,
 			(byte) 0xFE, (byte) 0xFE };
 
-	private static final byte PROTO_VERSION = 0x08;
-
-	private static final byte[] PROTO_VER_BA = { (byte) PROTO_VERSION };
-
-	/** Received data is malformed. */
-	private static final UserException UE_MALFORMED_DATA = new UserException(
-			"Connection broken", "Received data is malformed.");
+	private static final int HELLO_LEN = PREFIX.length + PROTO_VERSION.length
+			+ SUFFIX.length;
 
 	private boolean closed = false;
 
@@ -99,14 +57,18 @@ public final class Connection implements Runnable {
 
 	private final StreamConnection sc;
 
+	private final Timer timer;
+
 	public Connection(String url, IConnectionListener connectionListener,
 			IMessageListener messageListener) throws UserException {
 
 		this.connectionListener = connectionListener;
 		this.messageListener = messageListener;
 
+		timer = Remuco.getGlobalTimer();
+
 		Log.ln("[CN] url: " + url);
-		
+
 		try {
 			sc = (StreamConnection) Connector.open(url);
 			logSocketOptions(sc);
@@ -137,7 +99,13 @@ public final class Connection implements Runnable {
 
 		}
 
-		HELPER_THREAD.schedule(new StartReceiveThreadTask(this), 200);
+		// start the receiver thread delayed to give the UI some time to update
+		final Connection conn = this;
+		timer.schedule(new TimerTask() {
+			public void run() {
+				new Thread(conn).start();
+			}
+		}, 200);
 	}
 
 	/**
@@ -162,36 +130,26 @@ public final class Connection implements Runnable {
 		try {
 			pinfo = up();
 		} catch (UserException e) {
-			if (!connectionListenerNotifiedAboutError) {
-				// it seems we don't need a notification timer here
-				connectionListenerNotifiedAboutError = true;
-				connectionListener.notifyDisconnected(e);
-			}
+			notifyDisconnected(e);
 			return;
 		}
 
-		connectionListener.notifyConnected(this, pinfo);
+		notifyConnected(pinfo);
 
-		while (!closed) {
+		while (!closed) { // loop receiving messages
 
-			Message m;
+			final Message m;
 
 			try {
 				m = recv();
 			} catch (UserException e) {
-				if (!connectionListenerNotifiedAboutError) {
-					connectionListenerNotifiedAboutError = true;
-					connectionListener.notifyDisconnected(e);
-					/*
-					 * If notification does not work here, it should work if a
-					 * notifier task is used.
-					 */
-				}
+				notifyDisconnected(e);
 				return;
 			}
 
-			messageListener.notifyMessage(this, m);
-
+			if (m.id != Message.IGNORE) {
+				notifyMessage(m);
+			}
 		}
 
 	}
@@ -202,11 +160,9 @@ public final class Connection implements Runnable {
 	 * @param m
 	 *            The message to send. Content does not get changed.
 	 */
-	public synchronized void send(Message m) {
+	public void send(Message m) {
 
-		UserException ue = null;
-
-		synchronized (sc) {
+		synchronized (dos) {
 
 			if (closed)
 				return;
@@ -216,17 +172,10 @@ public final class Connection implements Runnable {
 			} catch (IOException e) {
 				Log.ln("[CN] connection broken", e);
 				downPrivate();
-				if (!connectionListenerNotifiedAboutError) {
-					connectionListenerNotifiedAboutError = true;
-					ue = new UserException("Connection broken",
-							"There was an IO error while sending data.", e);
-				}
-			}
-		}
+				notifyDisconnected(new UserException("Connection broken",
+						"There was an IO error while sending data.", e));
 
-		if (ue != null) {
-			// notification from an extra thread:
-			HELPER_THREAD.schedule(new NotifyDisconnectTask(ue), 500);
+			}
 		}
 	}
 
@@ -273,14 +222,60 @@ public final class Connection implements Runnable {
 		}
 	}
 
+	/** Notification is done via the global timer thread. */
+	private void notifyConnected(final PlayerInfo pinfo) {
+
+		final Connection conn = this;
+		timer.schedule(new TimerTask() {
+			public void run() {
+				connectionListener.notifyConnected(conn, pinfo);
+			}
+		}, 0);
+	}
+
 	/**
-	 * Reads <code>ba.length</code> bytes from the connection and compares the
-	 * received bytes with <code>ba</code>.
+	 * Notifies the connection listener that the connection is
+	 * down/broken/disconnected (but only if the listener has not yet been
+	 * notified).
+	 * <p>
+	 * Notification is done via the global timer thread.
+	 * 
+	 * @param ue
+	 *            the user exception describing the disconnect reason
+	 */
+	private void notifyDisconnected(final UserException ue) {
+
+		if (!connectionListenerNotifiedAboutError) {
+
+			connectionListenerNotifiedAboutError = true;
+
+			// notify via the global timer thread
+			timer.schedule(new TimerTask() {
+				public void run() {
+					connectionListener.notifyDisconnected(ue);
+				}
+			}, 200);
+		}
+	}
+
+	/** Notification is done via the global timer thread. */
+	private void notifyMessage(final Message m) {
+
+		final Connection conn = this;
+		timer.schedule(new TimerTask() {
+			public void run() {
+				messageListener.notifyMessage(conn, m);
+			}
+		}, 0);
+	}
+
+	/**
+	 * Reads <code>ba.length</code> data from the connection and compares the
+	 * received data with <code>ba</code>.
 	 * 
 	 * @param ba
 	 *            the byte array to compare to
-	 * @return <b>-1</b> if the received bytes differ, <b>0</b> if they are
-	 *         equal
+	 * @return <b>-1</b> if the received data differ, <b>0</b> if they are equal
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
@@ -292,13 +287,9 @@ public final class Connection implements Runnable {
 		n = ba.length;
 		bar = new byte[n];
 
-		// read
-
 		// the following may throw an InterruptedException which gets handled
 		// by the caller of recv() (Communicator)
 		dis.readFully(bar);
-
-		// compare
 
 		for (i = 0; i < n; i++) {
 
@@ -326,46 +317,28 @@ public final class Connection implements Runnable {
 		if (closed)
 			return m;
 
-		int size, skipped;
-
 		Log.ln("[CN] waiting for msg");
 
 		try {
-			if (readAndCompare(IO_PREFIX) < 0) {
-				Log.ln("[CN] prefix differs");
-				downPrivate();
-				throw UE_MALFORMED_DATA;
-			}
+			m.id = dis.readShort();
+			final int size = dis.readInt();
 
-			m.id = dis.readInt();
-			size = dis.readInt();
-
-			Log.ln("[CN] rxed msg (id " + m.id + ", payload " + size + ")");
+			Log.ln("[CN] read msg: " + m.id + ", " + size + "B");
 
 			if (size > 0) {
 
 				try {
-					m.bytes = new byte[size]; // may throw OutOfMemoryError
-					dis.readFully(m.bytes);
+					m.data = new byte[size]; // may throw OutOfMemoryError
+					dis.readFully(m.data);
 				} catch (OutOfMemoryError e) {
-					Log.ln("[CN] out of memory, discard incoming data (" + size
-							+ "B)");
-					m.id = Message.ID_IGNORE;
-					m.bytes = null;
-					while (size > 0) {
-						Tools.sleep(100);
-						skipped = (int) dis.skip(size);
-						size -= skipped;
-					}
-					Log.ln("[CN] discarded incoming data");
+					m.id = Message.IGNORE;
+					m.data = null;
+					Log.ln("[CN] out of mem, try to skip " + size + "B)");
+					skip(size);
 				}
 			}
-
-			if (readAndCompare(IO_SUFFIX) < 0) {
-				Log.ln("[CN] suffix differs");
-				downPrivate();
-				throw UE_MALFORMED_DATA;
-			}
+			
+			Log.ln("[CN] read msg: done");
 
 		} catch (EOFException e) {
 			Log.ln("[CN] connection broken", e);
@@ -379,7 +352,7 @@ public final class Connection implements Runnable {
 					"There was an IO error while receiving data.", e);
 		}
 
-		if (m.id == Message.ID_BYE) {
+		if (m.id == Message.CONN_BYE) {
 			downPrivate();
 			throw new UserException("Disconnected.", "Remote player said bye.");
 		}
@@ -391,24 +364,40 @@ public final class Connection implements Runnable {
 	/** Send a message without exception handling. */
 	private void sendPrivate(Message m) throws IOException {
 
-		Log.ln("[CN] send msg (id " + m.id + ", payload "
-				+ (m.bytes != null ? m.bytes.length : 0) + ")");
+		Log.ln("[CN] send msg: " + m.id + ", "
+				+ (m.data != null ? m.data.length : 0) + "B");
 
-		dos.write(IO_PREFIX);
-		dos.writeInt(m.id);
-		if (m.bytes != null) {
-			dos.writeInt(m.bytes.length);
-			dos.write(m.bytes);
+		dos.writeShort(m.id);
+		if (m.data != null) {
+			dos.writeInt(m.data.length);
+			dos.write(m.data);
 		} else {
 			dos.writeInt(0);
 		}
-		dos.write(IO_SUFFIX);
 		dos.flush();
+		
+		Log.ln("[CN] send msg: done");
+	}
+
+	private void skip(int num) throws IOException {
+
+		long rest = num;
+		while (rest > 0) {
+			Tools.sleep(20);
+			final long avail = dis.available();
+			if (avail == 0) {
+				break;
+			}
+			rest -= dis.skip(Math.min(avail, 10240));
+		}
+		;
+		Log.ln("[CN] skipped " + (num - rest) + "B");
+
 	}
 
 	/**
 	 * This method blocks until the <i>HELLO</i> message has been received, but
-	 * waiting time is limited {@value #HELLO_TIMEOUT} ms.
+	 * waiting time is limited to {@link #HELLO_TIMEOUT}.
 	 * <p>
 	 * When this method returns, {@link Message}s can be sent and received with
 	 * {@link #send(Message)} and {@link #recv(Message)}.
@@ -420,12 +409,9 @@ public final class Connection implements Runnable {
 
 		// ////// wait until there is enough data for hello message ////// //
 
-		final byte[] ba = new byte[IO_PREFIX.length + PROTO_VER_BA.length
-				+ IO_SUFFIX.length];
-
 		int n = 0, wait = 0;
 
-		while (wait < HELLO_TIMEOUT && n < ba.length) {
+		while (wait < HELLO_TIMEOUT && n < HELLO_LEN) {
 
 			try {
 
@@ -435,10 +421,9 @@ public final class Connection implements Runnable {
 
 				Log.ln("[CN] waiting for hello msg failed", e);
 				downPrivate();
-				throw new UserException(
-						"Connecting failed",
-						"There was an IO error while waiting for 'hello' from server.",
-						e);
+				throw new UserException("Connecting failed",
+						"There was an IO error while waiting for the hello "
+								+ "message from the server.", e);
 			}
 
 			Tools.sleep(HELLO_TIMEOUT / 10);
@@ -446,35 +431,36 @@ public final class Connection implements Runnable {
 			wait += HELLO_TIMEOUT / 10;
 		}
 
-		if (n < ba.length) {
+		if (n < HELLO_LEN) {
 
-			Log.ln("[CN] not enough data for hello msg (need " + ba.length
-					+ " bytes, only " + n + " available)");
+			Log.ln("[CN] not enough data for hello msg (need " + HELLO_LEN
+					+ "B, only " + n + "B available)");
 			downPrivate();
 			throw new UserException("Connecting failed",
-					"Timeout while waiting for 'hello' from server.");
+					"Timeout while waiting for the hello message from the "
+							+ "server.");
 		}
 
 		// ////// read hello message ////// //
 
 		try {
 
-			if (readAndCompare(IO_PREFIX) < 0) {
+			if (readAndCompare(PREFIX) < 0) {
 				Log.ln("[CN] IO prefix differs");
 				downPrivate();
 				throw new UserException("Connecting failed",
-						"Malformed 'hello' from server.");
+						"Received a malformed hello message from the server.");
 			}
-			if (readAndCompare(PROTO_VER_BA) < 0) {
+			if (readAndCompare(PROTO_VERSION) < 0) {
 				downPrivate();
 				throw new UserException("Connecting failed",
 						"Incompatible server version.");
 			}
-			if (readAndCompare(IO_SUFFIX) < 0) {
+			if (readAndCompare(SUFFIX) < 0) {
 				Log.ln("[CN] IO suffix differs");
 				downPrivate();
 				throw new UserException("Connecting failed",
-						"Malformed 'hello' from server.");
+						"Received a malformed hello message from the server.");
 			}
 
 			Log.ln("[CN] rx'ed hello message");
@@ -482,19 +468,18 @@ public final class Connection implements Runnable {
 		} catch (IOException e) {
 			Log.ln("[CN] rx'ing hello msg failed", e);
 			downPrivate();
-			throw new UserException(
-					"Connecting failed",
-					"There was an IO error while receiving 'hello' from server.",
-					e);
+			throw new UserException("Connecting failed",
+					"There was an IO error while receiving the hello message "
+							+ "from the server.", e);
 		}
 
-		final Message msg = new Message();
+		final Message msgCI = new Message();
 
-		msg.id = Message.ID_CINFO;
-		msg.bytes = Serial.out(ClientInfo.ci);
+		msgCI.id = Message.CONN_CINFO;
+		msgCI.data = Serial.out(ClientInfo.getInstance());
 
 		try {
-			sendPrivate(msg);
+			sendPrivate(msgCI);
 		} catch (IOException e) {
 			downPrivate();
 			throw new UserException("Connecting failed",
@@ -502,13 +487,13 @@ public final class Connection implements Runnable {
 					e);
 		}
 
-		final Message msgPlayerInfo = recv();
+		final Message msgPI = recv();
 
 		final PlayerInfo pinfo = new PlayerInfo();
 
 		try {
 
-			Serial.in(pinfo, msgPlayerInfo.bytes);
+			Serial.in(pinfo, msgPI.data);
 
 		} catch (BinaryDataExecption e) {
 			Log.ln("[UI] rxed malformed data", e);
@@ -520,5 +505,4 @@ public final class Connection implements Runnable {
 		return pinfo;
 
 	}
-
 }

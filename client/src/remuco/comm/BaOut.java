@@ -4,17 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import remuco.util.Log;
-
 /**
  * Extends {@link ByteArrayOutputStream} by some methods for convenient writing
  * of Remuco specific basic data types.
- * 
- * Some problems may occur when strings get written which have character not
- * contained in the default character encoding. It is not possible to detect
- * such a situation, so in that case the special characters get lost when
- * written into this output stream. This is probably ok, since the client only
- * sends pids and plids which should be ASCII.
+ * <p>
+ * The string related parts may fail if {@link Serial#ENCODING} is not
+ * supported.
  * 
  * @see Serial
  * @see BaIn
@@ -24,71 +19,133 @@ import remuco.util.Log;
  */
 public final class BaOut extends ByteArrayOutputStream {
 
-	protected BaOut() {
-		this(0);
-	}
-
 	protected BaOut(int size) {
 		super(size);
-	}
-
-	public byte[] getBuf() {
-		return buf;
 	}
 
 	/**
 	 * Overrides {@link ByteArrayOutputStream#write(byte[])}. Does exactly the
 	 * same but catches the senseless {@link IOException}.
 	 */
-	public void write(byte[] ba) {
+	public void write(byte[] ab) {
 		try {
-			super.write(ba);
+			super.write(ab);
 		} catch (IOException e) {
 			// should not happen on a ByteArrayOutputStream
 		}
 	}
 
 	/**
-	 * Write a string vector prefixed by a type code, encoding and length.
+	 * Writes a byte array with a prefixed length value.
 	 * 
-	 * @param sv
+	 * @param ab
+	 *            the byte array
+	 * 
+	 * @see BaIn#readAY()
+	 */
+	public void writeAB(boolean[] ab) {
+
+		write(SerialAtom.TYPE_AB);
+
+		if (ab == null) {
+			writeInt(0);
+		} else {
+			writeInt(ab.length);
+			for (int i = 0; i < ab.length; i++) {
+				write(ab[i] ? 1 : 0);
+			}
+		}
+	}
+
+	/**
+	 * Writes an integer array with a prefixed length value.
+	 * 
+	 * @param ai
+	 *            the integer array
+	 * 
+	 * @see BaIn#readAI()
+	 */
+	public void writeAI(int[] ai) {
+
+		write(SerialAtom.TYPE_AI);
+
+		if (ai == null) {
+			writeInt(0); // num ints
+			return;
+		}
+
+		writeInt(ai.length); // num ints
+
+		for (int i = 0; i < ai.length; i++) { // ints
+			writeInt(ai[i]);
+		}
+	}
+
+	/**
+	 * Writes a short array with a prefixed length value.
+	 * 
+	 * @param an
+	 *            the short array
+	 * 
+	 * @see BaIn#readAN()
+	 */
+	public void writeAN(short[] an) {
+
+		write(SerialAtom.TYPE_AN);
+
+		if (an == null) {
+			writeInt(0); // num shorts
+			return;
+		}
+
+		writeInt(an.length); // num shorts
+
+		for (int i = 0; i < an.length; i++) { // ints
+			writeShort(an[i]);
+		}
+	}
+
+	/**
+	 * Write a string array prefixed by a type code.
+	 * 
+	 * @param as
 	 *            the string vector
 	 * 
 	 * @see BaIn#readAS()
 	 */
-	public void writeAS(String[] sv) {
+	public void writeAS(String[] as) {
 
 		write(SerialAtom.TYPE_AS);
 
-		if (sv == null) {
+		if (as == null) {
 			writeInt(0); // num strings
 			return;
 		}
 
-		writeInt(sv.length); // num strings
+		writeInt(as.length); // num strings
 
-		for (int i = 0; i < sv.length; i++) { // strings
-			write(sv[i]);
+		for (int i = 0; i < as.length; i++) { // strings
+			write(as[i]);
 		}
 	}
 
 	/**
 	 * Writes a byte array with a prefixed length value.
 	 * 
-	 * @param ba
+	 * @param ay
 	 *            the byte array
 	 * 
 	 * @see BaIn#readAY()
 	 */
-	public void writeAY(byte[] ba) {
+	public void writeAY(byte[] ay) {
 
 		write(SerialAtom.TYPE_AY);
 
-		if (ba == null) {
+		if (ay == null) {
 			writeInt(0);
 		} else {
-			writeInt(ba.length);
-			write(ba);
+			writeInt(ay.length);
+			write(ay);
 		}
 	}
 
@@ -121,65 +178,22 @@ public final class BaOut extends ByteArrayOutputStream {
 		writeInt(i);
 	}
 
-	/** Same as {@link #writeI(int)} but without a prefixed type code. */
-	public void writeInt(int i) {
-
-		write((i >> 24) & 0xff);
-		write((i >> 16) & 0xff);
-		write((i >> 8) & 0xff);
-		write(i & 0xff);
-	}
-
 	/**
-	 * Writes an int as {@link #writeInt(int)} but here at a specific position
-	 * into the underlying byte array.
+	 * Writes a short (in net byte order) prefixed by a type code.
 	 * 
 	 * @param i
-	 *            the int
-	 * @param at
-	 *            the position to write to
+	 *            the short to write
+	 * 
+	 * @see BaIn#readN()
 	 */
-	public void writeIntAt(int i, int at) {
+	public void writeN(short i) {
 
-		if (at + 4 > count) {
-			Log.bug("Feb 22, 2009.6:27:49 PM");
-			return;
-		}
-
-		int tmp = count;
-
-		count = at;
-
-		writeInt(i);
-
-		count = tmp;
-
+		write(SerialAtom.TYPE_N);
+		writeShort(i);
 	}
 
 	/**
-	 * Writes a long (in net byte order) prefixed by a type code.
-	 * 
-	 * @param l
-	 *            the long to write
-	 * 
-	 * @see BaIn#readL()
-	 */
-	public void writeL(long l) {
-
-		write(SerialAtom.TYPE_L);
-		
-		write((int) (l >> 56) & 0xff);
-		write((int) (l >> 48) & 0xff);
-		write((int) (l >> 40) & 0xff);
-		write((int) (l >> 32) & 0xff);
-		write((int) (l >> 24) & 0xff);
-		write((int) (l >> 16) & 0xff);
-		write((int) (l >> 8) & 0xff);
-		write((int) l & 0xff);
-	}
-
-	/**
-	 * Writes a string prefixed by a type code and an encoding string.
+	 * Writes a string prefixed by a type code.
 	 * 
 	 * @param s
 	 *            the string
@@ -191,6 +205,28 @@ public final class BaOut extends ByteArrayOutputStream {
 		write(SerialAtom.TYPE_S);
 		write(s);
 
+	}
+
+	/**
+	 * Writes a long (in net byte order) prefixed by a type code.
+	 * 
+	 * @param x
+	 *            the long to write
+	 * 
+	 * @see BaIn#readX()
+	 */
+	public void writeX(long x) {
+
+		write(SerialAtom.TYPE_X);
+
+		write((int) (x >> 56) & 0xff);
+		write((int) (x >> 48) & 0xff);
+		write((int) (x >> 40) & 0xff);
+		write((int) (x >> 32) & 0xff);
+		write((int) (x >> 24) & 0xff);
+		write((int) (x >> 16) & 0xff);
+		write((int) (x >> 8) & 0xff);
+		write((int) x & 0xff);
 	}
 
 	/**
@@ -221,7 +257,7 @@ public final class BaOut extends ByteArrayOutputStream {
 		byte[] ba;
 
 		if (s == null) {
-			writeInt(0);
+			writeShort((short) 0);
 		} else {
 			try {
 				ba = s.getBytes(Serial.ENCODING);
@@ -230,9 +266,51 @@ public final class BaOut extends ByteArrayOutputStream {
 				// we are lucky if it is compatible to UTF-8
 				ba = s.getBytes();
 			}
-			writeInt(ba.length);
+			writeShort((short) ba.length);
 			write(ba);
 		}
 	}
+
+	/** Same as {@link #writeI(int)} but without a prefixed type code. */
+	private void writeInt(int i) {
+
+		write((i >> 24) & 0xff);
+		write((i >> 16) & 0xff);
+		write((i >> 8) & 0xff);
+		write(i & 0xff);
+	}
+
+	/** Same as {@link #writeN(int)} but without a prefixed type code. */
+	private void writeShort(short n) {
+
+		write((n >> 8) & 0xff);
+		write(n & 0xff);
+	}
+
+	// /**
+	// * Writes an int as {@link #writeInt(int)} but here at a specific position
+	// * into the underlying byte array.
+	// *
+	// * @param i
+	// * the int
+	// * @param at
+	// * the position to write to
+	// */
+	// private void writeIntAt(int i, int at) {
+	//
+	// if (at + 4 > count) {
+	// Log.bug("Feb 22, 2009.6:27:49 PM");
+	// return;
+	// }
+	//
+	// int tmp = count;
+	//
+	// count = at;
+	//
+	// writeInt(i);
+	//
+	// count = tmp;
+	//
+	// }
 
 }

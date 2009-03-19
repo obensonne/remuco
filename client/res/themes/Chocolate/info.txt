@@ -1,0 +1,8 @@
+This is the theme 'Chocolate'.
+
+It has been designed by The Unknown Designer.
+
+For this theme a minimum screen size of 128x190 is recommended.
+
+... remarks ...
+

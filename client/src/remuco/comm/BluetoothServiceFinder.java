@@ -26,6 +26,21 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 	}
 
+	/** Container for service search related data. */
+	private class Search {
+
+		public final int id;
+		public final IServiceListener listener;
+		public final Hashtable services;
+
+		public Search(int id, IServiceListener listener) {
+			this.id = id;
+			this.listener = listener;
+			this.services = new Hashtable();
+		}
+
+	}
+
 	/** Service name in default language. */
 	private static final int ATTRIBUTE_NAME = 0x0100;
 
@@ -70,79 +85,78 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 	private LocalDevice localDevice = null;
 
-	private final Hashtable services;
+	/**
+	 * Lock to synchronize service search state control. Concurrent threads
+	 * which have to be synchronized are the discovery agent's thread, the UI
+	 * event thread and the global timer thread.
+	 */
+	private final Object lock;
 
-	/** ID of the current service search or -1 if no search is active. */
-	private int serviceSearchID = -1;
-
-	private IServiceListener listener = null;
+	private Search search = null;
 
 	public BluetoothServiceFinder() {
 
-		services = new Hashtable();
+		lock = new Object();
 
 	}
 
 	public void cancelServiceSearch() {
 
-		synchronized (services) {
-
-			if (serviceSearchID > -1) {
-
-				agent.cancelServiceSearch(serviceSearchID);
-				serviceSearchID = -1;
-
-				// listener will be set to null in 'serviceSearchCompleted()'
-
+		synchronized (lock) {
+			if (search != null) {
+				agent.cancelServiceSearch(search.id);
+				search = null;
 			}
 		}
 	}
 
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-		// unused
+		Log.bug("Mar 18, 2009.0:16:23 AM");
 	}
 
 	public void findServices(String addr, IServiceListener listener)
 			throws UserException {
 
-		synchronized (services) {
+		synchronized (lock) {
 
-			if (serviceSearchID > -1)
+			if (search != null)
 				return;
 
-			this.listener = listener;
-
-			services.clear();
-			
 			initBluetooth();
 
 			final BTD btd = new BTD(addr);
 
+			final int sid;
 			try {
-				serviceSearchID = agent.searchServices(ATTRIBUTE_LIST,
-						UUID_LIST, btd, this);
+				sid = agent.searchServices(ATTRIBUTE_LIST, UUID_LIST, btd, this);
 
 			} catch (BluetoothStateException e) {
 
 				Log.ln("[BT] BluetoothStateException", e);
 				throw new UserException("Bluetooth Error",
-						"Bluetooth seems to be busy. Cannot search for Remuco services right now.");
+						"Bluetooth seems to be busy. Cannot search for Remuco "
+								+ "services right now.");
 
 			} catch (NullPointerException e) {
-				// WTK emulator throws a NPExc when there are no services
+				// WTK emulator throws this if there are no services
 				return;
 			}
 
+			search = new Search(sid, listener);
 		}
 	}
 
 	public void inquiryCompleted(int discType) {
-		// unused
+		Log.bug("Mar 18, 2009.0:15:49 AM");
 	}
 
 	public void servicesDiscovered(int transId, ServiceRecord[] srs) {
 
-		synchronized (services) {
+		synchronized (lock) {
+
+			if (search == null) {
+				return;
+			}
 
 			for (int i = 0; i < srs.length; i++) {
 
@@ -150,34 +164,36 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 				String name = getServiceName(srs[i]);
 
-				services.put(name, url); // assuming names are unique
+				search.services.put(name, url); // assuming names are unique
 			}
 		}
 	}
 
-	public void serviceSearchCompleted(int transID, int respCode) {
+	public void serviceSearchCompleted(int transID, final int respCode) {
 
-		Log.ln("[BT] service search finished (" + respCode + ")");
+		synchronized (lock) {
 
-		synchronized (services) {
+			if (search == null) {
+				return; // canceled
+			}
 
-			serviceSearchID = -1;
+			Log.ln("[BT] service search finished (" + respCode + ")");
 
-			switch (respCode) { // check search result
+			switch (respCode) {
 
 			case SERVICE_SEARCH_NO_RECORDS:
 
-				listener.notifyServices(null, new UserException("No Service",
+				search.listener.notifyServices(null, new UserException(
+						"No Service",
 						"Found no Remuco service on the selected device"));
 				break;
 
 			case SERVICE_SEARCH_ERROR:
 
-				listener
-						.notifyServices(
-								null,
-								new UserException("Bluetooth Error",
-										"Search for Remuco service on the selected device failed."));
+				search.listener.notifyServices(null, new UserException(
+						"Bluetooth Error",
+						"Search for a Remuco service on the selected device "
+								+ "failed."));
 				break;
 
 			case SERVICE_SEARCH_TERMINATED:
@@ -187,31 +203,27 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			case SERVICE_SEARCH_DEVICE_NOT_REACHABLE:
 
-				listener
-						.notifyServices(null, new UserException(
-								"Bluetooth Error",
-								"Selected device is not reachable."));
+				search.listener.notifyServices(null, new UserException(
+						"Bluetooth Error", "Selected device is not reachable."));
 				break;
 
 			case SERVICE_SEARCH_COMPLETED:
 
-				listener.notifyServices(services, null);
+				search.listener.notifyServices(search.services, null);
 				break;
 
 			default:
 
-				listener.notifyServices(services, null);
+				search.listener.notifyServices(search.services, null);
 				break;
 
 			}
 
-			listener = null;
-
+			search = null;
 		}
 	}
 
 	private void initBluetooth() throws UserException {
-
 
 		if (localDevice == null) {
 			try {

@@ -3,41 +3,60 @@ package remuco.player;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.Connection;
 import remuco.comm.IMessageListener;
+import remuco.comm.ISerializable;
 import remuco.comm.Message;
 import remuco.comm.Serial;
-import remuco.comm.SerializableString;
 import remuco.util.Log;
 
 /**
  * A player mirrors the state of a remote player and provides methods to control
- * the remote player (methods starting with <code>ctrl</code>, e.g.
- * {@link #ctrlStop()}). To get notifications about player state changes use the
- * <code>register..</code> methods, e.g.
- * {@link #registerCurrentPlobListener(IPlobListener)}.
+ * the remote player, to request data from the remote player and to register
+ * listener for changes in player state.
  * 
  * @author Oben Sonne
  * 
  */
 public final class Player {
 
-	private static final int VOLUME_STEP = 5;
+	private static String pathToString(String sa[]) {
+
+		if (sa == null || sa.length == 0) {
+			return "";
+		}
+
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < sa.length; i++) {
+			sb.append('/').append(sa[i]);
+		}
+
+		return sb.toString();
+	}
 
 	/** Do not alter outside {@link Player}! */
 	public final PlayerInfo info;
 
 	/** Do not alter outside {@link Player}! */
-	public final Plob plob;
+	public final Item item;
+
+	/** Do not alter outside {@link Player}! */
+	public final Progress progress;
 
 	/** Do not alter outside {@link Player}! */
 	public final State state;
 
 	private final Connection conn;
 
-	private IPlobListener plobListener;
+	private IItemListener itemListener;
 
-	private IPloblistRequestor ploblistRequestor;
+	private IProgressListener progressListener = null;
 
-	private IPlobRequestor plobRequestor;
+	private IRequester reqCaller;
+
+	/** Used to detect if incoming request replies are still up to date. */
+	private int reqMsgID = 0;
+
+	/** Used to detect if incoming request replies are still up to date. */
+	private String reqParamID = null;
 
 	private IStateListener stateListener;
 
@@ -55,96 +74,91 @@ public final class Player {
 		this.info = info;
 
 		state = new State();
-		plob = new Plob();
+		progress = new Progress();
+		item = new Item();
 
-		plobRequestor = null;
-		ploblistRequestor = null;
+		reqCaller = null;
 
 	}
 
-	/**
-	 * Jump to a specific plob in the playlist or queue
-	 * 
-	 * @param id
-	 *            id of the ploblist to jump into
-	 * @param pos
-	 *            position of the plob (within the specified ploblist) to play
-	 *            (starting from 0)
-	 * 
-	 */
-	public void ctrlJump(String id, int pos) {
+	public void actionFiles(ActionParam a) {
 
-		ctrl(Control.CMD_JUMP, pos, id);
+		action(Message.ACT_FILES, a);
+
+	}
+
+	public void actionMediaLib(ActionParam a) {
+
+		action(Message.ACT_MEDIALIB, a);
+
+	}
+
+	public void actionPlaylist(ActionParam a) {
+
+		action(Message.ACT_PLAYLIST, a);
+
+	}
+
+	public void actionQueue(ActionParam a) {
+
+		action(Message.ACT_QUEUE, a);
+
 	}
 
 	public void ctrlNext() {
 
-		ctrl(Control.CMD_NEXT, 0, null);
-	}
-
-	public void ctrlPlayNext(String pid) {
-
-		ctrl(Control.CMD_PLAYNEXT, 0, null);
+		ctrl(Message.CTRL_NEXT);
 	}
 
 	public void ctrlPlayPause() {
 
-		ctrl(Control.CMD_PLAYPAUSE, 0, null);
+		ctrl(Message.CTRL_PLAYPAUSE);
 	}
 
 	public void ctrlPrev() {
 
-		ctrl(Control.CMD_PREV, 0, null);
+		ctrl(Message.CTRL_PREV);
 	}
 
 	public void ctrlRate(int rating) {
 
-		ctrl(Control.CMD_RATE, rating, null);
+		ctrl(Message.CTRL_RATE, rating);
 	}
 
-	public void ctrlSeekBwd() {
+	public void ctrlSeek(int direction) {
 
-		ctrl(Control.CMD_SEEK_BWD, 0, null);
+		// not issued by PlayerScreen -> still need a feature check
+
+		if (info.supports(Feature.CTRL_SEEK)) {
+			ctrl(Message.CTRL_SEEK, direction);
+		}
 	}
 
-	public void ctrlSeekFwd() {
+	public void ctrlSetTags(String id, String tags) {
 
-		ctrl(Control.CMD_SEEK_FWD, 0, null);
-	}
+		final Tagging t = new Tagging(id, tags);
 
-	public void ctrlSetTags(String pid, String tags) {
-
-		ctrl(Control.CMD_SETTAGS, 0, pid + ":" + tags);
+		ctrl(Message.CTRL_TAG, t);
 	}
 
 	public void ctrlShutdownHost() {
 
-		ctrl(Control.CMD_SHUTDOWN, 0, null);
+		ctrl(Message.CTRL_SHUTDOWN);
 	}
 
 	public void ctrlToggleRepeat() {
 
-		ctrl(Control.CMD_REPEAT, 0, null);
+		ctrl(Message.CTRL_REPEAT);
 	}
 
 	public void ctrlToggleShuffle() {
 
-		ctrl(Control.CMD_SHUFFLE, 0, null);
+		ctrl(Message.CTRL_SHUFFLE);
 	}
 
-	public void ctrlVolumeDown() {
+	public void ctrlVolume(int direction) {
 
-		ctrlVolume(-1);
-	}
-
-	public void ctrlVolumeMute() {
-
-		ctrlVolume(0);
-	}
-
-	public void ctrlVolumeUp() {
-
-		ctrlVolume(1);
+		ctrl(Message.CTRL_VOLUME, direction);
 	}
 
 	/**
@@ -164,171 +178,224 @@ public final class Player {
 	 */
 	public void handleMessage(Message m) throws BinaryDataExecption {
 
+		if (Message.isRequest(m.id)) {
+			// ignore outdated request replies
+			if (reqCaller == null || reqMsgID != m.id) {
+				return;
+			}
+		}
+
 		switch (m.id) {
 
-		case Message.ID_PLOB:
+		case Message.SYNC_ITEM:
 
-			Serial.in(plob, m.bytes);
+			Serial.in(item, m.data);
 
-			if (plobListener != null) {
-				plobListener.currentPlobChanged();
+			if (itemListener != null) {
+				itemListener.notifyItemChanged();
 			}
 
 			break;
-			
-		case Message.ID_STATE:
 
-			Serial.in(state, m.bytes);
+		case Message.SYNC_STATE:
+
+			Serial.in(state, m.data);
 
 			if (stateListener != null) {
-				stateListener.stateChanged();
+				stateListener.notifyStateChanged();
 			}
 
 			break;
 
-		case Message.ID_REQ_PLOB:
+		case Message.SYNC_PROGRESS:
 
-			if (plobRequestor != null) {
+			Serial.in(progress, m.data);
 
-				final Plob plob = new Plob();
-
-				Serial.in(plob, m.bytes);
-				plobRequestor.handlePlob(plob);
-				plobRequestor = null;
+			if (progressListener != null) {
+				progressListener.notifyProgressChanged();
 			}
-			// else {
-			// May happen if plobs get requested back-to-back
-			// Log.ln("[PL] warn - rx'ed plob, but no requestor");
-			// }
 
 			break;
 
-		case Message.ID_REQ_PLOBLIST:
+		case Message.REQ_ITEM:
 
-			if (ploblistRequestor != null) {
+			final Item item = new Item();
 
-				final PlobList ploblist = new PlobList();
+			Serial.in(item, m.data);
 
-				Serial.in(ploblist, m.bytes);
-				ploblistRequestor.handlePloblist(ploblist);
-				ploblistRequestor = null;
+			if (item.getId().equals(reqParamID)) {
+				reqCaller.handleItem(item);
+				reqCaller = null;
+				reqMsgID = 0;
+				reqParamID = null;
 			}
-			// else {
-			// May happen if ploblists get requested back-to-back
-			// Log.ln("[PL] warn - rx'ed ploblist, but no requestor");
-			// }
+
+			break;
+
+		case Message.REQ_PLAYLIST:
+
+			final ItemList playlist = new ItemList(ItemList.TYPE_PLAYLIST);
+
+			Serial.in(playlist, m.data);
+			reqCaller.handlePlaylist(playlist);
+			reqCaller = null;
+			reqMsgID = 0;
+			reqParamID = null;
+
+			break;
+
+		case Message.REQ_QUEUE:
+
+			final ItemList queue = new ItemList(ItemList.TYPE_QUEUE);
+
+			Serial.in(queue, m.data);
+			reqCaller.handleQueue(queue);
+			reqCaller = null;
+			reqMsgID = 0;
+			reqParamID = null;
+
+			break;
+
+		case Message.REQ_MLIB:
+
+			final ItemList mlib = new ItemList(ItemList.TYPE_MLIB);
+
+			Serial.in(mlib, m.data);
+			if (pathToString(mlib.getPath()).equals(reqParamID)) {
+				reqCaller.handleLibrary(mlib);
+				reqCaller = null;
+				reqMsgID = 0;
+				reqParamID = null;
+			}
+
+			break;
+
+		case Message.REQ_FILES:
+
+			final ItemList files = new ItemList(info.getFileActions());
+
+			Serial.in(files, m.data);
+			if (pathToString(files.getPath()).equals(reqParamID)) {
+				reqCaller.handleFiles(files);
+				reqCaller = null;
+				reqMsgID = 0;
+				reqParamID = null;
+			}
 
 			break;
 
 		default:
-
-			Log.ln("[PL] warn - rx'ed unsupported message type " + m.id);
-
+			Log.bug("rx'ed unsupported msg: " + m.id);
 			break;
 		}
 	}
 
-	/**
-	 * Registers <code>cpl</code> to get notified when the current plob has
-	 * changed.
-	 */
-	public void registerCurrentPlobListener(IPlobListener cpl) {
+	public void reqCancel() {
+		reqMsgID = 0;
+		reqParamID = null;
+		reqCaller = null;
+	}
 
-		plobListener = cpl;
+	public void reqFiles(IRequester lr, String path[]) {
+
+		req(lr, Message.REQ_FILES, new RequestParam(path), pathToString(path));
+	}
+
+	public void reqItem(IRequester ir, String id) {
+
+		req(ir, Message.REQ_ITEM, new RequestParam(id), id);
+	}
+
+	public void reqMLib(IRequester lr, String path[]) {
+
+		req(lr, Message.REQ_MLIB, new RequestParam(path), pathToString(path));
+	}
+
+	public void reqPlaylist(IRequester lr) {
+
+		req(lr, Message.REQ_PLAYLIST, null, null);
+	}
+
+	public void reqQueue(IRequester lr) {
+
+		req(lr, Message.REQ_QUEUE, null, null);
 	}
 
 	/**
-	 * Registers <code>sl</code> to get notified when the state (see
-	 * {@link State}) has changed.
+	 * Registers <em>il</em> to get notified when the current item has changed.
+	 * 
+	 * @see #item
 	 */
-	public void registerStateListener(IStateListener sl) {
+	public void setItemListener(IItemListener il) {
+
+		itemListener = il;
+	}
+
+	/**
+	 * Registers <em>pl</em> to get notified when the progress has changed.
+	 * 
+	 * @see #progress
+	 */
+	public void setProgressListener(IProgressListener pl) {
+		progressListener = pl;
+	}
+
+	/**
+	 * Registers <em>sl</em> to get notified when the state has changed.
+	 * 
+	 * @see #state
+	 */
+	public void setStateListener(IStateListener sl) {
 
 		stateListener = sl;
 	}
 
-	/**
-	 * Request a plob.
-	 * 
-	 * @param pid
-	 *            the plob's ID
-	 * @param pr
-	 *            the requester of the plob
-	 * @return <code>true</code> if the request has been submitted to the remote
-	 *         player, <code>false</code> if a previous plob request is still in
-	 *         process.
-	 */
-	public boolean reqPlob(String pid, IPlobRequestor pr) {
+	private void action(int msgID, ActionParam action) {
 
-		if (plobRequestor != null)
-			return false;
+		final Message m = new Message();
 
-		plobRequestor = pr;
+		m.id = msgID;
+		m.data = Serial.out(action);
 
-		final SerializableString request = new SerializableString();
-		request.set(pid);
-
-		conn.send(new Message(Message.ID_REQ_PLOB, Serial.out(request)));
-
-		return true;
+		conn.send(m);
 	}
 
-	/**
-	 * Request a ploblist.
-	 * 
-	 * @param plid
-	 *            the ploblist's ID
-	 * @param response
-	 *            this ploblist will be updated to reflect the requested
-	 *            ploblist (to avoid many new object creations)
-	 * @param plr
-	 *            the requester of the ploblist
-	 * @return <code>true</code> if the request has been submitted to the remote
-	 *         player, <code>false</code> if a previous ploblist request is
-	 *         still in process.
-	 * 
-	 * @see IPloblistRequestor#handlePloblist(PlobList)
-	 */
-	public boolean reqPloblist(String id, IPloblistRequestor plr) {
+	private void ctrl(int id) {
 
-		if (ploblistRequestor != null)
-			return false;
-
-		ploblistRequestor = plr;
-		final SerializableString request = new SerializableString();
-		request.set(id);
-
-		conn.send(new Message(Message.ID_REQ_PLOBLIST, Serial.out(request)));
-
-		return true;
+		ctrl(id, null);
 	}
 
-	private void ctrl(int cmd, int paramI, String paramS) {
+	private void ctrl(int id, int param) {
 
-		final Control ctl = new Control();
-
-		ctl.set(cmd, paramI, paramS);
-
-		conn.send(new Message(Message.ID_CTRL, Serial.out(ctl)));
+		ctrl(id, new ControlParam(param));
 	}
 
-	private void ctrlVolume(int direction) {
+	private void ctrl(int id, ISerializable ser) {
 
-		int volumeNew;
+		final Message m = new Message();
 
-		Log.ln("Vol control: " + direction);
+		m.id = id;
 
-		volumeNew = direction == 0 ? 0 : state.getVolume() + direction
-				* VOLUME_STEP;
+		if (ser != null) {
+			m.data = Serial.out(ser);
+		}
 
-		volumeNew = volumeNew > 100 ? 100 : volumeNew < 0 ? 0 : volumeNew;
+		conn.send(m);
 
-		ctrl(Control.CMD_VOLUME, volumeNew, null);
+	}
 
-		// // small hack: trigger an immediate volume bar update
-		state.setVolume(volumeNew);
-		if (stateListener != null)
-			stateListener.stateChanged();
+	private void req(IRequester rc, int msgID, RequestParam req, String paramID) {
 
+		reqCaller = rc;
+		reqMsgID = msgID;
+		reqParamID = paramID;
+
+		final Message m = new Message();
+
+		m.id = msgID;
+		m.data = Serial.out(req);
+
+		conn.send(m);
 	}
 
 }

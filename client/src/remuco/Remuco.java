@@ -1,5 +1,8 @@
 package remuco;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -10,6 +13,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import remuco.comm.Connection;
 import remuco.ui.CMD;
 import remuco.ui.Theme;
 import remuco.ui.UI;
@@ -19,20 +23,8 @@ import remuco.util.Log;
 /**
  * MIDlet of the Remuco client.
  * <p>
- * <h1>Some general notes about the client source</h1>
- * A lot of classes are declared as <code>final</code>. This has no software
- * design specific but performance reason. There a lot of discussion in the net
- * about using final classes (and so methods) for performance reasons. To draw a
- * conclusion of these discussions it is actually bad style to use final classes
- * to improve performance since it may confuse other developers and since the
- * performance benefit is probably very small (due to nowadays very
- * sophisticated JIT compilers). However, in my understanding the last point is
- * valid for Java code running in JREs but it is unclear if it applies to a
- * J2ME-RE. So final classes may still improve performance. This is an
- * assumption. Once it is proved that this assumption is wrong, I will undo all
- * the performance related final declaration of classes.
  * <h1>Emulator Code</h1>
- * Some code is only used to while running inside the WTK emulator. All
+ * Some code is only used while running inside the WTK emulator. All
  * corresponding code is either tagged with <code>emulator</code> in its JavaDoc
  * or is located inside an if-statement block using the condition
  * {@link #EMULATION}.
@@ -40,7 +32,7 @@ import remuco.util.Log;
  * @author Oben Sonne
  * 
  */
-public final class Remuco extends MIDlet implements CommandListener {
+public class Remuco extends MIDlet implements CommandListener {
 
 	/**
 	 * @emulator If <code>true</code>, the client runs inside the WTK emulator.
@@ -55,9 +47,55 @@ public final class Remuco extends MIDlet implements CommandListener {
 	private static final Command CMD_SYSINFO = new Command("System",
 			Command.SCREEN, 1);
 
+	private static Timer GLOBAL_TIMER = null;
+
+	/**
+	 * Get the global (main loop) timer.
+	 * <p>
+	 * The global timer is used for
+	 * <ul>
+	 * <li>handling events from a {@link Connection} (decoupled from the
+	 * {@link Connection}'s receiver thread and from the threads calling methods
+	 * on a {@link Connection}),
+	 * <li>scheduling repetitive tasks,
+	 * <li>scheduling delayed tasks and
+	 * <li>synchronizing access to objects where critical race conditions may
+	 * occur.
+	 * </ul>
+	 * Do not call {@link Timer#cancel()} on this timer - this is done once on
+	 * application shutdown.
+	 */
+	public static Timer getGlobalTimer() {
+		if (GLOBAL_TIMER == null) {
+			GLOBAL_TIMER = new Timer();
+			// periodically log if the global timer is still alive:
+			GLOBAL_TIMER.schedule(new TimerTask() {
+				private final long startTime = System.currentTimeMillis();
+
+				public void run() {
+					final long now = System.currentTimeMillis();
+					final long seconds = (now - startTime) / 1000;
+					Log.ln("main loop alive (" + seconds + ")");
+				}
+			}, 30000, 30000);
+		}
+		return GLOBAL_TIMER;
+	}
+	
+	private static void cancelGlobalTimer() {
+		
+		if (GLOBAL_TIMER != null) {
+			GLOBAL_TIMER.cancel();
+			GLOBAL_TIMER = null;
+		}
+		
+	}
+
 	private final Alert alertLoadConfig;
 
 	private final Alert alertSaveConfig;
+
+	private final Config config;
 
 	private final Display display;
 
@@ -67,11 +105,6 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	/** Alert displaying current memory status */
 	private final Form logSysInfoForm;
-
-	/** Text for the memory status alert */
-	private final StringBuffer logSysInfoText;
-	
-	private final Config config;
 
 	/**
 	 * We need to know this since {@link #startApp()} might get called more than
@@ -93,8 +126,6 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 		// set up logging
 
-		logSysInfoText = new StringBuffer();
-
 		logSysInfoForm = new Form("System Info");
 		logSysInfoForm.addCommand(CMD_RUNGC);
 		logSysInfoForm.addCommand(CMD.BACK);
@@ -114,7 +145,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 		// load the configuration
 
 		Config.init(this);
-		
+
 		config = Config.getInstance();
 
 		Theme.init(display);
@@ -150,10 +181,6 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 			display.setCurrent(logForm);
 
-		} else if (c == CMD_RUNGC) {
-
-			System.gc();
-
 		} else if (c == CMD.BACK && d == logSysInfoForm) {
 
 			display.setCurrent(logForm);
@@ -185,21 +212,24 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 		} else if (c == CMD.EXIT) {
 
-			if (!config.save())
+			if (!config.save()) {
 				display.setCurrent(alertSaveConfig);
-			else
+			} else {
+				cancelGlobalTimer();
 				notifyDestroyed();
+			}
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
 
 			// continue start up
 
-			ui.showYourself();
+			ui.show();
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
 
 			// continue shut down
 
+			cancelGlobalTimer();
 			notifyDestroyed();
 
 		} else {
@@ -213,7 +243,13 @@ public final class Remuco extends MIDlet implements CommandListener {
 	protected void destroyApp(boolean unconditional)
 			throws MIDletStateChangeException {
 
+		/*
+		 * This method only gets called by the application management (and not
+		 * when the MIDLet gets shut down by the user)!
+		 */
+
 		config.save();
+		cancelGlobalTimer();
 
 	}
 
@@ -234,7 +270,7 @@ public final class Remuco extends MIDlet implements CommandListener {
 				return;
 			}
 
-			ui.showYourself();
+			ui.show();
 
 			Log.ln("[RM] started");
 
@@ -248,22 +284,24 @@ public final class Remuco extends MIDlet implements CommandListener {
 
 	private void updateSysInfoForm() {
 
-		logSysInfoForm.deleteAll();
-		logSysInfoText.delete(0, logSysInfoText.length());
-
 		final long memTotal = Runtime.getRuntime().totalMemory() / 1024;
 		final long memFree = Runtime.getRuntime().freeMemory() / 1024;
 		final long memUsed = memTotal - memFree;
 
-		logSysInfoText.append("--- Memory --- \n");
-		logSysInfoText.append("Total : ").append(memTotal).append(" KB\n");
-		logSysInfoText.append("Used  : ").append(memUsed).append(" KB\n");
-		logSysInfoText.append("Free  : ").append(memFree).append(" KB\n");
-		logSysInfoText.append("--- Misc --- \n");
-		logSysInfoText.append("UTF-8 : ");
-		logSysInfoText.append(Config.UTF8 ? "yes" : "no").append("\n");
+		final StringBuffer sb = new StringBuffer(200);
 
-		logSysInfoForm.append(logSysInfoText.toString());
+		sb.append("--- Memory --- \n");
+		sb.append("Total : ").append(memTotal).append(" KB\n");
+		sb.append("Used  : ").append(memUsed).append(" KB\n");
+		sb.append("Free  : ").append(memFree).append(" KB\n");
+		sb.append("--- Misc --- \n");
+		sb.append("UTF-8 : ");
+		sb.append(Config.UTF8 ? "yes" : "no").append("\n");
+		sb.append("Time  : ");
+		sb.append(System.currentTimeMillis());
+
+		logSysInfoForm.deleteAll();
+		logSysInfoForm.append(sb.toString());
 
 	}
 
