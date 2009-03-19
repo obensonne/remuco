@@ -2,6 +2,8 @@ import os.path
 import traceback
 import time
 
+import gobject
+
 import rb, rhythmdb
 
 import remuco
@@ -21,8 +23,17 @@ SECTION_LIBRARY = "Library"
 COVER_FILE_NAMES = ("folder", "front", "album", "cover")
 COVER_FILE_TYPES = ("png", "jpeg", "jpg")
 
-SEEK_STEP = 5
+# =============================================================================
+# actions
+# =============================================================================
 
+ACT_PL_JUMP = remuco.ItemAction("Jump", "Jump to marked item.")
+ACT_QU_JUMP = remuco.ItemAction("Jump", "Jump to marked item.")
+ACT_ML_LIST_PLAY = remuco.ItemAction("Play", "Play selected list.")
+
+PLAYLIST_ACTIONS = (ACT_PL_JUMP,)
+QUEUE_ACTIONS = (ACT_QU_JUMP,)
+MLIB_LIST_ACTIONS = (ACT_ML_LIST_PLAY,)
 
 # =============================================================================
 # player adapter
@@ -34,12 +45,16 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         self.__shell = None
         
-        remuco.PlayerAdapter.__init__(self, "Rhythmbox", max_rating=5)
+        remuco.PlayerAdapter.__init__(self, "Rhythmbox",
+                                      max_rating=5,
+                                      playback_known=True,
+                                      volume_known=True,
+                                      repeat_known=True,
+                                      shuffle_known=True,
+                                      progress_known=True)
         
-        self.__cover_file = "%s/cover.png" % self.get_cache_dir()
-
-        self.__plob_id = None
-        self.__plob_entry = None
+        self.__item_id = None
+        self.__item_entry = None
         self.__playlist_sc = None
         self.__queue_sc = None
         
@@ -61,8 +76,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         ###### shortcuts to RB data ###### 
         
-        self.__plob_id = None
-        self.__plob_entry = None
+        self.__item_id = None
+        self.__item_entry = None
         self.__playlist_sc = sp.get_playing_source()
         self.__queue_sc = self.__shell.props.queue_source
         
@@ -77,7 +92,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         ###### initially trigger server synchronization ######
         
         # state sync will happen by timeout
-        self.__notify_playing_uri_changed(sp, sp.get_playing_path()) # plob sync
+        self.__notify_playing_uri_changed(sp, sp.get_playing_path()) # item sync
         
         log.debug("start done")
 
@@ -127,61 +142,24 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         self.update_volume(volume)
         
-        return True
-
+        ###### check progress ######
+        
+        try:
+            progress = sp.get_playing_time()
+            length = sp.get_playing_song_duration()
+        except gobject.GError:
+            progress = 0
+            length = 0 
+        else:
+            self.update_progress(progress, length)
+        
     # =========================================================================
-    # client side player control
+    # control interface
     # =========================================================================
     
-    def ctrl_jump_in_playlist(self, position):
+    def ctrl_ml_playlist_set(self, path):
         
-        try:
-            self.__jump_in_plq(self.__playlist_sc, position)
-        except Exception, e:
-            log.debug("playlist jump failed: %s" % str(e))
-        
-    def ctrl_jump_in_queue(self, position):
-
-        try:
-            self.__jump_in_plq(self.__queue_sc, position)
-        except Exception, e:
-            log.debug("queue jump failed: %s" % str(e))
-
-    def __jump_in_plq(self, sc, position):
-
-        if sc is None:
-            return
-        
-        qm = sc.get_entry_view().props.model
-        
-        id_to_remove_from_queue = None
-        
-        sp = self.__shell.get_player()
-
-        if sp.props.playing_from_queue:
-            id_to_remove_from_queue = self.__plob_id
-
-        found = False
-        i = 0
-        for row in qm:
-            if i == position:
-                sp.set_selected_source(sc)
-                sp.set_playing_source(sc)
-                sp.play_entry(row[0])
-                found = True
-                break
-            i += 1
-        
-        if not found:
-            sp.do_next()
-        
-        if id_to_remove_from_queue != None:
-            log.debug("remove %s from queue" % id_to_remove_from_queue)
-            self.__shell.remove_from_queue(id_to_remove_from_queue)
-
-    def ctrl_load_playlist(self, path):
-        
-        sc = self.__library_path_to_source(path)
+        sc = self.__mlib_path_to_source(path)
         
         if sc is None:
             return
@@ -220,10 +198,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     
     def ctrl_rate(self, rating):
         
-        if self.__plob_entry is not None:
+        if self.__item_entry is not None:
             db = self.__shell.props.db
             try:
-                db.set(self.__plob_entry, rhythmdb.PROP_RATING, rating)
+                db.set(self.__item_entry, rhythmdb.PROP_RATING, rating)
             except Exception, e:
                 log.debug("rating failed: %s" % str(e))
     
@@ -236,80 +214,116 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except Exception, e:
             log.debug("toggle play pause failed: %s" % str(e))
                 
+    # shuffle and repeat cannot be set:
+    # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
     
-    def ctrl_toggle_repeat(self):
-        # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
-        log.warning("toggle repeat mode not possible")
-        
-    
-    def ctrl_toggle_shuffle(self):
-        # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
-        log.warning("toggle shuffle mode not possible")
-    
-    def ctrl_seek_forward(self):
+    def ctrl_seek(self, direction):
         
         sp = self.__shell.get_player()
 
         try:
-            sp.seek(SEEK_STEP)
+            sp.seek(direction * 5)
         except Exception, e:
-            log.debug("seek fwd failed: %s" % str(e))
+            log.debug("seek failed: %s" % str(e))
+        else:
+            # update volume within a short time (don't wait for scheduled poll)
+            gobject.idle_add(self.poll)    
     
-    def ctrl_seek_backward(self):
-
-        sp = self.__shell.get_player()
-        
-        try:
-            sp.seek(- SEEK_STEP)
-        except Exception, e:
-            log.debug("seek bwd failed: %s" % str(e))
-    
-    def ctrl_volume(self, volume):
+    def ctrl_volume(self, direction):
         
         sp = self.__shell.get_player()
-
-        try:
-            sp.set_volume(float(volume) / 100)
-        except Exception, e:
-            log.debug("set volume failed: %s" % str(e))
+        
+        if direction == 0:
+            sp.set_volume(0)
+        else:
+            try:
+                sp.set_volume_relative(direction * 0.05)
+            except Exception, e:
+                log.debug("set volume failed: %s" % str(e))
+        
+        # update volume within a short time (don't wait for scheduled poll)
+        gobject.idle_add(self.poll)    
         
     # =========================================================================
-    # client side requests
+    # action interface
     # =========================================================================
     
-    def request_plob(self, client, id):
-        
-        try:
-            db = self.__shell.props.db
-            entry = db.entry_lookup_by_location(id)
-        except Exception, e:
-            log.warning("requesting plob failed: %s" % e)
-            entry = None
+    def action_playlist(self, action_id, positions, ids):
+
+        if action_id == ACT_PL_JUMP.id:
             
-        info = self.__get_plob_info(entry)
+            try:
+                self.__jump_in_plq(self.__playlist_sc, positions[0])
+            except Exception, e:
+                log.debug("playlist jump failed: %s" % str(e))
         
-        self.reply_plob_request(client, id, info)
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    def action_queue(self, action_id, positions, ids):
+
+        if action_id == ACT_QU_JUMP.id:
+            
+            try:
+                self.__jump_in_plq(self.__queue_sc, positions[0])
+            except Exception, e:
+                log.debug("queue jump failed: %s" % str(e))
+    
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    def action_medialib(self, action_id, path, positions, ids):
         
+        if action_id == ACT_ML_LIST_PLAY.id:
+            
+            sc = self.__mlib_path_to_source(path)
+            if sc is None:
+                log.warning("no source for path %s" % path)
+                return
+            
+            qm = sc.get_entry_view().props.model
+            
+            sp = self.__shell.get_player()
+    
+            if sc != self.__playlist_sc:
+                try:
+                    sp.set_selected_source(sc)
+                    sp.set_playing_source(sc)
+                    self.__jump_in_plq(sc, 0)
+                except Exception, e:
+                    log.debug("switching source failed: %s" % str(e))
+            
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    
+    
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
     def request_playlist(self, client):
         
         try:
             qm = self.__playlist_sc.get_entry_view().props.model 
-            ids, names = self.__get_tracks_from_qmodel(qm)
+            ids, names = self.__get_items_from_qmodel(qm)
         except:
             ids, names = [], []
         
-        self.reply_playlist_request(client, ids, names)
+        self.reply_playlist_request(client, ids, names,
+                                    item_actions=PLAYLIST_ACTIONS)
 
     def request_queue(self, client):
         
         sc = self.__queue_sc
         qm = sc.props.query_model
 
-        ids, names = self.__get_tracks_from_qmodel(qm)
+        ids, names = self.__get_items_from_qmodel(qm)
         
-        self.reply_queue_request(client, ids, names)
+        self.reply_queue_request(client, ids, names,
+                                 item_actions=QUEUE_ACTIONS)
 
-    def request_library(self, client, path):
+    def request_medialib(self, client, path):
 
         nested = []
         ids = []
@@ -319,11 +333,11 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         ### root ? ###
         
-        if path is None or len(path) == 0:
+        if not path:
             for group in slm:
                 group_name = group[2]
                 nested.append(group_name)
-            self.reply_library_request(client, path, nested, ids, names)
+            self.reply_medialib_request(client, path, nested, ids, names)
             return
         
         ### group ? ### Library, Playlists
@@ -337,30 +351,31 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                         log.debug("append %s" % source_name)
                         nested.append(source_name)
                     break
-            self.reply_library_request(client, path, nested, ids, names)
+            self.reply_medialib_request(client, path, nested, ids, names,
+                                        list_actions=MLIB_LIST_ACTIONS)
             return
             
         ### regular playlist (source) ! ### Library/???, Playlists/???
         
-        sc = self.__library_path_to_source(path)
+        sc = self.__mlib_path_to_source(path)
 
         if sc is None:
             
-            self.reply_library_request(client, path, nested, ids, names)
+            self.reply_medialib_request(client, path, nested, ids, names)
             return
         
         qm = sc.get_entry_view().props.model
             
-        ids, names = self.__get_tracks_from_qmodel(qm)
+        ids, names = self.__get_items_from_qmodel(qm)
         
-        self.reply_library_request(client, path, nested, ids, names)
+        self.reply_medialib_request(client, path, nested, ids, names)
         
     # ==========================================================================
     # callbacks
     # ==========================================================================
     
     def __notify_playing_uri_changed(self, sp, uri):
-        """Shell player signal callback to handle a plob change."""
+        """Shell player signal callback to handle an item change."""
         
         log.debug("playing uri changed: %s" % uri)
         
@@ -371,39 +386,33 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             id = None
         else:
             id = db.entry_get(entry, rhythmdb.PROP_LOCATION)
-            # FIXME: id == uri ???
         
-        self.__plob_id = id
-        self.__plob_entry = entry
+        self.__item_id = id
+        self.__item_entry = entry
         
-        db = self.__shell.props.db
+        if entry is not None and id is not None:
 
-        if id is not None and entry is not None:
-
-            info = self.__get_plob_info(entry)
+            info = self.__get_item_info(entry)
     
             img_data = db.entry_request_extra_metadata(entry, "rb:coverArt")
             if img_data is None:
-                img_file = self.get_image(id)
+                img_file = self.find_image(id)
             else:
-                log.debug("image type: %s" % type(img_data))
                 try:
-                    img_data.save(self.__cover_file, "png")
-                    img_file = self.__cover_file
+                    img_file = "%s/art.png" % self.config.cache_dir
+                    img_data.save(img_file, "png")
                 except IOError, e:
-                    log.warning("failed to save RB cover (%s)" % e)
+                    log.warning("failed to save cover art (%s)" % e)
                     img_file = None
-    
-            log.debug("image: %s" % str(img_file))
     
         else:
             id = None
             img_file = None
             info = None
 
-        self.update_plob(id, info, img_file)
+        self.update_item(id, info, img_file)
         
-        # a new plob may result in a new position:
+        # a new item may result in a new position:
         pfq = self.__shell.get_player().props.playing_from_queue
         self.update_position(self.__get_position(), queue=pfq)
 
@@ -428,10 +437,50 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # helper methods
     # =========================================================================
 
-    def __get_tracks_from_qmodel(self, qmodel):
-        """Get all tracks in a query model.
+    def __jump_in_plq(self, sc, position):
+        """Do a jump within the playlist or queue.
         
-        Returns 2 lists, first with IDs, second with names of the tracks.
+        @param sc:
+            either current playlist or queue source
+        @param position:
+            position to jump to
+            
+        """
+
+        if sc is None:
+            return
+        
+        qm = sc.get_entry_view().props.model
+        
+        id_to_remove_from_queue = None
+        
+        sp = self.__shell.get_player()
+
+        if sp.props.playing_from_queue:
+            id_to_remove_from_queue = self.__item_id
+
+        found = False
+        i = 0
+        for row in qm:
+            if i == position:
+                sp.set_selected_source(sc)
+                sp.set_playing_source(sc)
+                sp.play_entry(row[0])
+                found = True
+                break
+            i += 1
+        
+        if not found:
+            sp.do_next()
+        
+        if id_to_remove_from_queue != None:
+            log.debug("remove %s from queue" % id_to_remove_from_queue)
+            self.__shell.remove_from_queue(id_to_remove_from_queue)
+
+    def __get_items_from_qmodel(self, qmodel):
+        """Get all items in a query model.
+        
+        @return: 2 lists - IDs and names of the items
         """
         
         db = self.__shell.props.db
@@ -446,22 +495,20 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             uri = db.entry_get(row[0], rhythmdb.PROP_LOCATION)
             ids.append(uri)
             artist = db.entry_get(row[0], rhythmdb.PROP_ARTIST)
-            artist_set = artist is not None and len(artist) > 0
             title = db.entry_get(row[0], rhythmdb.PROP_TITLE)
-            title_set = title is not None and len(title) > 0
-            if artist_set and title_set:
+            if artist and title:
                 names.append("%s - %s" % (artist, title))
-            elif title_set:
+            elif title:
                 names.append(title)
-            elif artist_set:
+            elif artist:
                 names.append(artist)
             else:
                 names.append("Unknown")
 
         return (ids, names)
 
-    def __get_plob_info(self, entry):
-        """Get meta information for a plob.
+    def __get_item_info(self, entry):
+        """Get meta information for an item.
         
         @return: meta information (dictionary) - also if entry is None (in this
                  case dummy information is returned)
@@ -486,14 +533,14 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         return meta 
     
-    def __library_path_to_source(self, path):
+    def __mlib_path_to_source(self, path):
         """Get the source object related to a library path.
         
-        'path' contains the source' group and name (2 element list).
+        @param path: must contain the source' group and name (2 element list)
         """
         
         if len(path) != 2:
-            log.error("** BUG ** invalid path length: %s" % str(path))
+            log.error("** BUG ** invalid path length: %s" % path)
             return None
         
         group_name, source_name = path
@@ -518,7 +565,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         position = 0
         queue = False
         
-        id_now = self.__plob_id
+        id_now = self.__item_id
         
         if id_now is not None:
             

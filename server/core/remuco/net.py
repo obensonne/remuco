@@ -10,13 +10,16 @@ from remuco import message
 from remuco import serial
 
 def build_message(id, serializable):
-    """ Create a message ready to send on a socket.
+    """Create a message ready to send on a socket.
     
-    @param id: message id
-    @param serializable: message content (object of type Serializable)
+    @param id:
+        message id
+    @param serializable:
+        message content (object of type Serializable)
     
-    @return: the message as a binary string (incl. IO prefix and suffix) or
-             None if serialization failed
+    @return:
+        the message as a binary string or None if serialization failed
+        
     """
     
     # This is not included in ClientConnection.send() because if there are
@@ -32,67 +35,70 @@ def build_message(id, serializable):
     else:
         ba = ""
     
-    header = struct.pack("!ii", id, len(ba))
+    header = struct.pack("!hi", id, len(ba))
     
-#    hex = ""
-#    for c in ba:
-#        hex = "%s %X" % (hex, ord(c))
-#    log.debug("built message (id %d, size %d, data '%s')" % (id, len(ba), hex))
-    
-    return "%s%s%s%s" % (ClientConnection.IO_PREFIX, header, ba,
-                         ClientConnection.IO_SUFFIX)
+    return "%s%s" % (header, ba)
 
-class ReceiveBuffer():
+class ReceiveBuffer(object):
     """ A box to pool some receive buffer related data. """
     
     def __init__(self):
         
+        self.header = ""
         self.data = ""
         self.rest = 0
         
-class ClientConnection():
+class ClientConnection(object):
+    
+    IO_HEADER_LEN = 6
+    IO_MSG_MAX_SIZE = 10240 # prevent DOS
     
     IO_PREFIX = '\xff\xff\xff\xff'
-    IO_PREFIX_LEN = len(IO_PREFIX)
     IO_SUFFIX = '\xfe\xfe\xfe\xfe'
-    IO_SUFFIX_LEN = len(IO_SUFFIX)
-    IO_HEADER_LEN = 8
-    IO_MSG_MAX_SIZE = 10240 # prevent DOS
-    PROTO_VERSION = '\x08'
-    IO_HELLO = "%s%s%s" % (IO_PREFIX, PROTO_VERSION, IO_SUFFIX) # hello message
+    IO_PROTO_VERSION = '\x08'
+    IO_HELLO = "%s%s%s" % (IO_PREFIX, IO_PROTO_VERSION, IO_SUFFIX) # hello msg
     
-    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn):
+    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping):
         
         self.__sock = sock
         self.__addr = addr
-        self.__addr_str = str(addr)
         self.__clients = clients
         self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
         
         # the following fields are used for iterative receiving on message data
         # see io_recv() and io_recv_buff()
-        self.__rcv_buff_prefix = ReceiveBuffer()
         self.__rcv_buff_header = ReceiveBuffer()
         self.__rcv_buff_data = ReceiveBuffer()
-        self.__rcv_buff_suffix = ReceiveBuffer()
-        self.__rcv_msg_id = message.MSG_ID_IGNORE
+        self.__rcv_msg_id = message.IGNORE
         self.__rcv_msg_size = 0
         
         self.__snd_buff = "" # buffer for outgoing data
         
-        # source IDs for IO related events
-        self.__sids = (
+        # source IDs for various events
+        self.__sids = [
             gobject.io_add_watch(self.__sock, gobject.IO_IN, self.__io_recv),
             gobject.io_add_watch(self.__sock, gobject.IO_ERR, self.__io_error),
             gobject.io_add_watch(self.__sock, gobject.IO_HUP, self.__io_hup)
-            )
+            ]
         self.__sid_out = 0
         
-        log.debug("send 'hello' to %s" % self.__addr_str)
+        # setup ping
+        self.__snd_ts = time.time()
+        self.__ping_ival = int(ping * 1000)
+        if self.__ping_ival > 0:
+            msg = build_message(message.IGNORE, None)
+            sid = gobject.timeout_add(self.__ping_ival, self.__ping, msg)
+            self.__sids.append(sid)
+
+        log.debug("send 'hello' to %s" % self)
         
         self.send(ClientConnection.IO_HELLO)
+    
+    def __str__(self):
         
+        return str(self.__addr)
+    
     #==========================================================================
     # io
     #==========================================================================
@@ -108,12 +114,12 @@ class ClientConnection():
         try:
             log.debug("try to receive %d bytes" % rcv_buff.rest)
             data = self.__sock.recv(rcv_buff.rest)
-        except socket.timeout, e:
-            log.warning("connection to %s broken (%s)" % (self.__addr_str, e))
+        except socket.timeout, e: # TODO: needed?
+            log.warning("connection to %s broken (%s)" % (self, e))
             self.disconnect()
             return False
         except socket.error, e:
-            log.warning("connection to %s broken (%s)" % (self.__addr_str, e))
+            log.warning("connection to %s broken (%s)" % (self, e))
             self.disconnect()
             return False
         
@@ -122,7 +128,7 @@ class ClientConnection():
         log.debug("received %d bytes" % received)
         
         if received == 0:
-            log.warning("connection to %s broken (no data)" % self.__addr_str)
+            log.warning("connection to %s broken (no data)" % self)
             self.disconnect()
             return False
         
@@ -135,132 +141,134 @@ class ClientConnection():
     def __io_recv(self, fd, cond):
         """ GObject callback function (when there is data to receive). """
         
-        log.debug("data from client %s available" % self.__addr_str)
+        log.debug("data from client %s available" % self)
 
-        if self.__rcv_buff_prefix.rest + self.__rcv_buff_header.rest + \
-                    self.__rcv_buff_data.rest + self.__rcv_buff_suffix.rest == 0:
-            # new message
-            self.__rcv_msg_id = message.MSG_ID_IGNORE
-            self.__rcv_msg_size = 0 # variable, will be set later
-            self.__rcv_buff_prefix.data = ""
-            self.__rcv_buff_prefix.rest = ClientConnection.IO_PREFIX_LEN
+        # --- init buffers on new message -------------------------------------
+
+        if (self.__rcv_buff_header.rest + self.__rcv_buff_data.rest == 0):
+
+            self.__rcv_msg_id = message.IGNORE
+            self.__rcv_msg_size = 0 # will be set later
+            
             self.__rcv_buff_header.data = ""
             self.__rcv_buff_header.rest = ClientConnection.IO_HEADER_LEN
             self.__rcv_buff_data.data = ""
-            self.__rcv_buff_data.rest = 0 # variable, will be set later
-            self.__rcv_buff_suffix.data = ""
-            self.__rcv_buff_suffix.rest = ClientConnection.IO_SUFFIX_LEN
+            self.__rcv_buff_data.rest = 0 # will be set later
     
-        if self.__rcv_buff_prefix.rest > 0:
-            
-            return self.__recv_buff(self.__rcv_buff_prefix)
-            
+        # --- receive header --------------------------------------------------
+
         if self.__rcv_buff_header.rest > 0:
             
             ok = self.__recv_buff(self.__rcv_buff_header)
-            if not ok: return False
-            if self.__rcv_buff_header.rest == 0:
-                # completely received header
-                self.__rcv_msg_id, self.__rcv_msg_size = \
-                    struct.unpack('!ii', self.__rcv_buff_header.data)
-                if self.__rcv_msg_size > ClientConnection.IO_MSG_MAX_SIZE:
-                    log.warning("msg from %s too big (%d bytes)" %
-                                (self.__addr_str ,self.__rcv_msg_size))
-                    self.disconnect()
-                    return False
-                self.__rcv_buff_data.rest = self.__rcv_msg_size
-            return True
+            if not ok:
+                return False
+            if self.__rcv_buff_header.rest > 0:
+                return True # more data to read, come back later
+            id, size = struct.unpack('!hi', self.__rcv_buff_header.data)
+            if size > ClientConnection.IO_MSG_MAX_SIZE:
+                log.warning("msg from %s too big (%d bytes)" % (self, size))
+                self.disconnect()
+                return False
+            log.debug("incoming msg: %d, %dB" % (id, size))
+            self.__rcv_buff_data.rest = size
+            self.__rcv_msg_id, self.__rcv_msg_size = id, size
+            if size > 0:
+                return True # more data to read, come back later
         
+        # --- receive content -------------------------------------------------
+
         if self.__rcv_buff_data.rest > 0:
             
-            return self.__recv_buff(self.__rcv_buff_data)
+            ok = self.__recv_buff(self.__rcv_buff_data)
+            if not ok:
+                return False
+            if self.__rcv_buff_data.rest > 0:
+                return True # more data to read, come back later
         
-        if self.__rcv_buff_suffix.rest > 0:
+        # --- message complete ------------------------------------------------
             
-            ok = self.__recv_buff(self.__rcv_buff_suffix)
-            if not ok: return False
-            if self.__rcv_buff_suffix.rest != 0:
-                # still need to get some bytes
-                return True
-            else:
-                # message complete
-                msg_id = self.__rcv_msg_id
-                msg_data = self.__rcv_buff_data.data
+        msg_id = self.__rcv_msg_id
+        msg_data = self.__rcv_buff_data.data
 
-        # handle message
-
-        log.debug("incoming message (id %d, payload %d)" % (msg_id, len(msg_data)))
+        log.debug("received msg ")
         
-        if msg_id == message.MSG_ID_CINFO:
+        if msg_id == message.CONN_CINFO:
             
-            log.debug("received client info from %s" % self.__addr_str)
+            log.debug("received client info from %s" % self)
             
             self.__clients.append(self)
             
-            log.debug("sending player info to %s" % self.__addr_str)
+            log.debug("sending player info to %s" % self)
             
             self.send(self.__pinfo_msg)
             
-            self.__msg_handler_fn(message.MSG_ID_REQ_INITIAL, None,
-                                  self)
+            self.__msg_handler_fn(self, message.PRIV_INITIAL_SYNC, None)
             
         else:
             
-            self.__msg_handler_fn(msg_id, msg_data, self)
+            self.__msg_handler_fn(self, msg_id, msg_data)
         
         return True
 
     def __io_error(self, fd, cond):
         """ GObject callback function (when there is an error). """
-        log.error("connection to client %s broken" % self.__addr_str)
+        log.error("connection to client %s broken" % self)
         self.disconnect()
         return False
         
     def __io_hup(self, fd, cond):
         """ GObject callback function (when other side disconnected). """
-        log.info("client %s disconnected" % self.__addr_str)
+        log.info("client %s disconnected" % self)
         self.disconnect()
         return False
     
     def __io_send(self, fd, cond):
         """ GObject callback function (when data can be written). """
         
-        if len(self.__snd_buff) == 0:
+        if not self.__snd_buff:
             self.__sid_out = 0
             return False
 
-        log.debug("try to send %d bytes to %s" %
-                  (len(self.__snd_buff), self.__addr_str))
+        log.debug("try to send %d bytes to %s" % (len(self.__snd_buff), self))
 
         try:
             sent = self.__sock.send(self.__snd_buff)
         except socket.error, e:
-            log.warning("failed to send data to %s (%s)" % (self.__addr_str, e))
+            log.warning("failed to send data to %s (%s)" % (self, e))
             self.disconnect()
             return False
 
         log.debug("sent %d bytes" % sent)
         
         if sent == 0:
-            log.warning("failed to send data to %s" % self.__addr_str)
+            log.warning("failed to send data to %s" % self)
             self.disconnect()
             return False
         
         self.__snd_buff = self.__snd_buff[sent:]
         
-        if len(self.__snd_buff) == 0:
+        if not self.__snd_buff:
             self.__sid_out = 0
             return False
         else:
             return True
     
+    def __ping(self, msg):
+        
+        now = time.time()
+        if now - self.__snd_ts >= self.__ping_ival:
+            log.debug("ping client %s" % self)
+            self.send(msg)
+    
     def send(self, msg):
-        """ Send a message to a client.
+        """Send a message to the client.
         
-        @param msg: complete message (incl. IO prefix and suffix, ID and length)
-                    in binary format (net.build_message() is your friend here)
+        @param msg:
+            complete message (incl. ID and length) in binary format
+            (net.build_message() is your friend here)
         
-        @see net.build_message()
+        @see: net.build_message()
+        
         """
         
         if msg is None:
@@ -268,10 +276,11 @@ class ClientConnection():
             return
         
         if self.__sock is None:
-            log.debug("cannot send message to %s, already disconnected" %
-                      self.__addr_str)
+            log.debug("cannot send message to %s, already disconnected" % self)
             return
 
+        self.__snd_ts = time.time()
+        
         self.__snd_buff = "%s%s" % (self.__snd_buff, msg)
         
         # if not already trying to send data ..
@@ -280,17 +289,6 @@ class ClientConnection():
             self.__sid_out = gobject.io_add_watch(self.__sock, gobject.IO_OUT,
                                                   self.__io_send)
         
-        
-#        try:
-#            log.debug("message: %s (len %d)" % (msg, len(msg)))
-#            log.debug("try to send message to %s" % self.__addr_str)
-#            self.__sock.sendall(msg)
-#            #self.__sock.sendall(ClientConnection.IO_SUFFIX)
-#            log.debug("sent message to %s" % self.__addr_str)
-#        except IOError, e:
-#            log.warning("failed to send message to client (%s)" % e)
-#            self.disconnect()
-            
     def disconnect(self, remove_from_list=True, send_bye_msg=False):
         """ Disconnect the client.
         
@@ -302,29 +300,28 @@ class ClientConnection():
         
         # send bye message
         
-        if send_bye_msg:
-            log.info("send 'bye' to %s" % self.__addr_str)
-            msg = build_message(message.MSG_ID_BYE, None)
+        if send_bye_msg and self.__sock is not None:
+            log.info("send 'bye' to %s" % self)
+            msg = build_message(message.CONN_BYE, None)
             sent = 0
             retry = 0
             while sent < len(msg) and retry < 10:
                 try:
                     sent += self.__sock.send(msg)
                 except socket.error, e:
-                    log.warning("failed to send 'bye' to %s (%s)" %
-                                (self.__addr_str, e))
+                    log.warning("failed to send 'bye' to %s (%s)" % (self, e))
                     break
                 time.sleep(0.02)
                 retry += 1
             if sent < len(msg):
-                log.warning("failed to send 'bye' to %s" % self.__addr_str)
+                log.warning("failed to send 'bye' to %s" % self)
             else:
                 # give client some time to close connection:
                 time.sleep(0.1)
         
         # disconnect
         
-        log.debug("disconnect %s" % self.__addr_str)
+        log.debug("disconnect %s" % self)
         
         if remove_from_list:
             try:
@@ -341,7 +338,6 @@ class ClientConnection():
         if (self.__sid_out > 0):
             gobject.source_remove(self.__sid_out)
             self.__sid_out = 0
-            
         
         if self.__sock is not None:
             try:
@@ -351,31 +347,27 @@ class ClientConnection():
             self.__sock.close()
             self.__sock = None
 
-    #==========================================================================
-    # miscellaneous
-    #==========================================================================
-
-    def get_address(self):
-        """ Get the address of this client as a string. """
-        return self.__addr_str
-    
-class Server():
+class _Server(object):
     
     SOCKET_TIMEOUT = 2.5
     
-    def __init__(self, clients, pinfo, msg_handler_fn):
+    def __init__(self, clients, pinfo, msg_handler_fn, ping_ival):
         """ Create a new server.
         
-        @param clients: a list to add connected clients to
-        @param pinfo: player info (type data.PlayerInfo)
-        @param msg_handler_fn: callback function for passing received messages to
+        @param clients:
+            a list to add connected clients to
+        @param pinfo:
+            player info (type data.PlayerInfo)
+        @param msg_handler_fn:
+            callback function for passing received messages to
                                  
         """
         
         self.__clients = clients
         self.__msg_handler_fn = msg_handler_fn
         self._pinfo = pinfo # needed by derived classes
-        self.__pinfo_msg = build_message(message.MSG_ID_PINFO, pinfo)
+        self.__pinfo_msg = build_message(message.CONN_PINFO, pinfo)
+        self.__ping_ival = ping_ival
         self._sock = None # needed by derived classes
         self.__sid = None
         
@@ -383,15 +375,15 @@ class Server():
         
         try:
             self._sock = self._create_socket()
-            self._sock.settimeout(Server.SOCKET_TIMEOUT)
+            self._sock.settimeout(_Server.SOCKET_TIMEOUT)
         except IOError, e:
-            log.error("failed to set up %s server (%s)" %
-                          (self._get_type(), e))
+            log.error("failed to set up %s server (%s)" % (self._get_type(), e))
             return
         except socket.error, e:
-            log.error("failed to set up %s server (%s)" %
-                          (self._get_type(), e))
+            log.error("failed to set up %s server (%s)" % (self._get_type(), e))
             return
+        
+        log.info("created %s server" % self._get_type())
         
         # watch socket
         
@@ -409,15 +401,15 @@ class Server():
         if condition == gobject.IO_IN:
             
             try:
-                log.debug("connection request from client")
+                log.debug("connection request from %s client" % self._get_type())
                 client_sock, addr = self._sock.accept();
                 log.debug("connection request accepted")
                 client_sock.setblocking(0)
                 ClientConnection(client_sock, addr, self.__clients,
-                                 self.__pinfo_msg, self.__msg_handler_fn)
+                    self.__pinfo_msg, self.__msg_handler_fn, self.__ping_ival)
             except IOError, e:
                 log.error("accepting %s client failed: %s" %
-                              (self._get_type(), e))
+                          (self._get_type(), e))
             
             return True
         
@@ -447,24 +439,18 @@ class Server():
         
         @return: a socket object
         
-        @attention: To be overwritten by sub classes.
         """
-        pass
+        raise NotImplementedError
     
     #==========================================================================
     # miscellaneous
     #==========================================================================
 
     def _get_type(self):
-        """ Get type name.
-        
-        @return: descriptive type name
-        
-        @attention: To be overwritten by sub classes.
-        """
-        return ""
+        """Get server type name."""
+        raise NotImplementedError
     
-class BluetoothServer(Server):
+class BluetoothServer(_Server):
     
     UUID = "025fe2ae-0762-4bed-90f2-d8d778f020fe"
 
@@ -477,12 +463,10 @@ class BluetoothServer(Server):
         sock.bind(("", bluetooth.PORT_ANY))
         sock.listen(1)
         
-        bluetooth.advertise_service(sock, self._pinfo.get_name(),
+        bluetooth.advertise_service(sock, self._pinfo.name,
             service_id = BluetoothServer.UUID,
             service_classes = [ BluetoothServer.UUID, bluetooth.SERIAL_PORT_CLASS ],
             profiles = [ bluetooth.SERIAL_PORT_PROFILE ])
-        
-        log.debug("created bluetooth server")
         
         return sock
         
@@ -494,12 +478,12 @@ class BluetoothServer(Server):
             except bluetooth.BluetoothError:
                 pass
         
-        Server.down(self)
+        super(BluetoothServer, self).down()
         
     def _get_type(self):
         return "bluetooth"
                 
-class WifiServer(Server):
+class WifiServer(_Server):
     
     PORT = 34271
 
@@ -508,8 +492,6 @@ class WifiServer(Server):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(('', WifiServer.PORT))
         sock.listen(1)
-        
-        log.debug("created wifi server")
         
         return sock
 

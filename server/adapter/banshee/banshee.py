@@ -1,13 +1,24 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+"""Banshee player adapter for Remuco, implemented as an executable script.
 
-import os
+__author__ = "Oben Sonne <obensonne@googlemail.com>"
+__copyright__ = "Copyright 2009, Oben Sonne"
+__license__ = "GPL"
+__version__ = "0.0.1"
 
-import xdg.BaseDirectory # to get banshee's album art location
+"""
+import os.path
+
+from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 import dbus
 import dbus.exceptions
 
 import remuco
 from remuco import log
+
+# =============================================================================
+# banshee dbus names
+# =============================================================================
 
 DBUS_NAME = "org.bansheeproject.Banshee"
 DBUS_PATH_ENGINE = "/org/bansheeproject/Banshee/PlayerEngine"
@@ -15,19 +26,36 @@ DBUS_IFACE_ENGINE = "org.bansheeproject.Banshee.PlayerEngine"
 DBUS_PATH_CONTROLLER = "/org/bansheeproject/Banshee/PlaybackController"
 DBUS_IFACE_CONTROLLER = "org.bansheeproject.Banshee.PlaybackController"
 
+# =============================================================================
+# banshee player adapter
+# =============================================================================
+
 class BansheeAdapter(remuco.PlayerAdapter):
     
     def __init__(self):
         
-        remuco.PlayerAdapter.__init__(self, "Banshee")
+        remuco.PlayerAdapter.__init__(self, "Banshee",
+                                      max_rating=5,
+                                      playback_known=True,
+                                      volume_known=True,
+                                      repeat_known=True,
+                                      shuffle_known=True,
+                                      progress_known=True)
         
         self.__dbus_signal_handler = ()
     
         self.__repeat = False
         self.__shuffle = False
+        self.__volume = 0
+        
+        self.__progress_length = 0
     
         log.debug("init done")
         
+    # -------------------------------------------------------------------------
+    # player adapter interface
+    # -------------------------------------------------------------------------
+
     def start(self):
         
         remuco.PlayerAdapter.start(self)
@@ -53,11 +81,11 @@ class BansheeAdapter(remuco.PlayerAdapter):
 
         try:
             self.__bse.GetCurrentTrack(reply_handler=self.__notify_track,
-                                             error_handler=self.__dbus_error)
-            self.__bse.GetCurrentState(reply_handler=self.__notify_playback,
-                                             error_handler=self.__dbus_error)
-            self.__bse.GetVolume(reply_handler=self.__notify_volume,
                                        error_handler=self.__dbus_error)
+            self.__bse.GetCurrentState(reply_handler=self.__notify_playback,
+                                       error_handler=self.__dbus_error)
+            self.__bse.GetVolume(reply_handler=self.__notify_volume,
+                                 error_handler=self.__dbus_error)
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
 
@@ -84,6 +112,8 @@ class BansheeAdapter(remuco.PlayerAdapter):
                                      error_handler=self.__dbus_error)
             self.__bsc.GetShuffleMode(reply_handler=self.__notify_shuffle,
                                       error_handler=self.__dbus_error)
+            self.__bse.GetPosition(reply_handler=self.__notify_progress,
+                                   error_handler=self.__dbus_error)
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
         
@@ -116,8 +146,15 @@ class BansheeAdapter(remuco.PlayerAdapter):
             log.warning("dbus error: %s" % e)
     
     
-    def ctrl_volume(self, volume):
+    def ctrl_volume(self, direction):
         
+        if direction == 0:
+            volume = 0
+        else:
+            volume = self.__volume + direction * 5
+            volume = min(volume, 100)
+            volume = max(volume, 0)
+            
         try:
             self.__bse.SetVolume(dbus.UInt16(volume),
                                  reply_handler=self.__dbus_ignore,
@@ -125,7 +162,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
             
-        self.__poll()
+        self.__notify_event("volume", None, None)
         
 
     def ctrl_toggle_repeat(self):
@@ -137,7 +174,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
             
-        self.__poll()
+        self.poll()
             
     def ctrl_toggle_shuffle(self):
 
@@ -148,7 +185,11 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except dbus.exceptions.DBusException, e:
             log.warning("dbus error: %s" % e)
             
-        self.__poll()
+        self.poll()
+
+    # -------------------------------------------------------------------------
+    # internal methods
+    # -------------------------------------------------------------------------
 
     def __notify_event(self, event, message, buff_percent):
         
@@ -174,7 +215,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             playback = remuco.PLAYBACK_PLAY
         elif state == "idle":
             playback = remuco.PLAYBACK_STOP
-            self.update_plob(None, None, None)
+            self.update_item(None, None, None)
         else:
             playback = remuco.PLAYBACK_PAUSE
             
@@ -182,30 +223,38 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
     def __notify_volume(self, volume):
         
+        self.__volume = volume
         self.update_volume(volume)
         
     def __notify_track(self, track):
         
         id = track.get("URI")
         
+        if not id:
+            self.update_item(None, None, None)
+            self.__progress_length = 0
+            return
+        
         info = {}
         info[remuco.INFO_TITLE] = track.get("name")
         info[remuco.INFO_ARTIST] = track.get("artist")
         info[remuco.INFO_ALBUM] = track.get("album")
-        info[remuco.INFO_LENGTH] = str(track.get("length", 0))
-        info[remuco.INFO_RATING] = str(track.get("rating", 0))
+        info[remuco.INFO_RATING] = track.get("rating", 0)
+        
+        self.__progress_length = int(track.get("length", 0))
 
         img = None
         art_id = track.get("artwork-id")
-        if art_id is not None and len(art_id) > 0:
-            file = "%s/album-art/%s.jpg" % (xdg.BaseDirectory.xdg_cache_home,
-                                            art_id)
-            if os.access(file, os.F_OK):
+        if art_id:
+            file = "%s/album-art/%s.jpg" % (xdg_cache, art_id)
+            if os.path.isfile(file):
                 img = file
+            else:
+                img = self.find_image(id)
             
         log.debug("track: %s" % info)
 
-        self.update_plob(id, info, img)
+        self.update_item(id, info, img)
         
     def __notify_repeat(self, repeat):
         
@@ -216,6 +265,10 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
         self.__shuffle = shuffle > 0
         self.update_shuffle(self.__shuffle)
+        
+    def __notify_progress(self, ms):
+        
+        self.update_progress(ms / 1000, self.__progress_length)
 
     def __dbus_error(self, error):
         """ DBus error handler. """

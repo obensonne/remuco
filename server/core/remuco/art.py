@@ -6,7 +6,7 @@ import urlparse
 
 from remuco import log
 
-TN_DIR = "%s/.thumbnails" % os.getenv("HOME")
+TN_DIR = os.path.join(os.getenv("HOME"), ".thumbnails")
 TN_SUBDIRS = ("large", "normal")
 
 ART_FILE_NAMES = ("folder", "front", "album", "cover", "art")

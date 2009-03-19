@@ -6,12 +6,12 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big></font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.8.0)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/core/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/server/core/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
 &nbsp;<br>
-This&nbsp;module&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
+The&nbsp;module&nbsp;'remuco'&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
 &nbsp;<br>
 Class&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Base&nbsp;class&nbsp;for&nbsp;player&nbsp;adapters.<br>
@@ -20,9 +20,8 @@ Class&nbsp;<a href="#Manager">Manager</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;managing&nbsp;the&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
 Constants:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'INFO'&nbsp;are&nbsp;the&nbsp;keys&nbsp;to&nbsp;use&nbsp;for&nbsp;the&nbsp;dictionary<br>
-&nbsp;&nbsp;&nbsp;&nbsp;describing&nbsp;a&nbsp;PLOB&nbsp;(PLOB&nbsp;means&nbsp;playable&nbsp;object&nbsp;-&nbsp;a&nbsp;song,&nbsp;video,&nbsp;slide&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;whatever&nbsp;may&nbsp;be&nbsp;played&nbsp;in&nbsp;that&nbsp;spirit).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'INFO'&nbsp;are&nbsp;keys&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;the&nbsp;dictionary<br>
+&nbsp;&nbsp;&nbsp;&nbsp;describing&nbsp;an&nbsp;item&nbsp;(a&nbsp;playable&nbsp;<a href="api.html#object">object</a>:&nbsp;song,&nbsp;video,&nbsp;slide,&nbsp;picture,&nbsp;...).<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;constants&nbsp;starting&nbsp;with&nbsp;'PLAYBACK'&nbsp;are&nbsp;the&nbsp;values&nbsp;used&nbsp;by&nbsp;Remuco&nbsp;to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;describe&nbsp;a&nbsp;playback&nbsp;state.<br>
@@ -50,13 +49,19 @@ Logging:<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="remuco.command.html">command</a><br>
-<a href="remuco.config.html">config</a><br>
-</td><td width="25%" valign=top><a href="remuco.data.html">data</a><br>
-<a href="remuco.log.html">log</a><br>
-</td><td width="25%" valign=top><a href="remuco.message.html">message</a><br>
-<a href="remuco.net.html">net</a><br>
-</td><td width="25%" valign=top><a href="remuco.serial.html">serial</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="api.html">adapter</a><br>
+<a href="api.html">art</a><br>
+<a href="api.html">command</a><br>
+<a href="api.html">config</a><br>
+</td><td width="25%" valign=top><a href="api.html">data</a><br>
+<a href="api.html">defs</a><br>
+<a href="api.html">features</a><br>
+<a href="api.html">files</a><br>
+</td><td width="25%" valign=top><a href="api.html">log</a><br>
+<a href="api.html">manager</a><br>
+<a href="api.html">message</a><br>
+<a href="api.html">net</a><br>
+</td><td width="25%" valign=top><a href="api.html">serial</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -65,19 +70,269 @@ Logging:<br>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="adapter-api.html#Manager">Manager</a>
-</font></dt><dt><font face="helvetica, arial"><a href="adapter-api.html#PlayerAdapter">PlayerAdapter</a>
+<dt><font face="helvetica, arial"><a href="api.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="api.html#ListAction">remuco.adapter.ListAction</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="api.html#ItemAction">remuco.adapter.ItemAction</a>
 </font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>
+</font></dt><dt><font face="helvetica, arial"><a href="api.html#Config">remuco.config.Config</a>
+</font></dt><dt><font face="helvetica, arial"><a href="api.html#Manager">remuco.manager.Manager</a>
+</font></dt></dl>
+</dd>
+</dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Manager">class <strong>Manager</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Config">class <strong>Config</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;for&nbsp;getting&nbsp;and&nbsp;setting&nbsp;player&nbsp;adapter&nbsp;specific&nbsp;configurations.<br>
+&nbsp;<br>
+An&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;of&nbsp;a&nbsp;specific&nbsp;player<br>
+adapter&nbsp;found&nbsp;(usually)&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any&nbsp;change&nbsp;to<br>
+the&nbsp;properties&nbsp;of&nbsp;an&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;automatically&nbsp;gets&nbsp;saved&nbsp;in&nbsp;the<br>
+configuration&nbsp;file.<br>
+&nbsp;<br>
+In&nbsp;most&nbsp;cases&nbsp;player&nbsp;adapters&nbsp;do&nbsp;not&nbsp;need&nbsp;this.&nbsp;It&nbsp;is&nbsp;useful&nbsp;if&nbsp;a&nbsp;player<br>
+adapter&nbsp;wants&nbsp;to&nbsp;provide&nbsp;a&nbsp;UI&nbsp;to&nbsp;configure&nbsp;the&nbsp;adapter.<br>
+&nbsp;<br>
+Player&nbsp;adapters&nbsp;are&nbsp;not&nbsp;supposed&nbsp;to&nbsp;create&nbsp;instances&nbsp;of&nbsp;<a href="#Config">Config</a>.&nbsp;Instead<br>
+use&nbsp;the&nbsp;property&nbsp;'config'&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;access&nbsp;the&nbsp;currently&nbsp;used<br>
+<a href="#Config">Config</a>&nbsp;instance.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Config-__init__"><strong>__init__</strong></a>(self, player_name)</dt><dd><tt>Do&nbsp;not&nbsp;use&nbsp;this.&nbsp;Use&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.config&nbsp;instead.</tt></dd></dl>
+
+<dl><dt><a name="Config-get_custom"><strong>get_custom</strong></a>(self, option)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
+&nbsp;<br>
+@param&nbsp;option:&nbsp;name&nbsp;of&nbsp;the&nbsp;option<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#Config-set_custom">set_custom</a>()</tt></dd></dl>
+
+<dl><dt><a name="Config-set_custom"><strong>set_custom</strong></a>(self, option, value)</dt><dd><tt>Set&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
+&nbsp;<br>
+Using&nbsp;this&nbsp;method,&nbsp;player&nbsp;adapters&nbsp;may&nbsp;integrate&nbsp;additional<br>
+configuration&nbsp;options&nbsp;in&nbsp;the&nbsp;adapter's&nbsp;configuration&nbsp;file.<br>
+&nbsp;<br>
+@param&nbsp;option:&nbsp;name&nbsp;of&nbsp;the&nbsp;option<br>
+&nbsp;<br>
+@note:&nbsp;Internally&nbsp;this&nbsp;is&nbsp;saved&nbsp;as&nbsp;"custom-&lt;OPTION&gt;".</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>bluetooth</strong></dt>
+<dd><tt>Flag&nbsp;if&nbsp;Bluetooth&nbsp;is&nbsp;enabled.<br>
+&nbsp;<br>
+Default:&nbsp;True&nbsp;(enabled)<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'bluetooth-enabled'</tt></dd>
+</dl>
+<dl><dt><strong>cache_dir</strong></dt>
+<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;directory.<br>
+&nbsp;<br>
+Usually&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER.<br>
+&nbsp;<br>
+@note:&nbsp;read-only</tt></dd>
+</dl>
+<dl><dt><strong>config_dir</strong></dt>
+<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;directory.<br>
+&nbsp;<br>
+Usually&nbsp;this&nbsp;is&nbsp;~/.config/remuco/PLAYER.<br>
+&nbsp;<br>
+@note:&nbsp;read-only</tt></dd>
+</dl>
+<dl><dt><strong>encoding</strong></dt>
+<dd><tt>Encoding&nbsp;of&nbsp;strings&nbsp;coming&nbsp;from&nbsp;and&nbsp;passed&nbsp;to&nbsp;the&nbsp;player&nbsp;(adapter).<br>
+&nbsp;<br>
+Default:&nbsp;'UTF-8'<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'player-encoding'</tt></dd>
+</dl>
+<dl><dt><strong>fb</strong></dt>
+<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;features&nbsp;are&nbsp;enabled.<br>
+&nbsp;<br>
+This&nbsp;setting&nbsp;has&nbsp;no&nbsp;effect&nbsp;if&nbsp;a&nbsp;player&nbsp;adapter&nbsp;does&nbsp;not&nbsp;implement&nbsp;any<br>
+file&nbsp;browser&nbsp;related&nbsp;features.<br>
+&nbsp;<br>
+Default:&nbsp;True&nbsp;(enable)<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'file-browser-enabled'</tt></dd>
+</dl>
+<dl><dt><strong>fb_extensions</strong></dt>
+<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;shows&nbsp;file&nbsp;name&nbsp;extensions.<br>
+&nbsp;<br>
+Default:&nbsp;False&nbsp;(hide&nbsp;extensions)<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'file-browser-show-extensions'</tt></dd>
+</dl>
+<dl><dt><strong>fb_root_dirs</strong></dt>
+<dd><tt>List&nbsp;of&nbsp;directories&nbsp;to&nbsp;show&nbsp;as&nbsp;root&nbsp;directories&nbsp;in&nbsp;the&nbsp;file&nbsp;browser.<br>
+&nbsp;<br>
+Default:&nbsp;[]<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'file-browser-root-dirs'</tt></dd>
+</dl>
+<dl><dt><strong>fb_xdg_user_dirs</strong></dt>
+<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;integrates&nbsp;XDG&nbsp;user&nbsp;dirs.<br>
+&nbsp;<br>
+The&nbsp;user&nbsp;dirs&nbsp;shown&nbsp;depend&nbsp;on&nbsp;the&nbsp;mime&nbsp;types&nbsp;set&nbsp;in&nbsp;this&nbsp;config's<br>
+player&nbsp;adapter.&nbsp;For&nbsp;instance&nbsp;if&nbsp;mime&nbsp;type&nbsp;'audio'&nbsp;is&nbsp;supported,&nbsp;then<br>
+the&nbsp;directory&nbsp;XDG_MUSIC_DIR&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;a&nbsp;root&nbsp;dir&nbsp;in&nbsp;the&nbsp;file<br>
+browser.<br>
+&nbsp;<br>
+Default:&nbsp;True<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'file-browser-use-xdg-user-dirs'</tt></dd>
+</dl>
+<dl><dt><strong>log_file</strong></dt>
+<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;log&nbsp;file.<br>
+&nbsp;<br>
+Usually&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER/log.<br>
+&nbsp;<br>
+@attention:&nbsp;Do&nbsp;not&nbsp;use&nbsp;this&nbsp;for&nbsp;writing&nbsp;log&nbsp;messages&nbsp;to&nbsp;(use<br>
+&nbsp;&nbsp;&nbsp;&nbsp;remuco.log.debug()&nbsp;and&nbsp;friends).&nbsp;This&nbsp;property&nbsp;may&nbsp;be&nbsp;useful&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;adapters&nbsp;integrating&nbsp;log&nbsp;information&nbsp;in&nbsp;a&nbsp;UI.<br>
+&nbsp;<br>
+@note:&nbsp;read-only</tt></dd>
+</dl>
+<dl><dt><strong>log_level</strong></dt>
+<dd><tt>Log&nbsp;level&nbsp;to&nbsp;use.<br>
+&nbsp;<br>
+Default:&nbsp;log.INFO<br>
+Possible&nbsp;values:&nbsp;log.DEBUG,&nbsp;log.INFO,&nbsp;log.WARNING,&nbsp;log.ERROR<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'log-level'</tt></dd>
+</dl>
+<dl><dt><strong>ping</strong></dt>
+<dd><tt>Interval&nbsp;in&nbsp;seconds&nbsp;for&nbsp;sending&nbsp;a&nbsp;ping&nbsp;to&nbsp;clients.<br>
+&nbsp;<br>
+An&nbsp;interval&nbsp;of&nbsp;0&nbsp;disables&nbsp;ping.<br>
+&nbsp;<br>
+Default:&nbsp;15<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'ping-interval'</tt></dd>
+</dl>
+<dl><dt><strong>wifi</strong></dt>
+<dd><tt>Flag&nbsp;if&nbsp;WiFi/Inet&nbsp;is&nbsp;enabled.<br>
+&nbsp;<br>
+Default:&nbsp;True&nbsp;(enabled)<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'wifi-enabled'</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ItemAction">class <strong>ItemAction</strong></a>(<a href="api.html#ListAction">ListAction</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Item&nbsp;related&nbsp;action&nbsp;within&nbsp;a&nbsp;client's&nbsp;media&nbsp;browser.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="api.html#ItemAction">ItemAction</a></dd>
+<dd><a href="api.html#ListAction">ListAction</a></dd>
+<dd><a href="api.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ItemAction-__init__"><strong>__init__</strong></a>(self, label, help, multiple<font color="#909090">=False</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;media&nbsp;browser&nbsp;action.<br>
+&nbsp;<br>
+@param&nbsp;label:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;of&nbsp;the&nbsp;action&nbsp;(keep&nbsp;short,&nbsp;ideally&nbsp;this&nbsp;is&nbsp;just&nbsp;a&nbsp;single&nbsp;word<br>
+&nbsp;&nbsp;&nbsp;&nbsp;like&nbsp;'Enqueue',&nbsp;'Play',&nbsp;..)<br>
+@param&nbsp;help:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;description&nbsp;of&nbsp;the&nbsp;action<br>
+@keyword&nbsp;multiple:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;action&nbsp;may&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;items&nbsp;(True)&nbsp;or&nbsp;only&nbsp;to&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;single&nbsp;item&nbsp;(False)</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>multiple</strong></dt>
+<dd><tt>scope&nbsp;of&nbsp;the&nbsp;action&nbsp;-&nbsp;multiple&nbsp;or&nbsp;single&nbsp;(read-only)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="api.html#ListAction">ListAction</a>:<br>
+<dl><dt><a name="ItemAction-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="api.html#ListAction">ListAction</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>help</strong></dt>
+<dd><tt>description&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>ID&nbsp;of&nbsp;the&nbsp;action&nbsp;(auto-generated,&nbsp;read&nbsp;only)</tt></dd>
+</dl>
+<dl><dt><strong>label</strong></dt>
+<dd><tt>label&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ListAction">class <strong>ListAction</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>List&nbsp;related&nbsp;action&nbsp;within&nbsp;a&nbsp;client's&nbsp;media&nbsp;browser.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ListAction-__init__"><strong>__init__</strong></a>(self, label, help)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;media&nbsp;browser&nbsp;action.<br>
+&nbsp;<br>
+@param&nbsp;label:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;of&nbsp;the&nbsp;action&nbsp;(keep&nbsp;short,&nbsp;ideally&nbsp;this&nbsp;is&nbsp;just&nbsp;a&nbsp;single&nbsp;word<br>
+&nbsp;&nbsp;&nbsp;&nbsp;like&nbsp;'Load',&nbsp;..)<br>
+@param&nbsp;help:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;description&nbsp;of&nbsp;the&nbsp;action</tt></dd></dl>
+
+<dl><dt><a name="ListAction-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>help</strong></dt>
+<dd><tt>description&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>ID&nbsp;of&nbsp;the&nbsp;action&nbsp;(auto-generated,&nbsp;read&nbsp;only)</tt></dd>
+</dl>
+<dl><dt><strong>label</strong></dt>
+<dd><tt>label&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Manager">class <strong>Manager</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Manages&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
 A&nbsp;<a href="#Manager">Manager</a>&nbsp;cares&nbsp;about&nbsp;calling&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
+Additionally,&nbsp;because&nbsp;Remuco&nbsp;needs&nbsp;a&nbsp;GLib&nbsp;main&nbsp;loop&nbsp;to&nbsp;run,&nbsp;it&nbsp;sets&nbsp;up&nbsp;and<br>
+manages&nbsp;such&nbsp;a&nbsp;loop.<br>
 &nbsp;<br>
 It&nbsp;is&nbsp;intended&nbsp;for&nbsp;player&nbsp;adapters&nbsp;running&nbsp;stand-alone,&nbsp;outside&nbsp;the&nbsp;players<br>
 they&nbsp;adapt.&nbsp;A&nbsp;<a href="#Manager">Manager</a>&nbsp;is&nbsp;not&nbsp;needed&nbsp;for&nbsp;player&nbsp;adapters&nbsp;realized&nbsp;as&nbsp;a<br>
@@ -90,11 +345,12 @@ To&nbsp;activate&nbsp;a&nbsp;manager&nbsp;call&nbsp;<a href="#Manager-run">run</
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, player_dbus_name<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#Manager">Manager</a>.<br>
 &nbsp;<br>
-@param&nbsp;pa:&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;manage<br>
-@keyword&nbsp;player_dbus_name:&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;communicate&nbsp;with&nbsp;its&nbsp;player&nbsp;set&nbsp;this&nbsp;to&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;more&nbsp;information)</tt></dd></dl>
+@param&nbsp;pa:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;manage<br>
+@keyword&nbsp;player_dbus_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to&nbsp;communicate&nbsp;with&nbsp;its&nbsp;player&nbsp;set<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;to&nbsp;the&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for&nbsp;more<br>
+&nbsp;&nbsp;&nbsp;&nbsp;information)</tt></dd></dl>
 
 <dl><dt><a name="Manager-run"><strong>run</strong></a>(self)</dt><dd><tt>Activate&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
@@ -103,291 +359,362 @@ blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;unt
 this&nbsp;happens&nbsp;the&nbsp;player&nbsp;adapter&nbsp;gets&nbsp;stopped&nbsp;and&nbsp;this&nbsp;method&nbsp;returns.<br>
 &nbsp;<br>
 @note:&nbsp;If&nbsp;'player_dbus_name'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;the&nbsp;constructor&nbsp;the&nbsp;player<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;whenever&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;is&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started&nbsp;whenever<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's&nbsp;player&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped<br>
+&nbsp;&nbsp;&nbsp;&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
 
 <dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;shut&nbsp;down&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
 Stops&nbsp;the&nbsp;manager's&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter.&nbsp;As&nbsp;a&nbsp;result&nbsp;a<br>
 previous&nbsp;call&nbsp;to&nbsp;<a href="#Manager-run">run</a>()&nbsp;will&nbsp;return&nbsp;now.</tt></dd></dl>
 
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PlayerAdapter">class <strong>PlayerAdapter</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="PlayerAdapter">class <strong>PlayerAdapter</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
 &nbsp;<br>
-Remuco&nbsp;player&nbsp;adapters&nbsp;must&nbsp;subclass&nbsp;this&nbsp;class&nbsp;and&nbsp;overwrite&nbsp;certain<br>
+Remuco&nbsp;player&nbsp;adapters&nbsp;must&nbsp;subclass&nbsp;this&nbsp;class&nbsp;and&nbsp;override&nbsp;certain<br>
 methods&nbsp;to&nbsp;implement&nbsp;player&nbsp;specific&nbsp;behavior.&nbsp;Additionally&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a><br>
 provides&nbsp;methods&nbsp;to&nbsp;interact&nbsp;with&nbsp;Remuco&nbsp;clients.&nbsp;Following&nbsp;is&nbsp;a&nbsp;summary<br>
 of&nbsp;all&nbsp;relevant&nbsp;methods,&nbsp;grouped&nbsp;by&nbsp;functionality.&nbsp;<br>
 &nbsp;<br>
-Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;manage&nbsp;life&nbsp;cycle:<br>
+===========================================================================<br>
+Methods&nbsp;to&nbsp;extend&nbsp;to&nbsp;manage&nbsp;life&nbsp;cycle<br>
+===========================================================================<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-start">start</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-stop">stop</a>()<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;can&nbsp;be&nbsp;started&nbsp;and&nbsp;stopped&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>()&nbsp;and&nbsp;<a href="#PlayerAdapter-stop">stop</a>().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;same&nbsp;instance&nbsp;of&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;should&nbsp;be&nbsp;startable&nbsp;and&nbsp;stoppable<br>
+&nbsp;&nbsp;&nbsp;&nbsp;multiple&nbsp;times.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Subclasses&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;may&nbsp;override&nbsp;these&nbsp;methods&nbsp;as&nbsp;needed&nbsp;but<br>
-&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;always&nbsp;call&nbsp;the&nbsp;super&nbsp;class&nbsp;implementations&nbsp;too!&nbsp;The&nbsp;same&nbsp;instance<br>
-&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;should&nbsp;be&nbsp;startable&nbsp;and&nbsp;stoppable&nbsp;multiple&nbsp;times.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;always&nbsp;call&nbsp;the&nbsp;super&nbsp;class&nbsp;implementations&nbsp;too!<br>
 &nbsp;<br>
-Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;player:<br>
+===========================================================================<br>
+Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;player:<br>
+===========================================================================<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_jump_in_playlist">ctrl_jump_in_playlist</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_jump_in_queue">ctrl_jump_in_queue</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_load_playlist">ctrl_load_playlist</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Basic&nbsp;playback&nbsp;control:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_toggle_playing">ctrl_toggle_playing</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_next">ctrl_next</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_previous">ctrl_previous</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_rate">ctrl_rate</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_toggle_playing">ctrl_toggle_playing</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_seek_forward()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_seek_backward()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_jump_in_playlist()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_jump_in_queue()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_toggle_repeat">ctrl_toggle_repeat</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_toggle_shuffle">ctrl_toggle_shuffle</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_seek_backward">ctrl_seek_backward</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_seek_forward">ctrl_seek_forward</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_tag">ctrl_tag</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Miscellaneous:<br>
+&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_volume">ctrl_volume</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_volume_up()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_volume_down()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_toggle_fullscreen">ctrl_toggle_fullscreen</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_play_file()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_play_id()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;an&nbsp;item's&nbsp;meta&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_rate">ctrl_rate</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_tag">ctrl_tag</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;following&nbsp;methods&nbsp;may&nbsp;be&nbsp;implemented&nbsp;to&nbsp;adjust&nbsp;a&nbsp;player's<br>
+&nbsp;&nbsp;&nbsp;&nbsp;current&nbsp;playlist:<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;all&nbsp;methods&nbsp;must&nbsp;be&nbsp;overwritten.&nbsp;Some&nbsp;even&nbsp;do&nbsp;not&nbsp;make&nbsp;sense&nbsp;for<br>
-&nbsp;&nbsp;&nbsp;&nbsp;certain&nbsp;players,&nbsp;e.g.&nbsp;<a href="#PlayerAdapter-ctrl_jump_in_queue">ctrl_jump_in_queue</a>()&nbsp;only&nbsp;should&nbsp;be&nbsp;overwritten<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;media&nbsp;player&nbsp;has&nbsp;a&nbsp;play&nbsp;queue.&nbsp;Do&nbsp;not&nbsp;overwrite&nbsp;methods&nbsp;you<br>
-&nbsp;&nbsp;&nbsp;&nbsp;finally&nbsp;do&nbsp;not&nbsp;implement&nbsp;because&nbsp;Remuco&nbsp;checks&nbsp;which&nbsp;methods&nbsp;has&nbsp;been<br>
-&nbsp;&nbsp;&nbsp;&nbsp;overwritten&nbsp;and&nbsp;uses&nbsp;this&nbsp;information&nbsp;to&nbsp;notify&nbsp;Remuco&nbsp;clients&nbsp;about<br>
-&nbsp;&nbsp;&nbsp;&nbsp;capabilities&nbsp;of&nbsp;player&nbsp;adapters.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_remove()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_next_ids()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_next_files()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_append_ids()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_append_files()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_set_ids()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_set_files()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_playlist_load()<br>
 &nbsp;<br>
-Methods&nbsp;to&nbsp;overwrite&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nbsp;the&nbsp;media&nbsp;player:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;a&nbsp;player&nbsp;has&nbsp;a&nbsp;global&nbsp;play&nbsp;queue,&nbsp;the&nbsp;following&nbsp;methods&nbsp;may&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;implemented&nbsp;to&nbsp;adjust&nbsp;the&nbsp;play&nbsp;queue:<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_plob">request_plob</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_remove()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_prepend_ids()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_prepend_files()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_append_ids()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_append_files()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;ctrl_queue_clear()<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-----------------------------------------------------------------------<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Don't&nbsp;feel&nbsp;daunted&nbsp;by&nbsp;the&nbsp;vast&nbsp;number&nbsp;of&nbsp;methods&nbsp;:),&nbsp;a&nbsp;player&nbsp;adapter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;should&nbsp;implement&nbsp;only&nbsp;a&nbsp;*subset*&nbsp;of&nbsp;these&nbsp;methods&nbsp;-&nbsp;depending&nbsp;on&nbsp;what<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;possible&nbsp;and&nbsp;what&nbsp;makes&nbsp;sense.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remuco&nbsp;checks&nbsp;which&nbsp;methods&nbsp;have&nbsp;been&nbsp;overridden&nbsp;and&nbsp;uses&nbsp;this<br>
+&nbsp;&nbsp;&nbsp;&nbsp;information&nbsp;to&nbsp;notify&nbsp;Remuco&nbsp;clients&nbsp;about&nbsp;capabilities&nbsp;of&nbsp;player<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adapters.&nbsp;<br>
+&nbsp;<br>
+===========================================================================<br>
+Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nbsp;the&nbsp;media&nbsp;player:<br>
+===========================================================================<br>
+&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_medialib">request_medialib</a>()<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;As&nbsp;above,&nbsp;only&nbsp;overwrite&nbsp;the&nbsp;methods&nbsp;that&nbsp;makes&nbsp;sense&nbsp;for&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;As&nbsp;above,&nbsp;only&nbsp;override&nbsp;the&nbsp;methods&nbsp;which&nbsp;make&nbsp;sense&nbsp;for&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.<br>
 &nbsp;<br>
-Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;send&nbsp;media&nbsp;player&nbsp;information&nbsp;to&nbsp;clients:<br>
+===========================================================================<br>
+Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;respond&nbsp;to&nbsp;the&nbsp;requests&nbsp;above:<br>
+===========================================================================<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_position">update_position</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_medialib_request">reply_medialib_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+===========================================================================<br>
+Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;synchronize&nbsp;media&nbsp;player&nbsp;state&nbsp;information&nbsp;with&nbsp;clients:<br>
+===========================================================================<br>
+&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_playback">update_playback</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_repeat">update_repeat</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_shuffle">update_shuffle</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_plob">update_plob</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_item">update_item</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_position">update_position</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;update_playlist_mutability()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;methods&nbsp;should&nbsp;be&nbsp;called&nbsp;whenever&nbsp;the&nbsp;corresponding&nbsp;information<br>
-&nbsp;&nbsp;&nbsp;&nbsp;has&nbsp;changed&nbsp;in&nbsp;the&nbsp;media&nbsp;player.&nbsp;Subclasses&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;may<br>
-&nbsp;&nbsp;&nbsp;&nbsp;overwrite&nbsp;the&nbsp;method&nbsp;<a href="#PlayerAdapter-poll">poll</a>()&nbsp;to&nbsp;periodically&nbsp;check&nbsp;a&nbsp;player's&nbsp;state.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;has&nbsp;changed&nbsp;in&nbsp;the&nbsp;media&nbsp;player&nbsp;(it&nbsp;is&nbsp;safe&nbsp;to&nbsp;call&nbsp;these&nbsp;methods&nbsp;also<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;there&nbsp;actually&nbsp;is&nbsp;no&nbsp;change,&nbsp;internally&nbsp;a&nbsp;change&nbsp;check&nbsp;is&nbsp;done<br>
+&nbsp;&nbsp;&nbsp;&nbsp;before&nbsp;sending&nbsp;any&nbsp;data&nbsp;to&nbsp;clients).<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_library_request">reply_library_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Subclasses&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;may&nbsp;override&nbsp;the&nbsp;method&nbsp;<a href="#PlayerAdapter-poll">poll</a>()&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;periodically&nbsp;check&nbsp;a&nbsp;player's&nbsp;state.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;methods&nbsp;should&nbsp;be&nbsp;called&nbsp;to&nbsp;reply&nbsp;to&nbsp;calls&nbsp;to&nbsp;one&nbsp;of&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;request&nbsp;methods&nbsp;above.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
-Finally&nbsp;some&nbsp;not&nbsp;so&nbsp;important&nbsp;utility&nbsp;methods:<br>
+===========================================================================<br>
+Finally&nbsp;some&nbsp;utility&nbsp;methods:<br>
+===========================================================================<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_cache_dir">get_cache_dir</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_log_file">get_log_file</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-get_clients">get_clients</a>()<br>&nbsp;</tt></td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-find_image">find_image</a>()<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player.<br>
+<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, playback_known<font color="#909090">=False</font>, volume_known<font color="#909090">=False</font>, repeat_known<font color="#909090">=False</font>, shuffle_known<font color="#909090">=False</font>, progress_known<font color="#909090">=False</font>, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>, file_actions<font color="#909090">=None</font>, mime_types<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
 Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbsp;starts&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
-@param&nbsp;name:&nbsp;name&nbsp;of&nbsp;the&nbsp;player<br>
-@keyword&nbsp;max_rating:&nbsp;maximum&nbsp;rating&nbsp;value&nbsp;of&nbsp;the&nbsp;player&nbsp;(default&nbsp;is&nbsp;0,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;means&nbsp;the&nbsp;player&nbsp;does&nbsp;not&nbsp;support&nbsp;rating)<br>
-@keyword&nbsp;poll:&nbsp;interval&nbsp;in&nbsp;seconds&nbsp;to&nbsp;call&nbsp;<a href="#PlayerAdapter-poll">poll</a>(),&nbsp;default&nbsp;is&nbsp;2.5<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(note&nbsp;that&nbsp;<a href="#PlayerAdapter-poll">poll</a>()&nbsp;only&nbsp;gets&nbsp;called&nbsp;periodically&nbsp;if<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;overwritten&nbsp;by&nbsp;player&nbsp;adapters)<br>
+@param&nbsp;name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;of&nbsp;the&nbsp;media&nbsp;player<br>
+@keyword&nbsp;playback_known:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;playback&nbsp;state&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_playback">update_playback</a>())<br>
+@keyword&nbsp;progress_known:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;playback&nbsp;progress&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>())<br>
+@keyword&nbsp;max_rating:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;maximum&nbsp;possible&nbsp;rating&nbsp;value&nbsp;for&nbsp;items<br>
+@keyword&nbsp;mime_types:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;mime&nbsp;types&nbsp;which&nbsp;can&nbsp;be&nbsp;handled&nbsp;by&nbsp;the&nbsp;player&nbsp;(for&nbsp;instance<br>
+&nbsp;&nbsp;&nbsp;&nbsp;['audio',&nbsp;'video/quicktime',&nbsp;...]&nbsp;or&nbsp;None&nbsp;for&nbsp;all&nbsp;mime&nbsp;types)&nbsp;-&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;only&nbsp;relevant&nbsp;if&nbsp;one&nbsp;of&nbsp;the&nbsp;control&nbsp;methods&nbsp;ending&nbsp;with&nbsp;'_file'&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'_files'&nbsp;are&nbsp;overridden,&nbsp;e.g.&nbsp;ctrl_play_file(),&nbsp;in&nbsp;that&nbsp;case&nbsp;this<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;filters&nbsp;the&nbsp;files&nbsp;which&nbsp;may&nbsp;be&nbsp;passed&nbsp;to&nbsp;these&nbsp;methods<br>
+@keyword&nbsp;poll:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;interval&nbsp;in&nbsp;seconds&nbsp;to&nbsp;call&nbsp;<a href="#PlayerAdapter-poll">poll</a>()<br>
 &nbsp;<br>
-@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
+@attention:&nbsp;When&nbsp;overriding,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_jump_in_playlist"><strong>ctrl_jump_in_playlist</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
-&nbsp;<br>
-@param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+<dl><dt><a name="PlayerAdapter-action_files"><strong>action_files</strong></a>(self, action_id, files, uris)</dt><dd><tt>@param&nbsp;files:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;file&nbsp;names&nbsp;(these&nbsp;may&nbsp;be&nbsp;any&nbsp;files&nbsp;from&nbsp;the&nbsp;local<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;system&nbsp;that&nbsp;have&nbsp;one&nbsp;of&nbsp;the&nbsp;mime&nbsp;types&nbsp;specified&nbsp;by&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;keyword&nbsp;'mime_types'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>())<br>
+@param&nbsp;uris:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;names&nbsp;in&nbsp;URI&nbsp;notation&nbsp;(preferred&nbsp;by&nbsp;some&nbsp;players)</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_jump_in_queue"><strong>ctrl_jump_in_queue</strong></a>(self, position)</dt><dd><tt>Jump&nbsp;to&nbsp;a&nbsp;specific&nbsp;position&nbsp;in&nbsp;the&nbsp;queue.<br>
-&nbsp;<br>
-@param&nbsp;postion:&nbsp;the&nbsp;position&nbsp;(starting&nbsp;form&nbsp;0)&nbsp;<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+<dl><dt><a name="PlayerAdapter-action_medialib"><strong>action_medialib</strong></a>(self, action_id, path, positions, ids)</dt><dd><tt>@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;item&nbsp;IDs&nbsp;(identifying&nbsp;items&nbsp;in&nbsp;the&nbsp;player's&nbsp;media&nbsp;library)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+if&nbsp;the&nbsp;action&nbsp;denotes&nbsp;to&nbsp;a&nbsp;<a href="#ListAction">ListAction</a>,&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are<br>
+empty&nbsp;lists</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_load_playlist"><strong>ctrl_load_playlist</strong></a>(self, path)</dt><dd><tt>Load&nbsp;a&nbsp;playlist.<br>
-&nbsp;<br>
-For&nbsp;some&nbsp;players&nbsp;this&nbsp;means&nbsp;'switch&nbsp;to&nbsp;another&nbsp;playlist',&nbsp;for&nbsp;others<br>
-it&nbsp;means&nbsp;'put&nbsp;the&nbsp;content&nbsp;of&nbsp;another&nbsp;playlist&nbsp;into&nbsp;the&nbsp;active&nbsp;playlist'.<br>
-&nbsp;<br>
-@param&nbsp;path:&nbsp;the&nbsp;path&nbsp;of&nbsp;the&nbsp;playlist&nbsp;to&nbsp;load&nbsp;(path&nbsp;is&nbsp;a&nbsp;library<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;as&nbsp;described&nbsp;in&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()&nbsp;)&nbsp;<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+<dl><dt><a name="PlayerAdapter-action_playlist"><strong>action_playlist</strong></a>(self, action_id, positions, ids)</dt><dd><tt>@param&nbsp;positions:&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-action_queue"><strong>action_queue</strong></a>(self, action_id, positions, ids)</dt><dd><tt>@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;apply&nbsp;to&nbsp;'positions'&nbsp;(specifies&nbsp;one&nbsp;of&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;actions&nbsp;set&nbsp;with&nbsp;keyword&nbsp;'queue_actions'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>())<br>
+@param&nbsp;positions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(if&nbsp;the&nbsp;action's&nbsp;scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;Action.SINGLE_ITEM&nbsp;then&nbsp;this&nbsp;is&nbsp;a&nbsp;one&nbsp;element&nbsp;list)</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-ctrl_clear_playlist"><strong>ctrl_clear_playlist</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="PlayerAdapter-ctrl_clear_queue"><strong>ctrl_clear_queue</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_previous"><strong>ctrl_previous</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;previous&nbsp;item.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
-@param&nbsp;rating:&nbsp;rating&nbsp;value&nbsp;(int)<br>
+@param&nbsp;rating:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rating&nbsp;value&nbsp;(int)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_seek_backward"><strong>ctrl_seek_backward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-ctrl_seek"><strong>ctrl_seek</strong></a>(self, direction)</dt><dd><tt>Seek&nbsp;forward&nbsp;or&nbsp;backward&nbsp;some&nbsp;seconds.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+The&nbsp;number&nbsp;of&nbsp;seconds&nbsp;to&nbsp;seek&nbsp;should&nbsp;be&nbsp;reasonable&nbsp;for&nbsp;the&nbsp;current<br>
+item's&nbsp;length&nbsp;(if&nbsp;known).<br>
+&nbsp;<br>
+If&nbsp;the&nbsp;progress&nbsp;of&nbsp;the&nbsp;current&nbsp;item&nbsp;is&nbsp;known,&nbsp;it&nbsp;should&nbsp;get<br>
+synchronized&nbsp;immediately&nbsp;with&nbsp;clients&nbsp;by&nbsp;calling&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>().<br>
+&nbsp;<br>
+@param&nbsp;direction:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;&gt;&nbsp;0:&nbsp;seek&nbsp;forward<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;&lt;&nbsp;0:&nbsp;seek&nbsp;backward&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_seek_forward"><strong>ctrl_seek_forward</strong></a>(self)</dt><dd><tt>Seek&nbsp;forward&nbsp;some&nbsp;seconds.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-ctrl_tag"><strong>ctrl_tag</strong></a>(self, id, tags)</dt><dd><tt>Attach&nbsp;some&nbsp;tags&nbsp;to&nbsp;an&nbsp;item.<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-ctrl_tag"><strong>ctrl_tag</strong></a>(self, id, tags)</dt><dd><tt>Attach&nbsp;some&nbsp;tags&nbsp;to&nbsp;a&nbsp;PLOB.<br>
-&nbsp;<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;PLOB&nbsp;to&nbsp;attach&nbsp;the&nbsp;tags&nbsp;to<br>
-@param&nbsp;tags:&nbsp;a&nbsp;list&nbsp;of&nbsp;tags<br>
+@param&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;item&nbsp;to&nbsp;attach&nbsp;the&nbsp;tags&nbsp;to<br>
+@param&nbsp;tags:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;tags<br>
 &nbsp;<br>
 @note:&nbsp;Tags&nbsp;does&nbsp;not&nbsp;mean&nbsp;ID3&nbsp;tags&nbsp;or&nbsp;similar.&nbsp;It&nbsp;means&nbsp;the&nbsp;general<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idea&nbsp;of&nbsp;tags&nbsp;(e.g.&nbsp;like&nbsp;used&nbsp;at&nbsp;last.fm).&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;idea&nbsp;of&nbsp;tags&nbsp;(e.g.&nbsp;like&nbsp;used&nbsp;at&nbsp;last.fm).&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-ctrl_toggle_fullscreen"><strong>ctrl_toggle_fullscreen</strong></a>(self)</dt><dd><tt>Toggle&nbsp;full&nbsp;screen&nbsp;mode.&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_toggle_playing"><strong>ctrl_toggle_playing</strong></a>(self)</dt><dd><tt>Toggle&nbsp;play&nbsp;and&nbsp;pause.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_toggle_repeat"><strong>ctrl_toggle_repeat</strong></a>(self)</dt><dd><tt>Toggle&nbsp;repeat&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#PlayerAdapter-update_repeat">update_repeat</a>()</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_toggle_shuffle"><strong>ctrl_toggle_shuffle</strong></a>(self)</dt><dd><tt>Toggle&nbsp;shuffle&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#PlayerAdapter-update_shuffle">update_shuffle</a>()</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_volume"><strong>ctrl_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;volume.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-ctrl_volume"><strong>ctrl_volume</strong></a>(self, direction)</dt><dd><tt>Adjust&nbsp;volume.&nbsp;<br>
 &nbsp;<br>
-@param&nbsp;volume:&nbsp;the&nbsp;new&nbsp;volume&nbsp;in&nbsp;percent<br>
+@param&nbsp;volume:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;-1:&nbsp;decrease&nbsp;by&nbsp;some&nbsp;percent&nbsp;(5&nbsp;is&nbsp;a&nbsp;good&nbsp;value)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;+1:&nbsp;increase&nbsp;by&nbsp;some&nbsp;percent&nbsp;(5&nbsp;is&nbsp;a&nbsp;good&nbsp;value)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;0:&nbsp;mute&nbsp;volume<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;wants&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;the&nbsp;player.</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-get_cache_dir"><strong>get_cache_dir</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;cache&nbsp;directory.<br>
+<dl><dt><a name="PlayerAdapter-find_image"><strong>find_image</strong></a>(self, resource, prefer_thumbnail<font color="#909090">=False</font>)</dt><dd><tt>Find&nbsp;a&nbsp;local&nbsp;art&nbsp;image&nbsp;file&nbsp;related&nbsp;to&nbsp;a&nbsp;resource.<br>
 &nbsp;<br>
-In&nbsp;most&nbsp;cases&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER<br>
+This&nbsp;method&nbsp;first&nbsp;looks&nbsp;in&nbsp;the&nbsp;resource'&nbsp;folder&nbsp;for&nbsp;typical&nbsp;art&nbsp;image<br>
+files&nbsp;(e.g.&nbsp;'cover.png',&nbsp;'front,jpg',&nbsp;...).&nbsp;If&nbsp;there&nbsp;is&nbsp;no&nbsp;such&nbsp;file&nbsp;it<br>
+then&nbsp;looks&nbsp;into&nbsp;the&nbsp;user's&nbsp;thumbnail&nbsp;directory&nbsp;(~/.thumbnails).<br>
 &nbsp;<br>
-@return:&nbsp;cache&nbsp;dir&nbsp;name</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-get_clients"><strong>get_clients</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
-&nbsp;<br>
-May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;media&nbsp;player&nbsp;UI.<br>
-&nbsp;<br>
-@return:&nbsp;a&nbsp;list&nbsp;of&nbsp;client&nbsp;names&nbsp;(or&nbsp;addresses)</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-get_log_file"><strong>get_log_file</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;player&nbsp;specific&nbsp;log&nbsp;file.<br>
-&nbsp;<br>
-@return:&nbsp;log&nbsp;file&nbsp;name<br>
-&nbsp;<br>
-@note:&nbsp;Do&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;to&nbsp;write&nbsp;log&nbsp;messages&nbsp;into.&nbsp;This&nbsp;should&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;done&nbsp;with&nbsp;the&nbsp;module&nbsp;log&nbsp;(contained&nbsp;within&nbsp;Remuco).&nbsp;The&nbsp;idea<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;the&nbsp;method&nbsp;is&nbsp;to&nbsp;integrate&nbsp;log&nbsp;information&nbsp;in&nbsp;the&nbsp;media<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;UI.</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-get_name"><strong>get_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;player.<br>
-&nbsp;<br>
-Probably&nbsp;not&nbsp;that&nbsp;useful&nbsp;for&nbsp;player&nbsp;adapters&nbsp;(used&nbsp;internally).</tt></dd></dl>
+@param&nbsp;resource:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;resource&nbsp;to&nbsp;find&nbsp;an&nbsp;art&nbsp;image&nbsp;for&nbsp;(may&nbsp;be&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;URI)<br>
+@keyword&nbsp;prefer_thumbnail:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;means&nbsp;first&nbsp;search&nbsp;in&nbsp;thumbnails,&nbsp;False&nbsp;means&nbsp;first&nbsp;search&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;resource'&nbsp;folder<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@return:&nbsp;an&nbsp;image&nbsp;file&nbsp;name&nbsp;(which&nbsp;can&nbsp;be&nbsp;used&nbsp;for&nbsp;<a href="#PlayerAdapter-update_item">update_item</a>())&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;None&nbsp;if&nbsp;no&nbsp;image&nbsp;file&nbsp;has&nbsp;been&nbsp;found&nbsp;or&nbsp;if&nbsp;'resource'&nbsp;is&nbsp;not&nbsp;local</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-poll"><strong>poll</strong></a>(self)</dt><dd><tt>Does&nbsp;nothing&nbsp;by&nbsp;default.<br>
 &nbsp;<br>
-If&nbsp;player&nbsp;adapters&nbsp;overwrite&nbsp;this&nbsp;method,&nbsp;it&nbsp;gets&nbsp;called&nbsp;periodically<br>
-in&nbsp;the&nbsp;interval&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'poll'&nbsp;in&nbsp;the&nbsp;constructor<br>
-(default&nbsp;is&nbsp;2500&nbsp;ms).<br>
+If&nbsp;player&nbsp;adapters&nbsp;override&nbsp;this&nbsp;method,&nbsp;it&nbsp;gets&nbsp;called&nbsp;periodically<br>
+in&nbsp;the&nbsp;interval&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'poll'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>().<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;must&nbsp;return&nbsp;True&nbsp;to&nbsp;be&nbsp;called&nbsp;again.</tt></dd></dl>
+A&nbsp;typical&nbsp;use&nbsp;case&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;detect&nbsp;the&nbsp;playback&nbsp;progress&nbsp;of<br>
+the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>().</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_library_request"><strong>reply_library_request</strong></a>(self, client, path, nested, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
-&nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level&nbsp;(string&nbsp;list)<br>
-@param&nbsp;nested:&nbsp;nested&nbsp;playlists&nbsp;(string&nbsp;list)<br>
-@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
-@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
-&nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_library">request_library</a>()</tt></dd></dl>
+<dl><dt><a name="PlayerAdapter-reply_item_request"><strong>reply_item_request</strong></a>(self, client, id, info)</dt></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_medialib_request"><strong>reply_medialib_request</strong></a>(self, client, path, nested, ids, names, item_actions<font color="#909090">=None</font>, list_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;media&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
-@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
+@param&nbsp;path:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
+@param&nbsp;nested:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;nested&nbsp;lists&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
+@param&nbsp;names:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
+@keyword&nbsp;actions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;media&nbsp;library&nbsp;actions&nbsp;possible&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(default&nbsp;is&nbsp;None,&nbsp;which&nbsp;means&nbsp;all&nbsp;actions&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'medialib_actions'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>()&nbsp;are&nbsp;possible&nbsp;-&nbsp;use&nbsp;the&nbsp;empty&nbsp;list<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;disable&nbsp;any&nbsp;media&nbsp;library&nbsp;actions&nbsp;at&nbsp;the&nbsp;requested&nbsp;path)<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#PlayerAdapter-request_medialib">request_medialib</a>()</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+&nbsp;<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
+@param&nbsp;names:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
 &nbsp;<br>
 @see:&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_plob_request"><strong>reply_plob_request</strong></a>(self, client, id, info)</dt><dd><tt>Send&nbsp;a&nbsp;reply&nbsp;to&nbsp;a&nbsp;PLOB&nbsp;request&nbsp;back&nbsp;to&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB<br>
-@param&nbsp;info:&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;(see&nbsp;<a href="#PlayerAdapter-update_plob">update_plob</a>())<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_plob">request_plob</a>()</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, plob_ids, plob_names)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
-&nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;plob_ids:&nbsp;IDs&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
-@param&nbsp;plob_names:&nbsp;names&nbsp;of&nbsp;the&nbsp;PLOBs&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
+@param&nbsp;names:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
 &nbsp;<br>
 @see:&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-request_library"><strong>request_library</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;library.<br>
+<dl><dt><a name="PlayerAdapter-request_item"><strong>request_item</strong></a>(self, client, id)</dt></dl>
+
+<dl><dt><a name="PlayerAdapter-request_medialib"><strong>request_medialib</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 @param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
 &nbsp;<br>
-@note:&nbsp;path&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;which&nbsp;describes&nbsp;a&nbsp;specific&nbsp;level&nbsp;in&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;playlist&nbsp;tree.&nbsp;If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;root&nbsp;of&nbsp;the&nbsp;player's&nbsp;library,&nbsp;i.e.&nbsp;all&nbsp;top&nbsp;level&nbsp;playlists&nbsp;are<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;requested.<br>
+@note:&nbsp;path&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;which&nbsp;describes&nbsp;a&nbsp;specific&nbsp;level&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;playlist&nbsp;tree.&nbsp;If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the&nbsp;root&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;library,&nbsp;i.e.&nbsp;all&nbsp;top&nbsp;level&nbsp;playlists&nbsp;are&nbsp;requested.<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;player&nbsp;may&nbsp;have&nbsp;a&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;player&nbsp;may&nbsp;have&nbsp;a&nbsp;media&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
@@ -403,111 +730,129 @@ in&nbsp;the&nbsp;interval&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'pol
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;a<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;specific&nbsp;level&nbsp;of&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
 &nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;current&nbsp;playlist.<br>
-&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-request_plob"><strong>request_plob</strong></a>(self, client, id)</dt><dd><tt>Request&nbsp;information&nbsp;about&nbsp;a&nbsp;specific&nbsp;PLOB.&nbsp;<br>
-&nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-@param&nbsp;id:&nbsp;ID&nbsp;of&nbsp;the&nbsp;requested&nbsp;PLOB&nbsp;(string)<br>
-&nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;information&nbsp;about&nbsp;a&nbsp;PLOB&nbsp;from&nbsp;the&nbsp;player.<br>
-&nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
 &nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 &nbsp;<br>
-@note:&nbsp;This&nbsp;method&nbsp;should&nbsp;be&nbsp;overwritten&nbsp;by&nbsp;sub&nbsp;classes&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.&nbsp;It&nbsp;gets&nbsp;called&nbsp;if&nbsp;a&nbsp;remote&nbsp;client&nbsp;requests&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;player's&nbsp;current&nbsp;queue.<br>
-&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-start"><strong>start</strong></a>(self)</dt><dd><tt>Start&nbsp;the&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
+@attention:&nbsp;When&nbsp;overriding,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Shutdown&nbsp;the&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
 Disconnects&nbsp;all&nbsp;clients&nbsp;and&nbsp;shuts&nbsp;down&nbsp;the&nbsp;Bluetooth&nbsp;and&nbsp;WiFi&nbsp;server.<br>
 Also&nbsp;ignores&nbsp;any&nbsp;subsequent&nbsp;calls&nbsp;to&nbsp;an&nbsp;update&nbsp;or&nbsp;reply&nbsp;method&nbsp;(e.g.<br>
-<a href="#PlayerAdapter-update_volume">update_volume</a>(),&nbsp;...,&nbsp;<a href="#PlayerAdapter-reply_plob_request">reply_plob_request</a>(),&nbsp;...).&nbsp;<br>
+<a href="#PlayerAdapter-update_volume">update_volume</a>(),&nbsp;...,&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>(),&nbsp;...).&nbsp;<br>
 &nbsp;<br>
 @note:&nbsp;The&nbsp;same&nbsp;player&nbsp;adapter&nbsp;instance&nbsp;can&nbsp;be&nbsp;started&nbsp;again&nbsp;with<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
-@attention:&nbsp;When&nbsp;overwriting,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
+@attention:&nbsp;When&nbsp;overriding,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-update_item"><strong>update_item</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;currently&nbsp;played&nbsp;item.<br>
+&nbsp;<br>
+@param&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;item&nbsp;ID&nbsp;(str)<br>
+@param&nbsp;info:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;meta&nbsp;information&nbsp;(dict)<br>
+@param&nbsp;img:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;image&nbsp;/&nbsp;cover&nbsp;art&nbsp;(either&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;instance&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Image.Image)<br>
+&nbsp;<br>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+&nbsp;<br>
+@see:&nbsp;<a href="#PlayerAdapter-find_image">find_image</a>()&nbsp;for&nbsp;finding&nbsp;image&nbsp;files&nbsp;for&nbsp;an&nbsp;item.<br>
+&nbsp;<br>
+@see:&nbsp;remuco.INFO_...&nbsp;for&nbsp;keys&nbsp;to&nbsp;use&nbsp;for&nbsp;'info'</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-update_playback"><strong>update_playback</strong></a>(self, playback)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;playback&nbsp;state.<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+@param&nbsp;playback:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;playback&nbsp;mode<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@see:&nbsp;remuco.PLAYBACK_...<br>
 &nbsp;<br>
-@param&nbsp;playback:&nbsp;playback&nbsp;mode&nbsp;(see&nbsp;constants)</tt></dd></dl>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-update_plob"><strong>update_plob</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;current&nbsp;PLOB.<br>
+<dl><dt><a name="PlayerAdapter-update_position"><strong>update_position</strong></a>(self, position, queue<font color="#909090">=False</font>)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;item's&nbsp;position&nbsp;in&nbsp;the&nbsp;playlist&nbsp;or&nbsp;queue.&nbsp;<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;the<br>
-currently&nbsp;played&nbsp;item&nbsp;with&nbsp;remote&nbsp;clients.<br>
-&nbsp;<br>
-@param&nbsp;id:&nbsp;PLOB&nbsp;ID&nbsp;(string)<br>
-@param&nbsp;info:&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;(dict)<br>
-@param&nbsp;img:&nbsp;image&nbsp;/&nbsp;cover&nbsp;art&nbsp;file&nbsp;(either&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instance&nbsp;of&nbsp;Image.Image)<br>
-&nbsp;<br>
-@note:&nbsp;For&nbsp;the&nbsp;PLOB&nbsp;meta&nbsp;information&nbsp;dictionary&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;constants<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starting&nbsp;with&nbsp;'INFO_'&nbsp;(e.g.&nbsp;INFO_ARTIST)&nbsp;as&nbsp;keys.</tt></dd></dl>
+@param&nbsp;position:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;position&nbsp;of&nbsp;the&nbsp;currently&nbsp;played&nbsp;item&nbsp;(starting&nbsp;at&nbsp;0)<br>
+@keyword&nbsp;queue:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;if&nbsp;currently&nbsp;played&nbsp;item&nbsp;is&nbsp;from&nbsp;the&nbsp;queue,&nbsp;False&nbsp;if&nbsp;it&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-update_position"><strong>update_position</strong></a>(self, position, queue<font color="#909090">=False</font>)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;PLOB's&nbsp;position&nbsp;in&nbsp;the&nbsp;playlist&nbsp;or&nbsp;queue.&nbsp;<br>
+<dl><dt><a name="PlayerAdapter-update_progress"><strong>update_progress</strong></a>(self, progress, length)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;playback&nbsp;progress.<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+@param&nbsp;progress:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;of&nbsp;currently&nbsp;elapsed&nbsp;seconds<br>
+@keyword&nbsp;length:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;item&nbsp;length&nbsp;in&nbsp;seconds&nbsp;(maximum&nbsp;possible&nbsp;progress&nbsp;value)<br>
 &nbsp;<br>
-@param&nbsp;position:&nbsp;position&nbsp;of&nbsp;the&nbsp;currently&nbsp;player&nbsp;item&nbsp;(starting&nbsp;from&nbsp;0)<br>
-@keyword&nbsp;queue:&nbsp;True&nbsp;if&nbsp;currently&nbsp;played&nbsp;item&nbsp;is&nbsp;from&nbsp;the&nbsp;queue,&nbsp;False<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;it&nbsp;is&nbsp;from&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist&nbsp;(default)</tt></dd></dl>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-update_repeat"><strong>update_repeat</strong></a>(self, repeat)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;repeat&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+@param&nbsp;repeat:&nbsp;True&nbsp;means&nbsp;play&nbsp;indefinitely,&nbsp;False&nbsp;means&nbsp;stop&nbsp;after&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;last&nbsp;playlist&nbsp;item<br>
 &nbsp;<br>
-@param&nbsp;repeat:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-update_shuffle"><strong>update_shuffle</strong></a>(self, shuffle)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;shuffle&nbsp;mode.&nbsp;<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+@param&nbsp;shuffle:&nbsp;True&nbsp;means&nbsp;play&nbsp;in&nbsp;non-linear&nbsp;order,&nbsp;False&nbsp;means&nbsp;play<br>
+&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;linear&nbsp;order<br>
 &nbsp;<br>
-@param&nbsp;shuffle:&nbsp;true&nbsp;means&nbsp;on,&nbsp;false&nbsp;means&nbsp;off</tt></dd></dl>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-update_volume"><strong>update_volume</strong></a>(self, volume)</dt><dd><tt>Set&nbsp;the&nbsp;current&nbsp;volume.<br>
 &nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;sync&nbsp;player<br>
-state&nbsp;with&nbsp;remote&nbsp;clients.<br>
+@param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent<br>
 &nbsp;<br>
-@param&nbsp;volume:&nbsp;the&nbsp;volume&nbsp;in&nbsp;percent</tt></dd></dl>
+@note:&nbsp;Call&nbsp;to&nbsp;synchronize&nbsp;player&nbsp;state&nbsp;with&nbsp;remote&nbsp;clients.</tt></dd></dl>
 
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>clients</strong></dt>
+<dd><tt>A&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
+&nbsp;<br>
+May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;media&nbsp;player&nbsp;UI.</tt></dd>
+</dl>
+<dl><dt><strong>config</strong></dt>
+<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;(instance&nbsp;of&nbsp;Config).<br>
+&nbsp;<br>
+This&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any<br>
+change&nbsp;to&nbsp;'config'&nbsp;is&nbsp;saved&nbsp;immediately&nbsp;into&nbsp;the&nbsp;configuration&nbsp;file.</tt></dd>
+</dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -515,23 +860,18 @@ state&nbsp;with&nbsp;remote&nbsp;clients.<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>INFO_ALBUM</strong> = 'album'<br>
+<td width="100%"><strong>API_VERSION</strong> = 1<br>
+<strong>INFO_ALBUM</strong> = 'album'<br>
 <strong>INFO_ARTIST</strong> = 'artist'<br>
-<strong>INFO_BITRATE</strong> = 'bitrate'<br>
-<strong>INFO_COMMENT</strong> = 'comment'<br>
 <strong>INFO_GENRE</strong> = 'genre'<br>
 <strong>INFO_LENGTH</strong> = 'length'<br>
 <strong>INFO_RATING</strong> = 'rating'<br>
 <strong>INFO_TAGS</strong> = 'tags'<br>
 <strong>INFO_TITLE</strong> = 'title'<br>
-<strong>INFO_TRACK</strong> = 'track'<br>
-<strong>INFO_TYPE</strong> = 'type'<br>
-<strong>INFO_TYPE_AUDIO</strong> = 1<br>
-<strong>INFO_TYPE_OTHER</strong> = 3<br>
-<strong>INFO_TYPE_VIDEO</strong> = 2<br>
 <strong>INFO_YEAR</strong> = 'year'<br>
 <strong>PLAYBACK_PAUSE</strong> = 1<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
 <strong>PLAYBACK_STOP</strong> = 0<br>
-<strong>version</strong> = '0.8.0'</td></tr></table>
+<strong>__all__</strong> = ('PlayerAdapter', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP', 'API_VERSION')<br>
+<strong>__version__</strong> = '0.8.0'</td></tr></table>
 </body></html>

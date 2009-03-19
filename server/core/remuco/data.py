@@ -1,3 +1,5 @@
+"""Data containers to send to and receive from clients."""
+
 import tempfile
 import Image
 
@@ -5,329 +7,278 @@ from remuco import command
 from remuco import log
 from remuco import serial
 
+# =============================================================================
+# outgoing data (to clients)
+# =============================================================================
+
+class PlayerInfo(serial.Serializable):
+    
+    def __init__(self, name, flags, max_rating, file_item_actions):
+        
+        self.name = name
+        self.flags = flags
+        self.max_rating = max_rating
+        
+        self.fia_ids = []
+        self.fia_labels = []
+        self.fia_multiples = []
+        self.fia_helps = []
+        for action in file_item_actions or []:
+            self.fia_ids.append(action.id);
+            self.fia_labels.append(action.label);
+            self.fia_multiples.append(action.multiple);
+            self.fia_helps.append(action.help);
+            
+    # === serial interface ===
+        
+    def get_fmt(self):
+        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y,
+                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
+                serial.TYPE_AS)
+        
+    def get_data(self):
+        return (self.name, self.flags, self.max_rating,
+                self.fia_ids, self.fia_labels, self.fia_multiples,
+                self.fia_helps)
+
 class PlayerState(serial.Serializable):
     
     def __init__(self):
         
-        self.__playback = 0
-        self.__volume = 0
-        self.__position = 0
-        self.__repeat = False
-        self.__shuffle = False
-        self.__queue = False
-        
-    def __eq__(self, other):
-        
-        if other is None: return False
-        
-        if not isinstance(other, PlayerState): return False
-        
-        try:
-            if other.__playback != self.__playback: return False
-            if other.__volume != self.__volume: return False
-            if other.__position != self.__position: return False
-            if other.__repeat != self.__repeat: return False
-            if other.__queue != self.__queue: return False
-        except AttributeError:
-            return False
-        
-        return True
+        self.playback = 0
+        self.volume = 0
+        self.position = 0
+        self.repeat = False
+        self.shuffle = False
+        self.queue = False
         
     def __str__(self):
         
-        return "(%d, %d, %d, %s, %s, %s)" % (self.__playback, self.__volume,
-                                             self.__position, self.__repeat,
-                                             self.__shuffle, self.__queue)
+        return "(%d, %d, %d, %s, %s, %s)" % (
+                self.playback, self.volume, self.position,
+                self.repeat, self.shuffle, self.queue)
+        
+    # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_I, serial.TYPE_I, serial.TYPE_B,
-                serial.TYPE_B, serial.TYPE_I, serial.TYPE_B)
+        return (serial.TYPE_Y, serial.TYPE_Y, serial.TYPE_I,
+                serial.TYPE_B, serial.TYPE_B, serial.TYPE_B)
         
     def get_data(self):
-        return (self.__playback, self.__volume, self.__repeat,
-                self.__shuffle, self.__position, self.__queue)
-        
-    def set_data(self, data):
-        self.__playback, self.__volume, self.__repeat, \
-            self.__shuffle, self.__position, self.__queue = data
-            
-    def get_playback(self):
-        return self.__playback
-        
-    def get_volume(self):
-        return self.__volume
-    
-    def get_position(self):
-        return self.__position
-    
-    def get_repeat(self):
-        return self.__repeat
-        
-    def get_shuffle(self):
-        return self.__shuffle
-        
-    def get_queue(self):
-        return self.__queue
-    
-    def set_playback(self, playback):
-        self.__playback = playback
-        
-    def set_volume(self, volume):
-        self.__volume = volume
-    
-    def set_position(self, position):
-        self.__position = position
-    
-    def set_repeat(self, repeat):
-        self.__repeat = repeat
-        
-    def set_shuffle(self, shuffle):
-        self.__shuffle = shuffle
-        
-    def set_queue(self, queue):
-        self.__queue = queue
-    
-class Library(serial.Serializable):
-    
-    PATH_QUEUE = ["__QUEUE__"];
-    PATH_PLAYLIST = ["__PLAYLIST__"];
-    MAX_LEN = 100
-    
-    def __eq__(self, other):
-        
-        if other is None: return False
-        
-        if not isinstance(other, Library): return False
-        
-        try:
-            if other.__path != self.__path: return False
-            if other.__nested != self.__nested: return False
-            if other.__plob_ids != self.__plob_ids: return False
-            if other.__plob_names != self.__plob_names: return False
-        except AttributeError:
-            return False
-        
-        return True
+        return (self.playback, self.volume, self.position,
+                self.repeat, self.shuffle, self.queue)
 
-    def __init__(self, path, nested, plob_ids, plob_names):
-        
-        self.__path = path
-        self.__nested = nested
-        self.__plob_ids = plob_ids
-        self.__plob_names = plob_names
-        
-    def get_fmt(self):
-        return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS)
-        
-    def get_data(self):
-        ml = Library.MAX_LEN
-        return (self.__path, self.__nested[:ml], self.__plob_ids[:ml],
-                self.__plob_names[:ml])
-        
-    def set_data(self, data):
-        self.__path, self.__nested, self.__plob_ids, self.__plob_names = data
-
-class Plob(serial.Serializable):
+class Progress(serial.Serializable):
     
     def __init__(self):
         
-        self.__id = None
-        self.__info = None
-        self.__img_data = None
+        self.progress = 0
+        self.length = 0
         
-    def __eq__(self, other):
+    def __str__(self):
+        return "(%d/%d)" % (self.progress, self.length)
         
-        if other is None: return False
+    # === serial interface ===
         
-        if not isinstance(other, Plob): return False
+    def get_fmt(self):
+        return (serial.TYPE_I, serial.TYPE_I)
         
-        try:
-            if other.__id != self.__id: return False
-            #if other.__img != self.__img: return False
-            if other.__info != self.__info: return False
-        except AttributeError:
-            return False
-        
-        return True
+    def get_data(self):
+        return (self.progress, self.length)
+
+class Item(serial.Serializable):
     
+    def __init__(self):
+        
+        self.id = None
+        self.__info_orig = None
+        self.__info_list = None
+        self.__img_orig = None
+        self.__img_bin = None
+        
     def __str__(self):
         
-        return "(%s, %s, %s)" % (self.__id, str(self.__info),
-                                 self.__img_data is not None)
+        return "(%s, %s, %s)" % (self.id, self.__info_orig, self.__img_orig)
 
+    # === property: img ===
+    
+    def __pget_img(self):
+        return self.__img_orig
+    
+    def __pset_img(self, img):
+        self.__img_orig = img
+        self.__img_bin = self.__thumbnail(img)
+    
+    img = property(__pget_img, __pset_img, None, None)
+        
+    # === property: info ===
+    
+    def __pget_info(self):
+        return self.__info_orig
+    
+    def __pset_info(self, info_dict):
+        
+        self.__info_orig = info_dict
+        self.__info_list = []
+        
+        if not info_dict:
+            return
+        
+        for key in info_dict.keys():
+            val = info_dict.get(key)
+            if val is not None:
+                self.__info_list.append(key)
+                if not isinstance(val, basestring):
+                    val = str(val)
+                self.__info_list.append(val)
+    
+    info = property(__pget_info, __pset_info, None, None)
+
+    # === serial interface ===
+    
     def get_fmt(self):
         return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AY)
         
     def get_data(self):
-        return (self.__id, self.__info, self.__img_data)
+        return (self.id, self.__info_list, self.__img_bin)
     
-    def get_id(self):
-        return self.__id
-        
-    def set_data(self, data):
-        self.__id, self.__info, self.__img_data = data
+    # === misc ===
+
+    def __thumbnail(self, img):
     
-    def set_id(self, id):
-        self.__id = id
-    
-    def set_img(self, img):
-        
         if img is None:
-            self.__img_data = None
-        else:
-            self.__img_data = self.__scale_image(img)
-            
-    def set_info(self, info_dict):
-        
-        if info_dict is None:
-            self.__info = None 
-        else:
-            self.__info = []
-            for key in info_dict.keys():
-                self.__info.append(key)
-                val = info_dict.get(key)
-                if not isinstance(val, str) and not isinstance(val, unicode):
-                    val = str(val)
-                self.__info.append(val)
-                
-    def __scale_image(self, img_in):
+            return []
     
         size = 300,300
         
         try:
-            if isinstance(img_in, Image.Image):
-                img_obj = img_in
-            else: # img_in is a file name
-                img_obj = Image.open(img_in)
-            img_obj.thumbnail(size)
-            outfile = tempfile.TemporaryFile()
-            img_obj.save(outfile, "JPEG")
-            outfile.seek(0)
-            img_out = outfile.read()
-            outfile.close()
+            if not isinstance(img, Image.Image):
+                img = Image.open(img)
+            img.thumbnail(size)
+            file_tmp = tempfile.TemporaryFile()
+            img.save(file_tmp, "JPEG")
+            file_tmp.seek(0)
+            thumb = file_tmp.read()
+            file_tmp.close()
+            return thumb
         except IOError, e:
-            log.warning("failed to thumbnail %s (%s)" % (img_in, e))
-            img_out = None
-            
-        return img_out
+            log.warning("failed to thumbnail %s (%s)" % (img, e))
+            return []
+
+class ItemList(serial.Serializable):
+    
+    MAX_LEN = 100
+    
+    def __init__(self, path, nested, plob_ids, plob_names, item_actions,
+                 list_actions):
         
+        self.path = path or []
+        self.nested = nested or []
+        self.items = plob_ids or []
+        self.names = plob_names or []
+
+        self.ia_ids = []
+        self.ia_labels = []
+        self.ia_multiples = []
+        self.ia_helps = []
+        for action in item_actions or []:
+            self.ia_ids.append(action.id);
+            self.ia_labels.append(action.label);
+            self.ia_multiples.append(action.multiple);
+            self.ia_helps.append(action.help);
+        
+        self.la_ids = []
+        self.la_labels = []
+        self.la_helps = []
+        for action in list_actions or []:
+            self.la_ids.append(action.id);
+            self.la_labels.append(action.label);
+            self.la_helps.append(action.help);
+        
+    def __str__(self):
+        
+        return "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
+                self.path, self.nested, self.items, self.names,
+                self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
+                self.la_ids, self.la_labels, self.la_helps)
+        
+    # === serial interface ===
+        
+    def get_fmt(self):
+        return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS,
+                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB, serial.TYPE_AS,
+                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AS)
+        
+    def get_data(self):
+        ml = ItemList.MAX_LEN
+        return (self.path, self.nested[:ml], self.items[:ml], self.names[:ml],
+                self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
+                self.la_ids, self.la_labels, self.la_helps)
+
+
+# =============================================================================
+# incoming data (from clients)
+# =============================================================================
+
+
 class Control(serial.Serializable):
-
-    def __init__(self):
-        
-        self.__cmd = command.CMD_IGNORE
-        self.__param_i = 0
-        self.__param_s = ''
-        
-    def __eq__(self, other):
-        
-        if other is None: return False
-        
-        if not isinstance(other, Control): return False
-        
-        try:
-            if other.__cmd != self.__cmd: return False
-            if other.__param_i != self.__param_i: return False
-            if other.__param_s != self.__param_s: return False
-        except AttributeError:
-            return False
-        
-        return True
-
-    def get_fmt(self):
-        return (serial.TYPE_I, serial.TYPE_I, serial.TYPE_S)
-        
-    def get_data(self):
-        return (self.__cmd, self.__param_i, self.__param_s)
-        
-    def set_data(self, data):
-        self.__cmd, self.__param_i, self.__param_s = data
-
-    def get_cmd(self):
-        return self.__cmd
-    
-    def get_param_i(self):
-        return self.__param_i
-    
-    def get_param_s(self):
-        return self.__param_s
-        
-class SerialString(serial.Serializable):
     
     def __init__(self):
         
-        self.__s = ''
-        
-    def __eq__(self, other):
-        
-        if other is None: return False
-        
-        if not isinstance(other, SerialString): return False
-        
-        try:
-            if other.__s != self.__s: return False
-        except AttributeError:
-            return False
-        
-        return True
+        self.param = 0
 
-    def get_fmt(self):
-        return (serial.TYPE_S,)
+    # === serial interface ===
         
-    def get_data(self):
-        return (self.__s,)
+    def get_fmt(self):
+        return (serial.TYPE_I,)
         
     def set_data(self, data):
-        self.__s, = data
+        self.param, = data
 
-    def set(self, s):
-        self.__s = s
+class Action(serial.Serializable):
+    
+    def __init__(self):
         
-    def get(self):
-        return self.__s
-    
-class PlayerInfo(serial.Serializable):
-    
-    FEATURE_PLAYLIST = 1 << 0
-    FEATURE_QUEUE = 1 << 1
-    FEATURE_LIBRARY = 1 << 2
-    FEATURE_TAGS = 1 << 3
-    FEATURE_PLOBINFO = 1 << 4
-    FEATURE_JUMP_PLAYLIST = 1 << 5
-    FEATURE_JUMP_QUEUE = 1 << 6
-    FEATURE_LOAD_PLAYLIST = 1 << 7
-    FEATURE_SHUTDOWN_HOST = 1 << 8    
-    
-    def __init__(self, name, flags, rating_max):
-        
-        self.__name = name
-        self.__flags = flags
-        self.__rating_max = rating_max
+        self.id = 0
+        self.path = None
+        self.positions = None
+        self.items = None # item ids or file names
 
-    def __eq__(self, other):
+    # === serial interface ===
         
-        if other is None: return False
-        
-        if not isinstance(other, PlayerInfo): return False
-        
-        try:
-            if other.__name != self.__name: return False
-            if other.__flags != self.__flags: return False
-            if other.__rating_max != self.__rating_max: return False
-        except AttributeError:
-            return False
-        
-        return True
-
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_I)
-        
-    def get_data(self):
-        return (self.__name, self.__flags, self.__rating_max)
+        return (serial.TYPE_I, serial.TYPE_AS, serial.TYPE_AI, serial.TYPE_AS)
         
     def set_data(self, data):
-        self.__name, self.__flags, self.__rating_max = data
+        self.id, self.path, self.positions, self.items = data
 
-    def get_name(self):
-        return self.__name
+class Tagging(serial.Serializable):
     
+    def __init__(self):
+        
+        self.id = None
+        self.tags = None
+
+    # === serial interface ===
+        
+    def get_fmt(self):
+        return (serial.TYPE_S, serial.TYPE_AS)
+        
+    def set_data(self, data):
+        self.id, self.tags = data
+
+class Request(serial.Serializable):
+
+    def __init__(self):
+        
+        self.id = None
+        self.path = None
+        
+    # === serial interface ===
+        
+    def get_fmt(self):
+        return (serial.TYPE_S, serial.TYPE_AS)
+        
+    def set_data(self, data):
+        self.id, self.path = data
+

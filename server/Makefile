@@ -58,10 +58,10 @@ dist: clean pydoc
 
 pydoc: api.html
 
-api.html: core/remuco/__init__.py
+api.html: core/remuco/*.py
 	cd core; pydoc -w remuco
 	mv core/remuco.html $@
-	sed -i $@ -e "s/remuco.html/$@/g"
+	sed -i $@ -e "s,[_a-z\.]\+\.html,$@,g"
 
 check:
 	@cd /; echo "import remuco" | python 2>/dev/null || \
