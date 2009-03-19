@@ -15,7 +15,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="karoma.svg"
+   sodipodi:docname="Karoma.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    enable-background="new">
   <defs
@@ -40,9 +40,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="13.435029"
-     inkscape:cx="107.61049"
-     inkscape:cy="297.21149"
+     inkscape:zoom="3.3587573"
+     inkscape:cx="107.95943"
+     inkscape:cy="244.76395"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -79,6 +79,16 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Karoma</dc:title>
+        <dc:description>A Remuco client theme.
+This theme makes use of some icons from Amarok 1.4.</dc:description>
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>The unknown Amarok 1.4 icon desinger.</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+        <cc:license
+           rdf:resource="" />
       </cc:Work>
     </rdf:RDF>
   </metadata>

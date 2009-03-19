@@ -212,25 +212,13 @@ def main(svg):
             
     print("--> recommended minimum screen size: %dx%d" % (minw, minh))
     
-    info_filename = os.path.join(dir, "info.txt")
-    
-    print("--> generate theme info file (%s)" % info_filename)
-    
-    try:
-        template = open("info.txt", 'r')
-        text = template.read()
-        template.close()
-    except IOError, e:
-        exit_err("--| failed to read info template: %s", e)
-    
-    name = os.path.basename(dir).capitalize()
-    text = text.replace("<NAME>", name)
-    text = text.replace("<SW>", str(minw))
-    text = text.replace("<SH>", str(minh))
-    
-    info = open(info_filename, 'w')
-    info.write(text)
-    info.close()
+#    info_filename = os.path.join(dir, "theme.desc")
+#    
+#    print("--> generate description file (%s)" % info_filename)
+#    
+#    info = open(info_filename, 'w')
+#    info.write("%dx%d" % (minw,minh))
+#    info.close()
     
     print("--> finished, good job :)")
 
