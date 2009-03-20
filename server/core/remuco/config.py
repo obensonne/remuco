@@ -35,8 +35,8 @@ class Config(object):
     """Class for getting and setting player adapter specific configurations.
     
     An instance of Config mirrors the configuration of a specific player
-    adapter found (usually) in ~/.config/remuco/PLAYER/conf. Any change to
-    the properties of an instance of Config automatically gets saved in the
+    adapter (usually ~/.config/remuco/PLAYER/conf). Any change to the
+    properties of an instance of Config automatically gets saved in the
     configuration file.
     
     In most cases player adapters do not need this. It is useful if a player
