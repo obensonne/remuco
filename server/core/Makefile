@@ -1,7 +1,7 @@
 all:
 	python setup.py build --root=$(DESTDIR)/
 
-install:
+install: check
 	python setup.py install --root=$(DESTDIR)/
 
 install.log:
@@ -33,4 +33,13 @@ clean:
 	@if [ -e install.log ] ; then \
 		echo "Keep file 'install.log' for uninstallation."; \
 	fi
+	
+MODULES := gobject xdg.BaseDirectory Image logging bluetooth dbus
+
+check:
+	@for MOD in $(MODULES) ; do \
+		echo "import $$MOD" | python 2>/dev/null || \
+			{ echo "ERROR: missing python module $$MOD"; exit 1; } \
+	done
+
 	
