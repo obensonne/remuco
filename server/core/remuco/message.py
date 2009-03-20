@@ -46,7 +46,7 @@ CTRL_SHUTDOWN = _CTRL + 90
 _ACT = 400
 ACT_PLAYLIST = _ACT
 ACT_QUEUE = _ACT + 1
-ACT_MEDIALIB = _ACT + 2
+ACT_MLIB = _ACT + 2
 ACT_FILES = _ACT + 3
 
 # =============================================================================
