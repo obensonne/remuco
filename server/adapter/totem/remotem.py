@@ -58,11 +58,8 @@ class RemucoPlugin(totem.Plugin):
 # supported file actions
 # =============================================================================
 
-FA_SETPL = remuco.ItemAction("Set playlist",
-    "Replace current playlist with marked items.", multiple=True)
-
-FA_ENQUEUE = remuco.ItemAction("Enqueue",
-    "Enqueue marked items to the playlist.", multiple=True)
+FA_SETPL = remuco.ItemAction("Set as playlist", multiple=True)
+FA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
 
 FILE_ACTIONS=(FA_ENQUEUE, FA_SETPL)
 
@@ -133,6 +130,10 @@ class TotemAdapter(remuco.PlayerAdapter):
         self.__poll_state()
         self.__poll_progress()
         
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
     def ctrl_toggle_playing(self):
         
         self.__to.action_play_pause()
@@ -187,6 +188,10 @@ class TotemAdapter(remuco.PlayerAdapter):
         
         self.__to.action_fullscreen_toggle()
 
+    # =========================================================================
+    # actions interface
+    # =========================================================================
+    
     def action_files(self, action_id, files, uris):
         
         if action_id == FA_ENQUEUE.id:
@@ -200,9 +205,9 @@ class TotemAdapter(remuco.PlayerAdapter):
         else:
             log.error("** BUG ** unexpected action ID")
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # internal methods
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     def __get_title_from_window(self):
 
