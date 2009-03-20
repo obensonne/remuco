@@ -73,13 +73,9 @@ Logging:<br>
 <dt><font face="helvetica, arial"><a href="api.html#object">__builtin__.object</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="api.html#ListAction">remuco.adapter.ListAction</a>
-</font></dt><dd>
-<dl>
 <dt><font face="helvetica, arial"><a href="api.html#ItemAction">remuco.adapter.ItemAction</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>
+</font></dt><dt><font face="helvetica, arial"><a href="api.html#ListAction">remuco.adapter.ListAction</a>
+</font></dt><dt><font face="helvetica, arial"><a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>
 </font></dt><dt><font face="helvetica, arial"><a href="api.html#Config">remuco.config.Config</a>
 </font></dt><dt><font face="helvetica, arial"><a href="api.html#Manager">remuco.manager.Manager</a>
 </font></dt></dl>
@@ -95,8 +91,8 @@ Logging:<br>
 <td colspan=2><tt>Class&nbsp;for&nbsp;getting&nbsp;and&nbsp;setting&nbsp;player&nbsp;adapter&nbsp;specific&nbsp;configurations.<br>
 &nbsp;<br>
 An&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;of&nbsp;a&nbsp;specific&nbsp;player<br>
-adapter&nbsp;found&nbsp;(usually)&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any&nbsp;change&nbsp;to<br>
-the&nbsp;properties&nbsp;of&nbsp;an&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;automatically&nbsp;gets&nbsp;saved&nbsp;in&nbsp;the<br>
+adapter&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).&nbsp;Any&nbsp;change&nbsp;to&nbsp;the<br>
+properties&nbsp;of&nbsp;an&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;automatically&nbsp;gets&nbsp;saved&nbsp;in&nbsp;the<br>
 configuration&nbsp;file.<br>
 &nbsp;<br>
 In&nbsp;most&nbsp;cases&nbsp;player&nbsp;adapters&nbsp;do&nbsp;not&nbsp;need&nbsp;this.&nbsp;It&nbsp;is&nbsp;useful&nbsp;if&nbsp;a&nbsp;player<br>
@@ -235,54 +231,33 @@ Option&nbsp;name:&nbsp;'wifi-enabled'</tt></dd>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ItemAction">class <strong>ItemAction</strong></a>(<a href="api.html#ListAction">ListAction</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="ItemAction">class <strong>ItemAction</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Item&nbsp;related&nbsp;action&nbsp;within&nbsp;a&nbsp;client's&nbsp;media&nbsp;browser.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="api.html#ItemAction">ItemAction</a></dd>
-<dd><a href="api.html#ListAction">ListAction</a></dd>
-<dd><a href="api.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="ItemAction-__init__"><strong>__init__</strong></a>(self, label, help, multiple<font color="#909090">=False</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;media&nbsp;browser&nbsp;action.<br>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ItemAction-__init__"><strong>__init__</strong></a>(self, label, multiple<font color="#909090">=False</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;action&nbsp;for&nbsp;items&nbsp;or&nbsp;files.<br>
 &nbsp;<br>
 @param&nbsp;label:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;of&nbsp;the&nbsp;action&nbsp;(keep&nbsp;short,&nbsp;ideally&nbsp;this&nbsp;is&nbsp;just&nbsp;a&nbsp;single&nbsp;word<br>
 &nbsp;&nbsp;&nbsp;&nbsp;like&nbsp;'Enqueue',&nbsp;'Play',&nbsp;..)<br>
-@param&nbsp;help:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;description&nbsp;of&nbsp;the&nbsp;action<br>
 @keyword&nbsp;multiple:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;action&nbsp;may&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;items&nbsp;(True)&nbsp;or&nbsp;only&nbsp;to&nbsp;a<br>
-&nbsp;&nbsp;&nbsp;&nbsp;single&nbsp;item&nbsp;(False)</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;action&nbsp;may&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;items/files&nbsp;or&nbsp;only&nbsp;to&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;single&nbsp;item/file</tt></dd></dl>
 
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>multiple</strong></dt>
-<dd><tt>scope&nbsp;of&nbsp;the&nbsp;action&nbsp;-&nbsp;multiple&nbsp;or&nbsp;single&nbsp;(read-only)</tt></dd>
-</dl>
-<hr>
-Methods inherited from <a href="api.html#ListAction">ListAction</a>:<br>
 <dl><dt><a name="ItemAction-__str__"><strong>__str__</strong></a>(self)</dt></dl>
 
 <hr>
-Data descriptors inherited from <a href="api.html#ListAction">ListAction</a>:<br>
+Data descriptors defined here:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-<dl><dt><strong>help</strong></dt>
-<dd><tt>description&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
-</dl>
 <dl><dt><strong>id</strong></dt>
 <dd><tt>ID&nbsp;of&nbsp;the&nbsp;action&nbsp;(auto-generated,&nbsp;read&nbsp;only)</tt></dd>
-</dl>
-<dl><dt><strong>label</strong></dt>
-<dd><tt>label&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
 </dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -294,13 +269,11 @@ Data descriptors inherited from <a href="api.html#ListAction">ListAction</a>:<br
 <td colspan=2><tt>List&nbsp;related&nbsp;action&nbsp;within&nbsp;a&nbsp;client's&nbsp;media&nbsp;browser.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="ListAction-__init__"><strong>__init__</strong></a>(self, label, help)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;media&nbsp;browser&nbsp;action.<br>
+<dl><dt><a name="ListAction-__init__"><strong>__init__</strong></a>(self, label)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;action&nbsp;for&nbsp;lists&nbsp;from&nbsp;a&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;label:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;of&nbsp;the&nbsp;action&nbsp;(keep&nbsp;short,&nbsp;ideally&nbsp;this&nbsp;is&nbsp;just&nbsp;a&nbsp;single&nbsp;word<br>
-&nbsp;&nbsp;&nbsp;&nbsp;like&nbsp;'Load',&nbsp;..)<br>
-@param&nbsp;help:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;description&nbsp;of&nbsp;the&nbsp;action</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;like&nbsp;'Load',&nbsp;..)</tt></dd></dl>
 
 <dl><dt><a name="ListAction-__str__"><strong>__str__</strong></a>(self)</dt></dl>
 
@@ -312,14 +285,8 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-<dl><dt><strong>help</strong></dt>
-<dd><tt>description&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
-</dl>
 <dl><dt><strong>id</strong></dt>
 <dd><tt>ID&nbsp;of&nbsp;the&nbsp;action&nbsp;(auto-generated,&nbsp;read&nbsp;only)</tt></dd>
-</dl>
-<dl><dt><strong>label</strong></dt>
-<dd><tt>label&nbsp;of&nbsp;the&nbsp;action&nbsp;(read-only)</tt></dd>
 </dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -330,7 +297,7 @@ Data descriptors defined here:<br>
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Manages&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-A&nbsp;<a href="#Manager">Manager</a>&nbsp;cares&nbsp;about&nbsp;calling&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
+A&nbsp;<a href="#Manager">Manager</a>&nbsp;cares&nbsp;about&nbsp;calling&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
 Additionally,&nbsp;because&nbsp;Remuco&nbsp;needs&nbsp;a&nbsp;GLib&nbsp;main&nbsp;loop&nbsp;to&nbsp;run,&nbsp;it&nbsp;sets&nbsp;up&nbsp;and<br>
 manages&nbsp;such&nbsp;a&nbsp;loop.<br>
 &nbsp;<br>
@@ -358,13 +325,13 @@ This&nbsp;method&nbsp;starts&nbsp;the&nbsp;player&nbsp;adapter,&nbsp;runs&nbsp;a
 blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#Manager-stop">stop</a>()&nbsp;gets&nbsp;called.&nbsp;If<br>
 this&nbsp;happens&nbsp;the&nbsp;player&nbsp;adapter&nbsp;gets&nbsp;stopped&nbsp;and&nbsp;this&nbsp;method&nbsp;returns.<br>
 &nbsp;<br>
-@note:&nbsp;If&nbsp;'player_dbus_name'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;the&nbsp;constructor&nbsp;the&nbsp;player<br>
-&nbsp;&nbsp;&nbsp;&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name<br>
-&nbsp;&nbsp;&nbsp;&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically&nbsp;gets&nbsp;started&nbsp;whenever<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the&nbsp;adapter's&nbsp;player&nbsp;is<br>
-&nbsp;&nbsp;&nbsp;&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no&nbsp;owner.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped<br>
-&nbsp;&nbsp;&nbsp;&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
+@note:&nbsp;If&nbsp;the&nbsp;keyword&nbsp;'player_dbus_name'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;<a href="#Manager-__init__">__init__</a>(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;then&nbsp;the&nbsp;player&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application<br>
+&nbsp;&nbsp;&nbsp;&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;started&nbsp;whenever&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adapter's&nbsp;player&nbsp;is&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no<br>
+&nbsp;&nbsp;&nbsp;&nbsp;owner.&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;stopped&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
 
 <dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;shut&nbsp;down&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
@@ -475,7 +442,7 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nb
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_medialib">request_medialib</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;request_medialib()<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;As&nbsp;above,&nbsp;only&nbsp;override&nbsp;the&nbsp;methods&nbsp;which&nbsp;make&nbsp;sense&nbsp;for&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.<br>
@@ -486,7 +453,7 @@ Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;respond&nbsp;to&nbsp;the&nbsp;requests&nb
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_medialib_request">reply_medialib_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_medialib_request()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 ===========================================================================<br>
 Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;synchronize&nbsp;media&nbsp;player&nbsp;state&nbsp;information&nbsp;with&nbsp;clients:<br>
@@ -515,7 +482,7 @@ Finally&nbsp;some&nbsp;utility&nbsp;methods:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-find_image">find_image</a>()<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, playback_known<font color="#909090">=False</font>, volume_known<font color="#909090">=False</font>, repeat_known<font color="#909090">=False</font>, shuffle_known<font color="#909090">=False</font>, progress_known<font color="#909090">=False</font>, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>, file_actions<font color="#909090">=None</font>, mime_types<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player&nbsp;adapter.<br>
+<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, playback_known<font color="#909090">=False</font>, volume_known<font color="#909090">=False</font>, repeat_known<font color="#909090">=False</font>, shuffle_known<font color="#909090">=False</font>, progress_known<font color="#909090">=False</font>, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>, file_actions<font color="#909090">=None</font>, mime_types<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player&nbsp;adapter&nbsp;and&nbsp;configure&nbsp;its&nbsp;capabilities.<br>
 &nbsp;<br>
 Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbsp;starts&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
@@ -524,47 +491,114 @@ Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbs
 @keyword&nbsp;playback_known:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;playback&nbsp;state&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_playback">update_playback</a>())<br>
+@keyword&nbsp;volume_known:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;volume&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_volume">update_volume</a>())<br>
+@keyword&nbsp;repeat_known:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;repeat&nbsp;mode&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_repeat">update_repeat</a>())<br>
+@keyword&nbsp;shuffle_known:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;shuffle&nbsp;mode&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_shuffle">update_shuffle</a>())<br>
 @keyword&nbsp;progress_known:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;indicates&nbsp;if&nbsp;the&nbsp;player's&nbsp;playback&nbsp;progress&nbsp;can&nbsp;be&nbsp;provided&nbsp;(see<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>())<br>
 @keyword&nbsp;max_rating:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;maximum&nbsp;possible&nbsp;rating&nbsp;value&nbsp;for&nbsp;items<br>
-@keyword&nbsp;mime_types:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;mime&nbsp;types&nbsp;which&nbsp;can&nbsp;be&nbsp;handled&nbsp;by&nbsp;the&nbsp;player&nbsp;(for&nbsp;instance<br>
-&nbsp;&nbsp;&nbsp;&nbsp;['audio',&nbsp;'video/quicktime',&nbsp;...]&nbsp;or&nbsp;None&nbsp;for&nbsp;all&nbsp;mime&nbsp;types)&nbsp;-&nbsp;is<br>
-&nbsp;&nbsp;&nbsp;&nbsp;only&nbsp;relevant&nbsp;if&nbsp;one&nbsp;of&nbsp;the&nbsp;control&nbsp;methods&nbsp;ending&nbsp;with&nbsp;'_file'&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;'_files'&nbsp;are&nbsp;overridden,&nbsp;e.g.&nbsp;ctrl_play_file(),&nbsp;in&nbsp;that&nbsp;case&nbsp;this<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;filters&nbsp;the&nbsp;files&nbsp;which&nbsp;may&nbsp;be&nbsp;passed&nbsp;to&nbsp;these&nbsp;methods<br>
 @keyword&nbsp;poll:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;interval&nbsp;in&nbsp;seconds&nbsp;to&nbsp;call&nbsp;<a href="#PlayerAdapter-poll">poll</a>()<br>
+@keyword&nbsp;file_actions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;files&nbsp;from&nbsp;the&nbsp;local<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;system&nbsp;(actions&nbsp;like&nbsp;play&nbsp;a&nbsp;file&nbsp;or&nbsp;append&nbsp;files&nbsp;to&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;playlist)&nbsp;-&nbsp;if&nbsp;this&nbsp;keyword&nbsp;is&nbsp;set,&nbsp;you&nbsp;should&nbsp;also&nbsp;set&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;keyword&nbsp;'mime_types'&nbsp;and&nbsp;override&nbsp;the&nbsp;method&nbsp;<a href="#PlayerAdapter-action_files">action_files</a>()<br>
+@keyword&nbsp;mime_types:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;mime&nbsp;types&nbsp;specifying&nbsp;the&nbsp;files&nbsp;to&nbsp;which&nbsp;the&nbsp;actions&nbsp;given<br>
+&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'file_actions'&nbsp;can&nbsp;be&nbsp;applied,&nbsp;this&nbsp;may&nbsp;be&nbsp;general<br>
+&nbsp;&nbsp;&nbsp;&nbsp;types&nbsp;like&nbsp;'audio'&nbsp;or&nbsp;'video'&nbsp;but&nbsp;also&nbsp;specific&nbsp;types&nbsp;like<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'audio/mp3'&nbsp;or&nbsp;'video/quicktime'&nbsp;(setting&nbsp;this&nbsp;to&nbsp;None&nbsp;means&nbsp;all<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mime&nbsp;types&nbsp;are&nbsp;supported)&nbsp;-&nbsp;this&nbsp;keyword&nbsp;is&nbsp;only&nbsp;relevant&nbsp;if&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;keyword&nbsp;'file_actions'&nbsp;has&nbsp;been&nbsp;set<br>
 &nbsp;<br>
 @attention:&nbsp;When&nbsp;overriding,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-action_files"><strong>action_files</strong></a>(self, action_id, files, uris)</dt><dd><tt>@param&nbsp;files:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;file&nbsp;names&nbsp;(these&nbsp;may&nbsp;be&nbsp;any&nbsp;files&nbsp;from&nbsp;the&nbsp;local<br>
-&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;system&nbsp;that&nbsp;have&nbsp;one&nbsp;of&nbsp;the&nbsp;mime&nbsp;types&nbsp;specified&nbsp;by&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;keyword&nbsp;'mime_types'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>())<br>
+<dl><dt><a name="PlayerAdapter-action_files"><strong>action_files</strong></a>(self, action_id, files, uris)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;files.<br>
+&nbsp;<br>
+The&nbsp;files&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;-&nbsp;use<br>
+whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
+multiple&nbsp;files,&nbsp;then&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.<br>
+&nbsp;<br>
+The&nbsp;files&nbsp;in&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;may&nbsp;be&nbsp;any&nbsp;files&nbsp;from&nbsp;the&nbsp;local&nbsp;file<br>
+system&nbsp;that&nbsp;have&nbsp;one&nbsp;of&nbsp;the&nbsp;mime&nbsp;types&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword<br>
+'mime_types'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>().<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'file_actions'<br>
+@param&nbsp;files:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(regular&nbsp;path&nbsp;names)&nbsp;<br>
 @param&nbsp;uris:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;names&nbsp;in&nbsp;URI&nbsp;notation&nbsp;(preferred&nbsp;by&nbsp;some&nbsp;players)</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(URI&nbsp;notation)</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-action_medialib"><strong>action_medialib</strong></a>(self, action_id, path, positions, ids)</dt><dd><tt>@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;item&nbsp;IDs&nbsp;(identifying&nbsp;items&nbsp;in&nbsp;the&nbsp;player's&nbsp;media&nbsp;library)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
-if&nbsp;the&nbsp;action&nbsp;denotes&nbsp;to&nbsp;a&nbsp;<a href="#ListAction">ListAction</a>,&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are<br>
-empty&nbsp;lists</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-action_playlist"><strong>action_playlist</strong></a>(self, action_id, positions, ids)</dt><dd><tt>@param&nbsp;positions:&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-action_queue"><strong>action_queue</strong></a>(self, action_id, positions, ids)</dt><dd><tt>@param&nbsp;action_id:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;apply&nbsp;to&nbsp;'positions'&nbsp;(specifies&nbsp;one&nbsp;of&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;actions&nbsp;set&nbsp;with&nbsp;keyword&nbsp;'queue_actions'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>())<br>
+<dl><dt><a name="PlayerAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, path, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+&nbsp;<br>
+The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
+whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
+multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+@param&nbsp;path:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;library&nbsp;path&nbsp;that&nbsp;contains&nbsp;the&nbsp;items<br>
 @param&nbsp;positions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(if&nbsp;the&nbsp;action's&nbsp;scope<br>
-&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;Action.SINGLE_ITEM&nbsp;then&nbsp;this&nbsp;is&nbsp;a&nbsp;one&nbsp;element&nbsp;list)</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_clear_playlist"><strong>ctrl_clear_playlist</strong></a>(self)</dt></dl>
+<dl><dt><a name="PlayerAdapter-action_mlib_list"><strong>action_mlib_list</strong></a>(self, action_id, path)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;a&nbsp;list&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
+@param&nbsp;path:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_clear_queue"><strong>ctrl_clear_queue</strong></a>(self)</dt></dl>
+<dl><dt><a name="PlayerAdapter-action_playlist_item"><strong>action_playlist_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;playlist.<br>
+&nbsp;<br>
+The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
+whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
+multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+@param&nbsp;positions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
+&nbsp;<br>
+The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
+whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
+multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+@param&nbsp;positions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-ctrl_clear_playlist"><strong>ctrl_clear_playlist</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;playlist.<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-ctrl_clear_queue"><strong>ctrl_clear_queue</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;play&nbsp;queue.<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -590,8 +624,8 @@ If&nbsp;the&nbsp;progress&nbsp;of&nbsp;the&nbsp;current&nbsp;item&nbsp;is&nbsp;k
 synchronized&nbsp;immediately&nbsp;with&nbsp;clients&nbsp;by&nbsp;calling&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>().<br>
 &nbsp;<br>
 @param&nbsp;direction:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;&gt;&nbsp;0:&nbsp;seek&nbsp;forward<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;&lt;&nbsp;0:&nbsp;seek&nbsp;backward&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;-1:&nbsp;seek&nbsp;forward<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;+1:&nbsp;seek&nbsp;backward&nbsp;<br>
 &nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
@@ -657,11 +691,13 @@ If&nbsp;player&nbsp;adapters&nbsp;override&nbsp;this&nbsp;method,&nbsp;it&nbsp;g
 in&nbsp;the&nbsp;interval&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'poll'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>().<br>
 &nbsp;<br>
 A&nbsp;typical&nbsp;use&nbsp;case&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;detect&nbsp;the&nbsp;playback&nbsp;progress&nbsp;of<br>
-the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>().</tt></dd></dl>
+the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAdapter-update_progress">update_progress</a>().&nbsp;It&nbsp;can&nbsp;also&nbsp;be&nbsp;used<br>
+to&nbsp;poll&nbsp;any&nbsp;other&nbsp;player&nbsp;state&nbsp;information&nbsp;when&nbsp;a&nbsp;player&nbsp;does&nbsp;not<br>
+provide&nbsp;signals&nbsp;for&nbsp;all&nbsp;or&nbsp;certain&nbsp;state&nbsp;information.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-reply_item_request"><strong>reply_item_request</strong></a>(self, client, id, info)</dt></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_medialib_request"><strong>reply_medialib_request</strong></a>(self, client, path, nested, ids, names, item_actions<font color="#909090">=None</font>, list_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;media&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-reply_mlib_request"><strong>reply_mlib_request</strong></a>(self, client, path, nested, ids, names, item_actions<font color="#909090">=None</font>, list_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;media&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
 @param&nbsp;client:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
@@ -679,7 +715,7 @@ the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAda
 &nbsp;&nbsp;&nbsp;&nbsp;'medialib_actions'&nbsp;in&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>()&nbsp;are&nbsp;possible&nbsp;-&nbsp;use&nbsp;the&nbsp;empty&nbsp;list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;disable&nbsp;any&nbsp;media&nbsp;library&nbsp;actions&nbsp;at&nbsp;the&nbsp;requested&nbsp;path)<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_medialib">request_medialib</a>()</tt></dd></dl>
+@see:&nbsp;<a href="#PlayerAdapter-request_mlib">request_mlib</a>()</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
 &nbsp;<br>
@@ -705,7 +741,7 @@ the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAda
 
 <dl><dt><a name="PlayerAdapter-request_item"><strong>request_item</strong></a>(self, client, id)</dt></dl>
 
-<dl><dt><a name="PlayerAdapter-request_medialib"><strong>request_medialib</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+<dl><dt><a name="PlayerAdapter-request_mlib"><strong>request_mlib</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
 @param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
