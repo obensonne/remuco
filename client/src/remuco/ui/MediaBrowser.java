@@ -125,7 +125,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void handleFiles(ItemList files) {
 
-		display.setCurrent(new ItemlistScreen(display, this, files));
+		display.setCurrent(new ItemlistScreen(display, player.info, this, files));
 
 	}
 
@@ -134,12 +134,14 @@ public final class MediaBrowser implements CommandListener, IRequester,
 	}
 
 	public void handleLibrary(ItemList library) {
-		display.setCurrent(new ItemlistScreen(display, this, library));
+		display.setCurrent(new ItemlistScreen(display, player.info, this,
+				library));
 	}
 
 	public void handlePlaylist(ItemList playlist) {
 
-		final ItemlistScreen ils = new ItemlistScreen(display, this, playlist);
+		final ItemlistScreen ils = new ItemlistScreen(display, player.info,
+				this, playlist);
 
 		if (!player.state.isPlayingFromQueue()) {
 			ils.setSelectedItem(player.state.getPosition());
@@ -150,7 +152,8 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void handleQueue(ItemList queue) {
 
-		final ItemlistScreen ils = new ItemlistScreen(display, this, queue);
+		final ItemlistScreen ils = new ItemlistScreen(display, player.info,
+				this, queue);
 
 		if (player.state.isPlayingFromQueue()) {
 			ils.setSelectedItem(player.state.getPosition());
@@ -197,6 +200,21 @@ public final class MediaBrowser implements CommandListener, IRequester,
 			}
 		}
 
+	}
+
+	public void ilcClear(ItemlistScreen ils) {
+
+		final ItemList list = ils.getItemList();
+
+		if (list.isPlaylist()) {
+			player.ctrlClearPlaylist();
+		} else if (list.isQueue()) {
+			player.ctrlClearQueue();
+		} else {
+			Log.bug("Mar 20, 2009.1:06:48 AM");
+		}
+
+		display.setCurrent(parent);
 	}
 
 	public void ilcRoot(ItemlistScreen ils) {
