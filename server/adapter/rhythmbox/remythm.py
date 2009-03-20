@@ -10,6 +10,42 @@ import remuco
 from remuco import log
 
 # =============================================================================
+# plugin
+# =============================================================================
+
+class RemucoPlugin(rb.Plugin):
+    
+    def __init__(self):
+        
+        rb.Plugin.__init__(self)
+        
+        self.__rba = None
+        
+    def activate(self, shell):
+        
+        if self.__rba is not None:
+            return
+        
+        print("create RhythmboxAdapter")
+        self.__rba = RhythmboxAdapter()
+        print("RhythmboxAdapter created")
+
+        print("start RhythmboxAdapter")
+        self.__rba.start(shell)
+        print("RhythmboxAdapter started")
+        
+    def deactivate(self, shell):
+    
+        if self.__rba is None:
+            return
+        
+        print("stop RhythmboxAdapter")
+        self.__rba.stop()
+        print("RhythmboxAdapter stopped")
+        
+        self.__rba = None
+        
+# =============================================================================
 # constants
 # =============================================================================
 
@@ -27,13 +63,17 @@ COVER_FILE_TYPES = ("png", "jpeg", "jpg")
 # actions
 # =============================================================================
 
-ACT_PL_JUMP = remuco.ItemAction("Jump", "Jump to marked item.")
-ACT_QU_JUMP = remuco.ItemAction("Jump", "Jump to marked item.")
-ACT_ML_LIST_PLAY = remuco.ItemAction("Play", "Play selected list.")
+IA_JUMP = remuco.ItemAction("Jump to")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+LA_PLAY = remuco.ListAction("Play")
+IA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
 
-PLAYLIST_ACTIONS = (ACT_PL_JUMP,)
-QUEUE_ACTIONS = (ACT_QU_JUMP,)
-MLIB_LIST_ACTIONS = (ACT_ML_LIST_PLAY,)
+PLAYLIST_ACTIONS = (IA_JUMP, IA_ENQUEUE)
+QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
+MLIB_LIST_ACTIONS = (LA_PLAY,)
+MLIB_ITEM_ACTIONS = (IA_ENQUEUE,)
+
+#TODO implement added actions
 
 # =============================================================================
 # player adapter
@@ -74,14 +114,14 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         sp = self.__shell.get_player()
         
-        ###### shortcuts to RB data ###### 
+        # shortcuts to RB data 
         
         self.__item_id = None
         self.__item_entry = None
         self.__playlist_sc = sp.get_playing_source()
         self.__queue_sc = self.__shell.props.queue_source
         
-        ###### connect to shell player signals ######
+        # connect to shell player signals
 
         self.__signal_ids = (
             sp.connect("playing_changed", self.__notify_playing_changed),
@@ -89,9 +129,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             sp.connect("playing-source-changed", self.__notify_source_changed)
         )
 
-        ###### initially trigger server synchronization ######
-        
         # state sync will happen by timeout
+        # trigger item sync:
         self.__notify_playing_uri_changed(sp, sp.get_playing_path()) # item sync
         
         log.debug("start done")
@@ -103,7 +142,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         if self.__shell is None:
             return
 
-        ###### disconnect from shell player signals ######
+        # disconnect from shell player signals
 
         sp = self.__shell.get_player()
 
@@ -112,7 +151,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             
         self.__signal_ids = ()
 
-        ###### release shell ######
+        # release shell
         
         self.__shell = None
         
@@ -122,27 +161,24 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         sp = self.__shell.get_player()
         
-        ###### check repeat and shuffle ######
+        # check repeat and shuffle
         
         order = sp.props.play_order
         
         repeat = order == PLAYORDER_REPEAT or \
                  order.startswith(PLAYORDER_SHUFFLE_ALT)
-                 
         self.update_repeat(repeat)
         
         shuffle = order == PLAYORDER_SHUFFLE or \
                   order.startswith(PLAYORDER_SHUFFLE_ALT)
-                  
         self.update_shuffle(shuffle)
         
-        ###### check volume ######
+        # check volume
 
         volume = int(sp.get_volume() * 100)
-        
         self.update_volume(volume)
         
-        ###### check progress ######
+        # check progress
         
         try:
             progress = sp.get_playing_time()
@@ -157,32 +193,13 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # control interface
     # =========================================================================
     
-    def ctrl_ml_playlist_set(self, path):
-        
-        sc = self.__mlib_path_to_source(path)
-        
-        if sc is None:
-            return
-        
-        qm = sc.get_entry_view().props.model
-        
-        sp = self.__shell.get_player()
-
-        if sc != self.__playlist_sc:
-            try:
-                sp.set_selected_source(sc)
-                sp.set_playing_source(sc)
-            except Exception, e:
-                log.debug("switching source failed: %s" % str(e))
-            
-            
     def ctrl_next(self):
         
         sp = self.__shell.get_player()
         
         try:
             sp.do_next()
-        except Exception, e:
+        except gobject.GError, e:
             log.debug("do next failed: %s" % str(e))
     
     def ctrl_previous(self):
@@ -193,7 +210,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             sp.set_playing_time(0)
             time.sleep(0.1)
             sp.do_previous()
-        except Exception, e:
+        except gobject.GError, e:
             log.debug("do previous failed: %s" % str(e))
     
     def ctrl_rate(self, rating):
@@ -202,7 +219,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             db = self.__shell.props.db
             try:
                 db.set(self.__item_entry, rhythmdb.PROP_RATING, rating)
-            except Exception, e:
+            except gobject.GError, e:
                 log.debug("rating failed: %s" % str(e))
     
     def ctrl_toggle_playing(self):
@@ -211,7 +228,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         try:
             sp.playpause()
-        except Exception, e:
+        except gobject.GError, e:
             log.debug("toggle play pause failed: %s" % str(e))
                 
     # shuffle and repeat cannot be set:
@@ -223,7 +240,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         try:
             sp.seek(direction * 5)
-        except Exception, e:
+        except gobject.GError, e:
             log.debug("seek failed: %s" % str(e))
         else:
             # update volume within a short time (don't wait for scheduled poll)
@@ -238,43 +255,75 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         else:
             try:
                 sp.set_volume_relative(direction * 0.05)
-            except Exception, e:
+            except gobject.GError, e:
                 log.debug("set volume failed: %s" % str(e))
         
         # update volume within a short time (don't wait for scheduled poll)
         gobject.idle_add(self.poll)    
         
+    def ctrl_clear_queue(self):
+        
+        qm = self.__queue_sc.get_entry_view().props.model
+        
+        db = self.__shell.props.db
+
+        uris = []
+        try:
+            for row in qm:
+                uris.append(db.entry_get(row[0], rhythmdb.PROP_LOCATION))
+        except gobject.GError, e:
+            log.debug("getting queue items failed: %s" % e)
+        
+        self.__remove_items_from_queue(uris)
+        
     # =========================================================================
     # action interface
     # =========================================================================
     
-    def action_playlist(self, action_id, positions, ids):
+    def action_playlist_item(self, action_id, positions, ids):
 
-        if action_id == ACT_PL_JUMP.id:
+        if action_id == IA_JUMP.id:
             
             try:
                 self.__jump_in_plq(self.__playlist_sc, positions[0])
-            except Exception, e:
-                log.debug("playlist jump failed: %s" % str(e))
+            except gobject.GError, e:
+                log.debug("playlist jump failed: %s" % e)
+        
+        elif action_id == IA_ENQUEUE.id:
+            
+            self.__enqueue_items(ids)
         
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
     
-    def action_queue(self, action_id, positions, ids):
+    def action_queue_item(self, action_id, positions, ids):
 
-        if action_id == ACT_QU_JUMP.id:
+        if action_id == IA_JUMP.id:
             
             try:
                 self.__jump_in_plq(self.__queue_sc, positions[0])
-            except Exception, e:
-                log.debug("queue jump failed: %s" % str(e))
+            except gobject.GError, e:
+                log.debug("queue jump failed: %s" % e)
     
+        elif action_id == IA_REMOVE.id:
+            
+            self.__remove_items_from_queue(ids)
+            
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
     
-    def action_medialib(self, action_id, path, positions, ids):
+    def action_mlib_item(self, action_id, path, positions, ids):
         
-        if action_id == ACT_ML_LIST_PLAY.id:
+        if action_id == IA_ENQUEUE.id:
+            
+            self.__enqueue_items(ids)
+        
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    def action_mlib_list(self, action_id, path):
+        
+        if action_id == LA_PLAY.id:
             
             sc = self.__mlib_path_to_source(path)
             if sc is None:
@@ -290,7 +339,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                     sp.set_selected_source(sc)
                     sp.set_playing_source(sc)
                     self.__jump_in_plq(sc, 0)
-                except Exception, e:
+                except gobject.GError, e:
                     log.debug("switching source failed: %s" % str(e))
             
         else:
@@ -307,7 +356,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         try:
             qm = self.__playlist_sc.get_entry_view().props.model 
             ids, names = self.__get_items_from_qmodel(qm)
-        except:
+        except gobject.GError, e:
+            log.warning("failed to get playlist items: %s" % e)
             ids, names = [], []
         
         self.reply_playlist_request(client, ids, names,
@@ -318,12 +368,16 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         sc = self.__queue_sc
         qm = sc.props.query_model
 
-        ids, names = self.__get_items_from_qmodel(qm)
+        try:
+            ids, names = self.__get_items_from_qmodel(qm)
+        except gobject.GError, e:
+            log.warning("failed to get queue items: %s" % e)
+            ids, names = [], []
         
         self.reply_queue_request(client, ids, names,
                                  item_actions=QUEUE_ACTIONS)
 
-    def request_medialib(self, client, path):
+    def request_mlib(self, client, path):
 
         nested = []
         ids = []
@@ -337,7 +391,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             for group in slm:
                 group_name = group[2]
                 nested.append(group_name)
-            self.reply_medialib_request(client, path, nested, ids, names)
+            self.reply_mlib_request(client, path, nested, ids, names)
             return
         
         ### group ? ### Library, Playlists
@@ -351,7 +405,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                         log.debug("append %s" % source_name)
                         nested.append(source_name)
                     break
-            self.reply_medialib_request(client, path, nested, ids, names,
+            self.reply_mlib_request(client, path, nested, ids, names,
                                         list_actions=MLIB_LIST_ACTIONS)
             return
             
@@ -361,14 +415,19 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
 
         if sc is None:
             
-            self.reply_medialib_request(client, path, nested, ids, names)
+            self.reply_mlib_request(client, path, nested, ids, names)
             return
         
         qm = sc.get_entry_view().props.model
             
-        ids, names = self.__get_items_from_qmodel(qm)
+        try:
+            ids, names = self.__get_items_from_qmodel(qm)
+        except gobject.GError, e:
+            log.warning("failed to list items: %s" % e)
+            ids, names = [], []
         
-        self.reply_medialib_request(client, path, nested, ids, names)
+        self.reply_mlib_request(client, path, nested, ids, names,
+                                item_actions=MLIB_ITEM_ACTIONS)
         
     # ==========================================================================
     # callbacks
@@ -555,6 +614,16 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                 for source in group.iterchildren():
                     if source_name == source[2]:
                         return source[3]
+
+    def __enqueue_items(self, ids):
+        
+        for id in ids:
+            self.__shell.add_to_queue(id)
+            
+    def __remove_items_from_queue(self, ids):
+        
+        for id in ids:
+            self.__shell.remove_from_queue(id)
 
     def __get_position(self):
 
