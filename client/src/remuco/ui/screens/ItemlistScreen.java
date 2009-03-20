@@ -18,8 +18,10 @@ import javax.microedition.lcdui.StringItem;
 import remuco.Remuco;
 import remuco.player.AbstractAction;
 import remuco.player.ActionParam;
+import remuco.player.Feature;
 import remuco.player.ItemAction;
 import remuco.player.ItemList;
+import remuco.player.PlayerInfo;
 import remuco.ui.CMD;
 import remuco.ui.IItemListController;
 import remuco.ui.Theme;
@@ -104,6 +106,9 @@ public final class ItemlistScreen extends List implements CommandListener {
 	private static final Command CMD_ROOT = new Command("Root", Command.SCREEN,
 			99);
 
+	private static final Command CMD_CLEAR = new Command("Clear",
+			Command.SCREEN, 50);
+
 	/** Pseudo-index for marking all items. */
 	private static final int MARK_ALL = -1;
 
@@ -134,8 +139,8 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 	private final Timer timer;
 
-	public ItemlistScreen(Display display, IItemListController listener,
-			ItemList list) {
+	public ItemlistScreen(Display display, PlayerInfo pinfo,
+			IItemListController listener, ItemList list) {
 
 		super("", List.IMPLICIT);
 
@@ -175,6 +180,11 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		if (numItems > 0) {
 			addCommand(CMD_MARK_ALL);
+		}
+
+		if ((list.isPlaylist() && pinfo.supports(Feature.CTRL_CLEAR_PL))
+				|| (list.isQueue() && pinfo.supports(Feature.CTRL_CLEAR_QU))) {
+			addCommand(CMD_CLEAR);
 		}
 
 		actionCommands = new Hashtable(list.getActions().size());
@@ -247,7 +257,11 @@ public final class ItemlistScreen extends List implements CommandListener {
 				toggleItemMark(index - numNested);
 				updateItemIcons();
 			}
-
+			
+		} else if (c == CMD_CLEAR) {
+			
+			listener.ilcClear(this);
+			
 		} else if (actionCommands.containsKey(c)) {
 
 			handleAction((AbstractAction) actionCommands.get(c));
