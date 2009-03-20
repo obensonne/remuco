@@ -107,7 +107,7 @@ class _DBusObserver():
 class Manager(object):
     """ Manages life cycle of a player adapter.
     
-    A Manager cares about calling PlayerAdapter's start and stop methods.
+    A Manager cares about calling a PlayerAdapter's start and stop methods.
     Additionally, because Remuco needs a GLib main loop to run, it sets up and
     manages such a loop.
     
@@ -152,13 +152,13 @@ class Manager(object):
         blocks until SIGINT or SIGTERM arrives or until stop() gets called. If
         this happens the player adapter gets stopped and this method returns.
         
-        @note: If 'player_dbus_name' has been set in the constructor the player
-            adapter does not get started until an application owns the bus name
-            given by 'player_dbus_name'. It automatically gets started whenever
-            the DBus name has an owner (which means the adapter's player is
-            running) and it gets stopped when it has no owner.
-            Obvisously here the player adapter may get started and stopped
-            repeatedly while this method is running.
+        @note: If the keyword 'player_dbus_name' has been set in __init__(),
+            then the player adapter does not get started until an application
+            owns the bus name given by 'player_dbus_name'. It automatically
+            gets started whenever the DBus name has an owner (which means the
+            adapter's player is running) and it gets stopped when it has no
+            owner. Obvisously here the player adapter may get started and
+            stopped repeatedly while this method is running.
         
         """
         
