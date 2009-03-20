@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""XMMS2 adapter for Remuco, implemented as an executable script.
+"""XMMS2 adapter for Remuco, implemented as an XMMS2 startup script.
 
 __author__ = "Oben Sonne <obensonne@googlemail.com>"
 __copyright__ = "Copyright 2009, Oben Sonne"
@@ -37,25 +37,15 @@ PLAYLIST_ID_ACTIVE = "_active"
 # actions
 # =============================================================================
 
-ACT_PL_JUMP = remuco.ItemAction("Jump to",
-    "Jump to marked item")
-
-ACT_PL_REMOVE = remuco.ItemAction("Remove",
-    "Remove marked items from the playlist.", multiple=True)
-
+ACT_PL_JUMP = remuco.ItemAction("Jump to")
+ACT_PL_REMOVE = remuco.ItemAction("Remove", multiple=True)
 PLAYLIST_ITEM_ACTIONS = (ACT_PL_JUMP, ACT_PL_REMOVE)
 
-ACT_ML_LOAD_LIST = remuco.ListAction("Load",
-    "Load selected list")
-
+ACT_ML_LOAD_LIST = remuco.ListAction("Load")
 MLIB_LIST_ACTIONS = (ACT_ML_LOAD_LIST,)
 
-ACT_ML_APPEND = remuco.ItemAction("Play last",
-    "Append marked items to the playlist.", multiple=True)
-
-ACT_ML_PLAY_NEXT = remuco.ItemAction("Play next",
-    "Insert marked into the playlist after the current item.", multiple=True)
-
+ACT_ML_APPEND = remuco.ItemAction("Enqueue", multiple=True)
+ACT_ML_PLAY_NEXT = remuco.ItemAction("Play next", multiple=True)
 MLIB_ITEM_ACTIONS = (ACT_ML_APPEND, ACT_ML_PLAY_NEXT)
 
 # =============================================================================
@@ -123,8 +113,8 @@ class ItemListRequest():
                 self.__names, item_actions=PLAYLIST_ITEM_ACTIONS)
         else:
             # have all item names, reply mlib list request
-            self.__pa.reply_medialib_request(self.__client, self.__path,
-                [], self.__ids, self.__names, item_actions=MLIB_ITEM_ACTIONS)
+            self.__pa.reply_mlib_request(self.__client, self.__path, [],
+                self.__ids, self.__names, item_actions=MLIB_ITEM_ACTIONS)
             
             
     def __handle_name(self, result):
@@ -231,60 +221,10 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2 = None
         self.__x2_glib_connector = None
         
-    def action_medialib(self, action_id, path, positions, ids):
-
-        if action_id == ACT_ML_LOAD_LIST.id:
-            
-            if len(path) == 1:
-                self._x2.playlist_load(path[0], cb=self.__ignore_result)
-                self._x2.playlist_set_next(0, cb=self.__ignore_result)
-                self._x2.playback_tickle(cb=self.__ignore_result)
-                if self.__state_playback != remuco.PLAYBACK_PLAY:
-                    self._x2.playback_start(cb=self.__ignore_result)
-            else:
-                log.error("** BUG ** unexpected path: %s" % path)
-                
-        elif action_id == ACT_ML_APPEND.id:
-            
-            for id in ids:
-                id = int(id)
-                self._x2.playlist_add_id(id, cb=self.__ignore_result)
-                
-        elif action_id == ACT_ML_PLAY_NEXT.id:
-            
-            pos = self.__state_position + 1
-            ids.reverse()
-            for id in ids:
-                id = int(id)
-                self._x2.playlist_insert_id(pos, id, cb=self.__ignore_result)
-                
-        else:
-            log.error("** BUG ** unexpected mlib action")
+    # =========================================================================
+    # control interface 
+    # =========================================================================
     
-    def action_playlist(self, action_id, positions, ids):
-
-        if action_id == ACT_PL_JUMP.id:
-            
-            self._x2.playlist_set_next(positions[0], cb=self.__ignore_result)
-            self._x2.playback_tickle(cb=self.__ignore_result)
-            if self.__state_playback != remuco.PLAYBACK_PLAY:
-                self._x2.playback_start(cb=self.__ignore_result)
-                
-        elif action_id == ACT_PL_REMOVE.id:
-            
-            positions.sort()
-            positions.reverse()
-            for pos in positions:
-                log.debug("remove %d from playlist" % pos)
-                self._x2.playlist_remove_entry(pos, cb=self.__ignore_result)
-        else:
-            log.error("** BUG ** unexpected playlist item action")
-        
-    def ctrl_clear_playlist(self):
-        
-        self._x2.playlist_clear(playlist=PLAYLIST_ID_ACTIVE,
-                                cb=self.__ignore_result)
-        
     def ctrl_next(self):
         
         self._x2.playlist_set_next_rel(1, cb=self.__ignore_result)
@@ -296,14 +236,6 @@ class XMMS2Adapter(remuco.PlayerAdapter):
             self._x2.playlist_set_next_rel(-1, cb=self.__ignore_result)
             self._x2.playback_tickle(cb=self.__ignore_result)
     
-    def ctrl_rate(self, rating):
-        
-        if self.__item_id_int == 0:
-            return
-        
-        self._x2.medialib_property_set(self.__item_id_int, MINFO_KEY_RATING,
-                                       rating, cb=self.__ignore_result)
-             
     def ctrl_toggle_playing(self):
         
             if self.__state_playback == remuco.PLAYBACK_STOP or \
@@ -326,6 +258,28 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         self._x2.playback_seek_ms_rel(direction * 5000, cb=self.__ignore_result)
     
+    def ctrl_volume(self, direction):
+        
+        # TODO: currently this fails, problem relates to xmms2 installation
+        
+        if direction == 0:
+            volume = 0
+        else:
+            volume = self.__state_volume + 5 * direction
+            volume = min(volume, 100)
+            volume = max(volume, 0)
+        
+        for chan in ("right", "left"):
+            self._x2.playback_volume_set(chan, volume, cb=self.__ignore_result)
+
+    def ctrl_rate(self, rating):
+        
+        if self.__item_id_int == 0:
+            return
+        
+        self._x2.medialib_property_set(self.__item_id_int, MINFO_KEY_RATING,
+                                       rating, cb=self.__ignore_result)
+             
     def ctrl_tag(self, id, tags):
         
         try:
@@ -341,28 +295,85 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2.medialib_property_set(id_int, MINFO_KEY_TAGS, s,
                                        cb=self.__ignore_result)
     
-    def ctrl_volume(self, direction):
+    def ctrl_clear_playlist(self):
         
-        # TODO: currently this fails, problem relates to xmms2 installation
+        self._x2.playlist_clear(playlist=PLAYLIST_ID_ACTIVE,
+                                cb=self.__ignore_result)
         
-        if direction == 0:
-            volume = 0
-        else:
-            volume = self.__state_volume + 5 * direction
-            volume = min(volume, 100)
-            volume = max(volume, 0)
-        
-        for chan in ("right", "left"):
-            self._x2.playback_volume_set(chan, volume, cb=self.__ignore_result)
+    # =========================================================================
+    # actions interface
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
 
+        if action_id == ACT_PL_JUMP.id:
+            
+            self._x2.playlist_set_next(positions[0], cb=self.__ignore_result)
+            self._x2.playback_tickle(cb=self.__ignore_result)
+            if self.__state_playback != remuco.PLAYBACK_PLAY:
+                self._x2.playback_start(cb=self.__ignore_result)
+                
+        elif action_id == ACT_PL_REMOVE.id:
+            
+            positions.sort()
+            positions.reverse()
+            for pos in positions:
+                log.debug("remove %d from playlist" % pos)
+                self._x2.playlist_remove_entry(pos, cb=self.__ignore_result)
+        else:
+            log.error("** BUG ** unexpected playlist item action")
+
+    def action_mlib_item(self, action_id, path, positions, ids):
+        
+        if action_id == ACT_ML_APPEND.id:
+            
+            for id in ids:
+                id = int(id)
+                self._x2.playlist_add_id(id, cb=self.__ignore_result)
+                
+        elif action_id == ACT_ML_PLAY_NEXT.id:
+            
+            pos = self.__state_position + 1
+            ids.reverse()
+            for id in ids:
+                id = int(id)
+                self._x2.playlist_insert_id(pos, id, cb=self.__ignore_result)
+                
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    def action_mlib_list(self, action_id, path):
+
+        if action_id == ACT_ML_LOAD_LIST.id:
+            
+            if len(path) == 1:
+                self._x2.playlist_load(path[0], cb=self.__ignore_result)
+                self._x2.playlist_set_next(0, cb=self.__ignore_result)
+                self._x2.playback_tickle(cb=self.__ignore_result)
+                if self.__state_playback != remuco.PLAYBACK_PLAY:
+                    self._x2.playback_start(cb=self.__ignore_result)
+            else:
+                log.error("** BUG ** unexpected path: %s" % path)
+                
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
+                
+    # =========================================================================
+    # request interface 
+    # =========================================================================
+    
     def request_playlist(self, client):
         
         ItemListRequest(client, self, [PLAYLIST_ID_ACTIVE])
 
-    def request_medialib(self, client, path):
+    def request_mlib(self, client, path):
         
         ItemListRequest(client, self, path)
         
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
     def _set_lcmgr(self, lcmgr):
         """ Set the life cycle manager to stop when XMMS2 disconnects. """
         
