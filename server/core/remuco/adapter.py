@@ -27,24 +27,21 @@ from remuco.data import Control, Action, Tagging, Request
 class ListAction(object):
     """List related action within a client's media browser."""
     
-    __id_counter = 1
+    __id_counter = 0
     
-    def __init__(self, label, help):
-        """Create a new media browser action.
+    def __init__(self, label):
+        """Create a new action for lists from a player's media library.
         
         @param label:
             label of the action (keep short, ideally this is just a single word
             like 'Load', ..)
-        @param help:
-            description of the action
         
         """
+        ListAction.__id_counter -= 1
+        self.__id = ListAction.__id_counter
         
-        self.__id = ItemAction.__id_counter
-        ItemAction.__id_counter += 1
-        
-        self.__label = label
-        self.__help = help
+        self.label = label
+        self.help = None
         
     def __str__(self):
         
@@ -57,60 +54,43 @@ class ListAction(object):
         return self.__id
     
     id = property(__pget_id, None, None, __pget_id.__doc__)
-
-    # === property: label ===
     
-    def __pget_label(self):
-        """label of the action (read-only)"""
-        return self.__label
-    
-    label = property(__pget_label, None, None, __pget_label.__doc__)
-
-    # === property: help ===
-    
-    def __pget_help(self):
-        """description of the action (read-only)"""
-        return self.__help
-    
-    help = property(__pget_help, None, None, __pget_help.__doc__)
-
-class ItemAction(ListAction):
+class ItemAction(object):
     """Item related action within a client's media browser."""
     
-    def __init__(self, label, help, multiple=False):
-        """Create a new media browser action.
+    __id_counter = 0
+    
+    def __init__(self, label, multiple=False):
+        """Create a new action for items or files.
         
         @param label:
             label of the action (keep short, ideally this is just a single word
             like 'Enqueue', 'Play', ..)
-        @param help:
-            description of the action
         @keyword multiple:
-            if the action may be applied to multiple items (True) or only to a
-            single item (False)
+            if the action may be applied to multiple items/files or only to a
+            single item/file
         
         """
+        ItemAction.__id_counter += 1
+        self.__id = ItemAction.__id_counter
         
-        super(ItemAction, self).__init__(label, help)
-
-        self.__multiple = multiple
+        self.label = label
+        self.help = None
         
-    def __pget_multiple(self):
-        """scope of the action - multiple or single (read-only)"""
-        return self.__multiple
+        self.multiple = multiple
+        
+    def __str__(self):
+        
+        return "(%d, %s, %s)" % (self.id, self.label, self.__multiple)
+        
+    # === property: id ===
     
-    multiple = property(__pget_multiple, None, None,
-                        __pget_multiple.__doc__)
-
-ITEM_ACTION_ENQUEUE = ItemAction("Enqueue", "Append items to the play queue.",
-                                 multiple=True)
-
-ITEM_ACTION_APPEND = ItemAction("Append", "Append items to the playlist.",
-                                multiple=True)
-
-ITEM_ACTION_NEXT = ItemAction("Play next", "Play items after the current one.",
-                              multiple=True)
-
+    def __pget_id(self):
+        """ID of the action (auto-generated, read only)"""
+        return self.__id
+    
+    id = property(__pget_id, None, None, __pget_id.__doc__)
+    
 # =============================================================================
 # player adapter
 # =============================================================================
@@ -253,7 +233,7 @@ class PlayerAdapter(object):
     def __init__(self, name, playback_known=False, volume_known=False,
                  repeat_known=False, shuffle_known=False, progress_known=False,
                  max_rating=0, poll=2.5, file_actions=None, mime_types=None):
-        """Create a new player adapter.
+        """Create a new player adapter and configure its capabilities.
         
         Just does some early initializations. Real job starts with start().
         
@@ -262,19 +242,34 @@ class PlayerAdapter(object):
         @keyword playback_known:
             indicates if the player's playback state can be provided (see
             update_playback())
+        @keyword volume_known:
+            indicates if the player's volume can be provided (see
+            update_volume())
+        @keyword repeat_known:
+            indicates if the player's repeat mode can be provided (see
+            update_repeat())
+        @keyword shuffle_known:
+            indicates if the player's shuffle mode can be provided (see
+            update_shuffle())
         @keyword progress_known:
             indicates if the player's playback progress can be provided (see
             update_progress())
         @keyword max_rating:
             maximum possible rating value for items
-        @keyword mime_types:
-            list of mime types which can be handled by the player (for instance
-            ['audio', 'video/quicktime', ...] or None for all mime types) - is
-            only relevant if one of the control methods ending with '_file' or
-            '_files' are overridden, e.g. ctrl_play_file(), in that case this
-            list filters the files which may be passed to these methods
         @keyword poll:
             interval in seconds to call poll()
+        @keyword file_actions:
+            list of ItemAction which can be applied to files from the local
+            file system (actions like play a file or append files to the
+            playlist) - if this keyword is set, you should also set the
+            keyword 'mime_types' and override the method action_files()
+        @keyword mime_types:
+            list of mime types specifying the files to which the actions given
+            by the keyword 'file_actions' can be applied, this may be general
+            types like 'audio' or 'video' but also specific types like
+            'audio/mp3' or 'video/quicktime' (setting this to None means all
+            mime types are supported) - this keyword is only relevant if the
+            keyword 'file_actions' has been set
         
         @attention: When overriding, call super class implementation first!
         
@@ -403,7 +398,9 @@ class PlayerAdapter(object):
         in the interval specified by the keyword 'poll' in __init__().
         
         A typical use case of this method is to detect the playback progress of
-        the current item and then call update_progress().
+        the current item and then call update_progress(). It can also be used
+        to poll any other player state information when a player does not
+        provide signals for all or certain state information.
         
         """
         raise NotImplementedError
@@ -509,8 +506,8 @@ class PlayerAdapter(object):
         synchronized immediately with clients by calling update_progress().
         
         @param direction:
-            * > 0: seek forward
-            * < 0: seek backward 
+            * -1: seek forward
+            * +1: seek backward 
         
         @note: Override if it is possible and makes sense.
         
@@ -558,9 +555,19 @@ class PlayerAdapter(object):
         log.error("** BUG ** in feature handling")
         
     def ctrl_clear_playlist(self):
+        """Clear the playlist.
+        
+        @note: Override if it is possible and makes sense.
+               
+        """
         log.error("** BUG ** in feature handling")
         
     def ctrl_clear_queue(self):
+        """Clear the play queue.
+        
+        @note: Override if it is possible and makes sense.
+               
+        """
         log.error("** BUG ** in feature handling")
     
     def __ctrl_shutdown_system(self):
@@ -579,46 +586,92 @@ class PlayerAdapter(object):
     # actions interface
     # =========================================================================
     
-    def action_playlist(self, action_id, positions, ids):
-        """
-        @param positions: list of positions to apply the action to
-        """
-        log.error("** BUG ** action_playlist() not implemented")
-    
-    def action_queue(self, action_id, positions, ids):
-        """
-        @param action_id:
-            ID of the action to apply to 'positions' (specifies one of the
-            actions set with keyword 'queue_actions' in __init__())
-        @param positions:
-            list of positions to apply the action to (if the action's scope
-            is Action.SINGLE_ITEM then this is a one element list) 
-        
-        """
-        log.error("** BUG ** action_queue() not implemented")
-    
     def action_files(self, action_id, files, uris):
-        """
+        """Do an action on one or more files.
         
+        The files are specified redundantly by 'files' and 'uris' - use
+        whatever fits better. If the specified action is not applicable to
+        multiple files, then 'files' and 'uris' are one element lists.
+         
+        The files in 'files' and 'uris' may be any files from the local file
+        system that have one of the mime types specified by the keyword
+        'mime_types' in __init__().
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to __init__() by the keyword 'file_actions'
         @param files:
-            list of file names (these may be any files from the local
-            file system that have one of the mime types specified by the
-            keyword 'mime_types' in __init__())
+            list of files to apply the action to (regular path names) 
         @param uris:
-            file names in URI notation (preferred by some players)
+            list of files to apply the action to (URI notation) 
+        
         """
         log.error("** BUG ** action_files() not implemented")
     
-    def action_medialib(self, action_id, path, positions, ids):
-        """
-        @param ids:
-            list of item IDs (identifying items in the player's media library)
-            
-        if the action denotes to a ListAction, 'positions' and 'ids' are
-        empty lists
+    def action_playlist_item(self, action_id, positions, ids):
+        """Do an action on one or more items from the playlist.
         
+        The items are specified redundantly by 'positions' and 'ids' - use
+        whatever fits better. If the specified action is not applicable to
+        multiple items, then 'positions' and 'ids' are one element lists. 
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to reply_playlist_request() by the keyword 'item_actions'
+        @param positions:
+            list of positions to apply the action to
+        @param ids:
+            list of IDs to apply the action to
         """
-        log.error("** BUG ** action_medialib() not implemented")
+        log.error("** BUG ** action_item() not implemented")
+    
+    def action_queue_item(self, action_id, positions, ids):
+        """Do an action on one or more items from the play queue.
+        
+        The items are specified redundantly by 'positions' and 'ids' - use
+        whatever fits better. If the specified action is not applicable to
+        multiple items, then 'positions' and 'ids' are one element lists. 
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to reply_queue_request() by the keyword 'item_actions'
+        @param positions:
+            list of positions to apply the action to 
+        @param ids:
+            list of IDs to apply the action to
+        """
+        log.error("** BUG ** action_item() not implemented")
+    
+    def action_mlib_item(self, path, action_id, positions, ids):
+        """Do an action on one or more items from the player's media library.
+        
+        The items are specified redundantly by 'positions' and 'ids' - use
+        whatever fits better. If the specified action is not applicable to
+        multiple items, then 'positions' and 'ids' are one element lists. 
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to reply_medialib_request() by the keyword 'item_actions'
+        @param path:
+            the library path that contains the items
+        @param positions:
+            list of positions to apply the action to 
+        @param ids:
+            list of IDs to apply the action to
+        """
+        log.error("** BUG ** action_item() not implemented")
+    
+    def action_mlib_list(self, action_id, path):
+        """Do an action on a list from the player's media library.
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to reply_medialib_request() by the keyword 'list_actions'
+        @param path:
+            path specifying the list to apply the action to
+            
+        """
+        log.error("** BUG ** action_mlib_list() not implemented")
     
     # =========================================================================
     # request interface 
@@ -654,7 +707,7 @@ class PlayerAdapter(object):
         """
         log.error("** BUG ** in feature handling")
 
-    def request_medialib(self, client, path):
+    def request_mlib(self, client, path):
         """Request contents of a specific level from the player's media library.
         
         @param client: the requesting client (needed for reply)
@@ -900,7 +953,7 @@ class PlayerAdapter(object):
         
         gobject.idle_add(self.__reply, client, msg, "queue")
     
-    def reply_medialib_request(self, client, path, nested, ids, names,
+    def reply_mlib_request(self, client, path, nested, ids, names,
                                item_actions=None, list_actions=None):
         """Send the reply to a media library request back to the client.
         
@@ -920,7 +973,7 @@ class PlayerAdapter(object):
             'medialib_actions' in __init__() are possible - use the empty list
             to disable any media library actions at the requested path)
         
-        @see: request_medialib()
+        @see: request_mlib()
         
         """ 
         if self.__stopped:
@@ -930,7 +983,7 @@ class PlayerAdapter(object):
         
         msg = net.build_message(message.REQ_MLIB, lib)
         
-        gobject.idle_add(self.__reply, client, msg, "medialib")
+        gobject.idle_add(self.__reply, client, msg, "mlib")
         
     def __reply_files_request(self, client, path, nested, ids, names):
 
@@ -1106,32 +1159,38 @@ class PlayerAdapter(object):
             self.__ctrl_shutdown_system()
             
         else:
-            log.error("** BUG ** unexpected control message (%d)" % id)
+            log.error("** BUG ** unexpected control message: %d" % id)
             
     def __handle_message_action(self, id, bindata):
     
-        action = serial.unpack(Action, bindata)
-        if action is None:
+        a = serial.unpack(Action, bindata)
+        if a is None:
             return
         
         if id == message.ACT_PLAYLIST:
             
-            self.action_playlist(action.id, action.positions, action.items)
+            self.action_playlist_item(a.id, a.positions, a.items)
             
         elif id == message.ACT_QUEUE:
             
-            self.action_queue(action.id, action.positions, action.items)
+            self.action_queue_item(a.id, a.positions, a.items)
             
-        elif id == message.ACT_MEDIALIB:
-
-            self.action_medialib(action.id, action.path, action.positions,
-                                 action.items)
+        elif id == message.ACT_MLIB and a.id < 0:
             
+            self.action_mlib_list(a.id, a.path)
+                
+        elif id == message.ACT_MLIB and a.id > 0:
+            
+            self.action_mlib_item(a.id, a.path, a.positions, a.items)
+                
         elif id == message.ACT_FILES:
         
-            uris = self.__util_files_to_uris(action.items)
+            uris = self.__util_files_to_uris(a.items)
             
-            self.action_files(action.id, action.items, uris)
+            self.action_files(a.id, a.items, uris)
+        
+        else:
+            log.error("** BUG ** unexpected action message: %d" % id)
             
     def __handle_message_request(self, client, id, bindata):
 
@@ -1157,7 +1216,7 @@ class PlayerAdapter(object):
             if request is None:
                 return
             
-            self.request_medialib(client, request.path)
+            self.request_mlib(client, request.path)
             
         elif id == message.REQ_FILES:
             
@@ -1170,7 +1229,7 @@ class PlayerAdapter(object):
             self.__reply_files_request(client, request.path, nested, ids, names)
             
         else:
-            log.error("** BUG ** unexpected request message (%d)" % id)
+            log.error("** BUG ** unexpected request message: %d" % id)
             
     # =========================================================================
     # miscellaneous 
@@ -1240,7 +1299,7 @@ class PlayerAdapter(object):
             ftc(self.request_item, FT_REQ_ITEM),
             ftc(self.request_playlist, FT_REQ_PL),
             ftc(self.request_queue, FT_REQ_QU),
-            ftc(self.request_medialib, FT_REQ_MLIB),
+            ftc(self.request_mlib, FT_REQ_MLIB),
 
             ftc(config.get_system_shutdown_command(), FT_SHUTDOWN),
         
