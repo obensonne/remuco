@@ -52,10 +52,6 @@ class BansheeAdapter(remuco.PlayerAdapter):
     
         log.debug("init done")
         
-    # -------------------------------------------------------------------------
-    # player adapter interface
-    # -------------------------------------------------------------------------
-
     def start(self):
         
         remuco.PlayerAdapter.start(self)
@@ -119,6 +115,10 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
         return True
         
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
     def ctrl_toggle_playing(self):
         
         try:
@@ -187,10 +187,10 @@ class BansheeAdapter(remuco.PlayerAdapter):
             
         self.poll()
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # internal methods
-    # -------------------------------------------------------------------------
-
+    # =========================================================================
+    
     def __notify_event(self, event, message, buff_percent):
         
         try:
