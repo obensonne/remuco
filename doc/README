@@ -74,7 +74,7 @@ described in the file 'api.html'.
 
 4. Packager Information
 
-Packagers should not use the top level make file- this is a wrapper around
+Packagers should not use the top level make file -- this is a wrapper around
 nested make files intended for end users. Instead the setup.py script in
 base/module and the make files in adapter/XXX should be used directly.
 
@@ -89,21 +89,21 @@ It is licensed under the GPLv3 or any newer version.
 
 A.1. Feedback, Help, Bugs, Discussion etc.
 
- You can get support and help at the help forum: https://sourceforge.net/forum/
-forum.php?forum_id=568227
+You can get support and help at the help forum:
+http://sourceforge.net/forum/forum.php?forum_id=568227
 
- To file bugs please visit the bug tracker: https://sourceforge.net/tracker/?
-group_id=166515&atid=839315
+To file bugs please visit the bug tracker:
+http://sourceforge.net/tracker2/?group_id=166515&atid=839315
 
- If you miss a nice feature, take a look at the feature request tracker: https:
-//sourceforge.net/tracker/?group_id=166515&atid=839318
+If you miss a nice feature, take a look at the feature request tracker:
+http://sourceforge.net/tracker2/?func=browse&group_id=166515&atid=839318
 
- If you need help on development issues, mainly concerning player adapter
-development, visit the developer forum: https://sourceforge.net/forum/
-forum.php?forum_id=568228
+If you need help on development issues, mainly concerning player adapter
+development, visit the developer forum:
+http://sourceforge.net/forum/forum.php?forum_id=568228
 
- For all other things to talk about, use the discussion forum: https://
-sourceforge.net/forum/forum.php?forum_id=568226
+For all other things to talk about, use the discussion forum:
+http://sourceforge.net/forum/forum.php?forum_id=568226
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
