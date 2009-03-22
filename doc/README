@@ -1,29 +1,127 @@
 Remuco - Remote media player control
 
-http://remuco.sf.net
+Remuco is a duplex remote control system for Linux media players and mobile
+devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
+your favorite media player - amongst others you can switch to the next,
+previous or any other media within the current playlist, browse your media
+library and activate other playlists, rate your media and adjust volume. On the
+mobile (the remote control) it displays information about the current media,
+including cover art. Visit http://remuco.sourceforge.net for a complete feature
+list, screenshots and a list of supported media players.
 
-Here you find just some short brief instructions. For more detailed information
-please visit http://remuco.sf.net.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-=== Installation ==============================================================
+Table of Contents
+
+1. Installation
+2. Usage
+3. Player Adapter Development
+4. Packager Information
+A. General Information
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Installation
 
 Run
 
-$ make help
+ $ make help
+ 
+to get instructions on how to install Remuco for one or more media players.
 
-to get some installation instructions.
+Subsequent, install the client application on your mobile device. You find the
+required JAR and JAD files in the directory 'client'.
+How to install is device dependent - please consult the documentation of your
+mobile device.
 
-=== Configuration and Logging =================================================
+For more information visit:
+http://remuco.sourceforge.net/index.php/Getting_Started
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. Usage
+
+2.1 Player Adapters
+
+Some player adapters need to get started manually, others get started
+automatically when the corresponding player application starts. Please visit
+http://remuco.sourceforge.net/index.php/Getting_Started for player specific
+information.
 
 Each player adapter has a configuration file ~/.config/remuco/<PLAYER>/conf.
 Edit this file if needed. Logging output of a player adapter goes to
 ~/.cache/remuco/<PLAYER>/log.
 
-=== Player Adapter Development ================================================
+2.2 Client
+
+Using the client is not too complicated, just start and use it ;) .
+
+Nevertheless, you'll find some usage information here:
+http://remuco.sourceforge.net/index.php/Getting_Started
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. Player Adapter Development
 
 To develop a player adapter, use 'fooplay' as a template and implement it as
 described in the file 'api.html'.
 
-===============================================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-More information at http://remuco.sf.net
+4. Packager Information
+
+Packagers should not use the top level make file- this is a wrapper around
+nested make files intended for end users. Instead the setup.py script in
+base/module and the make files in adapter/XXX should be used directly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A. General Information
+
+The Remuco project is hosted on SourceForge at http://remuco.sourceforge.net.
+It is licensed under the GPLv3 or any newer version.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.1. Feedback, Help, Bugs, Discussion etc.
+
+ You can get support and help at the help forum: https://sourceforge.net/forum/
+forum.php?forum_id=568227
+
+ To file bugs please visit the bug tracker: https://sourceforge.net/tracker/?
+group_id=166515&atid=839315
+
+ If you miss a nice feature, take a look at the feature request tracker: https:
+//sourceforge.net/tracker/?group_id=166515&atid=839318
+
+ If you need help on development issues, mainly concerning player adapter
+development, visit the developer forum: https://sourceforge.net/forum/
+forum.php?forum_id=568228
+
+ For all other things to talk about, use the discussion forum: https://
+sourceforge.net/forum/forum.php?forum_id=568226
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A.2. Source Code Access
+
+You can get the source code via SVN. The SVN root is:
+https://remuco.svn.sourceforge.net/svnroot/remuco
+
+To browse the SVN repository visit:
+http://remuco.svn.sourceforge.net/viewvc/remuco
+
+The most current code is located in "trunk". Note that this code is not always
+stable or in a working state. The sources of specific releases are located in
+"tags" -- getting code from "tags" ensures to have working code.
+
+Example A-1. Check out the current development version into the
+directory remuco-trunk:
+
+ $ svn co <SVN-ROOT>/trunk remuco-trunk
+
+Example A-2. Check out the source from release 0.8.0 into the directory
+remuco-0.8.0:
+
+ $ svn co <SVN-ROOT>/tags/0.8.0 remuco-0.8.0
