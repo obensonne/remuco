@@ -5,8 +5,8 @@
 # Remuco clients to remotely shut down the whole system (not only the media
 # player).
 
-# Note: If you have a malicious neighbor, he might use Remuco on _his_ mobile
-#       and shutdown _your_ computer! 
+# Note: If you enable this script, a malicious neighbor might use Remuco on
+#       _his_ mobile and shutdown _your_ computer! 
 
 dbus-send --session --type=method_call \
 	--dest=org.freedesktop.PowerManagement \
