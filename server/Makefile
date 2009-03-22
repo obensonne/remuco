@@ -4,6 +4,7 @@
 # -----------------------------------------------------------------------------
 
 default: help
+	true
 
 # -----------------------------------------------------------------------------
 
@@ -42,7 +43,7 @@ api.html: base/module/remuco/*.py
 help:
 	@echo
 	@echo "Run one of the following to install Remuco for a specific player:"
-	@for PA in $(ADAPTERS); do echo "make install-$$PA"; done
+	@for PA in $(ADAPTERS); do echo "sudo make install-$$PA"; done
 	@echo
 	@echo "This automatically also installs the Remuco base which is used by"
 	@echo "all player adapters. To uninstall, do a 'make uninstall-...'."
@@ -59,17 +60,6 @@ install: help
 
 uninstall: help
 	true
-
-install-base:
-	python base/module/install-check.py
-	make -C base install 
-	@echo
-	@echo "+-----------------------------------------------------------------+"
-	@echo "| Installed Remuco base."
-	@echo "| Now install a player adapter with one of the following:"
-	@for PA in $(ADAPTERS); do echo "| make install-$$PA"; done
-	@echo "+-----------------------------------------------------------------+"
-	@echo
 
 uninstall-base:
 	make -C base uninstall
