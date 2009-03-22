@@ -4,7 +4,7 @@
 __author__ = "Oben Sonne <obensonne@googlemail.com>"
 __copyright__ = "Copyright 2009, Oben Sonne"
 __license__ = "GPL"
-__version__ = "0.0.1"
+__version__ = "0.8.0"
 
 """
 import os.path
