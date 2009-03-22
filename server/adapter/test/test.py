@@ -15,8 +15,8 @@ ITEMS = {
          "ID7": { remuco.INFO_TITLE: "Song No. 7"},
          }
 
-FA1 = remuco.ItemAction("A1", "This is A1")
-FA2 = remuco.ItemAction("A2", "This is A2", multiple=True)
+FA1 = remuco.ItemAction("A1")
+FA2 = remuco.ItemAction("A2", multiple=True)
 
 
 class Player(object):
