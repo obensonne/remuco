@@ -1,14 +1,9 @@
-X2_STARTUP_DIR ?= $(HOME)/.config/xmms2/startup.d
+PREFIX ?= /usr
 
-MODULES := xmmsclient
+#X2_STARTUP_DIR ?= $(HOME)/.config/xmms2/startup.d
+X2_STARTUP_DIR ?= $(PREFIX)/share/xmms2/scripts/startup.d
 
-check:
-	@for MOD in $(MODULES) ; do \
-		echo "import $$MOD" | python 2>/dev/null || \
-			{ echo "ERROR: missing python module $$MOD"; exit 1; } \
-	done
-
-install: check
+install:
 	mkdir -p $(DESTDIR)$(X2_STARTUP_DIR)
 	install -T xmms2.py $(DESTDIR)$(X2_STARTUP_DIR)/remuco-xmms2
 	
