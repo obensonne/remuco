@@ -282,9 +282,6 @@ public final class Theme {
 
 		int w, slen, i, goodBreakPos;
 
-		final String cSpace = " ";
-		String cCurrent;
-
 		final Vector v = new Vector(3);
 
 		w = f.stringWidth(s);
@@ -295,9 +292,9 @@ public final class Theme {
 			i = 1;
 			w = 0;
 			while (w < maxWidth && i < slen) {
-				cCurrent = s.substring(i, i + 1);
-				if (cCurrent.equals(cSpace))
+				if (s.charAt(i) == ' ') {
 					goodBreakPos = i;
+				}
 				w = f.substringWidth(s, 0, i);
 				i++;
 			}
