@@ -74,21 +74,22 @@
 		<property name="mode.emulation" value="isset" />
 	</target>
 
-	<target name="setmode.dist.optimized">
+	<target name="setmode.dist-optimized">
 		<fail if="mode" />
-		<property name="mode" value="dist" />
-		<property name="mode.dist.optimized" value="isset" />
+		<property name="mode" value="dist (optimized version)" />
+		<property name="mode.dist-optimized" value="isset" />
 	</target>
 
-	<target name="setmode.dist.chary">
+	<target name="setmode.dist-chary">
 		<fail if="mode" />
 		<property name="mode" value="dist (chary version)" />
-		<property name="mode.dist.chary" value="isset" />
+		<property name="mode.dist-chary" value="isset" />
 	</target>
 
 	<target name="configure">
+		<!-- set various properties depending on used mode -->
 		<fail unless="mode" />
-		<echo message="configure for ${mode}" />
+		<!-- compile with debug symbols ? -->
 		<condition property="compile.debug" value="yes" else="no">
 			<or>
 				<and>
@@ -96,21 +97,23 @@
 					<istrue value="${run.debug}" />
 				</and>
 				<and>
-					<isset property="mode.dist.optimized" />
+					<isset property="mode.dist-optimized" />
 					<istrue value="${dist.debug}" />
 				</and>
-				<isset property="mode.dist.chary" />
+				<isset property="mode.dist-chary" />
 			</or>
 		</condition>
+		<!-- preverifier to use -->
 		<condition property="preverifier" value="${run.preverifier}">
 			<isset property="mode.emulation" />
 		</condition>
 		<condition property="preverifier" value="${dist.preverifier}">
-			<isset property="mode.dist.optimized" />
+			<isset property="mode.dist-optimized" />
 		</condition>
 		<condition property="preverifier" value="${dist.chary.preverifier}">
-			<isset property="mode.dist.chary" />
+			<isset property="mode.dist-chary" />
 		</condition>
+		<!-- when using proguard, optimize ? -->
 		<condition property="proguard.optimize" value="yes" else="no">
 			<or>
 				<and>
@@ -118,12 +121,13 @@
 					<istrue value="${run.proguard.optimize}" />
 				</and>
 				<and>
-					<isset property="mode.dist.optimized" />
+					<isset property="mode.dist-optimized" />
 					<istrue value="${dist.proguard.optimize}" />
 				</and>
-				<!-- if still false, mode is 'dist.chary', so false is ok -->
+				<!-- if still false, mode is 'dist-chary', so false is ok -->
 			</or>
 		</condition>
+		<echo message="mode                       : ${mode}" />
 		<echo message="compile with debug symbols : ${compile.debug}" />
 		<echo message="preverifier                : ${preverifier}" />
 		<echo message="proguard optimizes         : ${proguard.optimize}" />
@@ -272,53 +276,44 @@
 
 	<!-- =================== Dist ========================================= -->
 
-	<target name="dist.optimized" depends="setmode.dist.optimized,jad" />
+	<target name="dist.optimized"
+	        depends="clean,setmode.dist-optimized,jad"
+	        description="--> build an optimized jar" />
 
-	<target name="dist.chary" depends="setmode.dist.chary,jad" />
+	<target name="dist.chary"
+	        depends="clean,setmode.dist-chary,jad"
+	        description="--> build a non-optimized jar" />
 
-	<target name="dist"
-	        depends="clean"
-	        description="--> build binary distribution package">
-		<mkdir dir="build/${dist.name}" />
-		<!-- create optimized binary -->
-		<antcall target="dist.optimized" inheritall="false" />
-		<copy todir="build/${dist.name}">
-			<fileset dir="build/jar" />
-		</copy>
-		<!-- delete build files -->
-		<delete dir="build">
-			<include name="classes" />
-			<include name="preverified" />
-			<include name="jar" />
-		</delete>
-		<!-- create binary without optimization -->
-		<antcall target="dist.chary" inheritall="false" />
-		<mkdir dir="build/${dist.name}/debug" />
-		<copy todir="build/${dist.name}/debug">
-			<fileset dir="build/jar" />
-		</copy>
-		<!-- package files -->
-		<mkdir dir="build/${dist.name}/doc" />
-		<copy todir="build/${dist.name}/doc">
-			<fileset dir="doc" />
-		</copy>
-		<mkdir dir="dist" />
-		<tar destfile="dist/${dist.name}.tar.gz"
-		     compression="gzip"
-		     basedir="build"
-		     includes="${dist.name}/" />
-	</target>
 
 	<!-- =================== Snapshot ===================================== -->
 
-	<target name="snapshot"
-	        depends="clean,revision,dist.chary"
-	        description="--> create a binary snapshot of the client">
-		<copy todir="snapshot" file="build/jar/${midlet.jad}" />
-		<copy todir="snapshot" file="build/jar/${midlet.jar}" />
+	<target name="snapshot.optimized"
+	        depends="dist.optimized,snapshot"
+	        description="--> create an optimized binary snapshot of the client" />
+
+	<target name="snapshot.chary"
+	        depends="dist.chary,snapshot"
+	        description="--> create a chary binary snapshot of the client" />
+
+	<target name="snapshot" depends="revision">
+		<property name="snapdir" value="snapshot/snapshot-${revision.no}" />
+
+		<mkdir dir="${snapdir}" />
+		<copy todir="${snapdir}" file="build/jar/${midlet.jad}" />
+		<copy todir="${snapdir}" file="build/jar/${midlet.jar}" />
 		<tstamp />
-		<echo file="snapshot/README"
+		<echo file="${snapdir}/tmp1"
 		      message="Client snapshot (${TODAY}, Revision ${revision.no})." />
+		<echo file="${snapdir}/tmp1"
+		      append="true"
+		      message="${line.separator}${line.separator}" />
+		<echoproperties destfile="${snapdir}/tmp2" />
+		<concat destfile="${snapdir}/README">
+			<fileset dir="${snapdir}" includes="tmp*" id="snaptmp" />
+		</concat>
+		<delete>
+			<fileset refid="snaptmp" />
+		</delete>
 	</target>
 
 	<target name="revision">
