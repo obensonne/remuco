@@ -277,6 +277,8 @@ public final class Theme {
 		if (f.stringWidth(s) <= maxWidth) {
 			return new String[] { s };
 		}
+		
+		maxWidth -= f.charWidth('W'); // tweak the algorithm below
 
 		int w, slen, i, goodBreakPos;
 

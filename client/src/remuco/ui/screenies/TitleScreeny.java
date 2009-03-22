@@ -59,7 +59,7 @@ public final class TitleScreeny extends Screeny {
 
 			g.setColor(colorArtist);
 			g.setFont(Theme.FONT_ARTIST);
-			sa = Theme.splitString(item.getMeta(Item.META_ABSTRACT), width - 4,
+			sa = Theme.splitString(item.getMeta(Item.META_ABSTRACT), width,
 				Theme.FONT_ARTIST);
 			y = (height - sa.length * Theme.FONT_ARTIST.getHeight()) / 2;
 			y = drawStrings(sa, width, y);
@@ -71,7 +71,7 @@ public final class TitleScreeny extends Screeny {
 
 		g.setColor(colorArtist);
 		g.setFont(Theme.FONT_ARTIST);
-		sa = Theme.splitString(item.getMeta(Item.META_ARTIST), width - 4,
+		sa = Theme.splitString(item.getMeta(Item.META_ARTIST), width,
 			Theme.FONT_ARTIST);
 		y = drawStrings(sa, width, y);
 
@@ -79,7 +79,7 @@ public final class TitleScreeny extends Screeny {
 
 		g.setColor(colorTitle);
 		g.setFont(Theme.FONT_TITLE);
-		sa = Theme.splitString(item.getMeta(Item.META_TITLE), width - 4,
+		sa = Theme.splitString(item.getMeta(Item.META_TITLE), width,
 			Theme.FONT_TITLE);
 		y = drawStrings(sa, width, y);
 
@@ -87,7 +87,7 @@ public final class TitleScreeny extends Screeny {
 
 		g.setColor(colorAlbum);
 		g.setFont(Theme.FONT_ALBUM);
-		sa = Theme.splitString(item.getMeta(Item.META_ALBUM), width - 4,
+		sa = Theme.splitString(item.getMeta(Item.META_ALBUM), width,
 			Theme.FONT_ALBUM);
 		y = drawStrings(sa, width, y);
 
