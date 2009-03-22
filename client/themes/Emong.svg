@@ -20,6 +20,13 @@
    enable-background="new">
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 160 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="240 : 160 : 1"
+       inkscape:persp3d-origin="120 : 106.66667 : 1"
+       id="perspective89" />
     <filter
        inkscape:collect="always"
        id="filter3333">
@@ -40,9 +47,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0108349"
-     inkscape:cx="129.67995"
-     inkscape:cy="132.26617"
+     inkscape:zoom="16.086679"
+     inkscape:cx="60.6443"
+     inkscape:cy="250.22914"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -426,33 +433,33 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        x="46"
        height="16"
        width="21"
-       id="rte.state.shuffle.on"
+       id="rte.state.repeat.on"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:label="state.shuffle.on" />
+       inkscape:label="state.repeat.on" />
     <rect
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.shuffle.off"
+       id="rte.state.repeat.off"
        width="21"
        height="16"
        x="46"
        y="52"
-       inkscape:label="state.shuffle.off" />
+       inkscape:label="state.repeat.off" />
     <rect
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.repeat.on"
+       id="rte.state.shuffle.on"
        width="20"
        height="16"
        x="68"
        y="70"
-       inkscape:label="state.repeat.on" />
+       inkscape:label="state.shuffle.on" />
     <rect
        y="52"
        x="68"
        height="16"
        width="20"
-       id="rte.state.repeat.off"
+       id="rte.state.shuffle.off"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:label="state.repeat.off" />
+       inkscape:label="state.shuffle.off" />
     <rect
        y="70"
        x="90"
