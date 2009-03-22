@@ -34,6 +34,9 @@ required JAR and JAD files in the directory 'client'.
 How to install is device dependent - please consult the documentation of your
 mobile device.
 
+Note: If the client fails to start on your mobile, try the non-optimized
+      version in the directory 'client/non-optimized'.
+
 For more information visit:
 http://remuco.sourceforge.net/index.php/Getting_Started
 
