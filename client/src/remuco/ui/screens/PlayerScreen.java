@@ -370,6 +370,10 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		case KeyBindings.ACTION_PLAYPAUSE:
 
+			if (!checkFeature(Feature.CTRL_PLAYBACK)) {
+				break;
+			}
+
 			player.ctrlPlayPause();
 			break;
 
