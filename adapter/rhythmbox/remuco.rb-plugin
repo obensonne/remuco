@@ -1,0 +1,9 @@
+[RB Plugin]
+Loader=python
+Module=remythm
+IAge=1
+Name=Remuco
+Description=Rhythmbox adapter for Remuco (and vice versa).
+Authors=Oben Sonne <obensonne@googlemail.com>
+Copyright=Copyright © 2008 Oben Sonne
+Website=http://remuco.sourceforge.net/
