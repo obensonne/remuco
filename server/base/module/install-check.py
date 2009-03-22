@@ -8,5 +8,10 @@ try:
     import bluetooth
     import dbus
 except ImportError, e:
-    print("--> ERROR: Missing a required Python module (%s)!" % e)
+    print("")
+    print("+-----------------------------------------------------------------+")
+    print("| Unsatisfied Python requirement: %s." % e)
+    print("| Please install the missing module and then retry.")
+    print("+-----------------------------------------------------------------+")
+    print("")
     sys.exit(1)
