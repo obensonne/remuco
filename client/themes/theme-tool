@@ -122,9 +122,9 @@ def export_theme_elements(svg, dir):
                      (elem, svg, err))
         
 
-def main(svg):
+def build(svg):
 
-    dir, ext = os.path.splitext(svg)
+    dir = "build/%s" % os.path.splitext(svg)[0]
     
     if os.path.exists(dir):
         print("--> remove old theme dir '%s'" % dir)
@@ -212,14 +212,6 @@ def main(svg):
             
     print("--> recommended minimum screen size: %dx%d" % (minw, minh))
     
-#    info_filename = os.path.join(dir, "theme.desc")
-#    
-#    print("--> generate description file (%s)" % info_filename)
-#    
-#    info = open(info_filename, 'w')
-#    info.write("%dx%d" % (minw,minh))
-#    info.close()
-    
     print("--> finished, good job :)")
 
 
@@ -230,12 +222,22 @@ if __name__ == "__main__":
     except IndexError:
         svg = None
         
-    if not os.path.isfile(svg):
-        exit_err("--| no such file: '%s'" % svg)
+    if not os.path.exists("build"):
+        print("--> create build dir")
+        try:
+            os.mkdir("build")
+        except OSError, e:
+            exit_err("--| failed to create build dir (%s)" % e)
 
-    print("--> here we go")
-    print("    just to remind you .. have you hidden the mask layer?")
-    
-    main(svg)
-
-
+    if svg == "all":
+        x, dirs, files = os.walk(".").next()
+    else:
+        files = [ "%s.svg" % sys.argv[1] ]
+        
+    for svg in files:
+        if not svg.endswith(".svg"):
+            continue
+        if not os.path.isfile(svg):
+            exit_err("--| no such file: '%s'" % svg)
+        print("--> building  theme %s" % svg)
+        build(svg)
