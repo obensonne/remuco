@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Make file for creating a distribution package
+# Make file for creating a distribution package.
 # -----------------------------------------------------------------------------
 
 ADAPTERS := $(shell ls adapter)
@@ -19,10 +19,11 @@ dist: clean pydoc
 	cp -r base adapter build/$(PKG)
 	cp Makefile api.html README build/$(PKG)
 	find build -type d -name ".svn" | xargs rm -rf
-	mkdir dist
+	find build -type f -name "install.log" | xargs rm -f
 	cd ../client ; ant dist
 	mkdir build/$(PKG)/client
 	mv ../client/build/remuco-client-0.8.0/* build/$(PKG)/client/
+	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
 pydoc: api.html
