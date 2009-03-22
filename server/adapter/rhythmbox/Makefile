@@ -1,6 +1,6 @@
-RB_PLUGIN_DIR ?= $(HOME)/.gnome2/rhythmbox/plugins
-
-RB_MODULE = remythm
+PREFIX ?= /usr
+RB_PLUGIN_DIR ?= $(PREFIX)/lib/rhythmbox/plugins
+#RB_PLUGIN_DIR ?= $(HOME)/.gnome2/rhythmbox/plugins
 
 install: uninstall
 	install -d $(DESTDIR)$(RB_PLUGIN_DIR)/remuco
