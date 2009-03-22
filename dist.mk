@@ -12,23 +12,31 @@ clean:
 	make -C base clean
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
+	cd client; ant clean
 
 dist: clean pydoc
 	#[ -z "`svn st`" ] || { echo "ERROR: working copy has local changes" ; exit 1 ; }
+	
 	mkdir -p build/$(PKG)
-	cp -r base adapter build/$(PKG)
-	cp Makefile api.html README build/$(PKG)
+	cp -r base adapter doc Makefile build/$(PKG)
 	find build -type d -name ".svn" | xargs rm -rf
 	find build -type f -name "install.log" | xargs rm -f
-	cd ../client ; ant dist
+	
 	mkdir build/$(PKG)/client
-	mv ../client/build/remuco-client-0.8.0/* build/$(PKG)/client/
+	cd client ; ant dist.optimized
+	cp client/build/jar/remuco.jar client/build/jar/remuco.jad \
+		build/$(PKG)/client/
+	mkdir build/$(PKG)/client/non-optimized
+	cd client ; ant dist.chary
+	cp client/build/jar/remuco.jar client/build/jar/remuco.jad \
+		build/$(PKG)/client/non-optimized
+		
 	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
-pydoc: api.html
+pydoc: doc/api.html
 
-api.html: base/module/remuco/*.py
+doc/api.html: base/module/remuco/*.py
 	cd base/module; pydoc -w remuco
 	mv base/module/remuco.html $@
-	sed -i $@ -e "s,[_a-z\.]\+\.html,$@,g"
+	sed -i $@ -e "s,[_a-z\.]\+\.html,api.html,g"
