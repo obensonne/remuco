@@ -141,7 +141,7 @@ class SerializationTest(unittest.TestCase):
         
         #print("")
         
-        ia = remuco.ItemAction("ia_l", "ia_h", multiple=True)
+        ia = remuco.ItemAction("ia_l", multiple=True)
         pi = data.PlayerInfo("dings", 123, 4, [ia])
         
         #self.__serialize(pi)
@@ -156,11 +156,11 @@ class SerializationTest(unittest.TestCase):
         ids = ["id1", "id2", "id3" ]
         names = [ "na1", "na2", "na3" ]
         
-        ia1 = remuco.ItemAction("ia1_l", "ia1_h", multiple=True)
-        ia2 = remuco.ItemAction("ia2_l", "ia2_h", multiple=False)
+        ia1 = remuco.ItemAction("ia1_l", multiple=True)
+        ia2 = remuco.ItemAction("ia2_l", multiple=False)
         ias = [ ia1, ia2 ]
         
-        la1 = remuco.ListAction("la1_l", "la1_h")
+        la1 = remuco.ListAction("la1_l")
         las = [ la1 ]
         
         il = data.ItemList(path, nested, ids, names, ias, las)
@@ -175,11 +175,11 @@ class SerializationTest(unittest.TestCase):
         ids = None
         names = [ "na1", "na2", "na3" ]
         
-        ia1 = remuco.ItemAction("ia1_l", "ia1_h", multiple=True)
-        ia2 = remuco.ItemAction("ia2_l", "ia2_h", multiple=False)
+        ia1 = remuco.ItemAction("ia1_l", multiple=True)
+        ia2 = remuco.ItemAction("ia2_l", multiple=False)
         ias = [ ia1, ia2 ]
         
-        #la1 = remuco.ListAction("la1_l", "la1_h")
+        #la1 = remuco.ListAction("la1_l")
         #las = [ la1 ]
         las = None
         

@@ -19,7 +19,7 @@ class AdapterTest(unittest.TestCase):
         
         self.__ml = gobject.MainLoop()
         
-        ia = remuco.ItemAction("ia_l", "ia_h", multiple=True)
+        ia = remuco.ItemAction("ia_l", multiple=True)
 
         logarg = "--remuco-log-stdout"
         if not logarg in sys.argv:
