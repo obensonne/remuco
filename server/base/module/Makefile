@@ -1,45 +1,26 @@
 all:
 	python setup.py build --root=$(DESTDIR)/
 
-install: check
-	python setup.py install --root=$(DESTDIR)/
+install: install.log
 
-install.log:
+install.log: setup.py remuco/*.py
+	python setup.py install --root=$(DESTDIR)/ --record install.log 
 
-uninstall.files: install.log
-	rm -rf $@
-	touch $@
-	@echo "create file list"
-	@if [ -e install.log ] ; then \
-		cat install.log | while read FILE ; do \
-			if [ ! -d "$(DESTDIR)/$$FILE" ] ; then \
-				echo "$(DESTDIR)/$$FILE" >> $@ ; \
-			fi; \
-		done; \
-	fi
-
-uninstall: uninstall.files
-	@cat uninstall.files | while read FILE ; do \
-		echo "rm -f $$FILE" ; \
-		rm -f $$FILE || exit 1; \
-	done;
-	rm -f install.log
-	rm -f uninstall.files
+uninstall:
+	@echo ""
+	@echo "+----------------------------------------------------------------+"
+	@echo "| To uninstall the Remuco Python module, delete the files listed |"
+	@echo "| in 'install.log' manually.                                     |"
+	@echo "+----------------------------------------------------------------+"
+	@echo ""
 	
 clean:
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
-	rm -f uninstall.files
 	@if [ -e install.log ] ; then \
-		echo "Keep file 'install.log' for uninstallation."; \
+		echo ""; \
+		echo "+----------------------------------------------------------------+"; \
+		echo "| Keeping 'install.log' for uninstallation.                      |"; \
+		echo "+----------------------------------------------------------------+"; \
+		echo ""; \
 	fi
-	
-MODULES := gobject xdg.BaseDirectory Image logging bluetooth dbus
-
-check:
-	@for MOD in $(MODULES) ; do \
-		echo "import $$MOD" | python 2>/dev/null || \
-			{ echo "ERROR: missing python module $$MOD"; exit 1; } \
-	done
-
-	
