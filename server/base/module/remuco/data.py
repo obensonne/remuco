@@ -1,7 +1,8 @@
 """Data containers to send to and receive from clients."""
-
 import tempfile
 import Image
+import urlparse
+import urllib
 
 from remuco import command
 from remuco import log
@@ -146,7 +147,11 @@ class Item(serial.Serializable):
 
     def __thumbnail(self, img):
     
-        if img is None:
+        if isinstance(img, basestring) and img.startswith("file://"):
+            img = urlparse.urlparse(img)[2]
+            img = urllib.url2pathname(img)
+            
+        if not img:
             return []
     
         size = 300,300
