@@ -4,23 +4,22 @@ all:
 install: install.log
 
 install.log: setup.py remuco/*.py
-	python setup.py install --root=$(DESTDIR)/ --record install.log 
+	python setup.py install --root=$(DESTDIR)/ --record install.log
 
 uninstall:
-	@echo ""
-	@echo "+----------------------------------------------------------------+"
-	@echo "| To uninstall the Remuco Python module, delete the files listed |"
-	@echo "| in 'install.log' manually.                                     |"
-	@echo "+----------------------------------------------------------------+"
-	@echo ""
-	
+	@if [ ! -e install.log ] ; then \
+		echo "No 'install.log' -> not yet installed or already uninstalled."; \
+	else \
+		for FILE in `cat install.log` ; do \
+			FILE=$(DESTDIR)/$$FILE ; \
+			if [ -f $$FILE ] ; then rm -f $$FILE || exit 1; fi ; \
+		done ; \
+		rm -f install.log || exit 1; \
+	fi
+
 clean:
 	rm -rf build dist
 	find -type f -name "*.pyc" | xargs rm -f
 	@if [ -e install.log ] ; then \
-		echo ""; \
-		echo "+----------------------------------------------------------------+"; \
-		echo "| Keeping 'install.log' for uninstallation.                      |"; \
-		echo "+----------------------------------------------------------------+"; \
-		echo ""; \
+		echo "Preserve 'install.log' for uninstallation."; \
 	fi
