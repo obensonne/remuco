@@ -4,7 +4,7 @@
 __author__ = "Oben Sonne <obensonne@googlemail.com>"
 __copyright__ = "Copyright 2009, Oben Sonne"
 __license__ = "GPL"
-__version__ = "0.0.1"
+__version__ = "0.8.0"
 
 """
 import os
@@ -415,14 +415,6 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     def __handle_info(self, result):
         """Callback to handle meta data requested for the current item.""" 
         
-        def get_meta(key):
-            val = minfo.get(key, "")
-            if key == "duration":
-                val = int(val // 1000)
-            if not isinstance(val, basestring):
-                val = str(val)
-            return val
-    
         if not self._check_result(result):
             self.__item_id_int = 0
             self.__item_id = str(self.__item_id_int)
@@ -432,16 +424,14 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         minfo = result.value()
 
         info = {}
-        info[remuco.INFO_ARTIST] = get_meta("artist")
-        info[remuco.INFO_ALBUM] = get_meta("album")
-        info[remuco.INFO_TITLE] = get_meta("title")
-        info[remuco.INFO_GENRE] = get_meta("genre")
-        info[remuco.INFO_COMMENT] = get_meta("comment")
-        info[remuco.INFO_LENGTH] = get_meta("duration")
-        info[remuco.INFO_BITRATE] = get_meta("bitrate")
-        info[remuco.INFO_TRACK] = get_meta("tracknr")
-        info[remuco.INFO_RATING] = get_meta(MINFO_KEY_RATING)
-        info[remuco.INFO_TAGS] = get_meta(MINFO_KEY_TAGS)
+        info[remuco.INFO_ARTIST] = minfo.get("artist", "")
+        info[remuco.INFO_ALBUM] = minfo.get("album", "")
+        info[remuco.INFO_TITLE] = minfo.get("title", "")
+        info[remuco.INFO_GENRE] = minfo.get("genre", "")
+        info[remuco.INFO_YEAR] = minfo.get("year", "")
+        info[remuco.INFO_LENGTH] = int(minfo.get("duration", 0) // 1000)
+        info[remuco.INFO_RATING] = minfo.get(MINFO_KEY_RATING, 0)
+        info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
     
         img = ""
         for img_key in MINFO_KEYS_ART:
