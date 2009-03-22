@@ -1,9 +1,0 @@
-[Totem Plugin]
-Loader=python
-Module=remotem
-IAge=1
-Name=Remuco
-Description=Remuco Totem Adapter
-Authors=Oben Sonne <obensonne@googlemail.com>
-Copyright=Copyright © 2009 Oben Sonne
-Website=http://remuco.sourceforge.net
