@@ -40,6 +40,7 @@ Logging:
 #==============================================================================
 
 from remuco.adapter import PlayerAdapter, ItemAction, ListAction
+from remuco.mpris import MPRISAdapter
 from remuco.config import Config
 from remuco.defs import *
 from remuco.manager import Manager
@@ -50,7 +51,8 @@ from remuco.manager import Manager
 
 API_VERSION = 1
 
-__all__ = ("PlayerAdapter", "ItemAction", "ListAction", "Manager", "Config",
+__all__ = ("PlayerAdapter", "MPRISAdapter",
+           "ItemAction", "ListAction", "Manager", "Config",
            
            "INFO_ALBUM", "INFO_ARTIST", "INFO_GENRE", "INFO_LENGTH",
            "INFO_RATING", "INFO_TAGS", "INFO_TITLE", "INFO_YEAR",
