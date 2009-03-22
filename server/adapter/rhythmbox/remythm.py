@@ -1,3 +1,11 @@
+"""Rhythmbox player adapter for Remuco, implemented as a Rhythmbox plugin.
+
+__author__ = "Oben Sonne <obensonne@googlemail.com>"
+__copyright__ = "Copyright 2009, Oben Sonne"
+__license__ = "GPL"
+__version__ = "0.8.0"
+
+"""
 import os.path
 import traceback
 import time
@@ -259,7 +267,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                 log.debug("set volume failed: %s" % str(e))
         
         # update volume within a short time (don't wait for scheduled poll)
-        gobject.idle_add(self.poll)    
+        gobject.idle_add(self.poll)
         
     def ctrl_clear_queue(self):
         
