@@ -23,3 +23,6 @@ clean:
 	@if [ -e install.log ] ; then \
 		echo "Preserve 'install.log' for uninstallation."; \
 	fi
+
+test-module:
+	PYTHONPATH=$$PYTHONPATH:. python test/testall.py
