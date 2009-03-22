@@ -21,12 +21,21 @@ from remuco.data import PlayerInfo, PlayerState, Progress, ItemList, Item
 from remuco.data import Control, Action, Tagging, Request
 
 # =============================================================================
-# browser action
+# media browser actions
 # =============================================================================
 
 class ListAction(object):
-    """List related action within a client's media browser."""
+    """List related action for a client's media browser.
     
+    A list action defines an action a client may apply to a list from the
+    player's media library. If possible, player adapters may define list
+    actions and send them to clients via PlayerAdapter.replay_mlib_request()
+    Clients may then use these actions which results in a call to
+    PlayerAdapter.action_mlib_list().
+    
+    @see: PlayerAdapter.action_mlib_list()
+     
+    """
     __id_counter = 0
     
     def __init__(self, label):
@@ -56,8 +65,27 @@ class ListAction(object):
     id = property(__pget_id, None, None, __pget_id.__doc__)
     
 class ItemAction(object):
-    """Item related action within a client's media browser."""
+    """Item related action for a client's media browser.
     
+    An item action defines an action a client may apply to a file from the
+    local file system, to an item from the playlist, to an item from the play
+    queue or to an item from the player's media library.
+      
+    If possible, player adapters should define item actions and send them to
+    clients by setting the keyword 'file_actions' in PlayerAdapter.__init__(),
+    via PlayerAdapter.reply_playlist_request(), via
+    PlayerAdapter.reply_queue_request() or via
+    PlayerAdapter.reply_mlib_request(). Clients may then use these actions
+    which results in a call to PlayerAdapter.action_files(),
+    PlayerAdapter.action_playlist_item(), PlayerAdapter.action_queue_item() or
+    PlayerAdapter.action_mlib_item().
+    
+    @see: PlayerAdapter.action_files()
+    @see: PlayerAdapter.action_playlist()
+    @see: PlayerAdapter.action_queue()
+    @see: PlayerAdapter.action_mlib_item() 
+    
+    """
     __id_counter = 0
     
     def __init__(self, label, multiple=False):
@@ -121,59 +149,21 @@ class PlayerAdapter(object):
     Methods to override to control the media player:
     ===========================================================================
     
-        Basic playback control:
-
         * ctrl_toggle_playing()
-        * ctrl_next()
-        * ctrl_previous()
-        * ctrl_seek_forward()
-        * ctrl_seek_backward()
-        * ctrl_jump_in_playlist()
-        * ctrl_jump_in_queue()
         * ctrl_toggle_repeat()
         * ctrl_toggle_shuffle()
-        
-        Miscellaneous:
-
-        * ctrl_volume()
-        * ctrl_volume_up()
-        * ctrl_volume_down()
         * ctrl_toggle_fullscreen()
-        * ctrl_play_file()
-        * ctrl_play_id()
-        
-        Edit an item's meta data:
-        
+        * ctrl_next()
+        * ctrl_previous()
+        * ctrl_seek()
+        * ctrl_volume()
+        * ctrl_clear_playlist()
+        * ctrl_clear_queue()
         * ctrl_rate()
         * ctrl_tag()
         
-        The following methods may be implemented to adjust a player's
-        current playlist:
-
-        * ctrl_playlist_remove()
-        * ctrl_playlist_next_ids()
-        * ctrl_playlist_next_files()
-        * ctrl_playlist_append_ids()
-        * ctrl_playlist_append_files()
-        * ctrl_playlist_set_ids()
-        * ctrl_playlist_set_files()
-        * ctrl_playlist_load()
-
-        If a player has a global play queue, the following methods may be
-        implemented to adjust the play queue:
-
-        * ctrl_queue_remove()
-        * ctrl_queue_prepend_ids()
-        * ctrl_queue_prepend_files()
-        * ctrl_queue_append_ids()
-        * ctrl_queue_append_files()
-        * ctrl_queue_clear()
-
-        -----------------------------------------------------------------------
-
-        Don't feel daunted by the vast number of methods :), a player adapter
-        should implement only a *subset* of these methods - depending on what
-        is possible and what makes sense.
+        Player adapters only need to implement only a *subset* of these
+        methods - depending on what is possible and what makes sense.
         
         Remuco checks which methods have been overridden and uses this
         information to notify Remuco clients about capabilities of player
@@ -185,7 +175,7 @@ class PlayerAdapter(object):
     
         * request_playlist()
         * request_queue()
-        * request_medialib()
+        * request_mlib()
     
         As above, only override the methods which make sense for the
         corresponding media player.
@@ -196,7 +186,7 @@ class PlayerAdapter(object):
 
         * reply_playlist_request()
         * reply_queue_request()
-        * reply_medialib_request()
+        * reply_mlib_request()
         
     ===========================================================================
     Methods to call to synchronize media player state information with clients:
@@ -208,7 +198,6 @@ class PlayerAdapter(object):
         * update_item()
         * update_position()
         * update_progress()
-        * update_playlist_mutability()
         
         These methods should be called whenever the corresponding information
         has changed in the media player (it is safe to call these methods also
@@ -261,15 +250,15 @@ class PlayerAdapter(object):
         @keyword file_actions:
             list of ItemAction which can be applied to files from the local
             file system (actions like play a file or append files to the
-            playlist) - if this keyword is set, you should also set the
-            keyword 'mime_types' and override the method action_files()
+            playlist) - this keyword is only relevant if the method
+            action_files() gets overridden
         @keyword mime_types:
             list of mime types specifying the files to which the actions given
             by the keyword 'file_actions' can be applied, this may be general
             types like 'audio' or 'video' but also specific types like
             'audio/mp3' or 'video/quicktime' (setting this to None means all
             mime types are supported) - this keyword is only relevant if the
-            keyword 'file_actions' has been set
+            method action_files() gets overridden
         
         @attention: When overriding, call super class implementation first!
         
@@ -400,7 +389,7 @@ class PlayerAdapter(object):
         A typical use case of this method is to detect the playback progress of
         the current item and then call update_progress(). It can also be used
         to poll any other player state information when a player does not
-        provide signals for all or certain state information.
+        provide signals for all or certain state information changes.
         
         """
         raise NotImplementedError
@@ -422,7 +411,7 @@ class PlayerAdapter(object):
         """Find a local art image file related to a resource.
         
         This method first looks in the resource' folder for typical art image
-        files (e.g. 'cover.png', 'front,jpg', ...). If there is no such file it
+        files (e.g. 'cover.png', 'front.jpg', ...). If there is no such file it
         then looks into the user's thumbnail directory (~/.thumbnails).
         
         @param resource:
@@ -506,8 +495,8 @@ class PlayerAdapter(object):
         synchronized immediately with clients by calling update_progress().
         
         @param direction:
-            * -1: seek forward
-            * +1: seek backward 
+            * -1: seek backward 
+            * +1: seek forward
         
         @note: Override if it is possible and makes sense.
         
@@ -546,8 +535,8 @@ class PlayerAdapter(object):
         
         @param volume:
             * -1: decrease by some percent (5 is a good value)
-            * +1: increase by some percent (5 is a good value)
             *  0: mute volume
+            * +1: increase by some percent (5 is a good value)
         
         @note: Override if it is possible and makes sense.
                
@@ -677,9 +666,10 @@ class PlayerAdapter(object):
     # request interface 
     # =========================================================================
     
-    def request_item(self, client, id):
-        # maybe we enable this later
-        log.error("** BUG ** in feature handling")
+    def __request_item(self, client, id):
+        info = {}
+        info[INFO_TITLE] = "Sorry, item request is disabled."
+        self.__reply_item_request(client, "NoID", info)
         
     def request_playlist(self, client):
         """Request the content of the currently active playlist.
@@ -713,9 +703,9 @@ class PlayerAdapter(object):
         @param client: the requesting client (needed for reply)
         @param path: path of the requested level (string list)
         
-        @note: path is a list of strings which describes a specific level in
+        @note: path is a list of strings which describe a specific level in
             the player's playlist tree. If path is an empty list, the root of
-            the player's library, i.e. all top level playlists are requested.
+            the player's library (all top level playlists) are requested.
 
             A player may have a media library structure like this:
 
@@ -869,7 +859,7 @@ class PlayerAdapter(object):
         @param info:
             meta information (dict)
         @param img:
-            image / cover art (either a file name or an instance of
+            image / cover art (either a file name or URI or an instance of
             Image.Image)
         
         @note: Call to synchronize player state with remote clients.
@@ -896,7 +886,8 @@ class PlayerAdapter(object):
     # request replies
     # =========================================================================    
 
-    def reply_item_request(self, client, id, info):
+    def __reply_item_request(self, client, id, info):
+        """Currently unused."""
         
         if self.__stopped:
             return
@@ -918,6 +909,8 @@ class PlayerAdapter(object):
             IDs of the items contained in the playlist
         @param names:
             names of the items contained in the playlist
+        @keyword item_actions:
+            a list of ItemAction which can be applied to items in the playlist
         
         @see: request_playlist()
         
@@ -940,6 +933,8 @@ class PlayerAdapter(object):
             IDs of the items contained in the queue
         @param names:
             names of the items contained in the queue
+        @keyword item_actions:
+            a list of ItemAction which can be applied to items in the queue
         
         @see: request_queue()
         
@@ -967,11 +962,12 @@ class PlayerAdapter(object):
             IDs of the items at the requested path
         @param names:
             names of the items at the requested path
-        @keyword actions:
-            IDs of the media library actions possible at the requested path
-            (default is None, which means all actions specified by the keyword
-            'medialib_actions' in __init__() are possible - use the empty list
-            to disable any media library actions at the requested path)
+        @keyword item_actions:
+            a list of ItemAction which can be applied to items at the
+            requested path 
+        @keyword list_actions:
+            a list of ListAction which can be applied to nested lists at the
+            requested path 
         
         @see: request_mlib()
         
@@ -1200,7 +1196,7 @@ class PlayerAdapter(object):
             if request is None:
                 return
             
-            self.request_item(client, request.id)
+            self.__request_item(client, request.id)
         
         elif id == message.REQ_PLAYLIST:
             
@@ -1296,7 +1292,7 @@ class PlayerAdapter(object):
         
             # --- request features ---
 
-            ftc(self.request_item, FT_REQ_ITEM),
+            ftc(self.__request_item, FT_REQ_ITEM),
             ftc(self.request_playlist, FT_REQ_PL),
             ftc(self.request_queue, FT_REQ_QU),
             ftc(self.request_mlib, FT_REQ_MLIB),

@@ -4,7 +4,13 @@
 The module 'remuco' provides classes and constants for Remuco player adapters.
 
 Class PlayerAdapter:
-    Base class for player adapters.
+    Base class for player adapters (start reading here).
+
+Class MPRISAdapter:
+    Base class for player adapters for MPRIS players.
+
+Classes ItemAction and ListAction:
+    Classes to define actions clients may execute in their media browser. 
 
 Class Manager:
     Helper class for managing the life cycle of a player adapter.
@@ -49,8 +55,6 @@ from remuco.manager import Manager
 # exports
 #==============================================================================
 
-API_VERSION = 1
-
 __all__ = ("PlayerAdapter", "MPRISAdapter",
            "ItemAction", "ListAction", "Manager", "Config",
            
@@ -58,8 +62,6 @@ __all__ = ("PlayerAdapter", "MPRISAdapter",
            "INFO_RATING", "INFO_TAGS", "INFO_TITLE", "INFO_YEAR",
            
            "PLAYBACK_PAUSE", "PLAYBACK_PLAY", "PLAYBACK_STOP",
-           
-           "API_VERSION" 
            )
 
 __version__ = "0.8.0"
