@@ -66,9 +66,6 @@ public final class KeyBinderScreen extends Canvas {
 
 	protected void paint(Graphics g) {
 
-		int key, y;
-		String[] splitted;
-
 		// set up textHint
 
 		textHint.delete(0, textHint.length());
@@ -78,7 +75,7 @@ public final class KeyBinderScreen extends Canvas {
 		textCurrent.delete(0, textCurrent.length());
 		textCurrent.append("Currently ");
 
-		key = KeyBindings.getInstance().getKeyForAction(actionCode);
+		final int key = KeyBindings.getInstance().getKeyForAction(actionCode);
 
 		if (key == 0)
 			textCurrent.append("no key is set.");
@@ -93,6 +90,9 @@ public final class KeyBinderScreen extends Canvas {
 
 		g.setColor(0xFFCC00);
 
+		String[] splitted;
+		int y;
+		
 		splitted = Theme.splitString(textHint.toString(), getWidth(), FONT);
 		y = drawStrings(g, splitted, getWidth(), getHeight() / 2
 				- FONT.getHeight());
@@ -103,15 +103,11 @@ public final class KeyBinderScreen extends Canvas {
 
 	private int drawStrings(Graphics g, String[] sa, int width, int y) {
 
-		int i, saLen, fontHeight;
-
-		saLen = sa.length;
-
-		fontHeight = FONT.getHeight();
+		final int fontHeight = FONT.getHeight();
 
 		g.setFont(FONT);
 
-		for (i = 0; i < saLen; i++) {
+		for (int i = 0; i < sa.length; i++) {
 			g.drawString(sa[i], width / 2, y, Graphics.TOP | Graphics.HCENTER);
 			y += fontHeight;
 		}
