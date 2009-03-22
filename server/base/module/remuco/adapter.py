@@ -890,7 +890,7 @@ class PlayerAdapter(object):
             self.__item.id = id
             self.__item.info = info
             self.__item.img = img
-            self.__sync_trigger(self.__sync_plob)
+            self.__sync_trigger(self.__sync_item)
             
     # =========================================================================
     # request replies
@@ -1031,11 +1031,11 @@ class PlayerAdapter(object):
         
         return False
     
-    def __sync_plob(self):
+    def __sync_item(self):
 
         msg = net.build_message(message.SYNC_ITEM, self.__item)
         
-        self.__sync(msg, self.__sync_plob, "plob", self.__item)
+        self.__sync(msg, self.__sync_item, "item", self.__item)
         
         return False
     
