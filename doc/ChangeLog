@@ -1,0 +1,6 @@
+0.8.0	Oben Sonne <obensonne@googlemail.com>
+
+	* merged client and server side components into one package
+	* for that reason this change log is a fresh one
+	* the changes from 0.7 to 0.8 are just to many to list them here
+
