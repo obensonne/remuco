@@ -190,9 +190,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
             self._x2.connect(path=os.getenv("XMMS_PATH"),
                               disconnect_func=self.__notify_disconnect)
         except IOError, e:
-            log.error("failed to connect to XMMS2: %s" % str(e))
-            self.__lcmgr.stop()
-            return
+            raise StandardError("failed to connect to XMMS2: %s" % e)
         
         self.__x2_glib_connector = xmmsclient.glib.GLibConnector(self._x2)
         
