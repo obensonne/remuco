@@ -31,6 +31,29 @@ def _init_main_loop():
     
     return _ml
 
+def _start_pa(pa):
+    
+    log.info("start player adapter")
+    try:
+        pa.start()
+    except StandardError, e:
+        log.error("failed to start player adapter (%s)" % e)
+    except:
+        log.exception("** BUG **")
+    else:
+        log.info("player adapter started")
+
+def _stop_pa(pa):
+    
+    log.info("stop player adapter")
+    try:
+        pa.stop()
+    except:
+        log.exception("** BUG **")
+    else:
+        log.info("player adapter stopped")
+
+
 class _DBusObserver():
     """Helper class used by Manager.
     
@@ -83,26 +106,21 @@ class _DBusObserver():
         
         log.debug("dbus name owner changed: '%s' -> '%s'" % (old, new))
         
-        log.info("stop player adapter")
-        self.__pa.stop()
-        log.info("player adapter stopped")
+        _stop_pa(self.__pa)
         
-        if new:
-            try:
-                log.info("start player adapter")
-                self.__pa.start()
-                log.info("player adapter started")
-            except Exception, e:
-                pass
+        if not new:
+            return
+        
+        _start_pa(self.__pa)
     
     def __set_has_owner(self, has_owner):
         
         log.debug("dbus name has owner: %s" % has_owner)
 
-        if has_owner:
-            log.info("start player adapter")
-            self.__pa.start()
-            log.info("player adapter started")
+        if not has_owner:
+            return
+        
+        _start_pa(self.__pa)
     
     def __dbus_error(self, error):
         log.warning("dbus error: %s" % error)
@@ -111,7 +129,8 @@ class _DBusObserver():
         
         for handler in self.__handlers:
             handler.remove()
-        self.__dbus_handlers = ()
+            
+        self.__handlers = ()
         
         self.__dbus = None
 
@@ -172,31 +191,26 @@ class Manager(object):
             stopped repeatedly while this method is running.
         
         """
-        
-        try:
+        if self.__dbus_observer is None: # start pa directly
+            _start_pa(self.__pa)
+        # else: dbus observer will start pa
             
-            if self.__dbus_observer is None:
-                log.info("start player adapter")
-                self.__pa.start()
-                log.info("player adapter started")
-                
-            if not self.__stopped:
-                
-                log.info("start main loop")
+        if not self.__stopped: # not stopped since creation 
+            
+            log.info("start main loop")
+            try:
                 self.__ml.run()
-                log.info("main loop stopped")
-                
-            if self.__dbus_observer is not None:
-                log.info("stop dbus observer")
-                self.__dbus_observer.disconnect()
-                log.info("dbus observer stopped")
-                    
-            log.info("stop player adapter")
-            self.__pa.stop()
-            log.info("player adapter stopped")
-                
-        except:
-            log.exception("** BUG **")
+            except:
+                log.exception("** BUG **")
+            log.info("main loop stopped")
+            
+        if self.__dbus_observer is not None: # disconnect dbus observer
+            log.info("stop dbus observer")
+            self.__dbus_observer.disconnect()
+            log.info("dbus observer stopped")
+        
+        # stop pa
+        _stop_pa(self.__pa)
         
     def stop(self):
         """Manually shut down the manager.
