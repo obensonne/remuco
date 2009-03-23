@@ -14,9 +14,16 @@ clean:
 	find -type f -name "*.pyc" | xargs rm -f
 	cd client; ant clean
 
-dist: clean pydoc
-	#[ -z "`svn st`" ] || { echo "ERROR: working copy has local changes" ; exit 1 ; }
-	
+svn-check:
+	@if [ -n "`svn st`" ] ; then \
+		echo ; \
+		echo "+-----------------------------------------------------------" ; \
+		echo "| WARNING: working copy has local changes" ; \
+		echo "+-----------------------------------------------------------" ; \
+		echo ; \
+	fi
+
+dist: clean svn-check pydoc
 	mkdir -p build/$(PKG)
 	cp -r base adapter doc Makefile build/$(PKG)
 	find build -type d -name ".svn" | xargs rm -rf
@@ -34,6 +41,7 @@ dist: clean pydoc
 	mkdir dist
 	tar zcf dist/$(PKG).tar.gz -C build $(PKG)
 
+	
 pydoc: doc/api.html
 
 doc/api.html: base/module/remuco/*.py
