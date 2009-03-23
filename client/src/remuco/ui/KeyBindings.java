@@ -31,10 +31,10 @@ public final class KeyBindings {
 	/**
 	 * Mapping of action codes to their names.
 	 */
-	public static final String[] actionNames = new String[] { "Play/Pause",
+	public static final String[] actionNames = new String[] { "Toggle playing",
 			"Next", "Previous", "Volume up", "Volume down", "Volume mute",
-			"Rate up", "Rate down", "Edit Tags", "Show image", "Toggle Repeat",
-			"Toggle Shuffle" };
+			"Rate up", "Rate down", "Edit tags", "Show image", "Toggle repeat",
+			"Toggle shuffle" };
 
 	/**
 	 * Get the key bindings instance. <em>Must not</em> get called from a static
