@@ -9,9 +9,9 @@ __version__ = "0.8.0"
 """
 import os.path
 
-from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 import dbus
-import dbus.exceptions
+from dbus.exceptions import DBusException
+from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 
 import remuco
 from remuco import log
@@ -56,25 +56,26 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
         remuco.PlayerAdapter.start(self)
         
-        bus = dbus.SessionBus()
+        try:
+            bus = dbus.SessionBus()
+            proxy = bus.get_object(DBUS_NAME, DBUS_PATH_ENGINE)
+            self.__bse = dbus.Interface (proxy, DBUS_IFACE_ENGINE)
+            proxy = bus.get_object(DBUS_NAME, DBUS_PATH_CONTROLLER)
+            self.__bsc = dbus.Interface(proxy, DBUS_IFACE_CONTROLLER)
+        except DBusException, e:
+            log.error("dbus error: %s" % e)
+            return 
 
-        proxy = bus.get_object(DBUS_NAME, DBUS_PATH_ENGINE)
-        self.__bse = dbus.Interface (proxy, DBUS_IFACE_ENGINE)
-
-        proxy = bus.get_object(DBUS_NAME, DBUS_PATH_CONTROLLER)
-        self.__bsc = dbus.Interface(proxy, DBUS_IFACE_CONTROLLER)
-
-        # set up callbacks
-
-        self.__dbus_signal_handler = (
-            self.__bse.connect_to_signal("EventChanged",
-                                               self.__notify_event),
-            self.__bse.connect_to_signal("StateChanged",
-                                               self.__notify_playback),
-        )
+        try:
+            self.__dbus_signal_handler = (
+                self.__bse.connect_to_signal("EventChanged",
+                                             self.__notify_event),
+                self.__bse.connect_to_signal("StateChanged",
+                                             self.__notify_playback),
+            )
+        except DBusException, e:
+            log.error("dbus error: %s" % e)
         
-        # initial state query
-
         try:
             self.__bse.GetCurrentTrack(reply_handler=self.__notify_track,
                                        error_handler=self.__dbus_error)
@@ -82,7 +83,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
                                        error_handler=self.__dbus_error)
             self.__bse.GetVolume(reply_handler=self.__notify_volume,
                                  error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
 
         log.debug("start done")
@@ -110,7 +111,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
                                       error_handler=self.__dbus_error)
             self.__bse.GetPosition(reply_handler=self.__notify_progress,
                                    error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
         
         return True
@@ -124,7 +125,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         try:
             self.__bse.TogglePlaying(reply_handler=self.__dbus_ignore,
                                      error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
 
     def ctrl_next(self):
@@ -133,7 +134,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bsc.Next(False,
                             reply_handler=self.__dbus_ignore,
                             error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
     
     def ctrl_previous(self):
@@ -142,7 +143,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bsc.Previous(False,
                                 reply_handler=self.__dbus_ignore,
                                 error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
     
     
@@ -159,7 +160,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bse.SetVolume(dbus.UInt16(volume),
                                  reply_handler=self.__dbus_ignore,
                                  error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
             
         self.__notify_event("volume", None, None)
@@ -171,7 +172,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bsc.SetRepeatMode(int(not self.__repeat),
                                      reply_handler=self.__dbus_ignore,
                                      error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
             
         self.poll()
@@ -182,7 +183,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bsc.SetShuffleMode(int(not self.__shuffle),
                                       reply_handler=self.__dbus_ignore,
                                       error_handler=self.__dbus_error)
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
             
         self.poll()
@@ -204,7 +205,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             else:
                 log.debug("event: %s (%s)" %(event, message))
                 
-        except dbus.exceptions.DBusException, e:
+        except DBusException, e:
             log.warning("dbus error: %s" % e)
     
     def __notify_playback(self, state):
