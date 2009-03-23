@@ -43,7 +43,8 @@ PLAYLIST_ACTIONS = (IA_REMOVE, )
 class MPRISAdapter(PlayerAdapter):
     
     def __init__(self, name, display_name=None, poll=2.5, mime_types=None,
-                 rating=False, extra_file_actions=()):
+                 rating=False, extra_file_actions=None,
+                 extra_playlist_actions=None):
         
         display_name = display_name or name
             
@@ -52,8 +53,8 @@ class MPRISAdapter(PlayerAdapter):
         else:
             max_rating = 0
         
-        all_file_actions = FILE_ACTIONS + tuple(extra_file_actions or [])
-        
+        all_file_actions = FILE_ACTIONS + tuple(extra_file_actions or ())
+            
         PlayerAdapter.__init__(self, display_name,
                                max_rating=max_rating,
                                playback_known=True,
@@ -64,12 +65,16 @@ class MPRISAdapter(PlayerAdapter):
                                file_actions=all_file_actions,
                                mime_types=mime_types)
         
+        self.__playlist_actions = (PLAYLIST_ACTIONS +
+                                   tuple(extra_playlist_actions or ()))
+         
         self.__name = name
         
         self.__dbus_signal_handler = ()
         
-        self.__repeat = False
-        self.__shuffle = False
+        self._repeat = False
+        self._shuffle = False
+        self._playing = False
         self.__volume = 0
         self.__progress_now = 0
         self.__progress_max = 0
@@ -89,37 +94,37 @@ class MPRISAdapter(PlayerAdapter):
         try:
             bus = dbus.SessionBus()
             proxy = bus.get_object("org.mpris.%s" % self.__name, "/Player")
-            self.__mp_p = dbus.Interface(proxy, "org.freedesktop.MediaPlayer")
+            self._mp_p = dbus.Interface(proxy, "org.freedesktop.MediaPlayer")
             proxy = bus.get_object("org.mpris.%s" % self.__name, "/TrackList")
-            self.__mp_t = dbus.Interface(proxy, "org.freedesktop.MediaPlayer")
+            self._mp_t = dbus.Interface(proxy, "org.freedesktop.MediaPlayer")
         except DBusException, e:
-            log.error("dbus error: %s" % e)
-            return
+            raise StandardError("dbus error: %s" % e)
 
         try:
             self.__dbus_signal_handler = (
-                self.__mp_p.connect_to_signal("TrackChange",
-                                              self.__notify_track),
-                self.__mp_p.connect_to_signal("StatusChange",
-                                              self.__notify_status),
-                self.__mp_p.connect_to_signal("CapsChange",
-                                              self.__notify_caps),
-                self.__mp_t.connect_to_signal("TrackListChange",
-                                              self.__notify_tracklist_change),
+                self._mp_p.connect_to_signal("TrackChange",
+                                             self._notify_track),
+                self._mp_p.connect_to_signal("StatusChange",
+                                             self._notify_status),
+                self._mp_p.connect_to_signal("CapsChange",
+                                             self._notify_caps),
+                self._mp_t.connect_to_signal("TrackListChange",
+                                             self._notify_tracklist_change),
             )
         except DBusException, e:
-            log.error("dbus error: %s" % e)
+            raise StandardError("dbus error: %s" % e)
 
         try:
-            self.__mp_p.GetStatus(reply_handler=self.__notify_status,
-                                  error_handler=self.__dbus_error)
+            self._mp_p.GetStatus(reply_handler=self._notify_status,
+                                 error_handler=self._dbus_error)
             
-            self.__mp_p.GetMetadata(reply_handler=self.__notify_track,
-                                    error_handler=self.__dbus_error)
+            self._mp_p.GetMetadata(reply_handler=self._notify_track,
+                                   error_handler=self._dbus_error)
     
-            self.__mp_p.GetCaps(reply_handler=self.__notify_caps,
-                                error_handler=self.__dbus_error)
+            self._mp_p.GetCaps(reply_handler=self._notify_caps,
+                               error_handler=self._dbus_error)
         except DBusException, e:
+            # this is not necessarily a fatal error
             log.warning("dbus error: %s" % e)
         
     def stop(self):
@@ -131,39 +136,45 @@ class MPRISAdapter(PlayerAdapter):
             
         self.__dbus_signal_handler = ()
         
-        self.__mp_p = None
-        self.__mp_t = None
+        self._mp_p = None
+        self._mp_t = None
         
     def poll(self):
         
-        log.debug("poll")
+        self._poll_volume()
+        self._poll_progress()
         
-        self.__poll_volume()
-        self.__poll_progress()
-        
+    # =========================================================================
+    # control interface 
+    # =========================================================================
+    
     def ctrl_toggle_playing(self):
         
         try:
-            self.__mp_p.Pause(reply_handler=self.__dbus_ignore,
-                              error_handler=self.__dbus_error)
+            if self._playing:
+                self._mp_p.Pause(reply_handler=self._dbus_ignore,
+                                 error_handler=self._dbus_error)
+            else:
+                self._mp_p.Play(reply_handler=self._dbus_ignore,
+                                error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
     
     def ctrl_toggle_repeat(self):
         
         try:
-            self.__mp_t.SetLoop(not self.__repeat,
-                                reply_handler=self.__dbus_ignore,
-                                error_handler=self.__dbus_error)
+            self._mp_t.SetLoop(not self._repeat,
+                               reply_handler=self._dbus_ignore,
+                               error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
     
     def ctrl_toggle_shuffle(self):
         
         try:
-            self.__mp_t.SetRandom(not self.__shuffle,
-                                  reply_handler=self.__dbus_ignore,
-                                  error_handler=self.__dbus_error)
+            self._mp_t.SetRandom(not self._shuffle,
+                                 reply_handler=self._dbus_ignore,
+                                 error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
@@ -174,8 +185,8 @@ class MPRISAdapter(PlayerAdapter):
             return
         
         try:
-            self.__mp_p.Next(reply_handler=self.__dbus_ignore,
-                            error_handler=self.__dbus_error)
+            self._mp_p.Next(reply_handler=self._dbus_ignore,
+                            error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
     
@@ -186,8 +197,8 @@ class MPRISAdapter(PlayerAdapter):
             return
         
         try:
-            self.__mp_p.Prev(reply_handler=self.__dbus_ignore,
-                            error_handler=self.__dbus_error)
+            self._mp_p.Prev(reply_handler=self._dbus_ignore,
+                            error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
@@ -201,12 +212,12 @@ class MPRISAdapter(PlayerAdapter):
             volume = max(volume, 0)
             
         try:
-            self.__mp_p.VolumeSet(volume, reply_handler=self.__dbus_ignore,
-                                  error_handler=self.__dbus_error)
+            self._mp_p.VolumeSet(volume, reply_handler=self._dbus_ignore,
+                                 error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
-        gobject.idle_add(self.__poll_volume)
+        gobject.idle_add(self._poll_volume)
         
     def ctrl_seek(self, direction):
         
@@ -221,22 +232,26 @@ class MPRISAdapter(PlayerAdapter):
         log.debug("new progress: %d" % self.__progress_now)
         
         try:
-            self.__mp_p.PositionSet(self.__progress_now,
-                                    reply_handler=self.__dbus_ignore,
-                                    error_handler=self.__dbus_error)
+            self._mp_p.PositionSet(self.__progress_now,
+                                   reply_handler=self._dbus_ignore,
+                                   error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
-        gobject.idle_add(self.__poll_progress)
+        gobject.idle_add(self._poll_progress)
 
+    # =========================================================================
+    # actions interface
+    # =========================================================================
+    
     def action_files(self, action_id, files, uris):
         
         if action_id == IA_APPEND.id or action_id == IA_APPEND_PLAY.id:
             
             try:
-                self.__mp_t.AddTrack(uris[0], action_id == IA_APPEND_PLAY.id)
+                self._mp_t.AddTrack(uris[0], action_id == IA_APPEND_PLAY.id)
                 for uri in uris[1:]:
-                    self.__mp_t.AddTrack(uri, False)
+                    self._mp_t.AddTrack(uri, False)
             except DBusException, e:
                 log.warning("dbus error: %s" % e)
                 return
@@ -252,7 +267,7 @@ class MPRISAdapter(PlayerAdapter):
             positions.reverse()
             try:
                 for pos in positions:
-                    self.__mp_t.DelTrack(pos)
+                    self._mp_t.DelTrack(pos)
             except DBusException, e:
                 log.warning("dbus error: %s" % e)
                 return
@@ -263,6 +278,10 @@ class MPRISAdapter(PlayerAdapter):
         
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
+    
+    # =========================================================================
+    # request interface 
+    # =========================================================================
     
     def request_playlist(self, client):
         
@@ -283,8 +302,12 @@ class MPRISAdapter(PlayerAdapter):
             names.append(name)
         
         self.reply_playlist_request(client, ids, names,
-                                    item_actions=PLAYLIST_ACTIONS)
+                                    item_actions=self.__playlist_actions)
 
+    # =========================================================================
+    # internal methods (may be overriden by subclasses to fix MPRIS issues) 
+    # =========================================================================
+    
     def _poll_status(self):
         """Poll player status information.
         
@@ -293,32 +316,33 @@ class MPRISAdapter(PlayerAdapter):
         
         """
         try:
-            self.__mp_p.GetStatus(reply_handler=self.__notify_status,
-                                  error_handler=self.__dbus_error)
+            self._mp_p.GetStatus(reply_handler=self._notify_status,
+                                 error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
-    def __poll_volume(self):
+    def _poll_volume(self):
         
         try:
-            self.__mp_p.VolumeGet(reply_handler=self.__notify_volume,
-                                  error_handler=self.__dbus_error)
+            self._mp_p.VolumeGet(reply_handler=self._notify_volume,
+                                 error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
-    def __poll_progress(self):
+    def _poll_progress(self):
         
         try:
-            self.__mp_p.PositionGet(reply_handler=self.__notify_progress,
-                                    error_handler=self.__dbus_error)
+            self._mp_p.PositionGet(reply_handler=self._notify_progress,
+                                   error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             
-    def __notify_track(self, track):
+    def _notify_track(self, track):
         
         log.debug("track: %s" % str(track))
     
         id, info = self.__track2info(track)
+        
         
         self.__progress_max = track.get("mtime", 0) # for update_progress()
     
@@ -329,71 +353,64 @@ class MPRISAdapter(PlayerAdapter):
         self.update_item(id, info, img)
         
         try:
-            self.__mp_t.GetCurrentTrack(reply_handler=self.__notify_position,
-                                        error_handler=self.__dbus_error)
+            self._mp_t.GetCurrentTrack(reply_handler=self._notify_position,
+                                       error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             
-    def __notify_status(self, status):
+    def _notify_status(self, status):
         
         log.debug("status: %s " % str(status))
         
-        playing, shuffle, repeate_one, repeat_all = 0, 0, 0, 0
+        playing = status[0]
+        shuffle = status[1]
+        repeat_one = status[2]
+        repeat_all = status[3]
         
-        if isinstance(status, dbus.Struct):
-            try:
-                playing = status[0]
-                shuffle = status[1]
-                repeat_one = status[2]
-                repeat_all = status[3]
-            except IndexError: 
-                log.warning("MPRIS status malformed")
-                return
-        else:
-            log.warning("MPRIS status malformed")
-            playing = status
-            
         if playing == STATUS_PLAYING:
+            self._playing = True
             self.update_playback(PLAYBACK_PLAY)
         elif playing == STATUS_PAUSED:
+            self._playing = False
             self.update_playback(PLAYBACK_PAUSE)
         else:
+            self._playing = False
             self.update_playback(PLAYBACK_STOP)
         
-        self.__shuffle = shuffle > 0 # remember for toggle_shuffle()
-        self.__repeat = repeat_one > 0 or repeat_all > 0 # for toggle_repeat()
+        self._shuffle = shuffle > 0 # remember for toggle_shuffle()
+        self._repeat = repeat_one > 0 or repeat_all > 0 # for toggle_repeat()
         
-        self.update_shuffle(self.__shuffle)
-        self.update_repeat(self.__repeat)
+        self.update_shuffle(self._shuffle)
+        self.update_repeat(self._repeat)
         
-    def __notify_tracklist_change(self, new_len):
+    def _notify_tracklist_change(self, new_len):
         
         log.debug("tracklist change")
         try:
-            self.__mp_t.GetCurrentTrack(reply_handler=self.__notify_position,
-                                        error_handler=self.__dbus_error)
+            self._mp_t.GetCurrentTrack(reply_handler=self._notify_position,
+                                       error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
-    def __notify_position(self, position):
+    def _notify_position(self, position):
         
         log.debug("tracklist pos: %d" % position)
         
         self.update_position(position)
     
-    def __notify_volume(self, volume):
+    def _notify_volume(self, volume):
         
         self.__volume = volume # remember for ctrl_volume()
         self.update_volume(volume)
         
-    def __notify_progress(self, progress):
+    def _notify_progress(self, progress):
         
         self.__progress_now = progress # remember for ctrl_seek()
         progress = progress // 1000
         length = self.__progress_max // 1000
         self.update_progress(progress, length)
     
-    def __notify_caps(self, caps):
+    def _notify_caps(self, caps):
         
         self.__can_play = caps & CAN_PLAY != 0
         self.__can_pause = caps & CAN_PAUSE != 0
@@ -402,11 +419,15 @@ class MPRISAdapter(PlayerAdapter):
         self.__can_seek = caps & CAN_SEEK != 0
         self.__can_tracklist = caps & CAN_HAS_TRACKLIST != 0
     
+    # =========================================================================
+    # internal methods (private) 
+    # =========================================================================
+    
     def __get_tracklist(self):
         """Get a list of track dicts of all tracks in the tracklist."""
         
         try:
-            len = self.__mp_t.GetLength()
+            len = self._mp_t.GetLength()
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             len = 0
@@ -417,7 +438,7 @@ class MPRISAdapter(PlayerAdapter):
         tracks = []
         for i in range(0, len):
             try:
-                tracks.append(self.__mp_t.GetMetadata(i))
+                tracks.append(self._mp_t.GetMetadata(i))
             except DBusException, e:
                 log.warning("dbus error: %s" % e)
                 return []
@@ -462,15 +483,19 @@ class MPRISAdapter(PlayerAdapter):
         
         self.action_files(IA_APPEND_PLAY.id, [], uris)
     
-    def __dbus_error(self, error):
+    # =========================================================================
+    # dbus reply handler (may be reused by subclasses) 
+    # =========================================================================
+    
+    def _dbus_error(self, error):
         """ DBus error handler."""
         
-        if self.__mp_p is None:
+        if self._mp_p is None:
             return # do not log errors when not stopped already
         
         log.warning("DBus error: %s" % error)
         
-    def __dbus_ignore(self):
+    def _dbus_ignore(self):
         """ DBus reply handler for methods without reply."""
         
         pass
