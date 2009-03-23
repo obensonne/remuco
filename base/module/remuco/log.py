@@ -21,6 +21,7 @@ class _config:
     
     logga = logging.getLogger("remuco")
     logga.addHandler(handler)
+    logga.setLevel(INFO)
 
 #===============================================================================
 # log functions
