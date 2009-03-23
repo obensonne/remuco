@@ -245,7 +245,10 @@ class TotemAdapter(remuco.PlayerAdapter):
         
     def __poll_item(self):
         
-        mrl = self.__to.get_current_mrl()
+        try:
+            mrl = self.__to.get_current_mrl()
+        except AttributeError: # totem < 2.24
+            mrl = self.__to.get_main_window().get_title() # <- fake mrl
         
         if not self.__update_item and mrl == self.__last_mrl:
             return
