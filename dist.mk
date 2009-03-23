@@ -7,6 +7,8 @@ ADAPTERS := $(shell ls adapter)
 VERSION := 0.8.0
 PKG := remuco-$(VERSION)
 
+default: dist
+
 clean:
 	@for PA in $(ADAPTERS) ; do make -C adapter/$$PA clean ; done
 	make -C base clean
