@@ -8,6 +8,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import remuco.Config;
 import remuco.util.Log;
 
 public final class Theme {
@@ -62,8 +63,6 @@ public final class Theme {
 			RTE_STATE_SHUFFLE_ON = 30, RTE_STATE_SPACER = 31,
 			RTE_STATE_VOLUME_LEFT = 32, RTE_STATE_VOLUME_OFF = 33,
 			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35;
-
-	private static final String DEFAULT = "Emong";
 
 	private static final Image IMG_FALLBACK;
 
@@ -427,7 +426,7 @@ public final class Theme {
 
 		// load default theme
 
-		loadPrivate(DEFAULT);
+		load(null);
 
 	}
 
@@ -492,21 +491,31 @@ public final class Theme {
 	 */
 	public void load(String name) {
 
+		final String themes[] = Config.getInstance().getThemeList();
+
 		if (name == null)
-			name = DEFAULT;
+			name = themes[0];
 
-		if (!current.equals(name)) {
-			loadPrivate(name);
+		if (name.equals(current)) {
+			return;
 		}
-	}
-
-	private void loadPrivate(String name) {
-
+		
+		int i;
+		for (i = 0; i < themes.length; i++) {
+			if (name.equals(themes[i])) {
+				break;
+			}
+		}
+		if (i == themes.length) {
+			// 'name' seems to be an old, invalid name from the config
+			name = themes[0];
+		}
+		
 		current = name;
 
 		final String themeDir = "/themes/" + current + "/";
 
-		for (int i = 0; i < img.length; i++) {
+		for (i = 0; i < img.length; i++) {
 			img[i] = loadImage(themeDir + IMG_NAME[i] + ".png", 0);
 		}
 
