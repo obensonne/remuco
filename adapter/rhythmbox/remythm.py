@@ -269,21 +269,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         # update volume within a short time (don't wait for scheduled poll)
         gobject.idle_add(self.poll)
         
-    def ctrl_clear_queue(self):
-        
-        qm = self.__queue_sc.get_entry_view().props.model
-        
-        db = self.__shell.props.db
-
-        uris = []
-        try:
-            for row in qm:
-                uris.append(db.entry_get(row[0], rhythmdb.PROP_LOCATION))
-        except gobject.GError, e:
-            log.debug("getting queue items failed: %s" % e)
-        
-        self.__remove_items_from_queue(uris)
-        
     # =========================================================================
     # action interface
     # =========================================================================

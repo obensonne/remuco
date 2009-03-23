@@ -157,8 +157,6 @@ class PlayerAdapter(object):
         * ctrl_previous()
         * ctrl_seek()
         * ctrl_volume()
-        * ctrl_clear_playlist()
-        * ctrl_clear_queue()
         * ctrl_rate()
         * ctrl_tag()
         
@@ -543,22 +541,6 @@ class PlayerAdapter(object):
         """
         log.error("** BUG ** in feature handling")
         
-    def ctrl_clear_playlist(self):
-        """Clear the playlist.
-        
-        @note: Override if it is possible and makes sense.
-               
-        """
-        log.error("** BUG ** in feature handling")
-        
-    def ctrl_clear_queue(self):
-        """Clear the play queue.
-        
-        @note: Override if it is possible and makes sense.
-               
-        """
-        log.error("** BUG ** in feature handling")
-    
     def __ctrl_shutdown_system(self):
         
         shutdown_cmd = config.get_system_shutdown_command()
@@ -640,7 +622,7 @@ class PlayerAdapter(object):
         
         @param action_id:
             ID of the action to do - this specifies one of the actions passed
-            previously to reply_medialib_request() by the keyword 'item_actions'
+            previously to reply_mlib_request() by the keyword 'item_actions'
         @param path:
             the library path that contains the items
         @param positions:
@@ -655,7 +637,7 @@ class PlayerAdapter(object):
         
         @param action_id:
             ID of the action to do - this specifies one of the actions passed
-            previously to reply_medialib_request() by the keyword 'list_actions'
+            previously to reply_mlib_request() by the keyword 'list_actions'
         @param path:
             path specifying the list to apply the action to
             
@@ -1142,14 +1124,6 @@ class PlayerAdapter(object):
             
             self.ctrl_toggle_fullscreen()
 
-        elif id == message.CTRL_CLEAR_PL:
-            
-            self.ctrl_clear_playlist()
-
-        elif id == message.CTRL_CLEAR_QU:
-            
-            self.ctrl_clear_queue()
-
         elif id == message.CTRL_SHUTDOWN:
             
             self.__ctrl_shutdown_system()
@@ -1281,8 +1255,6 @@ class PlayerAdapter(object):
             ftc(self.ctrl_volume, FT_CTRL_VOLUME),
             ftc(self.ctrl_seek, FT_CTRL_SEEK),
             ftc(self.ctrl_tag, FT_CTRL_TAG),
-            ftc(self.ctrl_clear_playlist, FT_CTRL_CLEAR_PL),
-            ftc(self.ctrl_clear_queue, FT_CTRL_CLEAR_QU),
             ftc(self.ctrl_rate, FT_CTRL_RATE),
             ftc(self.ctrl_toggle_repeat, FT_CTRL_REPEAT),
             ftc(self.ctrl_toggle_shuffle, FT_CTRL_SHUFFLE),
