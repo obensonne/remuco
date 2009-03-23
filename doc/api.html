@@ -340,7 +340,11 @@ Data descriptors defined here:<br>
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="MPRISAdapter-__init__"><strong>__init__</strong></a>(self, name, display_name<font color="#909090">=None</font>, poll<font color="#909090">=2.5</font>, mime_types<font color="#909090">=None</font>, rating<font color="#909090">=False</font>)</dt></dl>
+<dl><dt><a name="MPRISAdapter-__init__"><strong>__init__</strong></a>(self, name, display_name<font color="#909090">=None</font>, poll<font color="#909090">=2.5</font>, mime_types<font color="#909090">=None</font>, rating<font color="#909090">=False</font>, extra_file_actions<font color="#909090">=None</font>, extra_playlist_actions<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="MPRISAdapter-action_files"><strong>action_files</strong></a>(self, action_id, files, uris)</dt></dl>
+
+<dl><dt><a name="MPRISAdapter-action_playlist_item"><strong>action_playlist_item</strong></a>(self, action_id, positions, ids)</dt></dl>
 
 <dl><dt><a name="MPRISAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt></dl>
 
@@ -360,32 +364,12 @@ Methods defined here:<br>
 
 <dl><dt><a name="MPRISAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt></dl>
 
-<dl><dt><a name="MPRISAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt></dl>
-
 <dl><dt><a name="MPRISAdapter-start"><strong>start</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="MPRISAdapter-stop"><strong>stop</strong></a>(self)</dt></dl>
 
 <hr>
 Methods inherited from <a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>:<br>
-<dl><dt><a name="MPRISAdapter-action_files"><strong>action_files</strong></a>(self, action_id, files, uris)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;files.<br>
-&nbsp;<br>
-The&nbsp;files&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;-&nbsp;use<br>
-whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
-multiple&nbsp;files,&nbsp;then&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.<br>
-&nbsp;<br>
-The&nbsp;files&nbsp;in&nbsp;'files'&nbsp;and&nbsp;'uris'&nbsp;may&nbsp;be&nbsp;any&nbsp;files&nbsp;from&nbsp;the&nbsp;local&nbsp;file<br>
-system&nbsp;that&nbsp;have&nbsp;one&nbsp;of&nbsp;the&nbsp;mime&nbsp;types&nbsp;specified&nbsp;by&nbsp;the&nbsp;keyword<br>
-'mime_types'&nbsp;in&nbsp;<a href="#MPRISAdapter-__init__">__init__</a>().<br>
-&nbsp;<br>
-@param&nbsp;action_id:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-__init__">__init__</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'file_actions'<br>
-@param&nbsp;files:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(regular&nbsp;path&nbsp;names)&nbsp;<br>
-@param&nbsp;uris:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(URI&nbsp;notation)</tt></dd></dl>
-
 <dl><dt><a name="MPRISAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, path, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
@@ -394,7 +378,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;library&nbsp;path&nbsp;that&nbsp;contains&nbsp;the&nbsp;items<br>
 @param&nbsp;positions:<br>
@@ -406,23 +390,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
-
-<dl><dt><a name="MPRISAdapter-action_playlist_item"><strong>action_playlist_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;playlist.<br>
-&nbsp;<br>
-The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
-whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
-multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbsp;one&nbsp;element&nbsp;lists.&nbsp;<br>
-&nbsp;<br>
-@param&nbsp;action_id:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
-@param&nbsp;positions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
@@ -437,14 +407,6 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
-
-<dl><dt><a name="MPRISAdapter-ctrl_clear_playlist"><strong>ctrl_clear_playlist</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;playlist.<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
-
-<dl><dt><a name="MPRISAdapter-ctrl_clear_queue"><strong>ctrl_clear_queue</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;play&nbsp;queue.<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -562,6 +524,15 @@ then&nbsp;looks&nbsp;into&nbsp;the&nbsp;user's&nbsp;thumbnail&nbsp;directory&nbs
 @note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 @see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+
+<dl><dt><a name="MPRISAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
+&nbsp;<br>
+@param&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@see:&nbsp;<a href="#MPRISAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-update_item"><strong>update_item</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;currently&nbsp;played&nbsp;item.<br>
 &nbsp;<br>
@@ -744,8 +715,6 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;play
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_previous">ctrl_previous</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_seek">ctrl_seek</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_volume">ctrl_volume</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_clear_playlist">ctrl_clear_playlist</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_clear_queue">ctrl_clear_queue</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_rate">ctrl_rate</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_tag">ctrl_tag</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
@@ -867,7 +836,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;library&nbsp;path&nbsp;that&nbsp;contains&nbsp;the&nbsp;items<br>
 @param&nbsp;positions:<br>
@@ -879,7 +848,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_medialib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
 
@@ -910,14 +879,6 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-ctrl_clear_playlist"><strong>ctrl_clear_playlist</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;playlist.<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-ctrl_clear_queue"><strong>ctrl_clear_queue</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;play&nbsp;queue.<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
