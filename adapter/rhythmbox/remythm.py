@@ -347,6 +347,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     
     def request_playlist(self, client):
         
+        if self.__playlist_sc is None:
+            self.reply_playlist_request(client, [], [])
+            return
+        
         try:
             qm = self.__playlist_sc.get_entry_view().props.model 
             ids, names = self.__get_items_from_qmodel(qm)
@@ -630,8 +634,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             if sp.props.playing_from_queue:
                 queue = True
                 qmodel = self.__queue_sc.props.query_model
-            else:
+            elif self.__playlist_sc is not None:
                 qmodel = self.__playlist_sc.get_entry_view().props.model
+            else:
+                qmodel = None
                 
             if qmodel is not None:
                 for row in qmodel:
