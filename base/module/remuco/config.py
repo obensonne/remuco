@@ -1,4 +1,5 @@
 import ConfigParser
+from ConfigParser import NoOptionError
 import os
 import os.path
 import sys
@@ -10,6 +11,9 @@ from remuco import log
 
 SEC = ConfigParser.DEFAULTSECT
 
+CONFIG_VERSION = "0.8.0"
+
+KEY_CONFIG_VERSION = "config-version"
 KEY_BLUETOOTH = "bluetooth-enabled"
 KEY_WIFI = "wifi-enabled"
 KEY_ENDCODING = "player-encoding"
@@ -58,9 +62,24 @@ class Config(object):
         self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
 
         if os.path.exists(self.__file_config):
-            self.__load()
-        
-        self.__save() # ensures structure of config file is up to date
+            
+            self.__load() # existing config
+            
+            try: # check version
+                version = self.__cp.get(SEC, KEY_CONFIG_VERSION)
+            except (ValueError, AttributeError, NoOptionError), e:
+                version = "none"
+    
+            if version != CONFIG_VERSION:
+                log.info("config structure changed -> reset config")
+                self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
+                self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
+                self.__save()
+                
+        else:
+            # new config file
+            self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
+            self.__save()
 
         log.set_level(self.log_level)
         
