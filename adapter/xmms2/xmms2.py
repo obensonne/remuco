@@ -37,16 +37,16 @@ PLAYLIST_ID_ACTIVE = "_active"
 # actions
 # =============================================================================
 
-ACT_PL_JUMP = remuco.ItemAction("Jump to")
-ACT_PL_REMOVE = remuco.ItemAction("Remove", multiple=True)
-PLAYLIST_ITEM_ACTIONS = (ACT_PL_JUMP, ACT_PL_REMOVE)
+IA_JUMP = remuco.ItemAction("Jump to")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+PLAYLIST_ITEM_ACTIONS = (IA_JUMP, IA_REMOVE)
 
-ACT_ML_LOAD_LIST = remuco.ListAction("Load")
-MLIB_LIST_ACTIONS = (ACT_ML_LOAD_LIST,)
+LA_LOAD = remuco.ListAction("Load")
+MLIB_LIST_ACTIONS = (LA_LOAD,)
 
-ACT_ML_APPEND = remuco.ItemAction("Enqueue", multiple=True)
-ACT_ML_PLAY_NEXT = remuco.ItemAction("Play next", multiple=True)
-MLIB_ITEM_ACTIONS = (ACT_ML_APPEND, ACT_ML_PLAY_NEXT)
+IA_APPEND = remuco.ItemAction("Enqueue", multiple=True)
+IA_PLAY_NEXT = remuco.ItemAction("Play next", multiple=True)
+MLIB_ITEM_ACTIONS = (IA_APPEND, IA_PLAY_NEXT)
 
 # =============================================================================
 # helper classes
@@ -150,8 +150,8 @@ class ItemListRequest():
             if not name.startswith("_"):
                 nested.append(name)
         
-        self.__pa.reply_medialib_request(self.__client, self.__path, nested,
-            [], [], list_actions=MLIB_LIST_ACTIONS)
+        self.__pa.reply_mlib_request(self.__client, self.__path, nested, [], [],
+                                     list_actions=MLIB_LIST_ACTIONS)
     
 # =============================================================================
 # player adapter
@@ -295,25 +295,20 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2.medialib_property_set(id_int, MINFO_KEY_TAGS, s,
                                        cb=self.__ignore_result)
     
-    def ctrl_clear_playlist(self):
-        
-        self._x2.playlist_clear(playlist=PLAYLIST_ID_ACTIVE,
-                                cb=self.__ignore_result)
-        
     # =========================================================================
     # actions interface
     # =========================================================================
     
     def action_playlist_item(self, action_id, positions, ids):
 
-        if action_id == ACT_PL_JUMP.id:
+        if action_id == IA_JUMP.id:
             
             self._x2.playlist_set_next(positions[0], cb=self.__ignore_result)
             self._x2.playback_tickle(cb=self.__ignore_result)
             if self.__state_playback != remuco.PLAYBACK_PLAY:
                 self._x2.playback_start(cb=self.__ignore_result)
                 
-        elif action_id == ACT_PL_REMOVE.id:
+        elif action_id == IA_REMOVE.id:
             
             positions.sort()
             positions.reverse()
@@ -325,13 +320,13 @@ class XMMS2Adapter(remuco.PlayerAdapter):
 
     def action_mlib_item(self, action_id, path, positions, ids):
         
-        if action_id == ACT_ML_APPEND.id:
+        if action_id == IA_APPEND.id:
             
             for id in ids:
                 id = int(id)
                 self._x2.playlist_add_id(id, cb=self.__ignore_result)
                 
-        elif action_id == ACT_ML_PLAY_NEXT.id:
+        elif action_id == IA_PLAY_NEXT.id:
             
             pos = self.__state_position + 1
             ids.reverse()
@@ -344,7 +339,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     
     def action_mlib_list(self, action_id, path):
 
-        if action_id == ACT_ML_LOAD_LIST.id:
+        if action_id == LA_LOAD.id:
             
             if len(path) == 1:
                 self._x2.playlist_load(path[0], cb=self.__ignore_result)
@@ -433,15 +428,15 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         info[remuco.INFO_RATING] = minfo.get(MINFO_KEY_RATING, 0)
         info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
     
-        img = ""
+        img = None
         for img_key in MINFO_KEYS_ART:
-            img = get_meta(img_key)
-            if img != "":
+            img = minfo.get(img_key)
+            if img:
                 img = "%s/%s" % (BIN_DATA_DIR, img)
                 break
         
-        if img == "":
-            url = get_meta("url").replace("+", "%20")
+        if not img:
+            url = minfo.get("url").replace("+", "%20")
             img = self.find_image(url)
         
         self.update_item(self.__item_id, info, img)
