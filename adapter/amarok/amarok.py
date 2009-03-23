@@ -7,6 +7,8 @@ __license__ = "GPL"
 __version__ = "0.8.0"
 
 """
+import dbus
+from dbus.exceptions import DBusException
 import gobject
 
 import remuco
@@ -28,6 +30,25 @@ class AmarokAdapter(remuco.MPRISAdapter):
         remuco.MPRISAdapter.__init__(self, "amarok", "Amarok",
                                      mime_types=("audio",), rating=True)
         
+        self.__am = None
+        
+    def start(self):
+        
+        remuco.MPRISAdapter.start(self)
+        
+        try:
+            bus = dbus.SessionBus()
+            proxy = bus.get_object("org.kde.amarok", "/amarok/MainWindow")
+            self.__am = dbus.Interface(proxy, "org.kde.KMainWindow")
+        except DBusException, e:
+            log.error("dbus error: %s" % e)
+
+    def stop(self):
+        
+        remuco.MPRISAdapter.stop(self)
+        
+        self.__am = None
+        
     def poll(self):
 
         remuco.MPRISAdapter.poll(self)
@@ -35,6 +56,17 @@ class AmarokAdapter(remuco.MPRISAdapter):
         # amarok does not signal change in shuffle state
         self._poll_status()
         
+    def ctrl_rate(self, rating):
+        
+        rating = min(rating, 5)
+        rating = max(rating, 1)
+        action = "rate%s" % rating
+        
+        try:
+            self.__am.activateAction(action)
+        except DBusException, e:
+            log.warning("dbus error: %s" % e)
+            
     def ctrl_toggle_shuffle(self):
         
         remuco.MPRISAdapter.ctrl_toggle_shuffle(self)
