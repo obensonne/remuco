@@ -15,11 +15,6 @@ import remuco
 from remuco import log
 
 # =============================================================================
-# Amarok constants
-# =============================================================================
-
-
-# =============================================================================
 # player adapter
 # =============================================================================
 
@@ -41,7 +36,7 @@ class AmarokAdapter(remuco.MPRISAdapter):
             proxy = bus.get_object("org.kde.amarok", "/amarok/MainWindow")
             self.__am = dbus.Interface(proxy, "org.kde.KMainWindow")
         except DBusException, e:
-            log.error("dbus error: %s" % e)
+            raise StandardError("dbus error: %s" % e)
 
     def stop(self):
         
@@ -56,6 +51,10 @@ class AmarokAdapter(remuco.MPRISAdapter):
         # amarok does not signal change in shuffle state
         self._poll_status()
         
+    # =========================================================================
+    # control interface 
+    # =========================================================================
+    
     def ctrl_rate(self, rating):
         
         rating = min(rating, 5)
