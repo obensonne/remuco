@@ -36,8 +36,6 @@ public final class Message {
 	public static final int CTRL_SHUFFLE = CTRL + 6;
 	public static final int CTRL_FULLSCREEN = CTRL + 7;
 	public static final int CTRL_RATE = CTRL + 8;
-	public static final int CTRL_CLEAR_PL = CTRL + 20;
-	public static final int CTRL_CLEAR_QU = CTRL + 21;
 	public static final int CTRL_TAG = CTRL + 30;
 	public static final int CTRL_SHUTDOWN = CTRL + 90;
 

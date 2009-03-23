@@ -9,8 +9,6 @@ public interface IItemListController {
 
 	public void ilcBack(ItemlistScreen ils);
 
-	public void ilcClear(ItemlistScreen ils);
-
 	public void ilcRoot(ItemlistScreen ils);
 
 	public void ilcShowNested(ItemlistScreen ils, String path[]);

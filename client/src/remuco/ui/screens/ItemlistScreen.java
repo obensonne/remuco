@@ -18,7 +18,6 @@ import javax.microedition.lcdui.StringItem;
 import remuco.Remuco;
 import remuco.player.AbstractAction;
 import remuco.player.ActionParam;
-import remuco.player.Feature;
 import remuco.player.ItemAction;
 import remuco.player.ItemList;
 import remuco.player.PlayerInfo;
@@ -106,9 +105,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 	private static final Command CMD_ROOT = new Command("Root", Command.SCREEN,
 			99);
 
-	private static final Command CMD_CLEAR = new Command("Clear",
-			Command.SCREEN, 50);
-
 	/** Pseudo-index for marking all items. */
 	private static final int MARK_ALL = -1;
 
@@ -182,11 +178,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 			addCommand(CMD_MARK_ALL);
 		}
 
-		if ((list.isPlaylist() && pinfo.supports(Feature.CTRL_CLEAR_PL))
-				|| (list.isQueue() && pinfo.supports(Feature.CTRL_CLEAR_QU))) {
-			addCommand(CMD_CLEAR);
-		}
-
 		actionCommands = new Hashtable(list.getActions().size());
 
 		final Enumeration e = list.getActions().elements();
@@ -257,10 +248,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 				toggleItemMark(index - numNested);
 				updateItemIcons();
 			}
-			
-		} else if (c == CMD_CLEAR) {
-			
-			listener.ilcClear(this);
 			
 		} else if (actionCommands.containsKey(c)) {
 

@@ -105,16 +105,6 @@ public final class Player {
 
 	}
 
-	public void ctrlClearPlaylist() {
-
-		ctrl(Message.CTRL_CLEAR_PL);
-	}
-
-	public void ctrlClearQueue() {
-
-		ctrl(Message.CTRL_CLEAR_QU);
-	}
-
 	public void ctrlNext() {
 
 		ctrl(Message.CTRL_NEXT);

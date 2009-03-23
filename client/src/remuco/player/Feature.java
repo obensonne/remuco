@@ -16,8 +16,8 @@ public class Feature {
 	public static final int CTRL_VOLUME = 1 << 10;
 	public static final int CTRL_SEEK = 1 << 11;
 	public static final int CTRL_TAG = 1 << 12;
-	public static final int CTRL_CLEAR_PL = 1 << 13;
-	public static final int CTRL_CLEAR_QU = 1 << 14;
+	//public static final int CTRL_ = 1 << 13;
+	//public static final int CTRL_ = 1 << 14;
 	public static final int CTRL_RATE = 1 << 15;
 	public static final int CTRL_REPEAT = 1 << 16;
 	public static final int CTRL_SHUFFLE = 1 << 17;
