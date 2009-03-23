@@ -247,6 +247,30 @@
        x2="141.07144"
        y2="226.86218"
        gradientTransform="translate(3.4960938e-7,13.999997)" />
+    <filter
+       inkscape:collect="always"
+       id="filter3398"
+       x="-0.2328342"
+       width="1.4656684"
+       y="-0.24738634"
+       height="1.4947727">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.82462113"
+         id="feGaussianBlur3400" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3402"
+       x="-0.3492513"
+       width="1.6985026"
+       y="-0.37107951"
+       height="1.742159">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.2369317"
+         id="feGaussianBlur3404" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -258,11 +282,11 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="33.021886"
-     inkscape:cx="100.82156"
-     inkscape:cy="296.32237"
+     inkscape:zoom="16.510943"
+     inkscape:cx="33.211643"
+     inkscape:cy="281.28828"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showgrid="true"
      borderlayer="false"
      inkscape:showpageshadow="false"
@@ -298,7 +322,7 @@
 This theme makes use of some icons from a VLC skin.</dc:description>
         <dc:contributor>
           <cc:Agent>
-            <dc:title></dc:title>
+            <dc:title />
           </cc:Agent>
         </dc:contributor>
         <cc:license
@@ -623,6 +647,40 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        width="26"
        id="rect3328"
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect2494"
+       width="12"
+       height="12.000003"
+       x="101.07144"
+       y="262.86218" />
+    <path
+       sodipodi:type="arc"
+       style="opacity:1;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3398)"
+       id="path2496"
+       sodipodi:cx="28.75"
+       sodipodi:cy="55.5"
+       sodipodi:rx="4.25"
+       sodipodi:ry="4"
+       d="M 33,55.5 A 4.25,4 0 1 1 24.5,55.5 A 4.25,4 0 1 1 33,55.5 z"
+       transform="matrix(1.1764706,0,0,1.25,73.247912,199.48718)" />
+    <rect
+       y="262.86218"
+       x="114.07144"
+       height="12.000003"
+       width="12"
+       id="rect3329"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       transform="matrix(0.4705882,0,0,0.4999999,106.54203,241.11218)"
+       d="M 33,55.5 A 4.25,4 0 1 1 24.5,55.5 A 4.25,4 0 1 1 33,55.5 z"
+       sodipodi:ry="4"
+       sodipodi:rx="4.25"
+       sodipodi:cy="55.5"
+       sodipodi:cx="28.75"
+       id="path3331"
+       style="opacity:1;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3402)"
+       sodipodi:type="arc" />
   </g>
   <g
      inkscape:groupmode="layer"
