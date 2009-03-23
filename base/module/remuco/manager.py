@@ -3,8 +3,8 @@ import signal
 import subprocess
 
 import dbus
-import dbus.exceptions
-import dbus.mainloop.glib
+from dbus.exceptions import DBusException
+from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
 from remuco import log
@@ -47,26 +47,37 @@ class _DBusObserver():
             the bus name used by the adapter's media player
         """
 
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        DBusGMainLoop(set_as_default=True)
 
         self.__pa = pa
         self.__dbus_name = dbus_name
         
-        bus = dbus.SessionBus()
+        try:
+            bus = dbus.SessionBus()
+        except DBusException, e:
+            log.error("no dbus session bus (%s)" % e)
+            return
+        
+        try:
+            proxy = bus.get_object(dbus.BUS_DAEMON_NAME, dbus.BUS_DAEMON_PATH)
+            self.__dbus = dbus.Interface(proxy, dbus.BUS_DAEMON_IFACE)
+        except DBusException, e:
+            log.error("failed to connect to dbus daemon (%s)" % e)
+            return
 
-        proxy = bus.get_object(dbus.BUS_DAEMON_NAME, dbus.BUS_DAEMON_PATH)
-        self.__dbus = dbus.Interface(proxy, dbus.BUS_DAEMON_IFACE)
-
-        self.__handlers = (
-            self.__dbus.connect_to_signal("NameOwnerChanged",
-                                          self.__notify_owner_change,
-                                          arg0=self.__dbus_name)
-            ,
-        )
-
-        self.__dbus.NameHasOwner(self.__dbus_name,
-                                 reply_handler=self.__set_has_owner,
-                                 error_handler=self.__dbus_error)
+        try:
+            self.__handlers = (
+                self.__dbus.connect_to_signal("NameOwnerChanged",
+                                              self.__notify_owner_change,
+                                              arg0=self.__dbus_name)
+                ,
+            )
+            self.__dbus.NameHasOwner(self.__dbus_name,
+                                     reply_handler=self.__set_has_owner,
+                                     error_handler=self.__dbus_error)
+        except DBusException, e:
+            log.error("failed to talk with dbus daemon (%s)" % e)
+            return
         
     def __notify_owner_change(self, name, old, new):
         
