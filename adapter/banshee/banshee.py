@@ -63,8 +63,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             proxy = bus.get_object(DBUS_NAME, DBUS_PATH_CONTROLLER)
             self.__bsc = dbus.Interface(proxy, DBUS_IFACE_CONTROLLER)
         except DBusException, e:
-            log.error("dbus error: %s" % e)
-            return 
+            raise StandardError("dbus error: %s" % e)
 
         try:
             self.__dbus_signal_handler = (
@@ -74,7 +73,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
                                              self.__notify_playback),
             )
         except DBusException, e:
-            log.error("dbus error: %s" % e)
+            raise StandardError("dbus error: %s" % e)
         
         try:
             self.__bse.GetCurrentTrack(reply_handler=self.__notify_track,
@@ -84,6 +83,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             self.__bse.GetVolume(reply_handler=self.__notify_volume,
                                  error_handler=self.__dbus_error)
         except DBusException, e:
+            # this is not necessarily a fatal error
             log.warning("dbus error: %s" % e)
 
         log.debug("start done")
