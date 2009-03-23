@@ -300,8 +300,9 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     
         elif action_id == IA_REMOVE.id:
             
-            self.__remove_items_from_queue(ids)
-            
+            for id in ids:
+                self.__shell.remove_from_queue(id)
+    
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
     
@@ -613,11 +614,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         for id in ids:
             self.__shell.add_to_queue(id)
             
-    def __remove_items_from_queue(self, ids):
-        
-        for id in ids:
-            self.__shell.remove_from_queue(id)
-
     def __get_position(self):
 
         sp = self.__shell.get_player()
