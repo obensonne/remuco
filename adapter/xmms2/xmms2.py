@@ -165,7 +165,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                                       max_rating=5,
                                       shuffle_known=True,
                                       playback_known=True,
-                                      volume_known=True)
+                                      volume_known=True,
+                                      progress_known=True)
         
         self.__lcmgr = None
         
@@ -176,6 +177,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self.__item_id_int = None # id as integer
         self.__item_id = None # id as string
         self.__item_meta = None
+        self.__item_len = 0 # for update_progress()
         
         self.__shuffle_off_sid = 0
         
@@ -200,12 +202,15 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         self._x2.broadcast_playlist_current_pos(self.__notify_position)
         # to dectect all posistion changes:
         self._x2.broadcast_playlist_changed(self.__notify_playlist_change)
+        self._x2.signal_playback_playtime(self.__notify_progress)
         
         # get initial player state (broadcasts only work on changes):
         self._x2.playback_current_id(cb=self.__notify_id)
         self._x2.playback_status(cb=self.__notify_playback)
         self._x2.playback_volume_get(cb=self.__notify_volume)
         self._x2.playlist_current_pos(cb=self.__notify_position)
+        
+        self.__item_len = 0
         
         
     def stop(self):
@@ -218,6 +223,10 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         self._x2 = None
         self.__x2_glib_connector = None
+        
+    def poll(self):
+        
+        self._x2.playback_playtime(cb=self.__notify_progress)
         
     # =========================================================================
     # control interface 
@@ -255,6 +264,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     def ctrl_seek(self, direction):
         
         self._x2.playback_seek_ms_rel(direction * 5000, cb=self.__ignore_result)
+        
+        self.poll()
     
     def ctrl_volume(self, direction):
         
@@ -422,9 +433,11 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         info[remuco.INFO_TITLE] = minfo.get("title", "")
         info[remuco.INFO_GENRE] = minfo.get("genre", "")
         info[remuco.INFO_YEAR] = minfo.get("year", "")
-        info[remuco.INFO_LENGTH] = int(minfo.get("duration", 0) // 1000)
         info[remuco.INFO_RATING] = minfo.get(MINFO_KEY_RATING, 0)
         info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
+    
+        self.__item_len = int(minfo.get("duration", 0) // 1000)
+        info[remuco.INFO_LENGTH] = self.__item_len
     
         img = None
         for img_key in MINFO_KEYS_ART:
@@ -457,6 +470,17 @@ class XMMS2Adapter(remuco.PlayerAdapter):
             
         self.update_playback(self.__state_playback)
         
+    def __notify_progress(self, result):
+        
+        if not self._check_result(result):
+            return
+        
+        progress = int(result.value() // 1000)
+        progress = min(progress, self.__item_len)
+        progress = max(progress, 0)
+        
+        self.update_progress(progress, self.__item_len)
+          
     def __notify_volume(self, result):
         
         if not self._check_result(result):
