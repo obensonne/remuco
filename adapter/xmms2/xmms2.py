@@ -452,6 +452,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         self.update_item(self.__item_id, info, img)
         
+        self.poll() # update progress
+        
     def __notify_playback(self, result):
         
         if not self._check_result(result):
