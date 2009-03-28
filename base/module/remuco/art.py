@@ -20,7 +20,7 @@
 #
 # =============================================================================
 
-import md5
+import hashlib
 import os
 import os.path
 import urllib
@@ -101,7 +101,7 @@ def __get_art_from_thumbnails(uri):
     
     log.debug("looking for art image in %s" % TN_DIR)
 
-    hex = md5.new(uri).hexdigest()
+    hex = hashlib.md5(uri).hexdigest()
     
     for subdir in TN_SUBDIRS:
         file = os.path.join(TN_DIR, subdir, "%s.png" % hex)
