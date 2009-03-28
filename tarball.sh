@@ -49,3 +49,5 @@ find $PKG -type f -name "install*.log" | xargs rm -f
 
 
 tar zcf $PKG.tar.gz $PKG
+
+rm -rf $PKG
