@@ -1,21 +1,22 @@
 # -----------------------------------------------------------------------------
-# Makefile intended for end users.
-# Packagers should use the setup.py script in ./base/module and the make files
-# in './adapter/XXX' directly.
+# Makefile intended for end users. It is a wrapper around setup.py.
 # -----------------------------------------------------------------------------
+
+PREFIX ?= /usr/local
+
+SETUP := python setup.py install --prefix=$(PREFIX)
 
 ADAPTERS := $(shell ls adapter)
 
 help:
 	@echo
-	@echo "Install a specific player adapter (also installs Remuco base,"
-	@echo "which is needed for all player adpaters):"
+	@echo "To install a player adapter (and required base components), run:"
 	@for PA in $(ADAPTERS); do echo "    make install-$$PA"; done
 	@echo
-	@echo "Uninstall a specific player adapter:"
+	@echo "To uninstall a player adapter, run"
 	@for PA in $(ADAPTERS); do echo "    make uninstall-$$PA"; done
-	@echo ""
-	@echo "Uninstall all Remuco components (base and all player adapters):"
+	@echo
+	@echo "To uninstall all components (base and player adapters), run"
 	@echo "    make uninstall-all"
 	@echo
 	@echo "Of course, use 'sudo' when needed."
@@ -30,38 +31,46 @@ install: help
 uninstall: help
 	@true
 
-install-%:
-	@[ -d adapter/$(subst install-,,$@) ] || { echo "no such adapter"; exit 1; }
+install-base: clean
 	python base/module/install-check.py
-	make -C base install
+	REMUCO_ADAPTERS="" $(SETUP) --record install-base.log
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Installed Remuco base."
 	@echo "+-----------------------------------------------------------------+"
-	@CHECK_FILE=adapter/$(subst install-,,$@)/install-check.py ; \
-		if [ -e $$CHECK_FILE ] ; then python $$CHECK_FILE ; fi 
-	make -C adapter/$(subst install-,,$@) install
+
+install-%: install-base
+	@IC=adapter/$(subst install-,,$@)/install-check.py ; \
+		[ ! -e $$IC ] || python $$IC
+	REMUCO_ADAPTERS=$(subst install-,,$@) $(SETUP) --record install-tmp.log
+	diff --suppress-common-lines -n \
+		install-base.log install-tmp.log \
+		| grep "^/" > install-$(subst install-,,$@).log
+	rm install-tmp.log
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Installed player adapter '$(subst install-,,$@)'."
 	@echo "+-----------------------------------------------------------------+"
 
-uninstall-all:
-	@for PA in $(ADAPTERS); do make uninstall-$$PA; done
-	make -C base uninstall
+uninstall-all: $(addprefix uninstall-,$(ADAPTERS)) uninstall-base
 	@echo "+-----------------------------------------------------------------+"
-	@echo "| Unnstalled Remuco base."
+	@echo "| Uninstalled all components."
 	@echo "+-----------------------------------------------------------------+"
 
 uninstall-%:
-	@[ -d adapter/$(subst uninstall-,,$@) ] || { echo "bad player name"; exit 1; }
-	make -C adapter/$(subst uninstall-,,$@) uninstall
-	@echo "+-----------------------------------------------------------------+"
-	@echo "| Uninstalled player adapter '$(subst uninstall-,,$@)'."
-	@echo "+-----------------------------------------------------------------+"
+	@PA='$(subst uninstall-,,$@)'; \
+	if [ -e install-$$PA.log ] ; then \
+		cat install-$$PA.log | xargs rm -f || exit 1; \
+		rm install-$$PA.log ; \
+		echo "+-----------------------------------------------------------------+" ; \
+		echo "| Uninstalled component '$$PA'." ; \
+		echo "+-----------------------------------------------------------------+" ; \
+	else \
+		echo "+-----------------------------------------------------------------+" ; \
+		echo "| Skipped component '$$PA' (install log does not exist)" ; \
+		echo "+-----------------------------------------------------------------+" ; \
+	fi
 
 clean:
-	for PA in $(ADAPTERS); do make -C adapter/$$PA clean; done
-	make -C base clean
-	find -type f -name "*.pyc" | xargs rm -f
+	python setup.py clean --all
 	@echo "+-----------------------------------------------------------------+"
-	@echo "| Clean ok."
+	@echo "| Clean ok (keep install log files for uninsallation)."
 	@echo "+-----------------------------------------------------------------+"

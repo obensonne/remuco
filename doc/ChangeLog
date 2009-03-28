@@ -1,3 +1,11 @@
+0.8.0.1	Oben Sonne <obensonne@googlemail.com>
+
+	* client: set 'Vilanco' as default theme ('Chocolate' is too big for
+	  some devices)
+	* general: added GPL header to source files
+	* general: replaced nested make files and setup.py by global setup.py
+	* general: include client source in tarball
+
 0.8.0	Oben Sonne <obensonne@googlemail.com>
 
 	* merged client and server side components into one package

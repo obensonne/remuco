@@ -272,17 +272,29 @@
 		<signjar alias="remuco" storepass="tester" jar="dist/${midlet.jar}" />
 	</target>
 
-
 	<!-- =================== Dist ========================================= -->
+
+	<target name="dist" description="--> create all jar variants">
+		<delete dir="app" />
+		<antcall target="dist.optimized" inheritall="false" />
+		<antcall target="dist.chary" inheritall="false" />
+	</target>
 
 	<target name="dist.optimized"
 	        depends="clean,setmode.dist-optimized,jad"
-	        description="--> build an optimized jar" />
+	        description="--> create an optimized jar">
+		<mkdir dir="app" />
+		<copy todir="app" file="build/jar/${midlet.jad}" />
+		<copy todir="app" file="build/jar/${midlet.jar}" />
+	</target>
 
 	<target name="dist.chary"
 	        depends="clean,setmode.dist-chary,jad"
-	        description="--> build a non-optimized jar" />
-
+	        description="--> create a non-optimized jar">
+		<mkdir dir="app/non-optimized" />
+		<copy todir="app/non-optimized" file="build/jar/${midlet.jad}" />
+		<copy todir="app/non-optimized" file="build/jar/${midlet.jar}" />
+	</target>
 
 	<!-- =================== Snapshot ===================================== -->
 

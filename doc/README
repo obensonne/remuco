@@ -1,27 +1,64 @@
 Remuco - Remote media player control
 
 Remuco is a duplex remote control system for Linux media players and mobile
-devices equipped with Bluetooth or WiFi. With Remuco you can remotely control
-your favorite media player - amongst others you can switch to the next,
-previous or any other media within the current playlist, browse your media
-library and activate other playlists, rate your media and adjust volume. On the
-mobile (the remote control) it displays information about the current media,
-including cover art. Visit http://remuco.sourceforge.net for a complete feature
-list, screenshots and a list of supported media players.
+devices equipped with Bluetooth or WiFi. With Remuco, you can remotely control
+your favorite media player. You can switch to the next, previous, or any other
+media within the current playlist, browse your media library and activate other
+playlists, rate your media, adjust volume, and more. On the mobile device (the
+remote control), it displays information about the current media, including
+cover art.
+
+Getting Started : http://remuco.sourceforge.net/index.php/Getting_Started
+Features        : http://remuco.sourceforge.net/index.php/Features
+Screenshots     : http://remuco.sourceforge.net/index.php/Screenshots
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Table of Contents
 
-1. Installation
-2. Usage
-3. Player Adapter Development
-4. Packager Information
+1. Requirements
+2. Installation
+3. Usage
+4. Player Adapter Development
+5. Packager Information
 A. General Information
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Installation
+1. Requirements
+
+General:
+ * Python >= 2.5 and < 3.0
+ * Python modules: dbus, gobject, xdg, Image, logging, bluetooth
+
+Amarok:
+ * Amarok >= 2.0
+
+Audacious:
+ * Audacious >= 1.5.1 (previous versions may work, not tested)
+
+Banshee:
+ * Banshee >= 1.4
+
+Rhythmbox:
+ * Rhythmbox >= 0.11.5
+ 
+Totem:
+ * Totem >= 2.22
+
+XMMS2:
+ * Python modules: xmmsclient (>= 0.5)
+
+Client:
+ The client runs on mobile devices with this JavaME configurations:
+ * MIDP >= 2.0
+ * CLDC >= 1.1
+ * JSR-82 (not needed for WiFi mode)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. Installation
 
 Run
 
@@ -30,12 +67,12 @@ Run
 to get instructions on how to install Remuco for one or more media players.
 
 Subsequent, install the client application on your mobile device. You find the
-required JAR and JAD files in the directory 'client'.
+required JAR and JAD files in the directory 'client/app'.
 How to install is device dependent - please consult the documentation of your
 mobile device.
 
 Note: If the client fails to start on your mobile, try the non-optimized
-      version in the directory 'client/non-optimized'.
+      version in the directory 'client/app/non-optimized'.
 
 For more information visit:
 http://remuco.sourceforge.net/index.php/Getting_Started
@@ -43,9 +80,9 @@ http://remuco.sourceforge.net/index.php/Getting_Started
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. Usage
+3. Usage
 
-2.1 Player Adapters
+3.1 Player Adapters
 
 Some player adapters need to get started manually, others get started
 automatically when the corresponding player application starts. Please visit
@@ -56,7 +93,7 @@ Each player adapter has a configuration file ~/.config/remuco/<PLAYER>/conf.
 Edit this file if needed. Logging output of a player adapter goes to
 ~/.cache/remuco/<PLAYER>/log.
 
-2.2 Client
+3.2 Client
 
 Using the client is not too complicated, just start and use it ;) .
 
@@ -65,18 +102,26 @@ http://remuco.sourceforge.net/index.php/Getting_Started
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. Player Adapter Development
+4. Player Adapter Development
 
 To develop a player adapter, use 'fooplay' as a template and implement it as
 described in the file 'api.html'.
 
+To test the fooplay adapter, simply run it as a Python script. It requires the
+Python module 'remuco' which is available if you installed another player
+adapter before. Otherwise, just add '<package-root>/base/module' to PYTHONPATH
+before running the fooplay adapter.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4. Packager Information
+5. Packager Information
 
 Packagers should not use the top level make file -- this is a wrapper around
-nested make files intended for end users. Instead the setup.py script in
-base/module and the make files in adapter/XXX should be used directly.
+'setup.py'. Instead use setup.py directly, which install all Remuco components
+(base, player adapters and client binaries) by default. The client installation
+can be suppressed by setting the environment variable 'REMUCO_NO_CLIENT'.
+Additionally some more environment variables may be used to adjust the
+installation process, just grep setup.py for 'os.getenv'.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
