@@ -84,6 +84,9 @@ public final class Theme {
 			RTE_STATE_VOLUME_LEFT = 32, RTE_STATE_VOLUME_OFF = 33,
 			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35;
 
+	/** Name of the default theme to load. */
+	private static final String DEFAULT = "Vilanco";
+
 	private static final Image IMG_FALLBACK;
 
 	/** Theme element file name (without extension) */
@@ -296,7 +299,7 @@ public final class Theme {
 		if (f.stringWidth(s) <= maxWidth) {
 			return new String[] { s };
 		}
-		
+
 		maxWidth -= f.charWidth('W'); // tweak the algorithm below
 
 		int w, slen, i, goodBreakPos;
@@ -511,15 +514,15 @@ public final class Theme {
 	 */
 	public void load(String name) {
 
-		final String themes[] = Config.getInstance().getThemeList();
-
 		if (name == null)
-			name = themes[0];
+			name = DEFAULT;
 
 		if (name.equals(current)) {
 			return;
 		}
-		
+
+		final String themes[] = Config.getInstance().getThemeList();
+
 		int i;
 		for (i = 0; i < themes.length; i++) {
 			if (name.equals(themes[i])) {
@@ -530,7 +533,7 @@ public final class Theme {
 			// 'name' seems to be an old, invalid name from the config
 			name = themes[0];
 		}
-		
+
 		current = name;
 
 		final String themeDir = "/themes/" + current + "/";
