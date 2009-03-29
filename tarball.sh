@@ -15,6 +15,18 @@ rm -rf build dist $PKG $PKG.tar.gz || exit 1
 mkdir $PKG
 
 # -----------------------------------------------------------------------------
+# update api.html
+# -----------------------------------------------------------------------------
+
+cd base/module
+pydoc -w remuco
+cd ../..
+
+mv base/module/remuco.html doc/api.html
+
+sed -i doc/api.html -e "s,[_a-z\.]\+\.html,api.html,g"
+
+# -----------------------------------------------------------------------------
 # base, adpaters, doc and top level files
 # -----------------------------------------------------------------------------
 
