@@ -327,7 +327,7 @@ class MPRISAdapter(PlayerAdapter):
                                     item_actions=self.__playlist_actions)
 
     # =========================================================================
-    # internal methods (may be overriden by subclasses to fix MPRIS issues) 
+    # internal methods (may be overridden by subclasses to fix MPRIS issues) 
     # =========================================================================
     
     def _poll_status(self):
