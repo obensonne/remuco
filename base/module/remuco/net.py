@@ -373,7 +373,7 @@ class _Server(object):
     
     SOCKET_TIMEOUT = 2.5
     
-    def __init__(self, clients, pinfo, msg_handler_fn, ping_ival):
+    def __init__(self, clients, pinfo, msg_handler_fn, config):
         """ Create a new server.
         
         @param clients:
@@ -382,16 +382,19 @@ class _Server(object):
             player info (type data.PlayerInfo)
         @param msg_handler_fn:
             callback function for passing received messages to
+        @param config:
+            adapter configuration
                                  
         """
-        
         self.__clients = clients
         self.__msg_handler_fn = msg_handler_fn
-        self._pinfo = pinfo # needed by derived classes
         self.__pinfo_msg = build_message(message.CONN_PINFO, pinfo)
-        self.__ping_ival = ping_ival
-        self._sock = None # needed by derived classes
+        self.__ping_ival = config.ping
         self.__sid = None
+        
+        self._pinfo = pinfo
+        self._config = config
+        self._sock = None
         
         # set up socket
         
@@ -410,8 +413,7 @@ class _Server(object):
         # watch socket
         
         self.__sid = gobject.io_add_watch(self._sock,
-                            gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
-                            self.__handle_io)
+            gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP, self.__handle_io)
         
     #==========================================================================
     # io
@@ -507,12 +509,10 @@ class BluetoothServer(_Server):
                 
 class WifiServer(_Server):
     
-    PORT = 34271
-
     def _create_socket(self):
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('', WifiServer.PORT))
+        sock.bind(('', self._config.wifi_port))
         sock.listen(1)
         
         return sock

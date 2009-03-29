@@ -33,11 +33,12 @@ from remuco import log
 
 SEC = ConfigParser.DEFAULTSECT
 
-CONFIG_VERSION = "0.8.0"
+CONFIG_VERSION = "0.8.1"
 
 KEY_CONFIG_VERSION = "config-version"
 KEY_BLUETOOTH = "bluetooth-enabled"
 KEY_WIFI = "wifi-enabled"
+KEY_WIFI_PORT = "wifi-port"
 KEY_ENDCODING = "player-encoding"
 KEY_LOGLEVEL = "log-level"
 KEY_PING = "ping-interval"
@@ -49,6 +50,7 @@ KEY_FB_XDG_UD = "file-browser-use-xdg-user-dirs"
 DEFAULTS = { # values as saved in config file
     KEY_BLUETOOTH: "1",
     KEY_WIFI: "1",
+    KEY_WIFI_PORT: "34271",
     KEY_ENDCODING: "UTF8",
     KEY_LOGLEVEL: "INFO",
     KEY_PING: "15",
@@ -225,6 +227,30 @@ class Config(object):
     
     wifi = property(__pget_wifi, __pset_wifi, None, __pget_wifi.__doc__)
     
+    # === property: wifi_port ===
+    
+    def __pget_wifi_port(self):
+        """Port to use for WiFi connections.
+        
+        Default: 34271
+        
+        Option name: 'wifi-port'
+
+        """
+        try:
+            return self.__cp.getint(SEC, KEY_WIFI_PORT)
+        except (ValueError, AttributeError), e:
+            log.warning("config '%s' malformed (%s)" % (KEY_WIFI_PORT, e))
+            return 34271
+        
+    def __pset_wifi_port(self, value):
+
+        self.__cp.set(SEC, KEY_WIFI_PORT, str(value))
+        self.__save()
+    
+    wifi_port = property(__pget_wifi_port, __pset_wifi_port, None,
+                         __pget_wifi_port.__doc__)
+
     # === property: encoding ===
     
     def __pget_encoding(self):
@@ -315,7 +341,7 @@ class Config(object):
         
     def __pset_ping(self, value):
 
-        self.__cp.set(SEC, KEY_LOGLEVEL, str(value))
+        self.__cp.set(SEC, KEY_PING, str(value))
         self.__save()
     
     ping = property(__pget_ping, __pset_ping, None, __pget_ping.__doc__)

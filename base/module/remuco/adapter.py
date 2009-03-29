@@ -340,13 +340,13 @@ class PlayerAdapter(object):
         
         if self.__config.bluetooth:
             self.__server_bluetooth = net.BluetoothServer(self.__clients,
-                    self.__info, self.__handle_message, self.__config.ping)
+                    self.__info, self.__handle_message, self.__config)
         else:
             self.__server_bluetooth = None
 
         if self.__config.wifi:
             self.__server_wifi = net.WifiServer(self.__clients,
-                    self.__info, self.__handle_message, self.__config.ping)        
+                    self.__info, self.__handle_message, self.__config)
         else:
             self.__server_wifi = None
             
