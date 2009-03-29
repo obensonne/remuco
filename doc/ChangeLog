@@ -1,10 +1,12 @@
 0.8.0.1	Oben Sonne <obensonne@googlemail.com>
 
+	* no additional features, just internal adjustments
+	* added GPL header to source files
+	* replaced nested make files and setup.py by global setup.py
+	* include client source in tarball
 	* client: set 'Vilanco' as default theme ('Chocolate' is too big for
 	  some devices)
-	* general: added GPL header to source files
-	* general: replaced nested make files and setup.py by global setup.py
-	* general: include client source in tarball
+	* base: replace Python module 'md5' by 'hashlib'
 
 0.8.0	Oben Sonne <obensonne@googlemail.com>
 
