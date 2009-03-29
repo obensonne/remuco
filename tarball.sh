@@ -68,7 +68,51 @@ find $PKG -type f -name "*.pyc" | xargs rm -f
 find $PKG -type f -name "*~" | xargs rm -f
 find $PKG -type f -name "install*.log" | xargs rm -f
 
-
 tar zcf $PKG.tar.gz $PKG
 
-rm -rf $PKG
+# -----------------------------------------------------------------------------
+# extra package: client source + binaries
+# -----------------------------------------------------------------------------
+
+PKG_CLIENT=remuco-client-$VERSION
+
+rm -rf $PKG_CLIENT $PKG_CLIENT.tar.gz
+
+cp -r $PKG $PKG_CLIENT
+
+cd $PKG_CLIENT
+
+ls -1 | grep -v "client" | xargs rm -rf
+mv client/* .
+rmdir client
+
+cat > README << EOF
+Remuco client sources and binaries.
+
+Please visit http://remuco.sourceforge.net/index.php/Getting_Started for
+installation and usage instructions.
+EOF
+
+cd ..
+
+tar zcf $PKG_CLIENT.tar.gz $PKG_CLIENT
+
+cp $PKG_CLIENT/app/remuco.jar remuco-client-$VERSION.jar
+
+# -----------------------------------------------------------------------------
+# extra package: server source
+# -----------------------------------------------------------------------------
+
+PKG_SERVER=remuco-server-$VERSION
+
+rm -rf $PKG_SERVER $PKG_SERVER.tar.gz
+
+cp -r $PKG $PKG_SERVER
+
+rm -rf $PKG_SERVER/client
+
+tar zcf $PKG_SERVER.tar.gz $PKG_SERVER
+
+# -----------------------------------------------------------------------------
+
+rm -rf $PKG $PKG_CLIENT $PKG_SERVER
