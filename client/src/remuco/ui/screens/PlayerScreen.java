@@ -498,6 +498,16 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			break;
 
+		case KeyBindings.ACTION_FULLSCREEN:
+
+			if (!checkFeature(Feature.CTRL_FULLSCREEN)) {
+				break;
+			}
+
+			player.ctrlToggleFullscreen();
+
+			break;
+
 		case KeyBindings.ACTION_NOOP:
 
 			break;

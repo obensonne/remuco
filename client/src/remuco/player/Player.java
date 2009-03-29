@@ -166,6 +166,11 @@ public final class Player {
 		ctrl(Message.CTRL_SHUTDOWN);
 	}
 
+	public void ctrlToggleFullscreen() {
+
+		ctrl(Message.CTRL_FULLSCREEN);
+	}
+
 	public void ctrlToggleRepeat() {
 
 		ctrl(Message.CTRL_REPEAT);
