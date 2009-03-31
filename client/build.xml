@@ -277,7 +277,7 @@
 		<copy todir="dist">
 			<fileset dir="build/jar">
 				<include name="${midlet.jar}" />
-				<include name="${midlet.jar}" />
+				<include name="${midlet.jad}" />
 			</fileset>
 		</copy>
 	</target>
@@ -306,7 +306,7 @@
 		<copy todir="snapdir">
 			<fileset dir="dist">
 				<include name="${midlet.jar}" />
-				<include name="${midlet.jar}" />
+				<include name="${midlet.jad}" />
 			</fileset>
 		</copy>
 		<tstamp />
