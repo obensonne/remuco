@@ -51,11 +51,17 @@ mkdir $PKG/client
 
 cd client
 
-ant dist
-
-for ITEM in app src res design *.example build.xml ; do
+for ITEM in src res design *.example build.xml ; do
 	cp -r $ITEM ../$PKG/client/
 done
+
+mkdir ../$PKG/client/app
+ant dist.opti.proguard
+cp dist/remuco.jar dist/remuco.jad ../$PKG/client/app
+
+mkdir ../$PKG/client/app/non-optimized
+ant dist.noop.proguard
+cp dist/remuco.jar dist/remuco.jad ../$PKG/client/app/non-optimized
 
 cd ..
 
