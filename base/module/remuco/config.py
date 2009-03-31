@@ -522,11 +522,11 @@ def get_system_shutdown_command():
         log.info("system shutdown command (%s) does not exist" % path)
         return None
     
-    if not os.access(shutdown_cmd, os.X_OK):
+    if not os.access(path, os.X_OK):
         log.info("system shutdown command (%s) is not executable" % path)
         return None
     
-    return file
+    return path
         
 __all__ = (Config,)
 
