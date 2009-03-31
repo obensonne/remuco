@@ -49,16 +49,12 @@
 	<property file="build.properties" />
 
 	<property name="midp.ver" value="MIDP-2.0" />
-	<property name="midp.ver.num" value="20" />
 	<property name="cldc.ver" value="CLDC-1.1" />
-	<property name="cldc.ver.num" value="11" />
 
 	<property name="midlet.icon" value="logo.png" />
 	<property name="midlet.vendor" value="remuco.sf.net" />
-	<property name="midlet.version" value="0.8.0" />
+	<property name="midlet.version" value="0.8.1" />
 	<property name="midlet.data-size" value="2048" />
-
-	<property name="dist.name" value="remuco-client-${midlet.version}" />
 
 	<property name="midlet.name" value="Remuco" />
 	<property name="midlet.name.lc" value="remuco" />
@@ -67,66 +63,54 @@
 
 	<!-- - - - - - - - -Target dependent configuration - - - - - - - - - - -->
 
-	<target name="setmode.emulation">
-		<fail if="mode" />
-		<property name="mode" value="emulation" />
-		<property name="mode.emulation" value="isset" />
+	<target name="configure.emulation">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="${run.debug}" />
+		<property name="preverifier" value="${run.preverifier}" />
+		<property name="proguard.optimize" value="${run.proguard.optimize}" />
+		<property name="emulation" value="isset" />
+		<antcall target="echo.configuration" />
 	</target>
 
-	<target name="setmode.dist-optimized">
-		<fail if="mode" />
-		<property name="mode" value="dist (optimized version)" />
-		<property name="mode.dist-optimized" value="isset" />
+	<target name="configure.dist.noop.wtk">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="yes" />
+		<property name="preverifier" value="wtk" />
+		<property name="proguard.optimize" value="no" />
+		<antcall target="echo.configuration" />
 	</target>
 
-	<target name="setmode.dist-chary">
-		<fail if="mode" />
-		<property name="mode" value="dist (chary version)" />
-		<property name="mode.dist-chary" value="isset" />
+	<target name="configure.dist.noop.proguard">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="yes" />
+		<property name="preverifier" value="proguard" />
+		<property name="proguard.optimize" value="no" />
+		<antcall target="echo.configuration" />
 	</target>
 
-	<target name="configure">
-		<!-- set various properties depending on used mode -->
-		<fail unless="mode" />
-		<!-- compile with debug symbols ? -->
-		<condition property="compile.debug" value="yes" else="no">
-			<or>
-				<and>
-					<isset property="mode.emulation" />
-					<istrue value="${run.debug}" />
-				</and>
-				<and>
-					<isset property="mode.dist-optimized" />
-					<istrue value="${dist.debug}" />
-				</and>
-				<isset property="mode.dist-chary" />
-			</or>
-		</condition>
-		<!-- preverifier to use -->
-		<condition property="preverifier" value="${run.preverifier}">
-			<isset property="mode.emulation" />
-		</condition>
-		<condition property="preverifier" value="${dist.preverifier}">
-			<isset property="mode.dist-optimized" />
-		</condition>
-		<condition property="preverifier" value="${dist.chary.preverifier}">
-			<isset property="mode.dist-chary" />
-		</condition>
-		<!-- when using proguard, optimize ? -->
-		<condition property="proguard.optimize" value="yes" else="no">
-			<or>
-				<and>
-					<isset property="mode.emulation" />
-					<istrue value="${run.proguard.optimize}" />
-				</and>
-				<and>
-					<isset property="mode.dist-optimized" />
-					<istrue value="${dist.proguard.optimize}" />
-				</and>
-				<!-- if still false, mode is 'dist-chary', so false is ok -->
-			</or>
-		</condition>
-		<echo message="mode                       : ${mode}" />
+	<target name="configure.dist.opti.wtk">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="no" />
+		<property name="preverifier" value="wtk" />
+		<property name="proguard.optimize" value="no" />
+		<antcall target="echo.configuration" />
+	</target>
+
+	<target name="configure.dist.opti.proguard">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="no" />
+		<property name="preverifier" value="proguard" />
+		<property name="proguard.optimize" value="yes" />
+		<antcall target="echo.configuration" />
+	</target>
+
+	<target name="echo.configuration">
+		<fail unless="configured" />
 		<echo message="compile with debug symbols : ${compile.debug}" />
 		<echo message="preverifier                : ${preverifier}" />
 		<echo message="proguard optimizes         : ${proguard.optimize}" />
@@ -134,15 +118,10 @@
 
 	<!-- =================== Libraries and Classpath ====================== -->
 
-	<property name="midp.jar"
-	          value="${wtk.home}/lib/midpapi${midp.ver.num}.jar" />
-	<property name="cldc.jar"
-	          value="${wtk.home}/lib/cldcapi${cldc.ver.num}.jar" />
-
 	<path id="cp.compile">
 		<fileset file="${midp.jar}" />
 		<fileset file="${cldc.jar}" />
-		<fileset dir="${wtk.home}/lib" includes="jsr082.jar" />
+		<fileset file="${jsr82.jar}" />
 	</path>
 
 	<property name="cp.compile.cmdline" refid="cp.compile" />
@@ -150,7 +129,7 @@
 	<path id="cp.preverify">
 		<fileset file="${midp.jar}" />
 		<fileset file="${cldc.jar}" />
-		<fileset dir="${wtk.home}/lib" includes="jsr082.jar" />
+		<fileset file="${jsr82.jar}" />
 	</path>
 
 	<property name="cp.preverify.cmdline" refid="cp.preverify" />
@@ -168,6 +147,7 @@
 	<!-- =================== Build ======================================== -->
 
 	<target name="compile">
+		<fail unless="configured" />
 		<mkdir dir="build/classes" />
 		<javac destdir="build/classes"
 		       target="1.1"
@@ -192,6 +172,7 @@
 		<proguard allowaccessmodification="${proguard.optimize}"
 		          overloadaggressively="${proguard.optimize}"
 		          repackageclasses=""
+		          shrink="${proguard.optimize}"
 		          obfuscate="${proguard.optimize}"
 		          usemixedcaseclassnames="no"
 		          optimize="${proguard.optimize}"
@@ -206,7 +187,8 @@
 	</target>
 
 	<target name="preverify.wtk">
-		<exec executable="${wtk.home}/bin/preverify">
+		<echo message="pcp: ${cp.preverify.cmdline}" />
+		<exec executable="${wtk.home}/bin/preverify" failonerror="true">
 			<arg line="-classpath ${cp.preverify.cmdline}" />
 			<arg line="-d build/preverified" />
 			<arg line="build/classes" />
@@ -220,7 +202,7 @@
 
 	<!-- - - - - - - - - - - Create Jar - - - - - - - - - - - - - - - - - - -->
 
-	<target name="jar" depends="configure,preverify,manifest">
+	<target name="jar" depends="preverify,manifest">
 		<mkdir dir="build/jar" />
 		<jar jarfile="build/jar/${midlet.jar}" manifest="build/MF">
 			<fileset dir="build/preverified" />
@@ -241,8 +223,8 @@
 
 	<target name="manifest">
 		<echo message="Themes: ${themes}" />
-		<condition property="emulation" value="true" else="false">
-			<isset property="mode.emulation" />
+		<condition property="emulation-flag" value="true" else="false">
+			<isset property="emulation" />
 		</condition>
 		<condition property="midlet.class"
 		           value="remuco.test.Test"
@@ -263,7 +245,7 @@
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client" />
 			-->
-			<attribute name="Remuco-emulation" value="${emulation}" />
+			<attribute name="Remuco-emulation" value="${emulation-flag}" />
 			<attribute name="Remuco-themes" value="${themes}" />
 		</manifest>
 	</target>
@@ -274,44 +256,59 @@
 
 	<!-- =================== Dist ========================================= -->
 
-	<target name="dist" description="--> create all jar variants">
-		<delete dir="app" />
-		<antcall target="dist.optimized" inheritall="false" />
-		<antcall target="dist.chary" inheritall="false" />
-	</target>
+	<target name="dist.opti.proguard"
+	        depends="clean,configure.dist.opti.proguard,jad,dist.copy"
+	        description="--> create an optimized jar using proguard" />
 
-	<target name="dist.optimized"
-	        depends="clean,setmode.dist-optimized,jad"
-	        description="--> create an optimized jar">
-		<mkdir dir="app" />
-		<copy todir="app" file="build/jar/${midlet.jad}" />
-		<copy todir="app" file="build/jar/${midlet.jar}" />
-	</target>
+	<target name="dist.opti.wtk"
+	        depends="clean,configure.dist.opti.wtk,jad,dist.copy"
+	        description="--> create an debug-free jar using wtk" />
 
-	<target name="dist.chary"
-	        depends="clean,setmode.dist-chary,jad"
-	        description="--> create a non-optimized jar">
-		<mkdir dir="app/non-optimized" />
-		<copy todir="app/non-optimized" file="build/jar/${midlet.jad}" />
-		<copy todir="app/non-optimized" file="build/jar/${midlet.jar}" />
+	<target name="dist.noop.proguard"
+	        depends="clean,configure.dist.noop.proguard,jad,dist.copy"
+	        description="--> create an non-optimized jar using proguard" />
+
+	<target name="dist.noop.wtk"
+	        depends="clean,configure.dist.noop.wtk,jad,dist.copy"
+	        description="--> create an non-optimized jar using wtk" />
+
+	<target name="dist.copy">
+		<mkdir dir="dist" />
+		<copy todir="dist">
+			<fileset dir="build/jar">
+				<include name="${midlet.jar}" />
+				<include name="${midlet.jar}" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- =================== Snapshot ===================================== -->
 
-	<target name="snapshot.optimized"
-	        depends="dist.optimized,snapshot"
-	        description="--> create an optimized binary snapshot of the client" />
+	<target name="snapshot.opti.proguard"
+	        depends="dist.opti.proguard,snapshot.copy"
+	        description="--> create an ptimized snapshot using proguard" />
 
-	<target name="snapshot.chary"
-	        depends="dist.chary,snapshot"
-	        description="--> create a chary binary snapshot of the client" />
+	<target name="snapshot.opti.wtk"
+	        depends="dist.opti.wtk,snapshot.copy"
+	        description="--> create an ptimized snapshot using proguard" />
 
-	<target name="snapshot" depends="revision">
+	<target name="snapshot.noop.proguard"
+	        depends="dist.noop.proguard,snapshot.copy"
+	        description="--> create an ptimized snapshot using proguard" />
+
+	<target name="snapshot.noop.wtk"
+	        depends="dist.noop.wtk,snapshot.copy"
+	        description="--> create an ptimized snapshot using proguard" />
+
+	<target name="snapshot.copy" depends="revision">
 		<property name="snapdir" value="snapshot/snapshot-${revision.no}" />
-
 		<mkdir dir="${snapdir}" />
-		<copy todir="${snapdir}" file="build/jar/${midlet.jad}" />
-		<copy todir="${snapdir}" file="build/jar/${midlet.jar}" />
+		<copy todir="snapdir">
+			<fileset dir="dist">
+				<include name="${midlet.jar}" />
+				<include name="${midlet.jar}" />
+			</fileset>
+		</copy>
 		<tstamp />
 		<echo file="${snapdir}/tmp1"
 		      message="Client snapshot (${TODAY}, Revision ${revision.no})." />
@@ -349,7 +346,11 @@
 
 	<!-- =================== Run ========================================== -->
 
-	<target name="run.wtk">
+	<target name="run.prepare" depends="clean,configure.emulation,jad" />
+
+	<target name="run.wtk"
+	        depends="run.prepare"
+	        description="--> run the client in the WTK emulator">
 		<exec executable="${wtk.home}/bin/emulator" dir="build/jar">
 			<arg value="-Xprefs:${basedir}/wtk-emulator.properties" />
 			<arg value="-Xdomain:${run.emulator.wtk.domain}" />
@@ -358,22 +359,20 @@
 		</exec>
 	</target>
 
-	<target name="run.microemu">
+	<target name="run.microemu"
+	        depends="run.prepare"
+	        description="--> run the client in the MicroEmu emulator">
 		<java fork="yes" classname="org.microemu.app.Main">
 			<arg value="build/jar/${midlet.jad}" />
+			<arg value="--device" />
+			<arg value="org/microemu/device/${run.emulator.microemu.device}/device.xml" />
 			<classpath>
-				<pathelement location="${microemu.jar}" />
+				<pathelement location="${microemu.home}/devices/microemu-device-${run.emulator.microemu.device}.jar" />
+				<pathelement location="${microemu.home}/microemulator.jar" />
 				<pathelement location="${microemu.bluecove.jar}" />
 				<pathelement location="${microemu.bluecove-gpl.jar}" />
 			</classpath>
 		</java>
-	</target>
-
-	<target name="run"
-	        depends="clean,setmode.emulation,jad"
-	        description="--> run client in emulator">
-		<antcall target="run.${run.emulator}" />
-		<antcall target="clean" />
 	</target>
 
 	<!-- =================== Clean ======================================== -->

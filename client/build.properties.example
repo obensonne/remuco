@@ -2,68 +2,70 @@
 # Tools
 # =============================================================================
 
-# Home of WTK.
+# You do not need all of the tools listed here. Read the 'Needed if:' comments
+# to check which tools you need to configure here.
+
+# Home of Sun's WTK.
 # Download: http://java.sun.com/products/sjwtoolkit/
+# Required version: >= 2.5.2
+# Needed if:
+#    - public targets with 'wtk' in their names get called
+#    - option 'run.preverifier' is set to 'wtk'
 wtk.home=${user.home}/opt/java/wtk-2.5.2
 
-# If you use MicroEmu for emulation, set its JAR file here.
+# Home of MicroEmu.
 # Download: http://www.microemu.org/
-microemu.jar=${user.home}/opt/microemulator-2.0.3/microemulator.jar
+# Required version: >= 2.0.3
+# Needed if MicroEmu is used for building or emulation.
+# Needed if:
+#    - public targets with 'microemu' in their names get called
+microemu.home=${user.home}/opt/java/microemulator-2.0.3
 
-# MicroEmu can use BlueCove for bluetooth facilities (optional).
+# BlueCove JAR
 # Download: http://bluecove.org/
+# Required version: >= 2.1
+# Needed if:
+#    - target 'run.microemu' gets called and Bluetooth shall be enabled
 microemu.bluecove.jar=${user.home}/opt/java/bluecove/bluecove-2.1.0.jar
-
-# When using BlueCove, you need this on systems with a BlueZ stack.
-# Download: http://bluecove.org/
+# Additionally needed on systems with a BlueZ stack:
 microemu.bluecove-gpl.jar=${user.home}/opt/java/bluecove/bluecove-gpl-2.1.0.jar
 
-# If you use ProGuard for preverification, set its JAR file here.
+# ProGuard JAR (containing the ProGuard Ant task)
 # Download: http://proguard.sourceforge.net/
-proguard.jar=${user.home}/opt/java/proguard4.2/lib/proguard.jar
+# Required version: >= 4.2
+# Needed if:
+#    - public targets with 'proguard' in their names get called
+#    - the option 'run.preverifier' is set to 'proguard'
+proguard.jar=${user.home}/opt/java/proguard-4.2/lib/proguard.jar
 
 # =============================================================================
-# Configurations for target 'dist'
+# API libs
+# =============================================================================
+
+# Use WTK libraries for building:
+#midp.jar=${wtk.home}/lib/midpapi20.jar
+#cldc.jar=${wtk.home}/lib/cldcapi11.jar
+#jsr82.jar=${wtk.home}/lib/jsr082.jar
+
+# Use MicroEmu libraries for building:
+midp.jar=${microemu.home}/lib/midpapi20.jar
+cldc.jar=${microemu.home}/lib/cldcapi11.jar
+jsr82.jar=${microemu.home}/lib/microemu-jsr-82.jar
+
+# =============================================================================
+# Configurations for targets 'run.wtk' and 'run.microemu'
 # =============================================================================
 
 # The preverifier to use.
-#dist.preverifier=wtk
-dist.preverifier=proguard
-
-# Whether to include debug symbols in the byte code or not.
-dist.debug=no
-#dist.debug=yes
-
-# Whether to optimize and obfuscate the byte code when using ProGuard.
-# Setting this to 'yes' produces smaller and optimized binaries, but may produce
-# errors on some devices.
-dist.proguard.optimize=yes
-#dist.proguard.optimize=no
-
-# Target 'dist' also produces a chary client binary which includes debug symbols
-# and is not optimized. Set the preverifier to use for that binary here.
-dist.chary.preverifier=wtk
-#dist.chary.preverifier=proguard
-
-# =============================================================================
-# Configurations for target 'run'
-# =============================================================================
-
-# The emulator to use.
-run.emulator=wtk
-#run.emulator=microemu
-
-# The preverifier to use.
-run.preverifier=wtk
-#run.preverifier=proguard
+#run.preverifier=wtk
+run.preverifier=proguard
 
 # Whether to include debug symbols in the byte code or not.
 #run.debug=no
 run.debug=yes
 
 # Whether to optimize and obfuscate the byte code when using ProGuard.
-# Setting this to 'yes' produces smaller and optimized binaries, but may produce
-# errors in some emulators.
+# Set this to 'no' to get readable stack traces.
 #run.proguard.optimize=yes
 run.proguard.optimize=no
 
@@ -79,3 +81,8 @@ run.emulator.wtk.device=DefaultColorPhone
 #run.emulator.wtk.domain=minimum
 run.emulator.wtk.domain=maximum
 
+# Device to use when emulating with MicroEmu.
+#run.emulator.microemu.device=default
+run.emulator.microemu.device=large
+#run.emulator.microemu.device=minimum
+#run.emulator.microemu.device=resizable
