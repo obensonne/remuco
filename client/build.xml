@@ -16,10 +16,10 @@
      Create a file 'build.properties' (use 'build.properties.example' as a
      template) and edit it as described within that file.
 
-     Run target 'dist'.
+     Run one of the public targets starting with 'dist' ('opti' means
+     optimized, 'noop' means non-optimized).
      
-     This will create a jar and jad file in the directory 'build' and a 
-     complete distribution package in the directory 'dist'.
+     This will create a jar and jad file in the directory 'dist'.
      
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -29,10 +29,12 @@
      Create a file 'build.properties' (use 'build.properties.example' as a
      template) and edit it as described within that file.
 
+     Run target 'run.microemu' to run the client in the MicroEmu emulator.
+
      When using the WTK emulator, create a file 'wtk-emulator.properties' (use
      'wtk-emulator.properties.example' as a template) and edit it if necessary.
      
-     Run target 'run'.
+     Run target 'run.wtk' to run the client in the WTK emulator.
      
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      
@@ -303,7 +305,7 @@
 	<target name="snapshot.copy" depends="revision">
 		<property name="snapdir" value="snapshot/snapshot-${revision.no}" />
 		<mkdir dir="${snapdir}" />
-		<copy todir="snapdir">
+		<copy todir="${snapdir}">
 			<fileset dir="dist">
 				<include name="${midlet.jar}" />
 				<include name="${midlet.jad}" />
