@@ -1,3 +1,11 @@
+0.8.1	Oben Sonne <obensonne@googlemail.com>
+
+	* base: WiFi port is now a config option
+	* base: fixed a bug concerning the system shutdown command
+	* client: full screen control enabled
+	* client: build process now works completely without WTK
+	* client: emulation with MicroEmu now possible with other skins 
+
 0.8.0.1	Oben Sonne <obensonne@googlemail.com>
 
 	* no additional features, just internal adjustments
