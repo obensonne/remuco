@@ -184,6 +184,7 @@ class Manager(object):
         """
 
         self.__pa = pa
+        self.__pa.manager = self
         
         self.__stopped = False
         
@@ -243,4 +244,14 @@ class Manager(object):
         log.info("stop manager manually")
         self.__stopped = True
         self.__ml.quit()
+
+class DummyManager(object):
+    """Dummy manager which can be stopped - does nothing.
     
+    A DummyManager is used for adapters which not yet or not at all have a
+    Manager to ensure it is always safe to call PlayerAdapter.manager.stop().
+    
+    """
+    
+    def stop(self):
+        """Stop me, I do nothing."""
