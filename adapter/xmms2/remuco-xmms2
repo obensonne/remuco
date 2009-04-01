@@ -185,8 +185,6 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                                       volume_known=True,
                                       progress_known=True)
         
-        self.__lcmgr = None
-        
         self.__state_playback = remuco.PLAYBACK_STOP
         self.__state_volume = 0
         self.__state_position = 0
@@ -395,11 +393,6 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     # internal methods
     # =========================================================================
     
-    def _set_lcmgr(self, lcmgr):
-        """ Set the life cycle manager to stop when XMMS2 disconnects. """
-        
-        self.__lcmgr = lcmgr
-        
     def _check_result(self, result):
         """ Check the result of a request send to XMMS2. """
         
@@ -410,7 +403,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         if err.lower() == ERROR_DISCONNECTED:
             log.warning("lost connection to XMMS2")
-            self.__lcmgr.stop()
+            self.manager.stop()
         else:
             log.warning("error result: %s" % err)
         
@@ -538,7 +531,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         log.info("xmms2 disconnected")
         
-        self.__lcmgr.stop()
+        self.manager.stop()
     
     def __ignore_result(self, result):
         """Handle an XMMS2 result which is not of interest."""
@@ -559,6 +552,5 @@ if __name__ == '__main__':
     
     pa = XMMS2Adapter()
     mg = remuco.Manager(pa)
-    pa._set_lcmgr(mg) # pa stops mg manually on xmms2 disconnect
     mg.run()
     
