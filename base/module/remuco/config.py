@@ -152,7 +152,7 @@ class Config(object):
 
     # === custom options ===
 
-    def get_custom(self, option):
+    def get_custom(self, option, default):
         """Get the value of a custom configuration option.
         
         @param option: name of the option
@@ -164,7 +164,9 @@ class Config(object):
             return self.__cp.get(SEC, "custom_%s" % option)
         except (ValueError, AttributeError), e:
             log.warning("config '%s' malformed (%s)" % (option, e))
-            return None
+            return default
+        except ConfigParser.NoOptionError:
+            return default
 
     def set_custom(self, option, value):
         """Set the value of a custom configuration option.
