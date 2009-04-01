@@ -1,0 +1,183 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""MPD adapter for Remuco, implemented as an executable script."""
+
+import socket # python-mpd does not fully abstract socket errors
+
+import gobject
+
+import mpd
+
+import remuco
+from remuco import log
+
+class MPDAdapter(remuco.PlayerAdapter):
+    
+    def __init__(self):
+        
+        remuco.PlayerAdapter.__init__(self, "MPD",
+                                      playback_known=True,
+                                      volume_known=True,
+                                      repeat_known=True,
+                                      shuffle_known=True,
+                                      progress_known=True
+                                      )
+        
+        self.__mpd = mpd.MPDClient()
+        
+        self.__mpd_host = self.config.get_custom("mpd-host", "localhost")
+        
+        port = self.config.get_custom("mpd-port", "6600")
+        try:
+            self.__mpd_port = int(port)
+        except ValueError, e:
+            log.error("option mpd-port malformed (%s) -> use default" % port)
+            self.__mpd_port = 6600
+        
+        log.debug("MPD is at %s:%d" % (self.__mpd_host, self.__mpd_port))
+        
+        # ensure options are saved:
+        self.config.set_custom("mpd-host", self.__mpd_host)
+        self.config.set_custom("mpd-port", self.__mpd_port)
+        
+        self.__playing = False
+        
+    def start(self):
+        
+        remuco.PlayerAdapter.start(self)
+        
+        self.__check_and_refresh_connection()
+
+        log.debug("here we go")
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+        
+        try:
+            self.__mpd.disconnect()
+        except mpd.ConnectionError:
+            pass
+
+    def poll(self):
+        
+        self.__poll_status()
+    
+        
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
+    def ctrl_toggle_playing(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        try:
+            if self.__playing:
+                self.__mpd.pause()
+            else:
+                self.__mpd.play()
+        except mpd.MPDError, e:
+            log.warning("failed to execute command: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+        
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    def request_playlist(self, client):
+        
+        self.reply_playlist_request(client, ["1", "2"],
+                ["Joe - Joe's Song", "Sue - Sue's Song"])
+
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
+    def __poll_status(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        status = self.__mpd.status()
+        
+        volume = int(status.get("volume", "0"))
+        self.update_volume(volume)
+
+        repeat = status.get("repeat", "0")
+        self.update_repeat(repeat != "0")
+
+        shuffle = status.get("random", "0")
+        self.update_shuffle(shuffle != "0")
+
+        playback = status.get("state", "stop")
+        if playback == "play":
+            self.__playing = True
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        elif playback == "pause":
+            self.__playing = False
+            self.update_playback(remuco.PLAYBACK_PAUSE)
+        else:
+            self.__playing = False
+            self.update_playback(remuco.PLAYBACK_STOP)
+        
+        progress, length = status.get("time", "0:0").split(':')
+        self.update_progress(progress, length)
+         
+        position = int(status.get("song", "0"))
+        self.update_position(position)
+    
+    def __check_and_refresh_connection(self):
+        """Check the current MPD connection and reconnect if broken."""
+        
+        try:
+            self.__mpd.ping()
+        except mpd.ConnectionError:
+            try:
+                self.__mpd.disconnect()
+            except mpd.ConnectionError:
+                pass
+            try:
+                self.__mpd.connect(self.__mpd_host, self.__mpd_port)
+                self.__mpd.ping()
+                log.debug("connected to MPD")
+            except (mpd.ConnectionError, socket.error), e:
+                log.error("failed to connect to MPD: %s" % e)
+                self.manager.stop()
+                return False
+            
+        return True
+    
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+    
+    pa = MPDAdapter()
+    mg = remuco.Manager(pa)
+    mg.run()
