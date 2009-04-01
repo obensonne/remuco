@@ -50,7 +50,7 @@ def build_message(id, serializable):
     # clients.
     
     if serializable is not None:
-        ba = serial.pack(serializable);
+        ba = serial.pack(serializable)
         if ba is None:
             log.warning("failed to serialize (msg-id %d)" % id)
             return None
@@ -345,12 +345,8 @@ class ClientConnection(object):
         
         log.debug("disconnect %s" % self)
         
-        if remove_from_list:
-            try:
-                self.__clients.remove(self)
-            except ValueError:
-                # not yet received client info -> not in client list
-                pass
+        if remove_from_list and self in self.__clients:
+            self.__clients.remove(self)
         
         for sid in self.__sids:
             gobject.source_remove(sid)
@@ -405,6 +401,7 @@ class _Server(object):
             log.error("failed to set up %s server (%s)" % (self._get_type(), e))
             return
         except socket.error, e:
+            # TODO: this may be removed when 2.5 support is dropped
             log.error("failed to set up %s server (%s)" % (self._get_type(), e))
             return
         
@@ -426,7 +423,7 @@ class _Server(object):
             
             try:
                 log.debug("connection request from %s client" % self._get_type())
-                client_sock, addr = self._sock.accept();
+                client_sock, addr = self._sock.accept()
                 log.debug("connection request accepted")
                 client_sock.setblocking(0)
                 ClientConnection(client_sock, addr, self.__clients,
@@ -453,7 +450,7 @@ class _Server(object):
             log.debug("closing %s server socket" % self._get_type())
             try:
                 self._sock.shutdown(socket.SHUT_RDWR)
-            except socket.error, e:
+            except socket.error:
                 pass
             self._sock.close()
             self._sock = None
@@ -499,8 +496,8 @@ class BluetoothServer(_Server):
         if self._sock is not None:
             try:
                 bluetooth.stop_advertising(self._sock)
-            except bluetooth.BluetoothError:
-                pass
+            except bluetooth.BluetoothError, e:
+                log.warning("failed to unregister bluetooth service (%s)" % e)
         
         super(BluetoothServer, self).down()
         

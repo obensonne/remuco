@@ -41,8 +41,9 @@ def _sighandler(signum, frame):
 def _init_main_loop():
     """Used by Manager. """
     
+    global _ml
+    
     if _ml is None:
-        global _ml
         _ml = gobject.MainLoop()
         signal.signal(signal.SIGINT, _sighandler)
         signal.signal(signal.SIGTERM, _sighandler)
