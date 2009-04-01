@@ -22,8 +22,6 @@
 
 """Rhythmbox player adapter for Remuco, implemented as a Rhythmbox plugin."""
 
-import os.path
-import traceback
 import time
 
 import gobject
@@ -96,8 +94,6 @@ PLAYLIST_ACTIONS = (IA_JUMP, IA_ENQUEUE)
 QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
 MLIB_LIST_ACTIONS = (LA_PLAY,)
 MLIB_ITEM_ACTIONS = (IA_ENQUEUE,)
-
-#TODO implement added actions
 
 # =============================================================================
 # player adapter
@@ -339,8 +335,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             if sc is None:
                 log.warning("no source for path %s" % path)
                 return
-            
-            qm = sc.get_entry_view().props.model
             
             sp = self.__shell.get_player()
     
@@ -641,7 +635,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         db = self.__shell.props.db
 
         position = 0
-        queue = False
         
         id_now = self.__item_id
         
@@ -662,7 +655,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                         break
                     position += 1
                     
-        log.debug ("position: %i" % position)
+        log.debug("position: %i" % position)
         
         return position
 
