@@ -20,9 +20,7 @@
 #
 # =============================================================================
 
-import os
 import signal
-import subprocess
 
 import dbus
 from dbus.exceptions import DBusException
@@ -37,16 +35,14 @@ def _sighandler(signum, frame):
     """Used by Manager. """
     
     log.info("received signal %i" % signum)
-    global _ml
     if _ml is not None:
         _ml.quit()
 
 def _init_main_loop():
     """Used by Manager. """
     
-    global _ml
-    
     if _ml is None:
+        global _ml
         _ml = gobject.MainLoop()
         signal.signal(signal.SIGINT, _sighandler)
         signal.signal(signal.SIGTERM, _sighandler)
@@ -54,6 +50,7 @@ def _init_main_loop():
     return _ml
 
 def _start_pa(pa):
+    """Start the given player adapter with error handling."""
     
     log.info("start player adapter")
     try:
@@ -66,11 +63,12 @@ def _start_pa(pa):
         log.info("player adapter started")
 
 def _stop_pa(pa):
+    """Stop the given player adapter with error handling."""
     
     log.info("stop player adapter")
     try:
         pa.stop()
-    except:
+    except Exception:
         log.exception("** BUG **")
     else:
         log.info("player adapter stopped")
@@ -222,7 +220,7 @@ class Manager(object):
             log.info("start main loop")
             try:
                 self.__ml.run()
-            except:
+            except Exception:
                 log.exception("** BUG **")
             log.info("main loop stopped")
             
