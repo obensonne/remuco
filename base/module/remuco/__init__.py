@@ -87,4 +87,4 @@ __all__ = ("PlayerAdapter", "MPRISAdapter",
            "PLAYBACK_PAUSE", "PLAYBACK_PLAY", "PLAYBACK_STOP",
            )
 
-__version__ = "0.8.1"
+__version__ = REMUCO_VERSION

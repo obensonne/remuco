@@ -30,6 +30,7 @@ from xdg.BaseDirectory import xdg_config_home as xdg_config
 from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 
 from remuco import log
+from remuco import defs
 
 SEC = ConfigParser.DEFAULTSECT
 
@@ -106,6 +107,8 @@ class Config(object):
             self.__save()
 
         log.set_level(self.log_level)
+        
+        log.info("remuco version: %s" % defs.REMUCO_VERSION)
         
     def __init_dirs(self):
         """Create config and cache dirs for given player."""
