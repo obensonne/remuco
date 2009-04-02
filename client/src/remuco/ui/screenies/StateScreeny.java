@@ -80,23 +80,23 @@ public class StateScreeny extends Screeny {
 			theme.getImg(Theme.RTE_STATE_BORDER_SW),
 			theme.getImg(Theme.RTE_STATE_BORDER_S),
 			theme.getImg(Theme.RTE_STATE_BORDER_SE),
-			theme.getColor(Theme.RTC_BG_ALL));
+			theme.getColor(Theme.RTC_BG_STATE));
 
 		int xOff = clip[0]; // x offset for elements
 		final int yOff = clip[1]; // y offset for elements
+		int wRest = clip[2]; // available width for elements
+		final int hRest = clip[3]; // available height for elements
 
 		// ////// initially fill everything with spacer ////// //
 
 		final int wSpacer = spacer.getWidth();
-		for (int x = xOff; x < clip[2]; x += wSpacer) {
+		for (int x = xOff; x < xOff + wRest; x += wSpacer) {
 			g.drawImage(spacer, x, yOff, TOP_LEFT);
 		}
 
 		// ////// draw state elements ////// //
 
-		int wRest = clip[2]; // available width for elements
-		final int hRest = clip[3]; // available height for elements
-		int wGap;;
+		int wGap;
 
 		xOff = clip[0];
 		screenyPlayback.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);

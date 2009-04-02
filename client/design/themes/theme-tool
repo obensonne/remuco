@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 ELEMENTS = (
-    "rte.color.bg.all", "rte.color.bg.item", "rte.color.text.album",
+    "rte.color.bg.state", "rte.color.bg.item", "rte.color.text.album",
     "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title",
     "rte.item.border.e", "rte.item.border.n", "rte.item.border.ne",
     "rte.item.border.nw", "rte.item.border.s", "rte.item.border.se",
@@ -51,7 +51,7 @@ SAME_HEIGHT = (
 )
 
 ONE_PIXEL = (
-    "rte.color.bg.all", "rte.color.bg.item", "rte.color.text.album",
+    "rte.color.bg.state", "rte.color.bg.item", "rte.color.text.album",
     "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title"
 )
 

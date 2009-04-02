@@ -20,13 +20,6 @@
    enable-background="new">
   <defs
      id="defs4">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 160 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="240 : 160 : 1"
-       inkscape:persp3d-origin="120 : 106.66667 : 1"
-       id="perspective89" />
     <filter
        inkscape:collect="always"
        id="filter3333">
@@ -47,11 +40,11 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16.086679"
-     inkscape:cx="60.6443"
-     inkscape:cy="250.22914"
+     inkscape:zoom="2.84375"
+     inkscape:cx="120"
+     inkscape:cy="160"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showgrid="true"
      borderlayer="false"
      inkscape:showpageshadow="false"
@@ -607,11 +600,11 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
     <rect
        inkscape:label="#rect2511"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.color.bg.all"
+       id="rte.color.bg.state"
        width="1"
        height="1"
-       x="0"
-       y="103" />
+       x="16"
+       y="83" />
     <rect
        inkscape:label="#rect2511"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"

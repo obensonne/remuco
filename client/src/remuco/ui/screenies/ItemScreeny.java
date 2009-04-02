@@ -93,7 +93,7 @@ public final class ItemScreeny extends Screeny {
 			theme.getImg(Theme.RTE_ITEM_BORDER_SW),
 			theme.getImg(Theme.RTE_ITEM_BORDER_S),
 			theme.getImg(Theme.RTE_ITEM_BORDER_SE),
-			theme.getColor(Theme.RTC_BG_ALL));
+			theme.getColor(Theme.RTC_BG_ITEM));
 
 		// fill clip with item background color
 

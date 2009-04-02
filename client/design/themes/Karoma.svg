@@ -47,11 +47,11 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.3587573"
-     inkscape:cx="21.617972"
-     inkscape:cy="244.76395"
+     inkscape:zoom="2.84375"
+     inkscape:cx="69.010989"
+     inkscape:cy="160"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showgrid="true"
      borderlayer="false"
      inkscape:showpageshadow="false"
@@ -575,8 +575,8 @@ This theme makes use of some icons from Amarok 1.4.</dc:description>
        y="252"
        inkscape:label="#rect2505" />
     <rect
-       y="284"
-       x="25"
+       y="78"
+       x="7"
        height="1"
        width="1"
        id="rte.color.bg.item"
@@ -585,11 +585,11 @@ This theme makes use of some icons from Amarok 1.4.</dc:description>
     <rect
        inkscape:label="#rect2511"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.color.bg.all"
+       id="rte.color.bg.state"
        width="1"
        height="1"
-       x="-3.4960937e-07"
-       y="253.42137" />
+       x="47"
+       y="37" />
     <rect
        inkscape:label="#rect2511"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"

@@ -63,7 +63,7 @@ public final class Theme {
 		Font.STYLE_PLAIN, Font.SIZE_LARGE);
 
 	/** Theme color ID */
-	public static final byte RTC_BG_ALL = 0, RTC_BG_ITEM = 1,
+	public static final byte RTC_BG_STATE = 0, RTC_BG_ITEM = 1,
 			RTC_TEXT_ALBUM = 2, RTC_TEXT_ARTIST = 3, RTC_TEXT_OTHER = 4,
 			RTC_TEXT_TITLE = 5;
 
@@ -90,7 +90,7 @@ public final class Theme {
 	private static final Image IMG_FALLBACK;
 
 	/** Theme element file name (without extension) */
-	private static final String[] IMG_NAME = { "rte.color.bg.all",
+	private static final String[] IMG_NAME = { "rte.color.bg.state",
 			"rte.color.bg.item", "rte.color.text.album",
 			"rte.color.text.artist", "rte.color.text.other",
 			"rte.color.text.title", "rte.item.border.e", "rte.item.border.n",
