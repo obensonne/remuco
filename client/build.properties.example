@@ -11,14 +11,15 @@
 # Needed if:
 #    - public targets with 'wtk' in their names get called
 #    - option 'run.preverifier' is set to 'wtk'
+#    - WTK libraries are used below in section 'API libs'
 wtk.home=${user.home}/opt/java/wtk-2.5.2
 
 # Home of MicroEmu.
 # Download: http://www.microemu.org/
 # Required version: >= 2.0.3
-# Needed if MicroEmu is used for building or emulation.
 # Needed if:
 #    - public targets with 'microemu' in their names get called
+#    - MicroEmu libraries are used below in section 'API libs'
 microemu.home=${user.home}/opt/java/microemulator-2.0.3
 
 # BlueCove JAR
