@@ -54,8 +54,12 @@ cldc.jar=${microemu.home}/lib/cldcapi11.jar
 jsr82.jar=${microemu.home}/lib/microemu-jsr-82.jar
 
 # =============================================================================
-# Configurations for targets 'run.wtk' and 'run.microemu'
+# Configurations for targets 'run', 'run.wtk' and 'run.microemu'
 # =============================================================================
+
+# Default emulator to use for the 'run' target.
+#run.emulator=wtk
+run.emulator=microemu
 
 # The preverifier to use.
 #run.preverifier=wtk

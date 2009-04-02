@@ -288,19 +288,19 @@
 
 	<target name="snapshot.opti.proguard"
 	        depends="dist.opti.proguard,snapshot.copy"
-	        description="--> create an ptimized snapshot using proguard" />
+	        description="--> create an optimized snapshot using proguard" />
 
 	<target name="snapshot.opti.wtk"
 	        depends="dist.opti.wtk,snapshot.copy"
-	        description="--> create an ptimized snapshot using proguard" />
+	        description="--> create an optimized snapshot using wtk" />
 
 	<target name="snapshot.noop.proguard"
 	        depends="dist.noop.proguard,snapshot.copy"
-	        description="--> create an ptimized snapshot using proguard" />
+	        description="--> create a non-optimized snapshot using proguard" />
 
 	<target name="snapshot.noop.wtk"
 	        depends="dist.noop.wtk,snapshot.copy"
-	        description="--> create an ptimized snapshot using proguard" />
+	        description="--> create a non-optimized snapshot using wtk" />
 
 	<target name="snapshot.copy" depends="revision">
 		<property name="snapdir" value="snapshot/snapshot-${revision.no}" />
@@ -375,6 +375,11 @@
 				<pathelement location="${microemu.bluecove-gpl.jar}" />
 			</classpath>
 		</java>
+	</target>
+
+	<target name="run"
+	        description="--> run the client in the configured default emulator">
+		<antcall target="run.${run.emulator}" />
 	</target>
 
 	<!-- =================== Clean ======================================== -->
