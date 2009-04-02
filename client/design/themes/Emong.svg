@@ -18,18 +18,6 @@
    sodipodi:docname="Emong.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    enable-background="new">
-  <defs
-     id="defs4">
-    <filter
-       inkscape:collect="always"
-       id="filter3333">
-      <feBlend
-         inkscape:collect="always"
-         mode="lighten"
-         in2="BackgroundImage"
-         id="feBlend3335" />
-    </filter>
-  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -75,6 +63,18 @@
        position="38.914184,278.49129"
        id="guide3363" />
   </sodipodi:namedview>
+  <defs
+     id="defs4">
+    <filter
+       inkscape:collect="always"
+       id="filter3333">
+      <feBlend
+         inkscape:collect="always"
+         mode="lighten"
+         in2="BackgroundImage"
+         id="feBlend3335" />
+    </filter>
+  </defs>
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -161,51 +161,44 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        id="image4133"
        height="24"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-pause.png"
-       xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-pause.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAABSUlEQVRIx+2Uu07DMBSGv9g+GYjdzgYpAxPvgxBvgCg8ALAAQh2A N0GIBcGI4DGY2FB3JMbkMLRJRZOgtmxV/yXSufyX2DKssfJIOuo9wC/Ao8A38DXbcB0L2d7+7uds 8f7uYQugo7c5t0CMMQW4ub4d21Pl9OyEGKNUM8OrIaUqqsrF5TkxxnQ0GjW4TIeAAJRlydPzI0VR 1PWqV5Qlr28vjZ15E9QCIoJqk8QYg/cBY8yfAq0J8jyXKYnHTkjyPJeqZ40leI+19tfOQr+odmmn LquedZbMh1pgoQTVsLNunMC6hoBzjuA9IrL8GRhr8T7gXNOliOB9QNw/BETGCdpIRFKyLMP9J4FI SraRYZ1rkkyulk6+SwmoKv1ev5VEUYIPywkAJcDh4IAuHB0PWndm0frYqeoOsE3HLesw9JEkyfuc 82usEn4AOntYY+/Ozv0AAAAASUVORK5CYII= " />
     <image
        y="229.86218"
        x="99.071442"
        id="image4146"
        height="24"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-start.png"
-       xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-start.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAAC10lEQVRIx+2UXUiTURjH/2fH13fvuy232cY+g1Q0ZF3koCKdrZCc hBd1ERWRfdyV2MdF9AUmeJGkKF2aQWZ+EWIUJESUghdWZtsuJgm2aWm5Tc2P3KZu68LUspnLhG78 w3Nx/hf/H885z3mAdf1v0QhePAA1gFgA0wBCaw3Q7MvO6tVt0orGxyZcfr8/DCAAILxmHSQmJRRc vnRlm3d46Hi8XD7ldnsGg8EgVgOKBJAnJiUUFBYWCbbv2MmKxWLTzPT0wbg4yQAg8Gm1Wni9Xv8/ A0wmE562PIHBYKCHjxyVBqYD+2dDsxmckB1MTt4Sk5qaGuzp6Zn6a4BEIlHo9br83Nxc9PW5MDE5 iZGRYZh376GW7By10+k8MDX1bbNso9ydtTdrg9lsDrS3t/uWAwiWGhqNhgUASil4ngfP82AYBv39 fRgdHSFXr11nCm8UWRAKNX7+MnBGoVJk1tTU7GpubpZGBdDpdIsAjl8sngelAng8bshkMkFF+W3h qZOnj73q6Ki22q2HlEqlxW63b10RoFKpYgGACih4XrTQxVzNncPhEEa/jsBoNMY01DVKXM4P51rb XmSq1WrD0ryYpYZer2c93qGFK2JZ9qcSAgAYhgHP8XA4HMHKqkpferqpLv9svpVhmJ4VAVqtlu16 1wlKKTieh5BlERvLgmEYUEohFonh8XhCxcXFQaVC2VJeUfFMtkHmAvCaEOJZEaBWq395A5Zl54LF EgT8ftwqLZ0JBHxvLpy/+CglJaX3R/Cn5aYoYgfzAI7jIBaJARDUN9TN2qw214m8vAcZGZnvAXQC 6CWE/PFn/waYH1OO4yGVytDa+nK2qalpLMdiqa26c/ctgC4ADkJIVEtw2Q66ux2hkpKbgbS0tIfV 9+63UUrtAGyEkJlogpcFUEqDAFBbX/u8rKz8sUKhsAHoIoSsuBYiiSw1wuGwEYABwEcAnYSQ8dUE rytqfQexx+wWAehHFAAAAABJRU5ErkJggg== " />
     <image
        y="278.86218"
        x="98.071442"
        id="image4159"
        height="24"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
-       xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAABOElEQVRIx+2UsUrEQBCGv92ZO5goNl6zFimsLNVXEfENRHvRV1Df RMQHEPE9rOwkIGIh2N5aZJN4xyUmXnfcQDbDhPm/2ZndwNpW3lxLfAvYHKATgW/ga/6DtiRsHJ8c vQ2p9P7uYac3IIQwBri5vm3qm9mvK920XF5dEEIYF0VBX8CoEn56fkREURVEpPTTW0Q42D+sc4YD HJhliEgpqpoggiaA8342pw8gz/PRx+c7DoeZNRXrrLio4BMgz/P+gBBCCfAVoKlctGpR06auHfiu FnnnMcsws/LJMrLKT3H9A9A5A+c9mVlTfWrT7yH7ZQAigpnVYiKCquJccz9jjMsCylNUDXPelgKo KpPtSX3PSGL1Gv8JAKYAZ+enDLDpouDCn12McQ/YpeWUtYi/OudehlS0thWxH8WxPQiql5p+AAAA AElFTkSuQmCC " />
     <image
        y="280.97208"
        x="167.07144"
        id="image4185"
        height="19.500002"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/status/audio-volume-high.png"
-       xlink:href="/usr/share/icons/gnome/24x24/status/audio-volume-high.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAAEYUlEQVRIx+WTbWwURRjH/7u3e729u7ZHey0KlLaB1JdIEWpreG2D orQJFJEXgRhrlJq0SSUxwbSJyX0w1Ap8gYQIaoghBCHymtqaSOKhSEkVisEWoWcpUc6Tau96t3O7 czsz64dW02trBL8Zn2Qyz07+s795npk/8F8P6V5E27dv90kKfUK2+dU9ew7+dj8A+V5Eqia+9vly PpFVV08gEFCm0hTVtJ6fXb1zyb8CcM5LVlQ+m804zzOMsGfKVijy205VOVFS++6y+wIEAnUuzrgy r7QUggtE/0Z36+ybn2se1ybN7T48b8v+afcEaGho8BLq+0zYwMCPA+BCYCKhuLr1raKa1mYAuHa0 6bzb6/rIo2W0/SOgsbkx1+tTuksfm7/Itm2oqgrO+SSdA/Z7iqJuLVm7ux4AfK4ZOz1ebeWKxiOF AJB2YTtaXj/HGFumyMolG3bhkxVLZy5dVKlcvnoFTqcKxgWkCWcKdbYMVbz4/mpbsS+U1x0627mv JlLbcvKYgPwCgLY0dTyeeGrDc1udcT2xvHrV6oKliyuVvLw8MIuNVsCErGnCBQBFawO+oprW8zNW B9zdh7fdypmWfTjX730ZANxe7YxHc9WmtWjj5o0vGWYKfn8eDDOFsgXlsj/Xj5GRGChNwaQUnHNV dmYeA4DB04FY/nR/7+z8WbsAICsn+6TPl7kWAFxeT8jt1eamAWTJ3msaFAUFBbBSDBlOF/pDNxD8 8guYpgmiE3DOEYncnb9uy7pCAHjo0dmBhx+Zux4AvFnuW9NysosB4FDT8iGPR8tMuwPORVaKMfT2 9oIQA/2hm4j8GoFpUliMQdd1WIzhzp0hEEpH9zCHV0iWDgCSJKuSJFkAUH/gWxUQchpAkvC7YdLc cDgMw6SQJQnUNJEkBJwJEEJgWQymSb/r6bp4u6z+gPpDX2gPJOlDAEjGEiWGw3ETAGCaD+qCR9Kf qYRXTYMiHA7DNCi+unhByJIDlKbAGINOCAQXVnaefxMARMMjRcPDw79IvdgFALFYYnN0eORjABhJ 6AsMYvSkVXD86InT5YuXYLSCFNo/7fip7PGFMwsKZinM4tD1BBjjQsowTAAYaN/RD6BhEEB53cHy aDT+jOaibwCASYznBXBiktE44z2n2jvAGP/GSCTLLnR19V/q7qZMcOgJHYzzyU5es6s0Fo2fio4k tgX3N+pVDccfIEnjaaaTM5OMdqX70sLx31VVVRV9N/rb3VpGJSEEjE12ss1YW0qym26faTkHADSl v0NT9t6uD16JTwJMjGAwqBdVVa0qtJhBCAFnHI4JmsGO5uo/83lb9m1IkuQiEhOv/fX8x2kVAG4A 2QByAeQDmD4YDGYJLrhORn3wczw+5aGK17StNHRjH02m1oc6m+j4nwKAA4BzbGSMyxUAzGJs4Pu+ vumMcf1uKGSN6dP6ZTOxm8GuDXXsuDZ+XZqQKwDUsVkeW7NnzJmTme/zldIkrly/fjkCwMb/Jv4A 250SLIlyyEUAAAAASUVORK5CYII= " />
     <image
-       xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAABOElEQVRIx+2UsUrEQBCGv92ZO5goNl6zFimsLNVXEfENRHvRV1Df RMQHEPE9rOwkIGIh2N5aZJN4xyUmXnfcQDbDhPm/2ZndwNpW3lxLfAvYHKATgW/ga/6DtiRsHJ8c vQ2p9P7uYac3IIQwBri5vm3qm9mvK920XF5dEEIYF0VBX8CoEn56fkREURVEpPTTW0Q42D+sc4YD HJhliEgpqpoggiaA8342pw8gz/PRx+c7DoeZNRXrrLio4BMgz/P+gBBCCfAVoKlctGpR06auHfiu FnnnMcsws/LJMrLKT3H9A9A5A+c9mVlTfWrT7yH7ZQAigpnVYiKCquJccz9jjMsCylNUDXPelgKo KpPtSX3PSGL1Gv8JAKYAZ+enDLDpouDCn12McQ/YpeWUtYi/OudehlS0thWxH8WxPQiql5p+AAAA AElFTkSuQmCC "
        width="24"
        height="24"
        id="image4241"
        x="90.071442"
        y="321.86218" />
     <image
-       xlink:href="/usr/share/icons/gnome/24x24/status/media-playlist-repeat.png"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/status/media-playlist-repeat.png"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAADHklEQVRIx+2UTUwUZxjH/887y7IdZ1F3Cyjsou6WgoaoQZMNZHqp GmJWohHW7XqqorholLUx8WrTXogfsTUejHTRi/h5IGFpDQcT04tJpW3aJiXVphnGdf1AhF3HwOI+ HjroBkaoFw+N/8s78zzv8/89z5t3Bniv/71o2rsA4AKgALC9hU8WQAbACIDcmwASAE9VVZVn9ZpV RyRBgWx20jmXs73APvoil7v108DtI3f+vJMEoAN4MZXP79Lt8/lK6uoDiW2RUFG5p5wEEYgIRAKC CCTMlQRIEAQJEGj+kK6vj3fGAxPGxDpN054DeGgFUDZuauhobAwWLXQtpM4z8Wwqdb9grgm8Fd5s W1u0INq2p8jpdB499e3pXZaASCSiZNKZwOKyMjofPz/eGNx0csOGhr/nAiS+T1R2nv3uQKw9Zs88 ywQikYjS3d2NGYDm5mb3xcsXZJtNwpCuF5rmCSK6NxugtrZ2ub9y2SEhCWQyGfmzbdvd+QAx9SDL sgAAIaTXN8DavBDAUgAfAZAHBgay+XXFxcX2/M2vJhBCsLnO1rCsqurmxeWlFwDgyqVrpVMJyayT JInzC165ud3uiXnzZENAoKJiyXh//3Wf2eWH5hanqqqba1auiHfFz0EIgWAwWFL/Sf1av98/LkiC oiiGy+WasARUV1ePlZV7/kgmk7yz5fPCvh8SX4TCTX+Fwk2PANhUVW2sWbkifvzYCUd2MguHwwFZ cfxWX1fXFYsdLNT0IfZ6vL97vd4nlrMz8wJN0w7ubm1J3/zxRk679w+nHiY5FG5iAAiFm/h+Kslj 6VEeHnnMI0+H+enYCI+OjfIvv/6ca92zK63reoyZF+T70jTI2sHBwU+7zsW3px6kPjaMZx8AwOWL V229vb0d1/v79n/15dd2EoT2WDsMw4BTcRqlixYN7tixs7vSX3mTiG7Neq+Z2c/MW5m5hZlbmTlo xit6eno69u2Pjg8PP+JwJMRmvoWZtzCzz8pvxg+NiO4CuGsR15j5G2bm6N7oYTN8lYisz9zqiP6L mLkEQAP+/R4uEVH6bT3e693qJWSlLt3iHKSdAAAAAElFTkSuQmCC "
        width="24"
        height="24"
        id="image4243"
        x="123.07144"
        y="260.86218" />
     <image
-       xlink:href="/usr/share/icons/gnome/24x24/status/media-playlist-shuffle.png"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/status/media-playlist-shuffle.png"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A /wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gFBwwFHAfi0kUAAAOgSURBVEjH 7VVtTJtVGD33fSlv7QyDFn9IKzpFGhmZgznNsqBkEHGLdk5AFiLI+ChsmrG4uFKZH9vKGFlUOsFk cbCNjGQkmFVFAkShk38accZJpCwbg2TJkLKWBqHt6PHHgFTH/Igk/tmT3B8358k5z73Pc+4F7sb/ HfIycGgB6AFoAEwDYDgo/it7WXkJZVlG0O+3NTWdPgHgGoDgAi79KX8VgISw9TAAA4CVYcXIAHQA 4gE8oigK6j+w4369YX9FRWnFfL5ypxMk5OZlDy+CQkClUhEUo6NXxyr7+/udJpPp2UeNCUcDAX88 SRETo4XVYkVEhAoHbQfg83rq7PbG4wCu3CYwMzOzo7DoleYjdbUQEAiFQvB4vBgY+B7O899Qs+Ke r6OjVmYWvboD8Q/EQ5IkAGKhEAQCQex5Yzd2VbyuT01NvXabAEnzy9tzji/enyRBp9Nxy+bNQpJl 9PX2ocpixc2bQXR0dnBwcFBoNCtQba2GLEfgwKH38JjR2JafX9AphGhZSqAQgHph73a71adONT1z 4acftxkTjSLnpRzodLGoravhmjVrz71o2nb+7Xer7e8f/RCHag4ukH8JoEsI8evfTghJDclUu93e unvPa/T5vGxqPsEzZ063kEwgGVlWXsKKXWa2tracJbmdZFQ4R8RfCQghfgMw4HQ6HSOjV/IlScLF ny8i5fHUJiHEJQAYGhpKS0xMTJqcnLzR09PTmZWVNf2PBebxKKfzq6eSVyeDBObmgnA4HBkABgBM 73/nrX4A8HmnbV1dXd8CCIT7QF7CB7Hz7tQaDIa43LzsnZDEXnNpuRgfH8fI1RFM+bxpBn1chNfr u/7Qqgd3HrM3YOCH757WxxlmXS7XMIAZAHNL+qCsvGRYrb7V58hIFZKSVtP0/FahKApsNTZkZm5C KER80fE5JybcIhQKobHhY8iyjCrrPtxwT9W1t7ff2QdvWvY2HzlcByFuzTdJjI6NofnkJ7g3KuqC 6xfX2oyMTVj/xHpotTGLXlAUBR6PF5aqfbBaqhd98IceqNVqld/vh7W6KrzRjI6Ontjy3AvH0tPT z3V3dxc4Pvu0uK+3N9YfCAiSaGz4CLMzszhca8PGDWltKSkpmQBalhrLQpLmsFVE0kQymaQ8n6Mm +STJHJLFuXnZvHz5EkvNxayvrz9LsoDkfcv2mubmZRMANm5Ia6usrHQA6BRCTC2bAMl1ANYBuA6g Wwgxe/eb/VfxO/W0j5HVtPkuAAAAAElFTkSuQmCC "
        width="24"
        height="24"
        id="image4265"
@@ -219,8 +212,7 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
          id="image4271"
          height="24"
          width="24"
-         sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
-         xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png" />
+         xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAABOElEQVRIx+2UsUrEQBCGv92ZO5goNl6zFimsLNVXEfENRHvRV1Df RMQHEPE9rOwkIGIh2N5aZJN4xyUmXnfcQDbDhPm/2ZndwNpW3lxLfAvYHKATgW/ga/6DtiRsHJ8c vQ2p9P7uYac3IIQwBri5vm3qm9mvK920XF5dEEIYF0VBX8CoEn56fkREURVEpPTTW0Q42D+sc4YD HJhliEgpqpoggiaA8342pw8gz/PRx+c7DoeZNRXrrLio4BMgz/P+gBBCCfAVoKlctGpR06auHfiu FnnnMcsws/LJMrLKT3H9A9A5A+c9mVlTfWrT7yH7ZQAigpnVYiKCquJccz9jjMsCylNUDXPelgKo KpPtSX3PSGL1Gv8JAKYAZ+enDLDpouDCn12McQ/YpeWUtYi/OudehlS0thWxH8WxPQiql5p+AAAA AElFTkSuQmCC " />
       <rect
          y="286.86218"
          x="191.07144"
@@ -233,8 +225,7 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        id="g4283"
        transform="translate(-70,42.999997)">
       <image
-         xlink:href="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
-         sodipodi:absref="/usr/share/icons/gnome/24x24/actions/media-playback-stop.png"
+         xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAABOElEQVRIx+2UsUrEQBCGv92ZO5goNl6zFimsLNVXEfENRHvRV1Df RMQHEPE9rOwkIGIh2N5aZJN4xyUmXnfcQDbDhPm/2ZndwNpW3lxLfAvYHKATgW/ga/6DtiRsHJ8c vQ2p9P7uYac3IIQwBri5vm3qm9mvK920XF5dEEIYF0VBX8CoEn56fkREURVEpPTTW0Q42D+sc4YD HJhliEgpqpoggiaA8342pw8gz/PRx+c7DoeZNRXrrLio4BMgz/P+gBBCCfAVoKlctGpR06auHfiu FnnnMcsws/LJMrLKT3H9A9A5A+c9mVlTfWrT7yH7ZQAigpnVYiKCquJccz9jjMsCylNUDXPelgKo KpPtSX3PSGL1Gv8JAKYAZ+enDLDpouDCn12McQ/YpeWUtYi/OudehlS0thWxH8WxPQiql5p+AAAA AElFTkSuQmCC "
          width="24"
          height="24"
          id="image4285"
@@ -266,24 +257,21 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        id="image2700"
        height="24"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/status/media-playlist-repeat.png"
-       xlink:href="/usr/share/icons/gnome/24x24/status/media-playlist-repeat.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBI WXMAAABIAAAASABGyWs+AAADHklEQVRIx+2UTUwUZxjH/887y7IdZ1F3Cyjsou6WgoaoQZMNZHqp GmJWohHW7XqqorholLUx8WrTXogfsTUejHTRi/h5IGFpDQcT04tJpW3aJiXVphnGdf1AhF3HwOI+ HjroBkaoFw+N/8s78zzv8/89z5t3Bniv/71o2rsA4AKgALC9hU8WQAbACIDcmwASAE9VVZVn9ZpV RyRBgWx20jmXs73APvoil7v108DtI3f+vJMEoAN4MZXP79Lt8/lK6uoDiW2RUFG5p5wEEYgIRAKC CCTMlQRIEAQJEGj+kK6vj3fGAxPGxDpN054DeGgFUDZuauhobAwWLXQtpM4z8Wwqdb9grgm8Fd5s W1u0INq2p8jpdB499e3pXZaASCSiZNKZwOKyMjofPz/eGNx0csOGhr/nAiS+T1R2nv3uQKw9Zs88 ywQikYjS3d2NGYDm5mb3xcsXZJtNwpCuF5rmCSK6NxugtrZ2ub9y2SEhCWQyGfmzbdvd+QAx9SDL sgAAIaTXN8DavBDAUgAfAZAHBgay+XXFxcX2/M2vJhBCsLnO1rCsqurmxeWlFwDgyqVrpVMJyayT JInzC165ud3uiXnzZENAoKJiyXh//3Wf2eWH5hanqqqba1auiHfFz0EIgWAwWFL/Sf1av98/LkiC oiiGy+WasARUV1ePlZV7/kgmk7yz5fPCvh8SX4TCTX+Fwk2PANhUVW2sWbkifvzYCUd2MguHwwFZ cfxWX1fXFYsdLNT0IfZ6vL97vd4nlrMz8wJN0w7ubm1J3/zxRk679w+nHiY5FG5iAAiFm/h+Kslj 6VEeHnnMI0+H+enYCI+OjfIvv/6ca92zK63reoyZF+T70jTI2sHBwU+7zsW3px6kPjaMZx8AwOWL V229vb0d1/v79n/15dd2EoT2WDsMw4BTcRqlixYN7tixs7vSX3mTiG7Neq+Z2c/MW5m5hZlbmTlo xit6eno69u2Pjg8PP+JwJMRmvoWZtzCzz8pvxg+NiO4CuGsR15j5G2bm6N7oYTN8lYisz9zqiP6L mLkEQAP+/R4uEVH6bT3e693qJWSlLt3iHKSdAAAAAElFTkSuQmCC " />
     <image
        y="277.86218"
        x="143.07144"
        id="image2702"
        height="24"
        width="24"
-       sodipodi:absref="/usr/share/icons/gnome/24x24/status/media-playlist-shuffle.png"
-       xlink:href="/usr/share/icons/gnome/24x24/status/media-playlist-shuffle.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A /wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gFBwwFHAfi0kUAAAOgSURBVEjH 7VVtTJtVGD33fSlv7QyDFn9IKzpFGhmZgznNsqBkEHGLdk5AFiLI+ChsmrG4uFKZH9vKGFlUOsFk cbCNjGQkmFVFAkShk38accZJpCwbg2TJkLKWBqHt6PHHgFTH/Igk/tmT3B8358k5z73Pc+4F7sb/ HfIycGgB6AFoAEwDYDgo/it7WXkJZVlG0O+3NTWdPgHgGoDgAi79KX8VgISw9TAAA4CVYcXIAHQA 4gE8oigK6j+w4369YX9FRWnFfL5ypxMk5OZlDy+CQkClUhEUo6NXxyr7+/udJpPp2UeNCUcDAX88 SRETo4XVYkVEhAoHbQfg83rq7PbG4wCu3CYwMzOzo7DoleYjdbUQEAiFQvB4vBgY+B7O899Qs+Ke r6OjVmYWvboD8Q/EQ5IkAGKhEAQCQex5Yzd2VbyuT01NvXabAEnzy9tzji/enyRBp9Nxy+bNQpJl 9PX2ocpixc2bQXR0dnBwcFBoNCtQba2GLEfgwKH38JjR2JafX9AphGhZSqAQgHph73a71adONT1z 4acftxkTjSLnpRzodLGoravhmjVrz71o2nb+7Xer7e8f/RCHag4ukH8JoEsI8evfTghJDclUu93e unvPa/T5vGxqPsEzZ063kEwgGVlWXsKKXWa2tracJbmdZFQ4R8RfCQghfgMw4HQ6HSOjV/IlScLF ny8i5fHUJiHEJQAYGhpKS0xMTJqcnLzR09PTmZWVNf2PBebxKKfzq6eSVyeDBObmgnA4HBkABgBM 73/nrX4A8HmnbV1dXd8CCIT7QF7CB7Hz7tQaDIa43LzsnZDEXnNpuRgfH8fI1RFM+bxpBn1chNfr u/7Qqgd3HrM3YOCH757WxxlmXS7XMIAZAHNL+qCsvGRYrb7V58hIFZKSVtP0/FahKApsNTZkZm5C KER80fE5JybcIhQKobHhY8iyjCrrPtxwT9W1t7ff2QdvWvY2HzlcByFuzTdJjI6NofnkJ7g3KuqC 6xfX2oyMTVj/xHpotTGLXlAUBR6PF5aqfbBaqhd98IceqNVqld/vh7W6KrzRjI6Ontjy3AvH0tPT z3V3dxc4Pvu0uK+3N9YfCAiSaGz4CLMzszhca8PGDWltKSkpmQBalhrLQpLmsFVE0kQymaQ8n6Mm +STJHJLFuXnZvHz5EkvNxayvrz9LsoDkfcv2mubmZRMANm5Ia6usrHQA6BRCTC2bAMl1ANYBuA6g Wwgxe/eb/VfxO/W0j5HVtPkuAAAAAElFTkSuQmCC " />
     <image
        y="482.86218"
        x="105.07144"
        id="image3390"
        height="16"
        width="16"
-       sodipodi:absref="/usr/share/icons/gnome/16x16/actions/gtk-close.png"
-       xlink:href="/usr/share/icons/gnome/16x16/actions/gtk-close.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAkVJREFU OI3FkMtrE1EYxe/NxIJ1ZqVUbB5NH5kkQjuTdFKLNVDBihGKxVK0JY9JddGlf4d/ghtFsBhuC4rY jQ+ikFixNpNJMpPGhYIS0NhGJTOTdCa5LiRpm+K6Z/Vdzj2H7/sBcNSCrYFfjNyFJhhtNvArtaqF EUKNzr8LoZsvj3WZRyA2PXpw/+EdAAAwtW0M+Fu3Yz0MOzzdTR1Hc3NzxP5wlA/FaRc9Nj9/41QT 44WWsVcA8ZNkMlUNBCZIlmWmyL0SyC+G4y6P+0ogcJ7c2NisQoiftmLm1uCwDy7JufxJM0Fcnrw4 SQKApwQhsxKNhbDnrOfS+PgY9S71XikWPr3Q1PpSK9deM5FIYKfTvbpd2fHXNc12ITBBmiBhtVh6 BznOR62vf1CkvPRaU+uz+/nsvxNIkoRppwttV3bGCbPZyjDDJ3pO93SJ2ZyS/ph+oyn1mU64JtAh hFATAKzq9V1s6DowDAMYuwYEGKj/vIMiOt4wEgs9pmln0Md5yXxO1srffxhuD92taqrNYrX6xEx2 5X8FMMqHloeG+q+OnfNT6U1BEdLp5LdS6bOu62dYliFrNdVmddhZUciuHiqI8OF7fQ77db+fozKC qOYlKaUpetDQG8uVX5UJQzd6GXaErGk1u6O/byAjiM8OMIAQz3Ccj8qKOUWS5WRN0YMIoQZCqFFX d6eLW8WEKOaU0VEv1Wzi2UMbeH2MrSBvDZR/lt9+/VK6tra21qYtSRKmaXf8T/X3iJwvWAjCFBfS 4vNOoEejvx7fDFN88/S5AAAAAElFTkSuQmCC " />
     <rect
        style="opacity:1;fill:#eeeeec;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect2578"
@@ -298,8 +286,7 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        id="image3359"
        height="8"
        width="8"
-       sodipodi:absref="/usr/share/icons/gnome/8x8/emblems/emblem-noread.png"
-       xlink:href="/usr/share/icons/gnome/8x8/emblems/emblem-noread.png" />
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAANtJREFU GJWNyUFKw0AUANA/mRlvUcHQZgQvoeBG9Bgup4kZUsEraFqZOtZ7GKegpZcoSBIKqR6jSb/fla77 to/pTB9xpEZKkeT3dprdJnHX7SxyFrrcbQRHaoY6paouH3CH12en5yqKFLln2wAAE1KK5Ptrk19e XB2ogTrp9weBnxct5/IO/qRGr6q6RCKiqioxNXr1nya7MW/+dUtEtF7XSES0WH60JhvGAAABYjdW 0bH086KdvTx9el+0h72eQPyxAAACOQvdzDacB6PHiZuygMWL5btFzkLYxy+MVmne6pWPYQAAAABJ RU5ErkJggg== " />
     <rect
        style="opacity:1;fill:#eeeeec;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect3365"
