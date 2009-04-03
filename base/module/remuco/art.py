@@ -47,7 +47,7 @@ def __resource_to_file_uri(resource):
     if elems[0] == "file": # location already is a file URI
         return resource
     
-    if elems[0] is None: # location is a path
+    if not elems[0]: # location is a path
     
         elems = list(elems) # make elems assignable
         elems[0] = "file"
