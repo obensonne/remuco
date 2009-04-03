@@ -639,7 +639,7 @@ class PlayerAdapter(object):
         """
         log.error("** BUG ** action_item() not implemented")
     
-    def action_mlib_item(self, path, action_id, positions, ids):
+    def action_mlib_item(self, action_id, path, positions, ids):
         """Do an action on one or more items from the player's media library.
         
         The items are specified redundantly by 'positions' and 'ids' - use
