@@ -40,6 +40,10 @@ Audacious:
 Banshee:
  * Banshee >= 1.4
 
+MPD:
+ * MPD >= 0.13.2
+ * Python modules: mpd (>= 0.2)
+
 Rhythmbox:
  * Rhythmbox >= 0.11.5
  
