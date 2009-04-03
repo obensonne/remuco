@@ -139,9 +139,24 @@ class Config(object):
             log.info("config major version changed -> reset config")
             self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
             
-        if version != CONFIG_VERSION:
+        # remove old, now unused options:
+        
+        log.info("%s" % self.__cp.items(SEC))
+        
+        rewrite = False
+        items = self.__cp.items(SEC)
+        for key, val in items:
+            if not (key in DEFAULTS or key.startswith("custom-") or
+                    key == KEY_CONFIG_VERSION):
+                # obsolete option -> remove
+                self.__cp.remove_option(SEC, key)
+                rewrite = True
+
+        # force a rewrite if something has changed
+        
+        if version != CONFIG_VERSION or rewrite:
             # on any change (major or minor), rewrite config
-            log.debug("config version changed -> force rewrite")
+            log.debug("config structure changed -> force rewrite")
             self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
             self.__save()
 
@@ -153,8 +168,8 @@ class Config(object):
             self.__cp.read(self.__file_config)
         except ConfigParser.Error, e:
             log.warning("failed to read config from %s (%s) -> %s" %
-                            (self.__file_config, e, "using defaults"))
-
+                        (self.__file_config, e, "using defaults"))
+        
     def __save(self):
         
         try:
@@ -174,7 +189,7 @@ class Config(object):
         
         """
         try:
-            return self.__cp.get(SEC, "custom_%s" % option)
+            return self.__cp.get(SEC, "custom-%s" % option)
         except (ValueError, AttributeError), e:
             log.warning("config '%s' malformed (%s)" % (option, e))
             return default
@@ -192,7 +207,7 @@ class Config(object):
         @note: Internally this is saved as "custom-<OPTION>".
         
         """
-        self.__cp.set(SEC, "custom_%s" % option, str(value))
+        self.__cp.set(SEC, "custom-%s" % option, str(value))
         self.__save()
 
     # === property: bluetooth ===
