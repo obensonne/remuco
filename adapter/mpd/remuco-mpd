@@ -24,6 +24,7 @@
 
 """MPD adapter for Remuco, implemented as an executable script."""
 
+import os.path
 import socket # python-mpd does not fully abstract socket errors
 
 import gobject
@@ -32,6 +33,19 @@ import mpd
 
 import remuco
 from remuco import log
+
+# =============================================================================
+# actions
+# =============================================================================
+
+IA_JUMP = remuco.ItemAction("Play")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+
+PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
+
+# =============================================================================
+# MPD player adapter
+# =============================================================================
 
 class MPDAdapter(remuco.PlayerAdapter):
     
@@ -55,23 +69,41 @@ class MPDAdapter(remuco.PlayerAdapter):
         except ValueError, e:
             log.error("option mpd-port malformed (%s) -> use default" % port)
             self.__mpd_port = 6600
+            
+        self.__mpd_music_dir = self.config.get_custom("mpd-music-dir",
+                                                      "/var/lib/mpd/music")
         
         log.debug("MPD is at %s:%d" % (self.__mpd_host, self.__mpd_port))
         
         # ensure options are saved:
         self.config.set_custom("mpd-host", self.__mpd_host)
         self.config.set_custom("mpd-port", self.__mpd_port)
+        self.config.set_custom("mpd-music-dir", self.__mpd_music_dir)
         
         self.__playing = False
+        self.__shuffle = False
+        self.__repeat = False
+        self.__volume = 0
+        self.__position = -1
+        self.__progress = 0
+        self.__length = 0
+        self.__song = None
         
     def start(self):
         
         remuco.PlayerAdapter.start(self)
         
-        self.__check_and_refresh_connection()
+        if not self.__check_and_refresh_connection():
+            raise StandardError("failed to connect to MPD")
 
-        log.debug("here we go")
-        
+        try:
+            mpd_version = self.__mpd.mpd_version
+        except mpd.MPDError:
+            log.warning("failed to get MPD version")
+            mpd_version = "unknown"
+
+        log.info("MPD version: %s" % mpd_version)
+
     def stop(self):
         
         remuco.PlayerAdapter.stop(self)
@@ -81,11 +113,14 @@ class MPDAdapter(remuco.PlayerAdapter):
         except mpd.ConnectionError:
             pass
 
+        log.debug("MPD adapter stopped")
+        
     def poll(self):
         
         self.__poll_status()
-    
         
+        self.__poll_item()
+    
     # =========================================================================
     # control interface
     # =========================================================================
@@ -97,22 +132,161 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         try:
             if self.__playing:
-                self.__mpd.pause()
+                self.__mpd.pause(1)
             else:
                 self.__mpd.play()
         except mpd.MPDError, e:
-            log.warning("failed to execute command: %s" % e)
+            log.warning("failed to control MPD: %s" % e)
         else:
             gobject.idle_add(self.__poll_status)
         
+    def ctrl_toggle_repeat(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+        try:
+            self.__mpd.repeat(int(not self.__repeat))
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+            
+    def ctrl_toggle_shuffle(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+        try:
+            self.__mpd.random(int(not self.__shuffle))
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+            
+    def ctrl_next(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+        try:
+            self.__mpd.next()
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+            
+    def ctrl_previous(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+        try:
+            self.__mpd.previous()
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+            
+    def ctrl_seek(self, direction):
+        
+        if self.__length == 0:
+            return
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        progress = self.__progress + direction * 5
+        progress = min(progress, self.__length)
+        progress = max(progress, 0)
+        
+        try:
+            self.__mpd.seek(self.__position, progress)
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+    
+    def ctrl_tag(self, id, tags):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+    def ctrl_volume(self, direction):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        try:
+            if direction == 0:
+                self.__mpd.setvol(0)
+            else:
+                volume = self.__volume + direction * 5
+                volume = min(volume, 100)
+                volume = max(volume, 0)
+                self.__mpd.setvol(volume)
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+        else:
+            gobject.idle_add(self.__poll_status)
+            
+    # =========================================================================
+    # action interface
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
+        
+        if not self.__check_and_refresh_connection():
+            return        
+        
+        if action_id == IA_JUMP.id:
+            
+            try:
+                self.__mpd.play(positions[0])
+            except mpd.MPDError, e:
+                log.warning("failed to control MPD: %s" % e)
+        
+        elif action_id == IA_REMOVE.id:
+            
+            positions.sort()
+            positions.reverse()
+            try:
+                for pos in positions:
+                    self.__mpd.delete(pos)
+            except mpd.MPDError, e:
+                log.warning("failed to control MPD: %s" % e)
+            
+            pass
+        
+        else:
+            log.error("** BUG ** unexpected playlist item action")
+    
     # =========================================================================
     # request interface
     # =========================================================================
     
     def request_playlist(self, client):
         
-        self.reply_playlist_request(client, ["1", "2"],
-                ["Joe - Joe's Song", "Sue - Sue's Song"])
+        if not self.__check_and_refresh_connection():
+            return
+        
+        try:
+            playlist = self.__mpd.playlistinfo()
+        except mpd.MPDError, e:
+            log.warning("failed to control MPD: %s" % e)
+            playlist = []
+        
+        ids = []
+        names = []
+        
+        for song in playlist:
+            ids.append(song.get("file", "XXX"))
+            artist = song.get("artist", "??")
+            title = song.get("title", "??")
+            names.append("%s - %s" % (artist, title))
+        
+        self.reply_playlist_request(client, ids, names,
+                                    item_actions=PLAYLIST_ACTIONS)
 
     # =========================================================================
     # internal methods
@@ -125,14 +299,14 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         status = self.__mpd.status()
         
-        volume = int(status.get("volume", "0"))
-        self.update_volume(volume)
+        self.__volume = int(status.get("volume", "0"))
+        self.update_volume(self.__volume)
 
-        repeat = status.get("repeat", "0")
-        self.update_repeat(repeat != "0")
+        self.__repeat = status.get("repeat", "0") != "0"
+        self.update_repeat(self.__repeat)
 
-        shuffle = status.get("random", "0")
-        self.update_shuffle(shuffle != "0")
+        self.__shuffle = status.get("random", "0") != "0"
+        self.update_shuffle(self.__shuffle)
 
         playback = status.get("state", "stop")
         if playback == "play":
@@ -145,11 +319,48 @@ class MPDAdapter(remuco.PlayerAdapter):
             self.__playing = False
             self.update_playback(remuco.PLAYBACK_STOP)
         
-        progress, length = status.get("time", "0:0").split(':')
-        self.update_progress(progress, length)
+        progress_length = status.get("time", "0:0").split(':')
+        self.__progress = int(progress_length[0])
+        self.__length = int(progress_length[1])
+        self.update_progress(self.__progress, self.__length)
          
-        position = int(status.get("song", "0"))
-        self.update_position(position)
+        self.__position = int(status.get("song", "-1"))
+        self.update_position(max(int(self.__position), 0))
+        
+    def __poll_item(self):
+        
+        if not self.__check_and_refresh_connection():
+            return
+    
+        try:
+            song = self.__mpd.currentsong()
+        except mpd.MPDError, e:
+            log.warning("failed to query current song: %s" % e)
+            song = None
+        
+        if self.__song == song:
+            return
+
+        self.__song = song
+
+        if not song:
+            self.update_item(None, None, None)
+            return
+        
+        id = song.get("file", "XXX")
+        
+        info = {}
+        info[remuco.INFO_ARTIST] = song.get("artist")
+        info[remuco.INFO_TITLE] = song.get("title")
+        info[remuco.INFO_ALBUM] = song.get("album")
+        info[remuco.INFO_GENRE] = song.get("genre")
+        info[remuco.INFO_LENGTH] = song.get("time")
+        info[remuco.INFO_YEAR] = song.get("year")
+        
+        full_file_name = os.path.join(self.__mpd_music_dir, id)
+        img = self.find_image(full_file_name)
+        
+        self.update_item(id, info, img)
     
     def __check_and_refresh_connection(self):
         """Check the current MPD connection and reconnect if broken."""
