@@ -34,7 +34,9 @@ from remuco import defs
 
 SEC = ConfigParser.DEFAULTSECT
 
-CONFIG_VERSION = "0.8.1"
+CONFIG_VERSION_MAJOR = "1"
+CONFIG_VERSION_MINOR = "0"
+CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
 KEY_BLUETOOTH = "bluetooth-enabled"
@@ -82,38 +84,9 @@ class Config(object):
         
         self.__name = player_name
         
-        self.__init_dirs()
+        ###### init directories and file names ######
         
-        self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
-
-        if os.path.exists(self.__file_config):
-            
-            self.__load() # existing config
-            
-            try: # check version
-                version = self.__cp.get(SEC, KEY_CONFIG_VERSION)
-            except (ValueError, AttributeError, NoOptionError), e:
-                version = "none"
-    
-            if version != CONFIG_VERSION:
-                log.info("config structure changed -> reset config")
-                self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
-                self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
-                self.__save()
-                
-        else:
-            # new config file
-            self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
-            self.__save()
-
-        log.set_level(self.log_level)
-        
-        log.info("remuco version: %s" % defs.REMUCO_VERSION)
-        
-    def __init_dirs(self):
-        """Create config and cache dirs for given player."""
-        
-        name_lower = self.__name.lower()
+        name_lower = player_name.lower()
         
         self.__dir_config = os.path.join(xdg_config, "remuco", name_lower)
         self.__dir_cache = os.path.join(xdg_cache, "remuco", name_lower)
@@ -123,17 +96,54 @@ class Config(object):
         try:
             if not os.path.isdir(self.__dir_config):
                 os.makedirs(self.__dir_config)
+            if not os.path.isdir(self.__dir_cache):
+                os.makedirs(self.__dir_cache)
         except OSError, e:
-            log.error("failed to create config dir (%s)", e)
-            
-        if not "--remuco-log-stdout" in sys.argv:
-            try:
-                if not os.path.isdir(self.__dir_cache):
-                    os.makedirs(self.__dir_cache)
-            except OSError, e:
-                log.error("failed to create cache dir (%s)", e)
-            else:
+            log.error("failed to make dir: %s", e)
+        else:
+            if not "--remuco-log-stdout" in sys.argv:
                 log.set_file(self.__file_log)
+        
+        ###### load configuration ######
+        
+        self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
+
+        if os.path.exists(self.__file_config):
+            self.__load() 
+            self.__check_version()
+        else:
+            self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
+            self.__save()
+
+        log.set_level(self.log_level)
+        
+        log.info("remuco version: %s" % defs.REMUCO_VERSION)
+        
+    def __check_version(self):
+        """Check version of the configuration.
+        
+        Resets the config on a major change and rewrites the config on any
+        change. The last ensures that added options (minor change) are present
+        in the configuration file.
+        
+        """
+        try: # check version
+            version = self.__cp.get(SEC, KEY_CONFIG_VERSION)
+        except (ValueError, AttributeError, NoOptionError):
+            version = "0.0"
+
+        major = version.split(".")[0]
+
+        if major != CONFIG_VERSION_MAJOR:
+            # on major change, reset configuration
+            log.info("config major version changed -> reset config")
+            self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
+            
+        if version != CONFIG_VERSION:
+            # on any change (major or minor), rewrite config
+            log.debug("config version changed -> force rewrite")
+            self.__cp.set(SEC, KEY_CONFIG_VERSION, CONFIG_VERSION)
+            self.__save()
 
     def __load(self):
 
@@ -291,18 +301,18 @@ class Config(object):
         Option name: 'log-level'
         """
         try:
-            s = self.__cp.get(SEC, KEY_LOGLEVEL)
-        except (ValueError, AttributeError), e:
+            val = self.__cp.get(SEC, KEY_LOGLEVEL)
+        except (ValueError, AttributeError,), e:
             log.warning("config '%s' malformed (%s)" % (KEY_LOGLEVEL, e))
+            val = "INFO"
+        
+        level_map = {"DEBUG": log.DEBUG, "INFO": log.INFO,
+                     "WARNING": log.WARNING, "ERROR": log.ERROR }
+        try:
+            return level_map[val]
+        except KeyError:
+            log.warning("config '%s' has invalid value" % KEY_LOGLEVEL)
             return log.INFO
-        
-        if s == "DEBUG": return log.DEBUG
-        if s == "INFO": return log.INFO
-        if s == "WARNING": return log.WARNING
-        if s == "ERROR": return log.ERROR
-        
-        log.warning("config '%s' has invalid value" % KEY_LOGLEVEL)
-        return log.INFO
     
     def __pset_log_level(self, value):
         
@@ -415,27 +425,27 @@ class Config(object):
             val = self.__cp.get(SEC, KEY_FB_ROOT_DIRS)
         except (ValueError, AttributeError), e:
             log.warning("config '%s' malformed (%s)" % (KEY_ENDCODING, e))
-            return []
+            val = None
 
         if not val:
             return []
         
-        dirs = val.split(os.path.pathsep)
+        roots = val.split(os.path.pathsep)
         stripped = []
-        for dir in dirs:
-            if dir:
-                stripped.append(dir.strip())
+        for root_dir in roots:
+            if root_dir:
+                stripped.append(root_dir.strip())
         return stripped
     
     def __pset_fb_root_dirs(self, value):
         
-        s = ""
+        roots = ""
         if value:
-            for dir in value:
-                s = "%s%s%s" % (s, os.path.pathsep, value)
-            s = s[1:]
+            for root_dir in value:
+                roots = "%s%s%s" % (roots, os.path.pathsep, root_dir)
+            roots = roots[1:]
 
-        self.__cp.set(SEC, KEY_FB_ROOT_DIRS, s)
+        self.__cp.set(SEC, KEY_FB_ROOT_DIRS, roots)
         self.__save()
     
     fb_root_dirs = property(__pget_fb_root_dirs, __pset_fb_root_dirs, None,
@@ -481,7 +491,7 @@ class Config(object):
         @note: read-only
 
         """
-        return self.__config_dir
+        return self.__dir_config
     
     config_dir = property(__pget_config_dir, None, None,
                           __pget_config_dir.__doc__)
