@@ -37,6 +37,12 @@ pa_files["banshee"] = [
     ["remuco-banshee"]
 ]
 
+# --- MPD ---------------------------------------------------------------------
+
+pa_files["mpd"] = [
+    ["remuco-mpd"]
+]
+
 # --- Rhythmbox ---------------------------------------------------------------
 
 # set prefix may not be valid for Rhythmbox -> use a Rhythmbox specific prefix:
