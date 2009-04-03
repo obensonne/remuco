@@ -84,8 +84,6 @@ public final class SliderScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		int w, h;
-
 		if (type == TYPE_VOLUME && !player.supports(Feature.KNOWN_VOLUME)) {
 			setImage(INVISIBLE);
 			return;
@@ -96,17 +94,21 @@ public final class SliderScreeny extends Screeny {
 		imgOff = theme.getImg(imgOffID);
 		imgRight = theme.getImg(imgRightID);
 
-		xBar = imgLeft.getWidth();
-		resolution = width - imgLeft.getWidth() - imgRight.getWidth();
-
-		w = imgLeft.getWidth() + resolution + imgRight.getWidth();
-		h = imgLeft.getHeight();
-
-		setImage(Image.createImage(w, h));
+		final int wLeft = imgLeft.getWidth();
+		final int wRight = imgRight.getWidth();
+		
+		xBar = wLeft;
+		resolution = width - wLeft - wRight;
+		if (resolution < 5) {
+			throw new ScreenyException("screen to small for volume bar");
+		}
+		
+		setImage(Image.createImage(width, imgLeft.getHeight()));
 
 		g.drawImage(imgLeft, 0, 0, TOP_LEFT);
 
-		g.drawImage(imgRight, width, 0, TOP_RIGHT);
+		// do not use TOP_RIGHT because this gets handled wrong by Nokia 5310
+		g.drawImage(imgRight, wLeft + resolution, 0, TOP_LEFT);
 
 	}
 
