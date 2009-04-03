@@ -38,10 +38,13 @@ from remuco import log
 # actions
 # =============================================================================
 
-IA_JUMP = remuco.ItemAction("Play")
+IA_JUMP = remuco.ItemAction("Jump to")
 IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
-
 PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
+
+IA_ADD = remuco.ItemAction("Add to playlist", multiple=True)
+IA_SET = remuco.ItemAction("Set as playlist", multiple=True)
+MLIB_ITEM_ACTIONS = (IA_ADD, IA_SET)
 
 # =============================================================================
 # MPD player adapter
@@ -207,11 +210,6 @@ class MPDAdapter(remuco.PlayerAdapter):
         else:
             gobject.idle_add(self.__poll_status)
     
-    def ctrl_tag(self, id, tags):
-        
-        if not self.__check_and_refresh_connection():
-            return
-    
     def ctrl_volume(self, direction):
         
         if not self.__check_and_refresh_connection():
@@ -250,16 +248,33 @@ class MPDAdapter(remuco.PlayerAdapter):
             
             positions.sort()
             positions.reverse()
-            try:
-                for pos in positions:
-                    self.__mpd.delete(pos)
-            except mpd.MPDError, e:
-                log.warning("failed to control MPD: %s" % e)
+            self.__batch_commands(self.__mpd.delete, positions)
             
-            pass
-        
         else:
             log.error("** BUG ** unexpected playlist item action")
+    
+    def action_mlib_item(self, action_id, path, positions, ids):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        log.debug("action: %s" % action_id)
+        
+        if action_id == IA_ADD.id:
+            
+            self.__batch_commands(self.__mpd.add, ids)
+            
+        elif action_id == IA_SET.id:
+            
+            try:
+                self.__mpd.clear()
+                self.__batch_commands(self.__mpd.add, ids)
+                self.__mpd.play(0)
+            except mpd.MPDError, e:
+                log.warning("failed to set playlist: %s" % e)
+        
+        else:
+            log.error("** BUG ** unexpected mlib item action")
     
     # =========================================================================
     # request interface
@@ -288,6 +303,47 @@ class MPDAdapter(remuco.PlayerAdapter):
         self.reply_playlist_request(client, ids, names,
                                     item_actions=PLAYLIST_ACTIONS)
 
+    def request_mlib(self, client, path):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        db_dir = ""
+        for elem in path:
+            db_dir = os.path.join(db_dir, elem)
+        
+        try:
+            content = playlist = self.__mpd.lsinfo(db_dir)
+        except mpd.MPDError, e:
+            log.warning("failed to get dir list (%s): %s" % (db_dir, e))
+            content = []
+            
+        nested = []
+        ids = []
+        names = []
+        
+        for entry in content:
+            if "directory" in entry:
+                nested.append(os.path.basename(entry["directory"]))
+            elif "file" in entry:
+                id = entry["file"]
+                ids.append(id)
+            else:
+                log.debug("unexpected lsinfo result: %s" % entry)
+        
+        song_list = self.__batch_commands(self.__mpd.listallinfo, ids)
+        
+        if song_list is None or len(song_list) != len(ids):
+            ids = []
+        else:
+            for song in song_list:
+                artist = song[0].get("artist", "??")
+                title = song[0].get("title", "??")
+                names.append("%s - %s" % (artist, title))
+        
+        self.reply_mlib_request(client, path, nested, ids, names,
+                                item_actions=MLIB_ITEM_ACTIONS)
+    
     # =========================================================================
     # internal methods
     # =========================================================================
@@ -382,6 +438,27 @@ class MPDAdapter(remuco.PlayerAdapter):
                 return False
             
         return True
+    
+    def __batch_commands(self, cmd, params):
+        
+        try:
+            self.__mpd.command_list_ok_begin()
+        except mpd.MPDError, e:
+            log.warning("failed to start command list: %s" % e)
+            return None
+        
+        for param in params:
+            try:
+                cmd(param)
+            except mpd.MPDError, e:
+                log.warning("in-list command failed: %s" % e)
+                break
+        
+        try:
+            return self.__mpd.command_list_end()
+        except mpd.MPDError, e:
+            log.warning("failed to end command list: %s" % e)
+            return None
     
 # =============================================================================
 # main (example startup using remuco.Manager)
