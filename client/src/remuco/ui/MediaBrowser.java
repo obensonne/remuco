@@ -24,6 +24,9 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.StringItem;
 
 import remuco.player.ActionParam;
 import remuco.player.Feature;
@@ -37,6 +40,70 @@ import remuco.util.Log;
 
 public final class MediaBrowser implements CommandListener, IRequester,
 		IItemListController {
+
+	/** Nice dialog to ask what to do next after an action has been executed. */
+	private class PostActionDialog extends Form implements CommandListener {
+
+		private final Command CMD_LIST = new Command("List", Command.BACK, 1);
+		private final Command CMD_MAIN = new Command("Main", Command.OK, 1);
+
+		private ItemlistScreen ils = null;
+
+		private final MediaBrowser outer;
+
+		public PostActionDialog(MediaBrowser outer) {
+
+			super("Action Done");
+
+			this.outer = outer;
+
+			final int layout;
+			layout = StringItem.LAYOUT_CENTER | StringItem.LAYOUT_NEWLINE_AFTER;
+
+			append(" \n");
+			append(new ImageItem(null, theme.aicYes, layout, ""));
+			append(" \n");
+
+			StringItem text;
+			text = new StringItem("What's next?", null);
+			text.setLayout(layout);
+			append(text);
+			text = new StringItem(
+					"Go back to the main screen or show the list again?", null);
+			text.setLayout(layout);
+			append(text);
+
+			addCommand(CMD_MAIN);
+			addCommand(CMD_LIST);
+
+			setCommandListener(this);
+
+		}
+
+		public void commandAction(Command c, Displayable d) {
+
+			if (c == CMD_LIST && ils != null) {
+				if (ils.getItemList().isPlaylist()) {
+					// playlist may have been changed by action
+					outer.commandAction(CMD_PLAYLIST, screenRoot);
+				} else if (ils.getItemList().isQueue()) {
+					// queue may have been changed by action
+					outer.commandAction(CMD_QUEUE, screenRoot);
+				} else {
+					display.setCurrent(ils);
+				}
+			} else {
+				display.setCurrent(parent);
+			}
+			ils = null;
+		}
+
+		public void show(ItemlistScreen ils) {
+			this.ils = ils;
+			display.setCurrent(this);
+		}
+
+	}
 
 	private static final Command CMD_FILES = new Command("File Browser",
 			Command.ITEM, 40);
@@ -58,6 +125,9 @@ public final class MediaBrowser implements CommandListener, IRequester,
 	private final Displayable parent;
 
 	private final Player player;
+
+	/** Dialog asking what to do next after executing an action. */
+	private final PostActionDialog screenPostActionDialog;
 
 	private final CommandList screenRoot;
 
@@ -81,6 +151,8 @@ public final class MediaBrowser implements CommandListener, IRequester,
 		screenWaiting.setTitle("Updating");
 		screenWaiting.setImage(theme.aicRefresh);
 		screenWaiting.setCommandListener(this);
+
+		screenPostActionDialog = new PostActionDialog(this);
 
 		screenRoot = new CommandList("Media Browser");
 		if (player.info.supports(Feature.REQ_PL)) {
@@ -198,7 +270,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 			Log.bug("Mar 13, 2009.10:55:05 PM");
 		}
 
-		display.setCurrent(parent);
+		screenPostActionDialog.show(ils);
 	}
 
 	public void ilcBack(ItemlistScreen ils) {
@@ -219,7 +291,6 @@ public final class MediaBrowser implements CommandListener, IRequester,
 				Log.bug("Mar 13, 2009.10:58:36 PM");
 			}
 		}
-
 	}
 
 	public void ilcRoot(ItemlistScreen ils) {

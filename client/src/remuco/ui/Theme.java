@@ -378,7 +378,7 @@ public final class Theme {
 
 	/** Alert icon */
 	public final Image aicBluetooth, aicWifi, aicConnecting, aicRefresh,
-			aicHmpf;
+			aicHmpf, aicYes;
 
 	/** List icon */
 	public final Image licBluetooth, licWifi, licItem, licItemMarked,
@@ -402,6 +402,7 @@ public final class Theme {
 		aicConnecting = loadImage("/icons/connecting_48.png", 48);
 		aicRefresh = loadImage("/icons/refresh_48.png", 48);
 		aicHmpf = loadImage("/icons/hmpf_48.png", 48);
+		aicYes = loadImage("/icons/yes_48.png", 48);
 
 		// list icons //
 
