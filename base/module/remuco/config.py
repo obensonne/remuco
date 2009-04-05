@@ -145,8 +145,6 @@ class Config(object):
             
         # remove old, now unused options:
         
-        log.info("%s" % self.__cp.items(SEC))
-        
         rewrite = False
         items = self.__cp.items(SEC)
         for key, val in items:
