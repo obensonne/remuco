@@ -25,7 +25,7 @@
 """MPD adapter for Remuco, implemented as an executable script."""
 
 import os.path
-import socket # python-mpd does not fully abstract socket errors
+import socket # python-mpd (0.2.0) does not fully abstract socket errors
 
 import gobject
 
@@ -45,6 +45,17 @@ PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
 IA_ADD = remuco.ItemAction("Add to playlist", multiple=True)
 IA_SET = remuco.ItemAction("Set as playlist", multiple=True)
 MLIB_ITEM_ACTIONS = (IA_ADD, IA_SET)
+
+LA_PLAY = remuco.ListAction("Play")
+LA_ENQUEUE = remuco.ListAction("Enqueue")
+MLIB_LIST_ACTIONS = (LA_PLAY, LA_ENQUEUE)
+
+# =============================================================================
+# constants
+# =============================================================================
+
+MLIB_FILES = "Files"
+MLIB_PLAYLISTS = "Playlists"
 
 # =============================================================================
 # MPD player adapter
@@ -248,7 +259,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             
             positions.sort()
             positions.reverse()
-            self.__batch_commands(self.__mpd.delete, positions)
+            self.__batch_cmd(self.__mpd.delete, positions)
             
         else:
             log.error("** BUG ** unexpected playlist item action")
@@ -258,24 +269,56 @@ class MPDAdapter(remuco.PlayerAdapter):
         if not self.__check_and_refresh_connection():
             return
         
-        log.debug("action: %s" % action_id)
-        
         if action_id == IA_ADD.id:
             
-            self.__batch_commands(self.__mpd.add, ids)
+            self.__batch_cmd(self.__mpd.add, ids)
             
         elif action_id == IA_SET.id:
             
             try:
                 self.__mpd.clear()
-                self.__batch_commands(self.__mpd.add, ids)
-                self.__mpd.play(0)
+                self.__batch_cmd(self.__mpd.add, ids)
+                if self.__playing:
+                    self.__mpd.play(0)
             except mpd.MPDError, e:
                 log.warning("failed to set playlist: %s" % e)
         
         else:
             log.error("** BUG ** unexpected mlib item action")
     
+    def action_mlib_list(self, action_id, path):
+        
+        if not self.__check_and_refresh_connection():
+            return
+        
+        try:
+            name = path[1]
+        except IndexError:
+            log.error("** BUG ** unexpected path for list actions: %s" % path)
+            return
+        
+        if action_id == LA_ENQUEUE.id:
+            
+            try:
+                self.__mpd.load(name)
+            except mpd.MPDError, e:
+                log.warning("failed to enqueue playlist (%s): %s" % (name, e))
+        
+        elif action_id == LA_PLAY.id:
+            
+            try:
+                self.__mpd.clear()
+                self.__mpd.load(name)
+                if self.__playing:
+                    self.__mpd.play(0)
+            except mpd.MPDError, e:
+                log.warning("failed to play playlist (%s): %s" % (name, e))
+        
+        else:
+            log.error("** BUG ** unexpected mlib list action")
+    
+        
+        
     # =========================================================================
     # request interface
     # =========================================================================
@@ -307,43 +350,30 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         if not self.__check_and_refresh_connection():
             return
+
+        nested, ids, names = [], [], []
+        item_actions, list_actions = None, None
         
-        db_dir = ""
-        for elem in path:
-            db_dir = os.path.join(db_dir, elem)
-        
-        try:
-            content = playlist = self.__mpd.lsinfo(db_dir)
-        except mpd.MPDError, e:
-            log.warning("failed to get dir list (%s): %s" % (db_dir, e))
-            content = []
-            
-        nested = []
-        ids = []
-        names = []
-        
-        for entry in content:
-            if "directory" in entry:
-                nested.append(os.path.basename(entry["directory"]))
-            elif "file" in entry:
-                id = entry["file"]
-                ids.append(id)
-            else:
-                log.debug("unexpected lsinfo result: %s" % entry)
-        
-        song_list = self.__batch_commands(self.__mpd.listallinfo, ids)
-        
-        if song_list is None or len(song_list) != len(ids):
-            ids = []
+        if not path:
+            nested = [MLIB_FILES, MLIB_PLAYLISTS]
+        elif path[0] == MLIB_FILES:
+            nested, ids, names = self.__get_music_dir(path[1:])
+            item_actions = MLIB_ITEM_ACTIONS
+        elif path[0] == MLIB_PLAYLISTS and len(path) == 1:
+            nested = self.__get_playlists()
+            list_actions = MLIB_LIST_ACTIONS
+        elif path[0] == MLIB_PLAYLISTS and len(path) == 2:
+            ids, names = self.__get_playlist_content(path[1])
+            item_actions = MLIB_ITEM_ACTIONS
+        elif path[0] == MLIB_PLAYLISTS:
+            log.error("** BUG ** unexpected path depth for playlists")
         else:
-            for song in song_list:
-                artist = song[0].get("artist", "??")
-                title = song[0].get("title", "??")
-                names.append("%s - %s" % (artist, title))
+            log.error("** BUG ** unexpected root list: %s" % path[0])
         
         self.reply_mlib_request(client, path, nested, ids, names,
-                                item_actions=MLIB_ITEM_ACTIONS)
-    
+                                item_actions=item_actions,
+                                list_actions=list_actions)
+        
     # =========================================================================
     # internal methods
     # =========================================================================
@@ -418,6 +448,78 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         self.update_item(id, info, img)
     
+    def __get_music_dir(self, path):
+        """Client requests a certain path in MPD's music directory."""
+        
+        path_s = ""
+        for elem in path:
+            path_s = os.path.join(path_s, elem)
+        
+        try:
+            content = self.__mpd.lsinfo(path_s)
+        except mpd.MPDError, e:
+            log.warning("failed to get dir list (%s): %s" % (path_s, e))
+            content = []
+            
+        dirs, files = [], []
+        
+        for entry in content:
+            if "directory" in entry:
+                dirs.append(os.path.basename(entry["directory"]))
+            elif "file" in entry:
+                files.append(entry["file"])
+            else:
+                pass
+        
+        songs = self.__batch_cmd(self.__mpd.listallinfo, files)
+        
+        names = []
+        if songs and len(songs) == len(files):
+            for item in songs:
+                artist = item[0].get("artist", "??")
+                title = item[0].get("title", "??")
+                names.append("%s - %s" % (artist, title))
+        else:
+            files = []
+        
+        return dirs, files, names
+        
+    def __get_playlists(self):
+        
+        try:
+            content = self.__mpd.lsinfo()
+        except mpd.MPDError, e:
+            log.warning("failed to get playlists: %s" % e)
+            content = []
+            
+        names = []
+        
+        for entry in content:
+            if "playlist" in entry:
+                names.append(os.path.basename(entry["playlist"]))
+            else:
+                pass
+            
+        return names
+    
+    def __get_playlist_content(self, name):
+
+        try:
+            songs = self.__mpd.listplaylistinfo(name)
+        except mpd.MPDError, e:
+            log.warning("failed to get playlist content (%s): %s" % (name, e))
+            songs = []
+            
+        ids, names = [], []
+        
+        for item in songs:
+            ids.append(item.get("file", "XXX"))
+            artist = item.get("artist", "??")
+            title = item.get("title", "??")
+            names.append("%s - %s" % (artist, title))
+            
+        return ids, names
+    
     def __check_and_refresh_connection(self):
         """Check the current MPD connection and reconnect if broken."""
         
@@ -439,7 +541,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             
         return True
     
-    def __batch_commands(self, cmd, params):
+    def __batch_cmd(self, cmd, params):
         
         try:
             self.__mpd.command_list_ok_begin()
@@ -461,7 +563,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             return None
     
 # =============================================================================
-# main (example startup using remuco.Manager)
+# main
 # =============================================================================
 
 if __name__ == '__main__':
