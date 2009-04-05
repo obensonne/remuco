@@ -1,10 +1,16 @@
 0.8.1	Oben Sonne <obensonne@googlemail.com>
 
-	* base: WiFi port is now a config option
+	* added player adapter for MPD
+	* various minor technical improvements (as always :)
+	* base: added an option for the WiFi port
+	* base: added options for size and type of images sent to clients
 	* base: fixed a bug concerning the system shutdown command
 	* client: full screen control enabled
+	* client: fixed a color bug in theme Karoma
+	* client: fixed some drawing issues on Nokia 5310
+	* client: action execution improved
 	* client: build process now works completely without WTK
-	* client: emulation with MicroEmu now possible with other skins 
+	* client: emulation with MicroEmu now possible with other skins
 
 0.8.0.1	Oben Sonne <obensonne@googlemail.com>
 
