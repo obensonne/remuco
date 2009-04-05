@@ -410,14 +410,14 @@ public final class Theme {
 
 		final int suggested = display.getBestImageWidth(Display.LIST_ELEMENT);
 
-		for (int i = 0; i < LIST_ICON_SIZES.length; i++) {
-			if (suggested <= LIST_ICON_SIZES[i]) {
+		for (int i = LIST_ICON_SIZES.length - 1; i >= 0 ; i--) {
+			if (suggested >= LIST_ICON_SIZES[i]) {
 				size = LIST_ICON_SIZES[i];
 				break;
 			}
 		}
 		if (size == -1) {
-			size = LIST_ICON_SIZES[LIST_ICON_SIZES.length - 1];
+			size = LIST_ICON_SIZES[0];
 		}
 
 		licBluetooth = loadImage("/icons/bluetooth_" + size + ".png", size);
