@@ -26,6 +26,7 @@ import gobject
 
 from remuco.data import PlayerInfo
 from remuco.net import WifiServer, BluetoothServer
+from remuco.config import Config
 
 
 class ServerTest(unittest.TestCase):
@@ -34,10 +35,11 @@ class ServerTest(unittest.TestCase):
         
         self.__ml = gobject.MainLoop()
         self.__pi = PlayerInfo("xxx", 0, 0, None)
+        self.__config = Config("unittest")
 
     def test_wifi(self):
         
-        s = WifiServer([], self.__pi, None, 0)
+        s = WifiServer([], self.__pi, None, self.__config)
         
         gobject.timeout_add(2000, self.__stop, s)
         
@@ -45,7 +47,7 @@ class ServerTest(unittest.TestCase):
 
     def test_bluetooth(self):
         
-        s = BluetoothServer([], self.__pi, None, 0)
+        s = BluetoothServer([], self.__pi, None, self.__config)
         
         gobject.timeout_add(2000, self.__stop, s)
         
