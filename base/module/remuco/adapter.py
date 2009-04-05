@@ -300,7 +300,8 @@ class PlayerAdapter(object):
         
         self.__state = PlayerState()
         self.__progress = Progress()
-        self.__item = Item()
+        self.__item = Item(img_size=self.__config.image_size,
+                           img_type=self.__config.image_type)
         
         flags = self.__util_calc_flags(playback_known, volume_known,
             repeat_known, shuffle_known, progress_known)
@@ -900,13 +901,13 @@ class PlayerAdapter(object):
         if self.__stopped:
             return
         
-        plob = Item()
-        plob.id = id
-        plob.info = info
+        item = Item()
+        item.id = id
+        item.info = info
 
-        msg = net.build_message(message.REQ_ITEM, plob)
+        msg = net.build_message(message.REQ_ITEM, item)
         
-        gobject.idle_add(self.__reply, client, msg, "plob")
+        gobject.idle_add(self.__reply, client, msg, "item")
         
     def reply_playlist_request(self, client, ids, names, item_actions=None):
         """Send the reply to a playlist request back to the client.

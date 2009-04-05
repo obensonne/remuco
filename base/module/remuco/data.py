@@ -112,13 +112,15 @@ class Progress(serial.Serializable):
 
 class Item(serial.Serializable):
     
-    def __init__(self):
+    def __init__(self, img_size=0, img_type="JPEG"):
         
         self.id = None
         self.__info_orig = None
         self.__info_list = None
         self.__img_orig = None
         self.__img_bin = None
+        self.__img_size = img_size
+        self.__img_type = img_type
         
     def __str__(self):
         
@@ -170,6 +172,9 @@ class Item(serial.Serializable):
 
     def __thumbnail(self, img):
     
+        if not self.__img_size:
+            return []
+    
         if isinstance(img, basestring) and img.startswith("file://"):
             img = urlparse.urlparse(img)[2]
             img = urllib.url2pathname(img)
@@ -177,14 +182,12 @@ class Item(serial.Serializable):
         if not img:
             return []
     
-        size = 300,300
-        
         try:
             if not isinstance(img, Image.Image):
                 img = Image.open(img)
-            img.thumbnail(size)
+            img.thumbnail((self.__img_size, self.__img_size))
             file_tmp = tempfile.TemporaryFile()
-            img.save(file_tmp, "JPEG")
+            img.save(file_tmp, self.__img_type)
             file_tmp.seek(0)
             thumb = file_tmp.read()
             file_tmp.close()
