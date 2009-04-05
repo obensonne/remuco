@@ -117,7 +117,7 @@ use&nbsp;the&nbsp;property&nbsp;'config'&nbsp;of&nbsp;<a href="#PlayerAdapter">P
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Config-__init__"><strong>__init__</strong></a>(self, player_name)</dt><dd><tt>Do&nbsp;not&nbsp;use&nbsp;this.&nbsp;Use&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.config&nbsp;instead.</tt></dd></dl>
 
-<dl><dt><a name="Config-get_custom"><strong>get_custom</strong></a>(self, option)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
+<dl><dt><a name="Config-get_custom"><strong>get_custom</strong></a>(self, option, default)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
 &nbsp;<br>
 @param&nbsp;option:&nbsp;name&nbsp;of&nbsp;the&nbsp;option<br>
 &nbsp;<br>
@@ -203,6 +203,23 @@ browser.<br>
 Default:&nbsp;True<br>
 &nbsp;<br>
 Option&nbsp;name:&nbsp;'file-browser-use-xdg-user-dirs'</tt></dd>
+</dl>
+<dl><dt><strong>image_size</strong></dt>
+<dd><tt>Size&nbsp;of&nbsp;images&nbsp;sent&nbsp;to&nbsp;clients.<br>
+&nbsp;<br>
+A&nbsp;size&nbsp;of&nbsp;0&nbsp;disables&nbsp;images.<br>
+&nbsp;<br>
+Default:&nbsp;200<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'image-size'</tt></dd>
+</dl>
+<dl><dt><strong>image_type</strong></dt>
+<dd><tt>Type&nbsp;of&nbsp;images&nbsp;sent&nbsp;to&nbsp;clients.<br>
+&nbsp;<br>
+Default:&nbsp;"JPEG"<br>
+Possible&nbsp;values:&nbsp;"JPEG",&nbsp;"PNG"<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'image-type'</tt></dd>
 </dl>
 <dl><dt><strong>log_file</strong></dt>
 <dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;log&nbsp;file.<br>
@@ -377,7 +394,7 @@ Methods defined here:<br>
 
 <hr>
 Methods inherited from <a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>:<br>
-<dl><dt><a name="MPRISAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, path, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+<dl><dt><a name="MPRISAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, action_id, path, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
 whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
@@ -391,7 +408,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-action_mlib_list"><strong>action_mlib_list</strong></a>(self, action_id, path)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;a&nbsp;list&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
@@ -399,7 +418,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
 &nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
@@ -413,7 +434,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_queue_request">reply_queue_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -624,6 +647,20 @@ May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;
 This&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any<br>
 change&nbsp;to&nbsp;'config'&nbsp;is&nbsp;saved&nbsp;immediately&nbsp;into&nbsp;the&nbsp;configuration&nbsp;file.</tt></dd>
 </dl>
+<dl><dt><strong>manager</strong></dt>
+<dd><tt>The&nbsp;Manager&nbsp;controlling&nbsp;this&nbsp;adapter.<br>
+&nbsp;<br>
+This&nbsp;property&nbsp;may&nbsp;be&nbsp;used&nbsp;to&nbsp;call&nbsp;the&nbsp;method&nbsp;stop()&nbsp;on&nbsp;to&nbsp;stop&nbsp;and<br>
+completely&nbsp;shutdown&nbsp;the&nbsp;adapter&nbsp;from&nbsp;within&nbsp;an&nbsp;adapter.&nbsp;Calling<br>
+Manager.stop()&nbsp;has&nbsp;the&nbsp;same&nbsp;effect&nbsp;as&nbsp;if&nbsp;the&nbsp;Manager&nbsp;process<br>
+received&nbsp;a&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.&nbsp;<br>
+&nbsp;<br>
+If&nbsp;this&nbsp;adapter&nbsp;is&nbsp;not&nbsp;controlled&nbsp;by&nbsp;or&nbsp;has&nbsp;not&nbsp;yet&nbsp;assigned&nbsp;a&nbsp;Manager<br>
+then&nbsp;this&nbsp;property&nbsp;refers&nbsp;to&nbsp;a&nbsp;dummy&nbsp;manager&nbsp;-&nbsp;so&nbsp;it&nbsp;is&nbsp;allways&nbsp;safe<br>
+to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
+&nbsp;<br>
+@see:&nbsp;Manager</tt></dd>
+</dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -724,6 +761,12 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;play
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_volume">ctrl_volume</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_rate">ctrl_rate</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_tag">ctrl_tag</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_files">action_files</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_playlist_item">action_playlist_item</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_queue_item">action_queue_item</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_mlib_item">action_mlib_item</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_mlib_list">action_mlib_list</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Player&nbsp;adapters&nbsp;only&nbsp;need&nbsp;to&nbsp;implement&nbsp;only&nbsp;a&nbsp;*subset*&nbsp;of&nbsp;these<br>
 &nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;-&nbsp;depending&nbsp;on&nbsp;what&nbsp;is&nbsp;possible&nbsp;and&nbsp;what&nbsp;makes&nbsp;sense.<br>
@@ -833,9 +876,11 @@ system&nbsp;that&nbsp;have&nbsp;one&nbsp;of&nbsp;the&nbsp;mime&nbsp;types&nbsp;s
 @param&nbsp;files:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(regular&nbsp;path&nbsp;names)&nbsp;<br>
 @param&nbsp;uris:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(URI&nbsp;notation)</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;files&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;(URI&nbsp;notation)&nbsp;<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;file&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-__init__">__init__</a>().</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, path, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+<dl><dt><a name="PlayerAdapter-action_mlib_item"><strong>action_mlib_item</strong></a>(self, action_id, path, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 The&nbsp;items&nbsp;are&nbsp;specified&nbsp;redundantly&nbsp;by&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;-&nbsp;use<br>
 whatever&nbsp;fits&nbsp;better.&nbsp;If&nbsp;the&nbsp;specified&nbsp;action&nbsp;is&nbsp;not&nbsp;applicable&nbsp;to<br>
@@ -849,7 +894,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_mlib_list"><strong>action_mlib_list</strong></a>(self, action_id, path)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;a&nbsp;list&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
@@ -857,7 +904,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
 &nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_playlist_item"><strong>action_playlist_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;playlist.<br>
 &nbsp;<br>
@@ -871,7 +920,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 @param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
@@ -885,7 +936,9 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -1176,6 +1229,20 @@ May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;
 &nbsp;<br>
 This&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any<br>
 change&nbsp;to&nbsp;'config'&nbsp;is&nbsp;saved&nbsp;immediately&nbsp;into&nbsp;the&nbsp;configuration&nbsp;file.</tt></dd>
+</dl>
+<dl><dt><strong>manager</strong></dt>
+<dd><tt>The&nbsp;Manager&nbsp;controlling&nbsp;this&nbsp;adapter.<br>
+&nbsp;<br>
+This&nbsp;property&nbsp;may&nbsp;be&nbsp;used&nbsp;to&nbsp;call&nbsp;the&nbsp;method&nbsp;stop()&nbsp;on&nbsp;to&nbsp;stop&nbsp;and<br>
+completely&nbsp;shutdown&nbsp;the&nbsp;adapter&nbsp;from&nbsp;within&nbsp;an&nbsp;adapter.&nbsp;Calling<br>
+Manager.stop()&nbsp;has&nbsp;the&nbsp;same&nbsp;effect&nbsp;as&nbsp;if&nbsp;the&nbsp;Manager&nbsp;process<br>
+received&nbsp;a&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.&nbsp;<br>
+&nbsp;<br>
+If&nbsp;this&nbsp;adapter&nbsp;is&nbsp;not&nbsp;controlled&nbsp;by&nbsp;or&nbsp;has&nbsp;not&nbsp;yet&nbsp;assigned&nbsp;a&nbsp;Manager<br>
+then&nbsp;this&nbsp;property&nbsp;refers&nbsp;to&nbsp;a&nbsp;dummy&nbsp;manager&nbsp;-&nbsp;so&nbsp;it&nbsp;is&nbsp;allways&nbsp;safe<br>
+to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
+&nbsp;<br>
+@see:&nbsp;Manager</tt></dd>
 </dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

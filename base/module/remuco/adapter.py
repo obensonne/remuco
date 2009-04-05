@@ -184,6 +184,12 @@ class PlayerAdapter(object):
         * ctrl_rate()
         * ctrl_tag()
         
+        * action_files()
+        * action_playlist_item()
+        * action_queue_item()
+        * action_mlib_item()
+        * action_mlib_list()
+        
         Player adapters only need to implement only a *subset* of these
         methods - depending on what is possible and what makes sense.
         
@@ -603,6 +609,8 @@ class PlayerAdapter(object):
         @param uris:
             list of files to apply the action to (URI notation) 
         
+        @note: Override if file item actions gets passed to __init__().
+        
         """
         log.error("** BUG ** action_files() not implemented")
     
@@ -620,6 +628,9 @@ class PlayerAdapter(object):
             list of positions to apply the action to
         @param ids:
             list of IDs to apply the action to
+
+        @note: Override if item actions gets passed to reply_playlist_request().
+        
         """
         log.error("** BUG ** action_item() not implemented")
     
@@ -637,6 +648,9 @@ class PlayerAdapter(object):
             list of positions to apply the action to 
         @param ids:
             list of IDs to apply the action to
+
+        @note: Override if item actions gets passed to reply_queue_request().
+        
         """
         log.error("** BUG ** action_item() not implemented")
     
@@ -656,6 +670,9 @@ class PlayerAdapter(object):
             list of positions to apply the action to 
         @param ids:
             list of IDs to apply the action to
+
+        @note: Override if item actions gets passed to reply_mlib_request().
+                
         """
         log.error("** BUG ** action_item() not implemented")
     
@@ -668,6 +685,8 @@ class PlayerAdapter(object):
         @param path:
             path specifying the list to apply the action to
             
+        @note: Override if list actions gets passed to reply_mlib_request().
+                
         """
         log.error("** BUG ** action_mlib_list() not implemented")
     
