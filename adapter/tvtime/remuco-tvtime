@@ -1,0 +1,185 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""TVtime adapter for Remuco, implemented as an executable script."""
+
+import commands
+import os
+import os.path
+from xml.dom import minidom
+
+import remuco
+from remuco import log
+
+# =============================================================================
+# actions
+# =============================================================================
+
+IA_JUMP = remuco.ItemAction("Jump to")
+PLAYLIST_ACTIONS = (IA_JUMP,)
+
+# =============================================================================
+# MPD player adapter
+# =============================================================================
+
+class TVtimeAdapter(remuco.PlayerAdapter):
+    
+    def __init__(self):
+        
+        remuco.PlayerAdapter.__init__(self, "TVtime", poll=10,
+                                      playback_known=True)
+        
+        stations_file = os.path.join(os.getenv("HOME", "/"), ".tvtime",
+                                     "stationlist.xml")
+        
+        if not os.path.exists(stations_file):
+            log.warning("station list file %s does not exist" % stations_file)
+            self.__stations_file = None
+        else:
+            self.__stations_file = stations_file
+            
+    def start(self):
+        
+        remuco.PlayerAdapter.start(self)
+
+        self.update_item("XYZ", {remuco.INFO_TITLE: "TVtime"}, None)
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+
+        log.debug("bye, turning off the light")
+        
+    def poll(self):
+        
+        status, output = commands.getstatusoutput("tvtime-command NOOP")
+        
+        if status == os.EX_OK:
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        else:
+            self.update_playback(remuco.PLAYBACK_STOP)
+        
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
+    def ctrl_toggle_playing(self):
+        
+        self.__tvcmd("MENU_ENTER")
+        
+    def ctrl_next(self):
+        
+        self.__tvcmd("DOWN")
+        
+    def ctrl_previous(self):
+        
+        self.__tvcmd("UP")
+        
+    def ctrl_volume(self, volume):
+        
+        if volume == 0:
+            self.__tvcmd("TOGGLE_MUTE")
+        elif volume < 0:
+            self.__tvcmd("LEFT")
+        else:
+            self.__tvcmd("RIGHT")
+            
+    def ctrl_toggle_repeat(self):
+        
+        self.__tvcmd("SHOW_MENU")
+        
+    def ctrl_toggle_shuffle(self):
+        
+        self.__tvcmd("SHOW_MENU")
+        
+    def ctrl_toggle_fullscreen(self):
+        
+        self.__tvcmd("TOGGLE_FULLSCREEN")
+        
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    def request_playlist(self, client):
+        
+        ids, names = [], []
+
+        if not self.__stations_file:
+            self.reply_playlist_request(client, ids, names)
+            return
+        
+        
+        xdoc = minidom.parse(self.__stations_file)
+        node = xdoc.getElementsByTagName("stationlist")[0]
+        node = node.getElementsByTagName("list")[0]
+        station_nodes = node.getElementsByTagName("station")
+        
+        for node in station_nodes:
+            active = node.getAttribute("active")
+            if active == "0":
+                continue
+            ids.append(node.getAttribute("position"))
+            names.append(node.getAttribute("name"))
+            
+        self.reply_playlist_request(client, ids, names,
+                                    item_actions=PLAYLIST_ACTIONS)
+
+    # =========================================================================
+    # action interface
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
+        
+        if action_id == IA_JUMP.id:
+            
+            channel = ids[0]
+            cmd = ""
+            for number in channel:
+                cmd += "CHANNEL_%s " % number
+            cmd += "ENTER"
+            
+            self.__tvcmd(cmd)
+        
+        else:
+            log.error("** BUG ** unexpected playlist item action")
+    
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
+    def __tvcmd(self, cmd):
+        
+        retval, output = commands.getstatusoutput("tvtime-command %s" % cmd)
+        if retval != os.EX_OK:
+            log.warning("command '%s' failed: %s" % (cmd, output)) 
+    
+# =============================================================================
+# main
+# =============================================================================
+
+if __name__ == '__main__':
+    
+    pa = TVtimeAdapter()
+    mg = remuco.Manager(pa)
+    mg.run()
