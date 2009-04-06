@@ -71,6 +71,12 @@ pa_files["totem"] = [
      ["remuco.totem-plugin", "remotem.py"])
 ]
 
+# --- TVtime ------------------------------------------------------------------
+
+pa_files["tvtime"] = [
+    ["remuco-tvtime"]
+]
+
 # --- XMMS2 -------------------------------------------------------------------
 
 # set prefix may not be valid for XMMS2 -> use an XMMS2 specific prefix:

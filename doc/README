@@ -50,6 +50,9 @@ Rhythmbox:
 Totem:
  * Totem >= 2.22
 
+TVtime:
+ * TVtime >= 0.9.11
+
 XMMS2:
  * Python modules: xmmsclient (>= 0.5)
 
