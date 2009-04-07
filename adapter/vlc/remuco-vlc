@@ -1,0 +1,95 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""Remuco player adapter for VLC, implemented as an executable script."""
+
+import os.path
+
+import gobject
+
+import remuco
+from remuco import log
+
+# =============================================================================
+# player adapter
+# =============================================================================
+
+class VLCAdapter(remuco.MPRISAdapter):
+    
+    def __init__(self):
+        
+        remuco.MPRISAdapter.__init__(self, "vlc", "VLC",
+                                     mime_types=("audio", "video"))
+        
+        self.__retry_track_active = False
+        
+    def start(self):
+        
+        self.__retry_track_active = False
+        
+        remuco.MPRISAdapter.start(self)
+        
+    def _notify_track(self, track={}):
+        
+        # vlc passes no argument after startup -> make argument a keyword
+            
+        # vlc may need some extra time to get length of a track
+        if (not "length" in track and not "mtime" in track and
+            not self.__retry_track_active):
+            self.__retry_track_active = True
+            gobject.timeout_add(500, self.__retry_track)
+            return
+        
+        self.__retry_track_active = False
+        
+        # vlc provides length in 'length', not in 'time' or 'mtime'        
+        if "length" in track and not "mtime" in track:
+            track["mtime"] = track["length"]
+            
+        # vlc may provide title in 'nowplaying'
+        if "nowplaying" in track and not "title" in track:
+            track["title"] = track["nowplaying"]
+        
+        remuco.MPRISAdapter._notify_track(self, track)
+             
+    def __retry_track(self):
+        log.debug("retry to get track data")
+        try:
+            self._mp_p.GetMetadata(reply_handler=self._notify_track,
+                                   error_handler=self._dbus_error)
+        except DBusException, e:
+            # this is not necessarily a fatal error
+            log.warning("dbus error: %s" % e)
+    
+# =============================================================================
+# main
+# =============================================================================
+
+if __name__ == '__main__':
+
+    pa = VLCAdapter()
+    mg = remuco.Manager(pa, player_dbus_name="org.mpris.vlc")
+    
+    mg.run()
+
