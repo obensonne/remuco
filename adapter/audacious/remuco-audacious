@@ -175,13 +175,10 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     def _notify_track(self, track):
         
         # audacious provides length in 'length', not in 'time' or 'mtime'
-        
-        if "length" in track:
+        if "length" in track and not "mtime" in track:
             track["mtime"] = track["length"]
-            track["time"] = int(track["length"] // 1000)
             
         # audacious provides length in 'URI', not in 'location'
-        
         if "URI" in track:
             track["location"] = track["URI"]
             
