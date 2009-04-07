@@ -53,6 +53,9 @@ Totem:
 TVtime:
  * TVtime >= 0.9.11
 
+VLC:
+ * VLC >= 0.9
+
 XMMS2:
  * Python modules: xmmsclient (>= 0.5)
 

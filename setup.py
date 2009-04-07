@@ -77,6 +77,12 @@ pa_files["tvtime"] = [
     ["remuco-tvtime"]
 ]
 
+# --- VLC ---------------------------------------------------------------------
+
+pa_files["vlc"] = [
+    ["remuco-vlc"]
+]
+
 # --- XMMS2 -------------------------------------------------------------------
 
 # set prefix may not be valid for XMMS2 -> use an XMMS2 specific prefix:
