@@ -20,6 +20,8 @@
 #
 # =============================================================================
 
+import os.path
+
 import dbus
 from dbus.exceptions import DBusException
 import gobject
@@ -96,7 +98,7 @@ class MPRISAdapter(PlayerAdapter):
         
         self._repeat = False
         self._shuffle = False
-        self._playing = False
+        self._playing = PLAYBACK_STOP
         self.__volume = 0
         self.__progress_now = 0
         self.__progress_max = 0
@@ -173,12 +175,12 @@ class MPRISAdapter(PlayerAdapter):
     def ctrl_toggle_playing(self):
         
         try:
-            if self._playing:
-                self._mp_p.Pause(reply_handler=self._dbus_ignore,
-                                 error_handler=self._dbus_error)
-            else:
+            if self._playing == PLAYBACK_STOP:
                 self._mp_p.Play(reply_handler=self._dbus_ignore,
                                 error_handler=self._dbus_error)
+            else:
+                self._mp_p.Pause(reply_handler=self._dbus_ignore,
+                                 error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
     
@@ -247,14 +249,14 @@ class MPRISAdapter(PlayerAdapter):
             log.debug("seeking is currently not possible")
             return
         
-        self.__progress_now += 5000 * direction
+        self.__progress_now += 5 * direction
         self.__progress_now = min(self.__progress_now, self.__progress_max)
         self.__progress_now = max(self.__progress_now, 0)
         
         log.debug("new progress: %d" % self.__progress_now)
         
         try:
-            self._mp_p.PositionSet(self.__progress_now,
+            self._mp_p.PositionSet(self.__progress_now * 1000,
                                    reply_handler=self._dbus_ignore,
                                    error_handler=self._dbus_error)
         except DBusException, e:
@@ -365,8 +367,7 @@ class MPRISAdapter(PlayerAdapter):
     
         id, info = self.__track2info(track)
         
-        
-        self.__progress_max = track.get("mtime", 0) # for update_progress()
+        self.__progress_max = info.get(INFO_LENGTH, 0) # for update_progress()
     
         img = track.get("arturl")
         if not img or not img.startswith("file:"):
@@ -384,25 +385,18 @@ class MPRISAdapter(PlayerAdapter):
         
         log.debug("status: %s " % str(status))
         
-        playing = status[0]
-        shuffle = status[1]
-        repeat_one = status[2]
-        repeat_all = status[3]
-        
-        if playing == STATUS_PLAYING:
-            self._playing = True
-            self.update_playback(PLAYBACK_PLAY)
-        elif playing == STATUS_PAUSED:
-            self._playing = False
-            self.update_playback(PLAYBACK_PAUSE)
+        if status[0] == STATUS_PLAYING:
+            self._playing = PLAYBACK_PLAY
+        elif status[0] == STATUS_PAUSED:
+            self._playing = PLAYBACK_PAUSE
         else:
-            self._playing = False
-            self.update_playback(PLAYBACK_STOP)
+            self._playing = PLAYBACK_STOP
+        self.update_playback(self._playing)
         
-        self._shuffle = shuffle > 0 # remember for toggle_shuffle()
-        self._repeat = repeat_one > 0 or repeat_all > 0 # for toggle_repeat()
-        
+        self._shuffle = status[1] > 0 # remember for toggle_shuffle()
         self.update_shuffle(self._shuffle)
+        
+        self._repeat = status[2] > 0 or status[3] > 0 # for toggle_repeat()
         self.update_repeat(self._repeat)
         
     def _notify_tracklist_change(self, new_len):
@@ -427,10 +421,8 @@ class MPRISAdapter(PlayerAdapter):
         
     def _notify_progress(self, progress):
         
-        self.__progress_now = progress # remember for ctrl_seek()
-        progress = progress // 1000
-        length = self.__progress_max // 1000
-        self.update_progress(progress, length)
+        self.__progress_now = progress // 1000 # remember for ctrl_seek()
+        self.update_progress(self.__progress_now, self.__progress_max)
     
     def _notify_caps(self, caps):
         
@@ -470,15 +462,17 @@ class MPRISAdapter(PlayerAdapter):
     def __track2info(self, track):
         """Convert an MPRIS meta data dict to a Remuco info dict."""
         
-        id = track.get("location", "there must be a location")
+        id = track.get("location", "None")
         
         info = {}
+        title_alt = os.path.basename(id)
+        title_alt = os.path.splitext(title_alt)[0]
+        info[INFO_TITLE] = track.get("title", title_alt)
         info[INFO_ARTIST] = track.get("artist", "")
         info[INFO_ALBUM] = track.get("album", "")
-        info[INFO_TITLE] = track.get("title", "")
         info[INFO_GENRE] = track.get("genre", "")
         info[INFO_YEAR] = track.get("year", "")
-        info[INFO_LENGTH] = track.get("time", 0)
+        info[INFO_LENGTH] = track.get("time", track.get("mtime", 0) // 1000)
         info[INFO_RATING] = track.get("rating", 0)
         
         return (id, info)
