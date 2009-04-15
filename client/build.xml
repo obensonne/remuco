@@ -242,11 +242,8 @@
 			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
 			<attribute name="MIDlet-Version" value="${midlet.version}" />
 			<attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
-			<!--
-			Some phones do not like this ..
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client" />
-			-->
 			<attribute name="Remuco-emulation" value="${emulation-flag}" />
 			<attribute name="Remuco-themes" value="${themes}" />
 		</manifest>
@@ -273,6 +270,10 @@
 	<target name="dist.noop.wtk"
 	        depends="clean,configure.dist.noop.wtk,jad,dist.copy"
 	        description="--> create an non-optimized jar using wtk" />
+
+	<target name="dist"
+	        depends="dist.opti.proguard"
+	        description="--> same as dist.opti.proguard" />
 
 	<target name="dist.copy">
 		<mkdir dir="dist" />
