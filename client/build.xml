@@ -75,39 +75,12 @@
 		<antcall target="echo.configuration" />
 	</target>
 
-	<target name="configure.dist.noop.wtk">
+	<target name="configure.dist">
 		<fail if="configured" />
 		<property name="configured" value="isset" />
-		<property name="compile.debug" value="yes" />
-		<property name="preverifier" value="wtk" />
-		<property name="proguard.optimize" value="no" />
-		<antcall target="echo.configuration" />
-	</target>
-
-	<target name="configure.dist.noop.proguard">
-		<fail if="configured" />
-		<property name="configured" value="isset" />
-		<property name="compile.debug" value="yes" />
-		<property name="preverifier" value="proguard" />
-		<property name="proguard.optimize" value="no" />
-		<antcall target="echo.configuration" />
-	</target>
-
-	<target name="configure.dist.opti.wtk">
-		<fail if="configured" />
-		<property name="configured" value="isset" />
-		<property name="compile.debug" value="no" />
-		<property name="preverifier" value="wtk" />
-		<property name="proguard.optimize" value="no" />
-		<antcall target="echo.configuration" />
-	</target>
-
-	<target name="configure.dist.opti.proguard">
-		<fail if="configured" />
-		<property name="configured" value="isset" />
-		<property name="compile.debug" value="no" />
-		<property name="preverifier" value="proguard" />
-		<property name="proguard.optimize" value="yes" />
+		<property name="compile.debug" value="${dist.debug}" />
+		<property name="preverifier" value="${dist.preverifier}" />
+		<property name="proguard.optimize" value="${dist.proguard.optimize}" />
 		<antcall target="echo.configuration" />
 	</target>
 
@@ -260,27 +233,9 @@
 
 	<!-- =================== Dist ========================================= -->
 
-	<target name="dist.opti.proguard"
-	        depends="clean,configure.dist.opti.proguard,jad,dist.copy"
-	        description="--> create an optimized jar using proguard" />
-
-	<target name="dist.opti.wtk"
-	        depends="clean,configure.dist.opti.wtk,jad,dist.copy"
-	        description="--> create an debug-free jar using wtk" />
-
-	<target name="dist.noop.proguard"
-	        depends="clean,configure.dist.noop.proguard,jad,dist.copy"
-	        description="--> create an non-optimized jar using proguard" />
-
-	<target name="dist.noop.wtk"
-	        depends="clean,configure.dist.noop.wtk,jad,dist.copy"
-	        description="--> create an non-optimized jar using wtk" />
-
 	<target name="dist"
-	        depends="dist.opti.proguard"
-	        description="--> same as dist.opti.proguard" />
-
-	<target name="dist.copy">
+	        depends="clean,configure.dist,jad"
+	        description="--> create distributable jar and jad file">
 		<mkdir dir="dist" />
 		<copy todir="dist">
 			<fileset dir="build/jar">
@@ -292,44 +247,31 @@
 
 	<!-- =================== Snapshot ===================================== -->
 
-	<target name="snapshot.opti.proguard"
-	        depends="dist.opti.proguard,snapshot.copy"
-	        description="--> create an optimized snapshot using proguard" />
-
-	<target name="snapshot.opti.wtk"
-	        depends="dist.opti.wtk,snapshot.copy"
-	        description="--> create an optimized snapshot using wtk" />
-
-	<target name="snapshot.noop.proguard"
-	        depends="dist.noop.proguard,snapshot.copy"
-	        description="--> create a non-optimized snapshot using proguard" />
-
-	<target name="snapshot.noop.wtk"
-	        depends="dist.noop.wtk,snapshot.copy"
-	        description="--> create a non-optimized snapshot using wtk" />
-
-	<target name="snapshot.copy" depends="revision">
-		<property name="snapdir" value="snapshot/snapshot-${revision.no}" />
-		<mkdir dir="${snapdir}" />
-		<copy todir="${snapdir}">
-			<fileset dir="dist">
-				<include name="${midlet.jar}" />
-				<include name="${midlet.jad}" />
-			</fileset>
-		</copy>
+	<target name="snapshot"
+	        depends="clean,revision,configure.dist,jad"
+	        description="--> create snapshot tarball">
 		<tstamp />
-		<echo file="${snapdir}/tmp1"
+		<echo file="build/tmp1"
 		      message="Client snapshot (${TODAY}, Revision ${revision.no})." />
-		<echo file="${snapdir}/tmp1"
+		<echo file="build/tmp1"
 		      append="true"
 		      message="${line.separator}${line.separator}" />
-		<echoproperties destfile="${snapdir}/tmp2" />
-		<concat destfile="${snapdir}/README">
-			<fileset dir="${snapdir}" includes="tmp*" id="snaptmp" />
+		<echoproperties destfile="build/tmp2" />
+		<concat destfile="build/README">
+			<fileset dir="build" includes="tmp*" id="snaptmp" />
 		</concat>
 		<delete>
 			<fileset refid="snaptmp" />
 		</delete>
+		<mkdir dir="dist" />
+		<tar destfile="dist/remuco-client-${revision.no}.tar.gz"
+		     compression="gzip">
+			<fileset dir="build/jar">
+				<include name="${midlet.jar}" />
+				<include name="${midlet.jad}" />
+			</fileset>
+			<fileset dir="build" includes="README" />
+		</tar>
 	</target>
 
 	<target name="revision">

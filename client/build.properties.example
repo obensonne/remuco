@@ -9,35 +9,35 @@
 # Download: http://java.sun.com/products/sjwtoolkit/
 # Required version: >= 2.5.2
 # Needed if:
-#    - public targets with 'wtk' in their names get called
+#    - option 'dist.preverifier' is set to 'wtk'
 #    - option 'run.preverifier' is set to 'wtk'
 #    - WTK libraries are used below in section 'API libs'
-wtk.home=${user.home}/opt/java/wtk-2.5.2
+wtk.home=${user.home}/opt/wtk-2.5.2
 
 # Home of MicroEmu.
 # Download: http://www.microemu.org/
 # Required version: >= 2.0.3
 # Needed if:
-#    - public targets with 'microemu' in their names get called
+#    - target 'run.microemu' gets called
 #    - MicroEmu libraries are used below in section 'API libs'
-microemu.home=${user.home}/opt/java/microemulator-2.0.3
+microemu.home=${user.home}/opt/microemulator-2.0.3
 
 # BlueCove JAR
 # Download: http://bluecove.org/
 # Required version: >= 2.1
 # Needed if:
 #    - target 'run.microemu' gets called and Bluetooth shall be enabled
-microemu.bluecove.jar=${user.home}/opt/java/bluecove/bluecove-2.1.0.jar
+microemu.bluecove.jar=${user.home}/opt/bluecove/bluecove-2.1.0.jar
 # Additionally needed on systems with a BlueZ stack:
-microemu.bluecove-gpl.jar=${user.home}/opt/java/bluecove/bluecove-gpl-2.1.0.jar
+microemu.bluecove-gpl.jar=${user.home}/opt/bluecove/bluecove-gpl-2.1.0.jar
 
 # ProGuard JAR (containing the ProGuard Ant task)
 # Download: http://proguard.sourceforge.net/
 # Required version: >= 4.2
 # Needed if:
-#    - public targets with 'proguard' in their names get called
+#    - the option 'dist.preverifier' is set to 'proguard'
 #    - the option 'run.preverifier' is set to 'proguard'
-proguard.jar=${user.home}/opt/java/proguard-4.2/lib/proguard.jar
+proguard.jar=${user.home}/opt/proguard-4.2/lib/proguard.jar
 
 # =============================================================================
 # API libs
@@ -52,6 +52,26 @@ proguard.jar=${user.home}/opt/java/proguard-4.2/lib/proguard.jar
 midp.jar=${microemu.home}/lib/midpapi20.jar
 cldc.jar=${microemu.home}/lib/cldcapi11.jar
 jsr82.jar=${microemu.home}/lib/microemu-jsr-82.jar
+
+# =============================================================================
+# Configurations for targets 'dist'
+# =============================================================================
+
+# The preverifier to use.
+#dist.preverifier=wtk
+dist.preverifier=proguard
+
+# Whether to include debug symbols in the byte code or not.
+#dist.debug=yes
+dist.debug=no
+
+# Whether to optimize and obfuscate the byte code when using ProGuard.
+#dist.proguard.optimize=no
+dist.proguard.optimize=yes
+
+# Size of the application logo.
+# Possible values: 12, 16, 24, 32, 48
+logo.size=12
 
 # =============================================================================
 # Configurations for targets 'run', 'run.wtk' and 'run.microemu'
