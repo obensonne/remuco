@@ -206,10 +206,15 @@
 
 	<target name="jar" depends="preverify,manifest">
 		<mkdir dir="build/jar" />
+		<copy tofile="build/logo.png"
+		      file="design/logos/logo_${logo.size}.png" />
 		<jar jarfile="build/jar/${midlet.jar}" manifest="build/MF">
 			<fileset dir="build/preverified" />
 			<fileset dir="res/">
 				<exclude unless="build.test" name="test/" />
+			</fileset>
+			<fileset dir="build">
+				<include name="logo.png" />
 			</fileset>
 		</jar>
 	</target>
