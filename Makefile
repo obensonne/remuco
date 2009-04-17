@@ -2,9 +2,10 @@
 # Makefile intended for end users. It is a wrapper around setup.py.
 # -----------------------------------------------------------------------------
 
-PREFIX ?= /usr/local
+#PREFIX ?= /usr/local
+#SETUP := python setup.py install --prefix=$(PREFIX)
 
-SETUP := python setup.py install --prefix=$(PREFIX)
+SETUP := python setup.py install
 
 ADAPTERS := $(shell ls adapter)
 
