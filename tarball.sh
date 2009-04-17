@@ -56,12 +56,8 @@ for ITEM in src res design *.example build.xml ; do
 done
 
 mkdir ../$PKG/client/app
-ant dist.opti.proguard
+ant dist
 cp dist/remuco.jar dist/remuco.jad ../$PKG/client/app
-
-mkdir ../$PKG/client/app/non-optimized
-ant dist.noop.proguard
-cp dist/remuco.jar dist/remuco.jad ../$PKG/client/app/non-optimized
 
 cd ..
 
@@ -104,6 +100,7 @@ cd ..
 tar zcf $PKG_CLIENT.tar.gz $PKG_CLIENT
 
 cp $PKG_CLIENT/app/remuco.jar remuco-client-$VERSION.jar
+cp $PKG_CLIENT/app/remuco.jad remuco-client-$VERSION.jad
 
 # -----------------------------------------------------------------------------
 # extra package: server source
