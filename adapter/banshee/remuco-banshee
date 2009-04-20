@@ -28,6 +28,7 @@ import os.path
 
 import dbus
 from dbus.exceptions import DBusException
+import gobject
 from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 
 import remuco
@@ -65,6 +66,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         self.__shuffle = False
         self.__volume = 0
         
+        self.__progress = 0
         self.__progress_length = 0
     
         log.debug("init done")
@@ -121,17 +123,26 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
     def poll(self):
         
+        self.__poll_repeat_shuffle()
+        self.__poll_progress()
+        
+    def __poll_repeat_shuffle(self):
+        
         try:
             self.__bsc.GetRepeatMode(reply_handler=self.__notify_repeat,
                                      error_handler=self.__dbus_error)
             self.__bsc.GetShuffleMode(reply_handler=self.__notify_shuffle,
                                       error_handler=self.__dbus_error)
+        except DBusException, e:
+            log.warning("dbus error: %s" % e)
+        
+    def __poll_progress(self):
+        
+        try:
             self.__bse.GetPosition(reply_handler=self.__notify_progress,
                                    error_handler=self.__dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
-        
-        return True
         
     # =========================================================================
     # control interface
@@ -163,7 +174,25 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except DBusException, e:
             log.warning("dbus error: %s" % e)
     
-    
+    def ctrl_seek(self, direction):
+        
+        if self.__progress_length == 0:
+            return
+        
+        progress_new = self.__progress + direction * 5
+        progress_new = min(progress_new, self.__progress_length)
+        progress_new = max(progress_new, 0)
+        
+        try:
+            self.__bse.SetPosition(dbus.UInt32(progress_new * 1000),
+                                   reply_handler=self.__dbus_ignore,
+                                   error_handler=self.__dbus_error)
+        except DBusException, e:
+            log.warning("dbus error: %s" % e)
+        else:
+            # poll with a small delay, otherwise we get 0 as progress
+            gobject.timeout_add(100, self.__poll_progress)
+        
     def ctrl_volume(self, direction):
         
         if direction == 0:
@@ -192,7 +221,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             
-        self.poll()
+        self.__poll_repeat_shuffle()
             
     def ctrl_toggle_shuffle(self):
 
@@ -203,7 +232,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             
-        self.poll()
+        self.__poll_repeat_shuffle()
 
     # =========================================================================
     # internal methods
@@ -286,7 +315,8 @@ class BansheeAdapter(remuco.PlayerAdapter):
         
     def __notify_progress(self, ms):
         
-        self.update_progress(ms / 1000, self.__progress_length)
+        self.__progress = ms // 1000
+        self.update_progress(self.__progress, self.__progress_length)
 
     def __dbus_error(self, error):
         """ DBus error handler. """
