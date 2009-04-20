@@ -19,8 +19,9 @@ fi
 
 PKG=remuco-$VERSION
 
-rm -rf build dist $PKG $PKG.tar.gz || exit 1
+rm -rf tarballs build dist $PKG || exit 1
 
+mkdir tarballs
 mkdir $PKG
 
 # -----------------------------------------------------------------------------
@@ -70,7 +71,7 @@ find $PKG -type f -name "*.pyc" | xargs rm -f
 find $PKG -type f -name "*~" | xargs rm -f
 find $PKG -type f -name "install*.log" | xargs rm -f
 
-tar zcf $PKG.tar.gz $PKG
+tar zcf tarballs/$PKG.tar.gz $PKG
 
 # -----------------------------------------------------------------------------
 # extra package: client source + binaries
@@ -78,7 +79,7 @@ tar zcf $PKG.tar.gz $PKG
 
 PKG_CLIENT=remuco-client-$VERSION
 
-rm -rf $PKG_CLIENT $PKG_CLIENT.tar.gz
+rm -rf $PKG_CLIENT
 
 cp -r $PKG $PKG_CLIENT
 
@@ -97,10 +98,14 @@ EOF
 
 cd ..
 
-tar zcf $PKG_CLIENT.tar.gz $PKG_CLIENT
+tar zcf tarballs/$PKG_CLIENT.tar.gz $PKG_CLIENT
 
-cp $PKG_CLIENT/app/remuco.jar remuco-client-$VERSION.jar
-cp $PKG_CLIENT/app/remuco.jad remuco-client-$VERSION.jad
+# -----------------------------------------------------------------------------
+# extra package: client JAR and JAD
+# -----------------------------------------------------------------------------
+
+cp $PKG_CLIENT/app/remuco.jar tarballs/remuco.jar
+cp $PKG_CLIENT/app/remuco.jad tarballs/remuco.jad
 
 # -----------------------------------------------------------------------------
 # extra package: server source
@@ -108,13 +113,13 @@ cp $PKG_CLIENT/app/remuco.jad remuco-client-$VERSION.jad
 
 PKG_SERVER=remuco-server-$VERSION
 
-rm -rf $PKG_SERVER $PKG_SERVER.tar.gz
+rm -rf $PKG_SERVER
 
 cp -r $PKG $PKG_SERVER
 
 rm -rf $PKG_SERVER/client
 
-tar zcf $PKG_SERVER.tar.gz $PKG_SERVER
+tar zcf tarballs/$PKG_SERVER.tar.gz $PKG_SERVER
 
 # -----------------------------------------------------------------------------
 
