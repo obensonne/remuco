@@ -1,0 +1,38 @@
+msc {
+	Client,Server,Adapter;
+
+	Server<=Adapter [ label = "__init__()" ] ;
+	Server<=Adapter [ label = "update_...()" ] ;
+	...;
+	--- [ label = "client connects [1] " ];
+	Client<=Server [ label = "HELLO" ] ;
+	Client=>Server [ label = "CONN_CINFO"];
+	Client<=Server [ label = "CONN_PINFO" ];
+	Client<=Server [ label = "SYNC_STATE" ];
+	Client<=Server [ label = "SYNC_PROGRESS" ];
+	Client<=Server [ label = "SYNC_ITEM" ];
+	...;
+	--- [ label = "client controls player [2] " ];
+	Client=>Server [ label = "CTRL_..." ];
+	Server=>Adapter [ label = "ctrl_...()" ] ;
+	...;
+	--- [ label = "player state changed [3] " ];
+	Server<=Adapter [ label = "update_...()" ] ;
+	Server<=Adapter [ label = "update_...()" ] ;
+	Client<=Server [ label = "SYNC_..." ];
+	...;
+	--- [ label = "client requests data from player [4] " ];
+	Client=>Server [ label = "REQ_..." ];
+	Server=>Adapter [ label = "request_...()" ];
+	Server<=Adapter [ label = "reply_..._request()" ];
+	Client<=Server [ label = "REQ_..." ];
+	...;
+	--- [ label = "client issues a media browser action [5] " ];
+	Client=>Server [ label = "ACT_..." ];
+	Server=>Adapter [ label = "action_...()" ];
+	...;
+	--- [ label = "player goes down [6] " ];
+	Server<=Adapter [ label="down()" ];
+	Client<=Server [ label="CONN_BYE" ];
+
+}
