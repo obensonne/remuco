@@ -36,6 +36,7 @@ from remuco import serial
 # =============================================================================
 
 class PlayerInfo(serial.Serializable):
+    """ Parameter of the player info message sent to clients."""
     
     def __init__(self, name, flags, max_rating, file_item_actions):
         
@@ -66,6 +67,7 @@ class PlayerInfo(serial.Serializable):
                 self.fia_helps)
 
 class PlayerState(serial.Serializable):
+    """ Parameter of the state sync message sent to clients."""
     
     def __init__(self):
         
@@ -93,6 +95,7 @@ class PlayerState(serial.Serializable):
                 self.repeat, self.shuffle, self.queue)
 
 class Progress(serial.Serializable):
+    """ Parameter of the progress sync message sent to clients."""
     
     def __init__(self):
         
@@ -111,6 +114,7 @@ class Progress(serial.Serializable):
         return (self.progress, self.length)
 
 class Item(serial.Serializable):
+    """ Parameter of the item sync message sent to clients."""
     
     def __init__(self, img_size=0, img_type="JPEG"):
         
@@ -197,6 +201,7 @@ class Item(serial.Serializable):
             return []
 
 class ItemList(serial.Serializable):
+    """ Parameter of a request reply message sent to clients."""
     
     MAX_LEN = 100
     
@@ -253,6 +258,7 @@ class ItemList(serial.Serializable):
 
 
 class Control(serial.Serializable):
+    """ Parameter of control messages from clients with integer arguments."""
     
     def __init__(self):
         
@@ -267,6 +273,7 @@ class Control(serial.Serializable):
         self.param, = data
 
 class Action(serial.Serializable):
+    """ Parameter of an action message from a client."""
     
     def __init__(self):
         
@@ -284,6 +291,7 @@ class Action(serial.Serializable):
         self.id, self.path, self.positions, self.items = data
 
 class Tagging(serial.Serializable):
+    """ Parameter of a tagging message from a client."""
     
     def __init__(self):
         
@@ -299,6 +307,7 @@ class Tagging(serial.Serializable):
         self.id, self.tags = data
 
 class Request(serial.Serializable):
+    """ Parameter of a request message from a client."""
 
     def __init__(self):
         

@@ -75,7 +75,7 @@ ACT_FILES = _ACT + 3
 
 _REQ = 500
 
-REQ_ITEM = _REQ
+REQ_ITEM = _REQ # currently unused
 REQ_PLAYLIST = _REQ + 1
 REQ_QUEUE = _REQ + 2
 REQ_MLIB = _REQ + 3
