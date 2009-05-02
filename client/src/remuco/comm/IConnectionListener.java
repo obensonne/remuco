@@ -34,15 +34,23 @@ public interface IConnectionListener {
 
 	/**
 	 * Notifies a successful connection.
-	 * @param conn the connected connection
-	 * @param pinfo information about the connected player
+	 * 
+	 * @param conn
+	 *            the connected connection
+	 * @param pinfo
+	 *            information about the connected player
 	 */
 	public void notifyConnected(Connection conn, PlayerInfo pinfo);
 
 	/**
-	 * Notifies a disconnection caused by the reason described in
-	 * <i>reason</i>.
+	 * Notifies a disconnection.
+	 * 
+	 * @param url
+	 *            the URL of the broken connection if it is worth trying to
+	 *            reconnect, or <code>null</code> otherwise
+	 * @param reason
+	 *            the user exception describing the reason for disconnecting
 	 */
-	public void notifyDisconnected(UserException reason);
+	public void notifyDisconnected(String url, UserException reason);
 
 }

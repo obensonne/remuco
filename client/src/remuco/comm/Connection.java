@@ -79,9 +79,12 @@ public final class Connection implements Runnable {
 
 	private final Timer timer;
 
+	private String url = null;
+
 	public Connection(String url, IConnectionListener connectionListener,
 			IMessageListener messageListener) throws UserException {
 
+		this.url = url;
 		this.connectionListener = connectionListener;
 		this.messageListener = messageListener;
 
@@ -269,10 +272,9 @@ public final class Connection implements Runnable {
 
 			connectionListenerNotifiedAboutError = true;
 
-			// notify via the global timer thread
 			timer.schedule(new TimerTask() {
 				public void run() {
-					connectionListener.notifyDisconnected(ue);
+					connectionListener.notifyDisconnected(url, ue);
 				}
 			}, 200);
 		}
@@ -357,7 +359,7 @@ public final class Connection implements Runnable {
 					skip(size);
 				}
 			}
-			
+
 			Log.ln("[CN] read msg: done");
 
 		} catch (EOFException e) {
@@ -374,6 +376,7 @@ public final class Connection implements Runnable {
 
 		if (m.id == Message.CONN_BYE) {
 			downPrivate();
+			url = null; // suppress reconnecting
 			throw new UserException("Disconnected.", "Remote player said bye.");
 		}
 
@@ -395,7 +398,7 @@ public final class Connection implements Runnable {
 			dos.writeInt(0);
 		}
 		dos.flush();
-		
+
 		Log.ln("[CN] send msg: done");
 	}
 
@@ -468,17 +471,20 @@ public final class Connection implements Runnable {
 			if (readAndCompare(PREFIX) < 0) {
 				Log.ln("[CN] IO prefix differs");
 				downPrivate();
+				url = null; // suppress reconnecting;
 				throw new UserException("Connecting failed",
 						"Received a malformed hello message from the server.");
 			}
 			if (readAndCompare(PROTO_VERSION) < 0) {
 				downPrivate();
+				url = null; // suppress reconnecting;
 				throw new UserException("Connecting failed",
 						"Incompatible server version.");
 			}
 			if (readAndCompare(SUFFIX) < 0) {
 				Log.ln("[CN] IO suffix differs");
 				downPrivate();
+				url = null; // suppress reconnecting;
 				throw new UserException("Connecting failed",
 						"Received a malformed hello message from the server.");
 			}

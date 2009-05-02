@@ -30,7 +30,11 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.StringItem;
 
 import remuco.Config;
 import remuco.Remuco;
@@ -63,6 +67,43 @@ import remuco.util.Log;
  */
 public final class UI implements CommandListener, IConnectionListener,
 		IMessageListener, IServiceListener, IDeviceSelectionListener {
+
+	private class ReconnectDialog extends Form implements CommandListener {
+
+		private final String url;
+
+		public ReconnectDialog(String url, String msg) {
+			super("Disconnected");
+			this.url = url;
+			final ImageItem img = new ImageItem(null,
+					Theme.getInstance().aicConnecting, Item.LAYOUT_CENTER
+							| Item.LAYOUT_NEWLINE_AFTER, "");
+			append(img);
+			final StringItem text = new StringItem(null, msg);
+			text.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+			append(text);
+			append("\n");
+			final StringItem question = new StringItem("Reconnect?", null);
+			question.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+			append(question);
+			addCommand(CMD.YES);
+			addCommand(CMD.NO);
+			setCommandListener(this);
+
+		}
+
+		public void commandAction(Command c, Displayable d) {
+
+			if (c == CMD.YES) {
+				connect(url);
+			} else if (c == CMD.NO) {
+				display.setCurrent(screenDeviceSelector);
+			} else {
+				Log.bug("Apr 9, 2009.9:53:36 PM");
+			}
+		}
+
+	}
 
 	/** An alert to signal an alerting message :) */
 	private final Alert alert;
@@ -203,10 +244,15 @@ public final class UI implements CommandListener, IConnectionListener,
 		display.setCurrent(screenPlayer);
 	}
 
-	public void notifyDisconnected(UserException reason) {
+	public void notifyDisconnected(String url, UserException reason) {
 
 		disposePlayerScreen();
-		alert(reason, screenDeviceSelector);
+
+		if (url != null) {
+			display.setCurrent(new ReconnectDialog(url, reason.getDetails()));
+		} else {
+			alert(reason, screenDeviceSelector);
+		}
 	}
 
 	public void notifyMessage(Connection conn, Message m) {
