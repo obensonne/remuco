@@ -93,7 +93,7 @@ IA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
 PLAYLIST_ACTIONS = (IA_JUMP, IA_ENQUEUE)
 QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
 MLIB_LIST_ACTIONS = (LA_PLAY,)
-MLIB_ITEM_ACTIONS = (IA_ENQUEUE,)
+MLIB_ITEM_ACTIONS = (IA_ENQUEUE, IA_JUMP)
 
 # =============================================================================
 # player adapter
@@ -324,6 +324,14 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             
             self.__enqueue_items(ids)
         
+        if action_id == IA_JUMP.id:
+            
+            self.action_mlib_list(LA_PLAY.id, path)
+            
+            # delay jump, otherwise sync with clients sometimes fails
+            gobject.timeout_add(100, self.action_playlist_item, IA_JUMP.id,
+                                positions, ids)
+
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
     
