@@ -1,7 +1,14 @@
 0.8.2	Oben Sonne <obensonne@googlemail.com>
 
-	* added player adapter for VLC
-	* added player adapter for TVtime
+	* vlc: added player adapter for VLC
+	* tvtime: added player adapter for TVtime
+	* banshee: added seek support
+	* rhythmbox: added action to directly jump to items somewhere in the
+	  library
+	* base: fixed Python path issue in Ubuntu Jaunty
+	* client: quick reconnect when connection is broken
+	* client: removed some unused icons (smaller JAR size)
+	* client: logo size configurable in build process
 	
 0.8.1	Oben Sonne <obensonne@googlemail.com>
 
