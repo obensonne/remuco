@@ -55,6 +55,8 @@ TVtime:
 
 VLC:
  * VLC >= 0.9
+ * If not enabled by default, VLC needs to be started with DBus control:
+   $ vlc --control dbus
 
 XMMS2:
  * Python modules: xmmsclient (>= 0.5)
