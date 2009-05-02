@@ -76,13 +76,21 @@ Run
  
 to get instructions on how to install Remuco for one or more media players.
 
-Subsequent, install the client application on your mobile device. You find the
+Note: Please remove any Remuco version < 0.8.2. Installation process has
+      changed in 0.8.2 so that you otherwise might end up with multiple Remuco
+      installations on your system. If you do not have the install log files
+      anymore which lists all installed files, then look for files starting
+      with 'remuco-...' in /usr/local/bin and for a directory called 'remuco'
+      and a remuco egg info file in /usr/local/lib/python2.X/site-packages/.
+
+Next, install the client application on your mobile device. You find the
 required JAR and JAD files in the directory 'client/app'.
 How to install is device dependent - please consult the documentation of your
 mobile device.
 
-Note: If the client fails to start on your mobile, try the non-optimized
-      version in the directory 'client/app/non-optimized'.
+Note: If the client fails to start on your mobile, have a look at
+      http://remuco.sourceforge.net/index.php/Client_Customization
+      for possible reasons and solutions.
 
 For more information visit:
 http://remuco.sourceforge.net/index.php/Getting_Started
