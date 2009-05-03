@@ -326,11 +326,13 @@ class TotemAdapter(remuco.PlayerAdapter):
         
         return int(self.__vw.get_property("volume") * 100)
         
-    def __notify_metadata_updated(self, totem, artist, title, album):
+    def __notify_metadata_updated(self, totem, artist, title, album, track=0):
+        
+        # 'track' has been added in Totem 2.26
         
         log.debug("metadata updated: %s, %s, %s" % (artist, title, album))
 
-        # in Totem 2.24 meta data is allways None :(
+        # in Totem < 2.26 meta data is always None
         
         self.__md_artist = artist
         self.__md_title = title
