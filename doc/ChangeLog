@@ -1,3 +1,8 @@
+0.8.2.1	Oben Sonne <obensonne@googlemail.com>
+
+	* fixed obsolete client installation in setup.py
+	* totem: adapted to Totem 2.26
+	
 0.8.2	Oben Sonne <obensonne@googlemail.com>
 
 	* vlc: added player adapter for VLC
