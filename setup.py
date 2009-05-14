@@ -142,11 +142,8 @@ install_client = (os.getenv("REMUCO_ADAPTERS") is None and
                   os.getenv("REMUCO_NO_CLIENT") is None)  
 
 if install_client and os.path.exists("client/app"):
-    
-    for client in ("", "non-optimized"):
-        data_files.append(("%s/%s" % (CLIENT_DEST, client),
-                           ["client/app/%s/remuco.jar" % client,
-                            "client/app/%s/remuco.jad" % client]))
+    data_files.append((CLIENT_DEST, ["client/app/remuco.jar",
+                                     "client/app/remuco.jad"]))
         
 
 # =============================================================================
