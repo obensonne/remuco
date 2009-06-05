@@ -24,6 +24,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.player.PlayerInfo;
+import remuco.ui.IActionListener;
 import remuco.ui.Theme;
 import remuco.ui.screens.PlayerScreen;
 import remuco.util.Log;
@@ -241,7 +242,7 @@ public abstract class Screeny {
 	/**
 	 * Get the (bottom anchored) possible position of a screeny above this one
 	 * (to be used with an anchor point {@link Graphics#BOTTOM}). See
-	 * description for param <code>achnor</code> in
+	 * description for param <code>anchor</code> in
 	 * {@link #initRepresentation(int, int, int, int, int)} for when this method
 	 * may be used and when not.
 	 * <p>
@@ -341,6 +342,36 @@ public abstract class Screeny {
 
 	}
 
+	/**
+	 * Implementations may override this method to handle pointer <i>pressed</i>
+	 * events and notify corresponding key action events to the given action
+	 * listener.
+	 * <p>
+	 * The method {@link #isInScreeny(int, int)} may be used to check if the
+	 * given point is within the screeny.
+	 * <p>
+	 * Screenies with sub screenies which forward this call to their sub
+	 * screenies should care about making the given coordinates relative before
+	 * forwarding.
+	 */
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+	}
+
+	/**
+	 * Implementations may override this method to handle pointer
+	 * <i>released</i> events and notify corresponding key action events to the
+	 * given action listener.
+	 * <p>
+	 * The method {@link #isInScreeny(int, int)} may be used to check if the
+	 * given point is within the screeny.
+	 * <p>
+	 * Screenies with sub screenies which forward this call to their sub
+	 * screenies should care about making the given coordinates relative before
+	 * forwarding.
+	 */
+	public void pointerReleased(int px, int py, IActionListener actionListener) {
+	}
+
 	public final String toString() {
 
 		StringBuffer sb = new StringBuffer("Screeny: ");
@@ -371,7 +402,7 @@ public abstract class Screeny {
 	 * {@link #data} has been updated. This is especially useful for screenies
 	 * which contain sub screenies to call the {@link #updateData(Object)}
 	 * methods of the sub screenies. Notice that representation updates get
-	 * triggered seperately via {@link #updateRepresentation()}!
+	 * triggered separately via {@link #updateRepresentation()}!
 	 * <p>
 	 * The default implementation does nothing.
 	 */
@@ -468,6 +499,19 @@ public abstract class Screeny {
 	 *             see {@link #initRepresentation(int, int, int, int, int)}
 	 */
 	protected abstract void initRepresentation() throws ScreenyException;
+
+	/** Check if the given point is inside the area of this screeny. */
+	protected boolean isInScreeny(int px, int py) {
+
+		boolean isIn = true;
+
+		isIn &= px >= getPreviousX(); // right anchored -> '>='
+		isIn &= px < getNextX();
+		isIn &= py >= getPreviousY(); // bottom anchored -> '>='
+		isIn &= py < getNextY();
+
+		return isIn;
+	}
 
 	/**
 	 * To be used by {@link Screeny} implementations to set their

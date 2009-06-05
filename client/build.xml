@@ -55,7 +55,7 @@
 
 	<property name="midlet.icon" value="logo.png" />
 	<property name="midlet.vendor" value="remuco.sf.net" />
-	<property name="midlet.version" value="0.8.2" />
+	<property name="midlet.version" value="0.8.3" />
 	<property name="midlet.data-size" value="2048" />
 
 	<property name="midlet.name" value="Remuco" />
@@ -224,6 +224,7 @@
 			           value="javax.microedition.io.Connector.bluetooth.client" />
 			<attribute name="Remuco-emulation" value="${emulation-flag}" />
 			<attribute name="Remuco-themes" value="${themes}" />
+			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />			
 		</manifest>
 	</target>
 

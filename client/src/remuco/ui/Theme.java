@@ -471,7 +471,7 @@ public final class Theme {
 	 * Get a specific image of this theme.
 	 * 
 	 * @param id
-	 *            the image id, one of <code>IMIGID_...</code>
+	 *            the image id, one of <code>RTE_...</code>
 	 * @return the image
 	 */
 	public Image getImg(int id) {

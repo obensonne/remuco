@@ -23,8 +23,10 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.player.PlayerInfo;
 import remuco.player.Item;
+import remuco.player.PlayerInfo;
+import remuco.ui.IActionListener;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 public final class RateScreeny extends Screeny {
@@ -53,6 +55,19 @@ public final class RateScreeny extends Screeny {
 		super(player);
 	}
 
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+
+		if (!isInScreeny(px, py)) {
+			return;
+		}
+
+		if (px < getPreviousX() + rating * ratingWidth) {
+			actionListener.handleActionPressed(KeyBindings.ACTION_RATEDOWN);
+		} else {
+			actionListener.handleActionPressed(KeyBindings.ACTION_RATEUP);
+		}
+	}
+
 	protected void dataUpdated() {
 
 		Item item = (Item) data;
@@ -79,9 +94,9 @@ public final class RateScreeny extends Screeny {
 		// scale rate images if needed (may happen if the remote player has a
 		// wide rating range)
 		ratingOn = Theme.shrinkImageIfNeeded(ratingOn, width / ratingMax,
-				height);
+			height);
 		ratingOff = Theme.shrinkImageIfNeeded(ratingOff, width / ratingMax,
-				height);
+			height);
 
 		ratingWidth = ratingOn.getWidth();
 		ratingHeight = ratingOn.getHeight();

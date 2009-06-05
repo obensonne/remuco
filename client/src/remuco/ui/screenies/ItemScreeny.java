@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Image;
 import remuco.player.Item;
 import remuco.player.PlayerInfo;
 import remuco.player.Progress;
+import remuco.ui.IActionListener;
 import remuco.ui.Theme;
 
 public final class ItemScreeny extends Screeny {
@@ -38,9 +39,9 @@ public final class ItemScreeny extends Screeny {
 
 	private boolean fullScreenImage = false;
 
-	private ImageScreeny screenyImage, screenyImageClear;
+	private TitleScreeny screenyDesc;
 
-	private TitleScreeny screenyPlobDesc;
+	private ImageScreeny screenyImageFullScreen, screenyImageClear;
 
 	private ProgressScreeny screenyProgress;
 
@@ -50,12 +51,30 @@ public final class ItemScreeny extends Screeny {
 
 		super(player);
 
-		screenyPlobDesc = new TitleScreeny(player);
+		screenyDesc = new TitleScreeny(player);
 		screenyProgress = new ProgressScreeny(player);
 		screenyRate = new RateScreeny(player);
-		screenyImage = new ImageScreeny(player);
+		screenyImageFullScreen = new ImageScreeny(player);
 		screenyImageClear = new ImageScreeny(player);
 
+	}
+
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+		final int rx = px - getPreviousX();
+		final int ry = py - getPreviousY();
+		screenyImageFullScreen.pointerPressed(rx, ry, actionListener);
+		screenyDesc.pointerPressed(rx, ry, actionListener);
+		screenyProgress.pointerPressed(rx, ry, actionListener);
+		screenyRate.pointerPressed(rx, ry, actionListener);
+	}
+
+	public void pointerReleased(int px, int py, IActionListener actionListener) {
+		final int rx = px - getPreviousX();
+		final int ry = py - getPreviousY();
+		screenyImageFullScreen.pointerReleased(rx, ry, actionListener);
+		screenyDesc.pointerReleased(rx, ry, actionListener);
+		screenyProgress.pointerReleased(rx, ry, actionListener);
+		screenyRate.pointerReleased(rx, ry, actionListener);
 	}
 
 	protected void dataUpdated() {
@@ -65,14 +84,14 @@ public final class ItemScreeny extends Screeny {
 			fullScreenImage = fullScreenImage ? false : true;
 
 		} else if (data instanceof Progress) {
-			
+
 			screenyProgress.updateData(data);
-			
+
 		} else { // instance of Item
 
-			screenyImage.updateData(data != null ? ((Item) data).getImg()
+			screenyImageFullScreen.updateData(data != null ? ((Item) data).getImg()
 					: null);
-			screenyPlobDesc.updateData(data);
+			screenyDesc.updateData(data);
 			screenyRate.updateData(data);
 
 			fullScreenImage = false;
@@ -122,12 +141,12 @@ public final class ItemScreeny extends Screeny {
 		x = xClip;
 		y = screenyProgress.getPreviousY();
 		h = y - yClip;
-		screenyPlobDesc.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
+		screenyDesc.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
 
 		x = xClip;
 		y = yClip;
 		h = hClip;
-		screenyImage.initRepresentation(x, y, TOP_LEFT, wClip, h);
+		screenyImageFullScreen.initRepresentation(x, y, TOP_LEFT, wClip, h);
 		screenyImageClear.initRepresentation(x, y, TOP_LEFT, wClip, h);
 
 	}
@@ -136,12 +155,12 @@ public final class ItemScreeny extends Screeny {
 
 		if (fullScreenImage) {
 
-			screenyImage.draw(g);
+			screenyImageFullScreen.draw(g);
 
 		} else {
 
 			screenyImageClear.draw(g); // removes any item images artefacts
-			screenyPlobDesc.draw(g);
+			screenyDesc.draw(g);
 			screenyProgress.draw(g);
 			screenyRate.draw(g);
 

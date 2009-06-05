@@ -25,6 +25,8 @@ import javax.microedition.lcdui.Image;
 import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
+import remuco.ui.IActionListener;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 public final class SliderScreeny extends Screeny {
@@ -43,9 +45,9 @@ public final class SliderScreeny extends Screeny {
 	/** Number of steps (pixel) displayable in the progress bar */
 	private int resolution;
 
-	private final int type;
-
 	// private final boolean displayLength;
+
+	private final int type;
 
 	/** x position for first use of ({@link #imgOn} or {@link #imgOff}) */
 	private int xBar;
@@ -68,6 +70,31 @@ public final class SliderScreeny extends Screeny {
 		}
 
 		this.type = type;
+
+	}
+
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+		
+		if (!isInScreeny(px, py)) {
+			return;
+		}
+
+		// convert position to number of filled pixels (based on resolution):
+		final int filled = (int) ((float) resolution / length * position);
+
+		if (px < getX() + xBar + filled) {
+			actionListener.handleActionPressed(KeyBindings.ACTION_VOLDOWN);
+		} else {
+			actionListener.handleActionPressed(KeyBindings.ACTION_VOLUP);
+		}
+	}
+
+	public void pointerReleased(int px, int py, IActionListener actionListener) {
+
+		// stop any running volume adjustments (also if pointer has been
+		// released outside the area of this screeny)
+		actionListener.handleActionReleased(KeyBindings.ACTION_VOLDOWN);
+		actionListener.handleActionReleased(KeyBindings.ACTION_VOLUP);
 
 	}
 
@@ -96,13 +123,13 @@ public final class SliderScreeny extends Screeny {
 
 		final int wLeft = imgLeft.getWidth();
 		final int wRight = imgRight.getWidth();
-		
+
 		xBar = wLeft;
 		resolution = width - wLeft - wRight;
 		if (resolution < 5) {
 			throw new ScreenyException("screen to small for volume bar");
 		}
-		
+
 		setImage(Image.createImage(width, imgLeft.getHeight()));
 
 		g.drawImage(imgLeft, 0, 0, TOP_LEFT);
@@ -114,17 +141,15 @@ public final class SliderScreeny extends Screeny {
 
 	protected void updateRepresentation() {
 
-		int x, numOn;
+		// convert position to number of filled pixels (based on resolution):
+		final int filled = (int) ((float) resolution / length * position);
 
-		// convert position to number of 'imgOn' images (based on resolution):
-		numOn = (int) ((float) resolution / length * position);
+		int x = xBar;
 
-		x = xBar;
-
-		for (int i = 0; i < numOn; i++, x++) {
+		for (int i = 0; i < filled; i++, x++) {
 			g.drawImage(imgOn, x, 0, TOP_LEFT);
 		}
-		for (int i = numOn; i < resolution; i++, x++) {
+		for (int i = filled; i < resolution; i++, x++) {
 			g.drawImage(imgOff, x, 0, TOP_LEFT);
 		}
 

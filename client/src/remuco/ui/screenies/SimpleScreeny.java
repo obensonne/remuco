@@ -25,6 +25,8 @@ import javax.microedition.lcdui.Image;
 import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.State;
+import remuco.ui.IActionListener;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.util.Log;
 
@@ -35,35 +37,38 @@ import remuco.util.Log;
  */
 public final class SimpleScreeny extends Screeny {
 
+	public static final int TYPE_PLAYBACK = 0;
+
 	public static final int TYPE_REPEAT = 1;
 
 	public static final int TYPE_SHUFFLE = 2;
 
-	public static final int TYPE_PLAYBACK = 0;
-
-	private static final int VALUE_REPEAT_OFF = 0;
-	private static final int VALUE_REPEAT_ON = 1;
-	private static final int VALUE_SHUFFLE_OFF = 0;
-	private static final int VALUE_SHUFFLE_ON = 1;
-
-	private static final int[] IMGIDS_REPEAT = new int[] {
-			Theme.RTE_STATE_REPEAT_OFF, Theme.RTE_STATE_REPEAT_ON };
-
-	private static final int[] IMGIDS_SHUFFLE = new int[] {
-			Theme.RTE_STATE_SHUFFLE_OFF, Theme.RTE_STATE_SHUFFLE_ON };
-
 	private static final int[] IMGIDS_PLAYBACK = new int[] {
 			Theme.RTE_STATE_PLAYBACK_STOP, Theme.RTE_STATE_PLAYBACK_PAUSE,
 			Theme.RTE_STATE_PLAYBACK_PLAY };
+	
+	private static final int[] IMGIDS_REPEAT = new int[] {
+			Theme.RTE_STATE_REPEAT_OFF, Theme.RTE_STATE_REPEAT_ON };
+	
+	private static final int[] IMGIDS_SHUFFLE = new int[] {
+			Theme.RTE_STATE_SHUFFLE_OFF, Theme.RTE_STATE_SHUFFLE_ON };
+	
+	private static final int VALUE_REPEAT_OFF = 0;
+
+	private static final int VALUE_REPEAT_ON = 1;
+
+	private static final int VALUE_SHUFFLE_OFF = 0;
+
+	private static final int VALUE_SHUFFLE_ON = 1;
+
+	private static final int[] VALUES_PLAYBACK = new int[] {
+			State.PLAYBACK_STOP, State.PLAYBACK_PAUSE, State.PLAYBACK_PLAY };
 
 	private static final int[] VALUES_REPEAT = new int[] { VALUE_REPEAT_OFF,
 			VALUE_REPEAT_ON };
 
 	private static final int[] VALUES_SHUFFLE = new int[] { VALUE_SHUFFLE_OFF,
 			VALUE_SHUFFLE_ON };
-
-	private static final int[] VALUES_PLAYBACK = new int[] {
-			State.PLAYBACK_STOP, State.PLAYBACK_PAUSE, State.PLAYBACK_PLAY };
 
 	/**
 	 * The images to use to represent a value. The image to use to represent
@@ -129,6 +134,32 @@ public final class SimpleScreeny extends Screeny {
 
 		images = new Image[imgIDs.length];
 
+	}
+
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+
+		if (!isInScreeny(px, py)) {
+			return;
+		}
+		
+		switch (type) {
+
+		case TYPE_REPEAT:
+			actionListener.handleActionPressed(KeyBindings.ACTION_REPEAT);
+			break;
+
+		case TYPE_SHUFFLE:
+			actionListener.handleActionPressed(KeyBindings.ACTION_SHUFFLE);
+			break;
+
+		case TYPE_PLAYBACK:
+			actionListener.handleActionPressed(KeyBindings.ACTION_PLAYPAUSE);
+			break;
+
+		default:
+			Log.bug("Feb 22, 2009.6:27:06 PM");
+			break;
+		}
 	}
 
 	protected void dataUpdated() {

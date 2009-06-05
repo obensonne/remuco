@@ -46,6 +46,7 @@ import remuco.player.Player;
 import remuco.player.PlayerInfo;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
+import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 import remuco.ui.MediaBrowser;
 import remuco.ui.RepeatedControl;
@@ -62,7 +63,7 @@ import remuco.util.Log;
  * (PlayerHandler).
  */
 public final class PlayerScreen extends Canvas implements IItemListener,
-		IStateListener, IProgressListener, CommandListener {
+		IStateListener, IProgressListener, CommandListener, IActionListener {
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
@@ -122,7 +123,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	private boolean screenTooSmall = false;
 
-	private final ItemScreeny screenyPlob;
+	private final ItemScreeny screenyItem;
 
 	private final StateScreeny screenyState;
 
@@ -184,7 +185,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		screenThemeSelection.setCommandListener(this);
 
 		screenyState = new StateScreeny(player.info);
-		screenyPlob = new ItemScreeny(player.info);
+		screenyItem = new ItemScreeny(player.info);
 
 		screenKeyConfig = new KeyBindingsScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
@@ -327,37 +328,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	}
 
-	public void handleMessageForPlayer(Message msg) throws BinaryDataExecption {
-		player.handleMessage(msg);
-	}
+	public void handleActionPressed(int action) {
 
-	public void notifyItemChanged() {
-
-		screenyPlob.updateData(player.item);
-		repaint(screenyPlob);
-	}
-
-	public void notifyProgressChanged() {
-
-		screenyPlob.updateData(player.progress);
-		repaint(screenyPlob);
-
-	}
-
-	public void notifyStateChanged() {
-
-		screenyState.updateData(player.state);
-		repaint(screenyState);
-	}
-
-	/** Set an <em>external</em> command listener. */
-	public void setCommandListener(CommandListener l) {
-		externalCommandListener = l;
-	}
-
-	protected void keyPressed(int key) {
-
-		final int action = KeyBindings.getInstance().getActionForKey(key);
 		final int rating, ratingMax;
 
 		// Log.debug("[UI] pressed key "
@@ -456,10 +428,10 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			if (player.item.getImg() != null) {
 
-				screenyPlob.updateData(ItemScreeny.ToogleImageFullScreen);
+				screenyItem.updateData(ItemScreeny.ToogleImageFullScreen);
 
-				repaint(screenyPlob.getX(), screenyPlob.getY(),
-					screenyPlob.getWidth(), screenyPlob.getHeight());
+				repaint(screenyItem.getX(), screenyItem.getY(),
+					screenyItem.getWidth(), screenyItem.getHeight());
 			}
 
 			break;
@@ -520,9 +492,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	}
 
-	protected void keyReleased(int key) {
-
-		final int action = KeyBindings.getInstance().getActionForKey(key);
+	public void handleActionReleased(int action) {
 
 		switch (action) {
 
@@ -559,6 +529,45 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		default:
 			break;
 		}
+
+	}
+
+	public void handleMessageForPlayer(Message msg) throws BinaryDataExecption {
+		player.handleMessage(msg);
+	}
+
+	public void notifyItemChanged() {
+
+		screenyItem.updateData(player.item);
+		repaint(screenyItem);
+	}
+
+	public void notifyProgressChanged() {
+
+		screenyItem.updateData(player.progress);
+		repaint(screenyItem);
+
+	}
+
+	public void notifyStateChanged() {
+
+		screenyState.updateData(player.state);
+		repaint(screenyState);
+	}
+
+	/** Set an <em>external</em> command listener. */
+	public void setCommandListener(CommandListener l) {
+		externalCommandListener = l;
+	}
+
+	protected void keyPressed(int key) {
+
+		handleActionPressed(KeyBindings.getInstance().getActionForKey(key));
+	}
+
+	protected void keyReleased(int key) {
+
+		handleActionReleased(KeyBindings.getInstance().getActionForKey(key));
 	}
 
 	/**
@@ -592,8 +601,18 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		} else {
 			screenyState.draw(g);
-			screenyPlob.draw(g);
+			screenyItem.draw(g);
 		}
+	}
+
+	protected void pointerPressed(int x, int y) {
+		screenyState.pointerPressed(x, y, this);
+		screenyItem.pointerPressed(x, y, this);
+	}
+
+	protected void pointerReleased(int x, int y) {
+		screenyState.pointerReleased(x, y, this);
+		screenyItem.pointerReleased(x, y, this);
 	}
 
 	protected void sizeChanged(int w, int h) {
@@ -682,7 +701,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			w = getWidth();
 			y = screenyState.getNextY();
 			h = getHeight() - y;
-			screenyPlob.initRepresentation(x, y, anchor, w, h);
+			screenyItem.initRepresentation(x, y, anchor, w, h);
 
 			screenTooSmall = false;
 

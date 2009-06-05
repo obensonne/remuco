@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Image;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
 import remuco.player.State;
+import remuco.ui.IActionListener;
 import remuco.ui.Theme;
 
 public class StateScreeny extends Screeny {
@@ -46,7 +47,6 @@ public class StateScreeny extends Screeny {
 		screenyVolume = new SliderScreeny(player, SliderScreeny.TYPE_VOLUME);
 		sliderStateVolume = new SliderState();
 		sliderStateVolume.setLength(100);
-
 	}
 
 	protected void dataUpdated() {
@@ -59,7 +59,7 @@ public class StateScreeny extends Screeny {
 
 		sliderStateVolume.setPosition(s.getVolume());
 		screenyVolume.updateData(sliderStateVolume);
-
+		
 	}
 
 	protected void initRepresentation() throws ScreenyException {
@@ -129,7 +129,25 @@ public class StateScreeny extends Screeny {
 		screenyVolume.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
 
 	}
+	
+	public void pointerPressed(int px, int py, IActionListener actionListener) {
+		final int rx = px - getPreviousX();
+		final int ry = py - getPreviousY();
+		screenyPlayback.pointerPressed(rx, ry, actionListener);
+		screenyRepeat.pointerPressed(rx, ry, actionListener);
+		screenyShuffle.pointerPressed(rx, ry, actionListener);
+		screenyVolume.pointerPressed(rx, ry, actionListener);
+	}
 
+	public void pointerReleased(int px, int py, IActionListener actionListener) {
+		final int rx = px - getPreviousX();
+		final int ry = py - getPreviousY();
+		screenyPlayback.pointerReleased(rx, ry, actionListener);
+		screenyRepeat.pointerReleased(rx, ry, actionListener);
+		screenyShuffle.pointerReleased(rx, ry, actionListener);
+		screenyVolume.pointerReleased(rx, ry, actionListener);
+	}
+	
 	protected void updateRepresentation() {
 
 		screenyPlayback.draw(g);
