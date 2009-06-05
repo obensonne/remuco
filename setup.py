@@ -151,7 +151,7 @@ if install_client and os.path.exists("client/app"):
 # =============================================================================
 
 setup(name='remuco',
-      version='0.8.2',
+      version='0.8.3',
       description='Remuco is a remote control system for media players.',
       author='Oben Sonne',
       author_email='obensonne@googlemail.com',
