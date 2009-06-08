@@ -28,9 +28,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.84375"
-     inkscape:cx="120"
-     inkscape:cy="160"
+     inkscape:zoom="32.173358"
+     inkscape:cx="148.7226"
+     inkscape:cy="290.85804"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -65,6 +65,13 @@
   </sodipodi:namedview>
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 160 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="240 : 160 : 1"
+       inkscape:persp3d-origin="120 : 106.66667 : 1"
+       id="perspective89" />
     <filter
        inkscape:collect="always"
        id="filter3333">
@@ -74,6 +81,34 @@
          in2="BackgroundImage"
          id="feBlend3335" />
     </filter>
+    <inkscape:perspective
+       id="perspective2469"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2482"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2495"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2508"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <metadata
      id="metadata7">
@@ -313,6 +348,59 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
          width="1"
          id="rect3359"
          style="opacity:1;fill:#555753;fill-opacity:1;stroke:none;stroke-width:5.36199999;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g2518">
+      <image
+         xlink:href="/usr/share/icons/gnome/32x32/actions/media-skip-forward.png"
+         sodipodi:absref="/usr/share/icons/gnome/32x32/actions/media-skip-forward.png"
+         width="32"
+         height="32"
+         id="image2510"
+         x="173.07144"
+         y="225.86218" />
+      <rect
+         y="230.86218"
+         x="166.07144"
+         height="20"
+         width="20"
+         id="rect2514"
+         style="opacity:1;fill:#eeeeec;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         style="opacity:1;fill:#dededc;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect2516"
+         width="0.99999964"
+         height="8.5000057"
+         x="186.07144"
+         y="236.86218" />
+    </g>
+    <g
+       id="g2546">
+      <image
+         transform="scale(-1,1)"
+         y="225.36218"
+         x="-246.90268"
+         id="image2525"
+         height="32"
+         width="32"
+         sodipodi:absref="/usr/share/icons/gnome/32x32/actions/media-skip-forward.png"
+         xlink:href="/usr/share/icons/gnome/32x32/actions/media-skip-forward.png" />
+      <rect
+         transform="scale(-1,1)"
+         style="fill:#eeeeec;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect2527"
+         width="20"
+         height="20"
+         x="-254.07144"
+         y="231.36218" />
+      <rect
+         transform="scale(-1,1)"
+         y="236.86218"
+         x="-234.07144"
+         height="8.5000057"
+         width="0.99999964"
+         id="rect2529"
+         style="fill:#dededc;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
   <g
@@ -658,5 +746,21 @@ This theme makes use of some GNOME icons, thus it is GPL licensed.</dc:descripti
        width="1"
        id="rte.item.border.n"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <rect
+       inkscape:label="#rect3294"
+       y="19"
+       x="107"
+       height="19"
+       width="20"
+       id="rte.next"
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <rect
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rte.prev"
+       width="20"
+       height="19"
+       x="137"
+       y="18.5"
+       inkscape:label="#rect3294" />
   </g>
 </svg>

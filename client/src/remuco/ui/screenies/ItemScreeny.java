@@ -26,6 +26,7 @@ import remuco.player.Item;
 import remuco.player.PlayerInfo;
 import remuco.player.Progress;
 import remuco.ui.IActionListener;
+import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 public final class ItemScreeny extends Screeny {
@@ -39,13 +40,15 @@ public final class ItemScreeny extends Screeny {
 
 	private boolean fullScreenImage = false;
 
-	private TitleScreeny screenyDesc;
+	private final TitleScreeny screenyDesc;
 
-	private ImageScreeny screenyImageFullScreen, screenyImageClear;
+	private final ImageScreeny screenyImageFullScreen, screenyImageClear;
 
-	private ProgressScreeny screenyProgress;
+	private final ButtonScreeny screenyNext, screenyPrev;
 
-	private RateScreeny screenyRate;
+	private final ProgressScreeny screenyProgress;
+
+	private final RateScreeny screenyRate;
 
 	public ItemScreeny(PlayerInfo player) {
 
@@ -56,25 +59,29 @@ public final class ItemScreeny extends Screeny {
 		screenyRate = new RateScreeny(player);
 		screenyImageFullScreen = new ImageScreeny(player);
 		screenyImageClear = new ImageScreeny(player);
+		screenyNext = new ButtonScreeny(player, Theme.RTE_NEXT,
+				KeyBindings.ACTION_NEXT);
+		screenyPrev = new ButtonScreeny(player, Theme.RTE_PREV,
+				KeyBindings.ACTION_PREV);
 
 	}
 
 	public void pointerPressed(int px, int py, IActionListener actionListener) {
 		final int rx = px - getPreviousX();
 		final int ry = py - getPreviousY();
-		screenyImageFullScreen.pointerPressed(rx, ry, actionListener);
 		screenyDesc.pointerPressed(rx, ry, actionListener);
-		screenyProgress.pointerPressed(rx, ry, actionListener);
 		screenyRate.pointerPressed(rx, ry, actionListener);
+		screenyNext.pointerPressed(rx, ry, actionListener);
+		screenyPrev.pointerPressed(rx, ry, actionListener);
 	}
 
 	public void pointerReleased(int px, int py, IActionListener actionListener) {
 		final int rx = px - getPreviousX();
 		final int ry = py - getPreviousY();
-		screenyImageFullScreen.pointerReleased(rx, ry, actionListener);
 		screenyDesc.pointerReleased(rx, ry, actionListener);
-		screenyProgress.pointerReleased(rx, ry, actionListener);
 		screenyRate.pointerReleased(rx, ry, actionListener);
+		screenyNext.pointerReleased(rx, ry, actionListener);
+		screenyPrev.pointerReleased(rx, ry, actionListener);
 	}
 
 	protected void dataUpdated() {
@@ -126,20 +133,32 @@ public final class ItemScreeny extends Screeny {
 
 		// sub screenies
 
-		int x, y, h;
+		int x, y, w, h;
 
-		x = wClip / 2 + xClip;
+		x = xClip;
+		y = yClip + hClip;
+		h = hClip / 3; // max 1/3 for next/prev buttons
+		screenyPrev.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
+
+		x = xClip + wClip;
+		y = yClip + hClip;
+		h = hClip / 3; // max 1/3 for next/prev buttons
+		screenyNext.initRepresentation(x, y, BOTTOM_RIGHT, wClip, h);
+
+		x = xClip + wClip / 2;
 		y = yClip + hClip;
 		h = hClip / 3; // max 1/3 for rating
-		screenyRate.initRepresentation(x, y, BOTTOM_CENTER, wClip, h);
+		w = screenyNext.getPreviousX() - screenyPrev.getNextX();
+		screenyRate.initRepresentation(x, y, BOTTOM_CENTER, w, h);
 
-		x = xClip;
+		x = screenyPrev.getNextX();
 		y = screenyRate.getPreviousY();
+		w = screenyNext.getPreviousX() - screenyPrev.getNextX();
 		h = 2 * hClip / 3; // all available space, screeny sets height as needed
-		screenyProgress.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
+		screenyProgress.initRepresentation(x, y, BOTTOM_LEFT, w, h);
 
 		x = xClip;
-		y = screenyProgress.getPreviousY();
+		y = Math.min(screenyProgress.getPreviousY(), screenyPrev.getPreviousY());
 		h = y - yClip;
 		screenyDesc.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
 
@@ -163,6 +182,8 @@ public final class ItemScreeny extends Screeny {
 			screenyDesc.draw(g);
 			screenyProgress.draw(g);
 			screenyRate.draw(g);
+			screenyPrev.draw(g);
+			screenyNext.draw(g);
 
 		}
 

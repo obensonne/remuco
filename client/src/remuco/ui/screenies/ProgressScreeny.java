@@ -26,8 +26,6 @@ import javax.microedition.lcdui.Image;
 import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.Progress;
-import remuco.ui.IActionListener;
-import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 /**
@@ -40,38 +38,11 @@ public class ProgressScreeny extends Screeny {
 
 	private int colorBG = 0, colorFG;
 
-	/** Action initiated by last pointer pressed event (-1 means none). */
-	private int lastPointerAction = -1;
-
-	private int yOff = 0;
+	private int yOff, xOff;
 
 	public ProgressScreeny(PlayerInfo player) {
 
 		super(player);
-
-	}
-
-	public void pointerPressed(int px, int py, IActionListener actionListener) {
-
-		if (!isInScreeny(px, py) || lastPointerAction != -1) {
-			return;
-		}
-
-		if (px < getPreviousX() + width / 2) {
-			lastPointerAction = KeyBindings.ACTION_PREV;
-		} else {
-			lastPointerAction = KeyBindings.ACTION_NEXT;
-		}
-
-		actionListener.handleActionPressed(lastPointerAction);
-	}
-
-	public void pointerReleased(int px, int py, IActionListener actionListener) {
-		// stop any active seeking
-		if (lastPointerAction != -1) {
-			actionListener.handleActionReleased(lastPointerAction);
-			lastPointerAction = -1;
-		}
 
 	}
 
@@ -86,6 +57,7 @@ public class ProgressScreeny extends Screeny {
 
 		setImage(Image.createImage(width, fontHeight * 3 / 2));
 
+		xOff = width / 2;
 		yOff = fontHeight;
 
 		g.setFont(Theme.FONT_PROGRESS);
@@ -106,27 +78,26 @@ public class ProgressScreeny extends Screeny {
 
 		final Progress p = (Progress) data;
 
-		final String len;
-		if (p.getLength() < 0) {
-			len = "???";
-		} else {
-			len = p.getLengthFormatted();
-		}
+		final StringBuffer sb = new StringBuffer(13);
 
-		final String val;
 		if (p.getProgress() < 0) {
-			val = "???";
+			sb.append("???");
 		} else {
-			val = p.getProgressFormatted();
+			sb.append(p.getProgressFormatted());
 		}
 
-		// Log.debug("update porgress values to " + val + "/" + len);
+		sb.append(" - ");
+
+		if (p.getLength() < 0) {
+			sb.append("???");
+		} else {
+			sb.append(p.getLengthFormatted());
+		}
 
 		g.setColor(colorFG);
 
-		g.drawString(val, 0, yOff, Graphics.LEFT | Graphics.BASELINE);
-
-		g.drawString(len, width, yOff, Graphics.RIGHT | Graphics.BASELINE);
+		g.drawString(sb.toString(), xOff, yOff, Graphics.HCENTER
+				| Graphics.BASELINE);
 
 	}
 

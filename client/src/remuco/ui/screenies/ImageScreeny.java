@@ -24,21 +24,12 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.player.PlayerInfo;
-import remuco.ui.IActionListener;
-import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 public final class ImageScreeny extends Screeny {
 
 	public ImageScreeny(PlayerInfo player) {
 		super(player);
-	}
-
-	public void pointerPressed(int px, int py, IActionListener actionListener) {
-		if (!isInScreeny(px, py)) {
-			return;
-		}
-		actionListener.handleActionPressed(KeyBindings.ACTION_IMAGE);
 	}
 
 	protected void initRepresentation() throws ScreenyException {

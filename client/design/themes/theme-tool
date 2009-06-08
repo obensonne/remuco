@@ -20,7 +20,7 @@ ELEMENTS = (
     "rte.state.playback.stop", "rte.state.repeat.off", "rte.state.repeat.on",
     "rte.state.shuffle.off", "rte.state.shuffle.on", "rte.state.spacer",
     "rte.state.volume.left", "rte.state.volume.off", "rte.state.volume.on",
-    "rte.state.volume.right"
+    "rte.state.volume.right", "rte.next", "rte.prev"
 )
 
 SAME_WIDTH = (
@@ -47,7 +47,8 @@ SAME_HEIGHT = (
       "rte.state.repeat.on", "rte.state.shuffle.off",
       "rte.state.shuffle.on", "rte.state.spacer", "rte.state.volume.left",
       "rte.state.volume.on", "rte.state.volume.off", "rte.state.volume.right" ),
-    ( "rte.item.rating.on", "rte.item.rating.off" )
+    ( "rte.item.rating.on", "rte.item.rating.off" ),
+    ( "rte.next", "rte.prev" )
 )
 
 ONE_PIXEL = (

@@ -82,7 +82,8 @@ public final class Theme {
 			RTE_STATE_REPEAT_ON = 28, RTE_STATE_SHUFFLE_OFF = 29,
 			RTE_STATE_SHUFFLE_ON = 30, RTE_STATE_SPACER = 31,
 			RTE_STATE_VOLUME_LEFT = 32, RTE_STATE_VOLUME_OFF = 33,
-			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35;
+			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35,
+			RTE_NEXT = 36, RTE_PREV = 37;
 
 	/** Name of the default theme to load. */
 	private static final String DEFAULT = "Vilanco";
@@ -105,7 +106,7 @@ public final class Theme {
 			"rte.state.shuffle.off", "rte.state.shuffle.on",
 			"rte.state.spacer", "rte.state.volume.left",
 			"rte.state.volume.off", "rte.state.volume.on",
-			"rte.state.volume.right" };
+			"rte.state.volume.right", "rte.next", "rte.prev" };
 
 	private static Theme instance = null;
 
