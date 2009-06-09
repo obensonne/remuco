@@ -26,6 +26,10 @@ import javax.microedition.lcdui.Image;
 import remuco.player.PlayerInfo;
 import remuco.ui.Theme;
 
+/**
+ * An image screeny displays an image in its center. If the image to display is
+ * bigger than the screeny's area, it gets scaled down.
+ */
 public final class ImageScreeny extends Screeny {
 
 	public ImageScreeny(PlayerInfo player) {

@@ -38,9 +38,9 @@ import remuco.ui.Theme;
  */
 public final class TitleScreeny extends Screeny {
 
-	private final Item noPlob;
-
 	private int colorBg, colorArtist, colorAlbum, colorTitle; // colorText;
+
+	private final Item noPlob;
 
 	public TitleScreeny(PlayerInfo player) {
 

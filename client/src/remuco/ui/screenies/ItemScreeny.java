@@ -22,7 +22,6 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.player.Item;
 import remuco.player.PlayerInfo;
 import remuco.player.Progress;
 import remuco.ui.IActionListener;
@@ -31,18 +30,7 @@ import remuco.ui.Theme;
 
 public final class ItemScreeny extends Screeny {
 
-	/**
-	 * Object to use for {@link #updateData(Object)} when this screeny shall
-	 * toggle whether to display the image of the current item (given by a
-	 * previous call to {@link #updateData(Object)}) as fullscreen.
-	 */
-	public static final Object ToogleImageFullScreen = new Object();
-
-	private boolean fullScreenImage = false;
-
 	private final TitleScreeny screenyDesc;
-
-	private final ImageScreeny screenyImageFullScreen, screenyImageClear;
 
 	private final ButtonScreeny screenyNext, screenyPrev;
 
@@ -57,8 +45,6 @@ public final class ItemScreeny extends Screeny {
 		screenyDesc = new TitleScreeny(player);
 		screenyProgress = new ProgressScreeny(player);
 		screenyRate = new RateScreeny(player);
-		screenyImageFullScreen = new ImageScreeny(player);
-		screenyImageClear = new ImageScreeny(player);
 		screenyNext = new ButtonScreeny(player, Theme.RTE_NEXT,
 				KeyBindings.ACTION_NEXT);
 		screenyPrev = new ButtonScreeny(player, Theme.RTE_PREV,
@@ -86,25 +72,12 @@ public final class ItemScreeny extends Screeny {
 
 	protected void dataUpdated() {
 
-		if (data == ToogleImageFullScreen) {
-
-			fullScreenImage = fullScreenImage ? false : true;
-
-		} else if (data instanceof Progress) {
-
+		if (data instanceof Progress) {
 			screenyProgress.updateData(data);
-
 		} else { // instance of Item
-
-			screenyImageFullScreen.updateData(data != null ? ((Item) data).getImg()
-					: null);
 			screenyDesc.updateData(data);
 			screenyRate.updateData(data);
-
-			fullScreenImage = false;
-
 		}
-
 	}
 
 	protected void initRepresentation() throws ScreenyException {
@@ -162,31 +135,15 @@ public final class ItemScreeny extends Screeny {
 		h = y - yClip;
 		screenyDesc.initRepresentation(x, y, BOTTOM_LEFT, wClip, h);
 
-		x = xClip;
-		y = yClip;
-		h = hClip;
-		screenyImageFullScreen.initRepresentation(x, y, TOP_LEFT, wClip, h);
-		screenyImageClear.initRepresentation(x, y, TOP_LEFT, wClip, h);
-
 	}
 
 	protected void updateRepresentation() {
 
-		if (fullScreenImage) {
-
-			screenyImageFullScreen.draw(g);
-
-		} else {
-
-			screenyImageClear.draw(g); // removes any item images artefacts
-			screenyDesc.draw(g);
-			screenyProgress.draw(g);
-			screenyRate.draw(g);
-			screenyPrev.draw(g);
-			screenyNext.draw(g);
-
-		}
-
+		screenyDesc.draw(g);
+		screenyProgress.draw(g);
+		screenyRate.draw(g);
+		screenyPrev.draw(g);
+		screenyNext.draw(g);
 	}
 
 }

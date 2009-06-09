@@ -51,6 +51,7 @@ import remuco.ui.KeyBindings;
 import remuco.ui.MediaBrowser;
 import remuco.ui.RepeatedControl;
 import remuco.ui.Theme;
+import remuco.ui.screenies.ImageScreeny;
 import remuco.ui.screenies.ItemScreeny;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
@@ -101,6 +102,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	private CommandListener externalCommandListener = null;
 
+	/** Indicates if the item's image is currently shown in fullscreen mode. */
+	private boolean itemImageFullscreen;
+
 	/** Screen for browsing the remote player's media */
 	private final MediaBrowser mediaBrowser;
 
@@ -124,6 +128,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private boolean screenTooSmall = false;
 
 	private final ItemScreeny screenyItem;
+
+	private final ImageScreeny screenyItemImageFullscreen;
 
 	private final StateScreeny screenyState;
 
@@ -185,6 +191,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		screenThemeSelection.setCommandListener(this);
 
 		screenyState = new StateScreeny(player.info);
+		screenyItemImageFullscreen = new ImageScreeny(player.info);
 		screenyItem = new ItemScreeny(player.info);
 
 		screenKeyConfig = new KeyBindingsScreen(this, display);
@@ -426,12 +433,15 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		case KeyBindings.ACTION_IMAGE:
 
-			if (player.item.getImg() != null) {
-
-				screenyItem.updateData(ItemScreeny.ToogleImageFullScreen);
-
-				repaint(screenyItem.getX(), screenyItem.getY(),
-					screenyItem.getWidth(), screenyItem.getHeight());
+			if (itemImageFullscreen) {
+				itemImageFullscreen = false;
+				repaint(); // repaint all on fullscreen change
+			} else {
+				if (player.item.getImg() != null) {
+					itemImageFullscreen = true;
+					screenyItemImageFullscreen.updateData(player.item.getImg());
+					repaint(); // repaint all on fullscreen change
+				}
 			}
 
 			break;
@@ -539,7 +549,12 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	public void notifyItemChanged() {
 
 		screenyItem.updateData(player.item);
-		repaint(screenyItem);
+		if (itemImageFullscreen) {
+			itemImageFullscreen = false;
+			repaint(screenyItemImageFullscreen);
+		} else {
+			repaint(screenyItem);
+		}
 	}
 
 	public void notifyProgressChanged() {
@@ -582,23 +597,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	protected void paint(Graphics g) {
 
 		if (screenTooSmall) {
-
-			int y;
-
-			g.setColor(0xFFFFFF);
-			g.fillRect(0, 0, getWidth(), getHeight());
-
-			g.setColor(0);
-			g.setFont(Theme.FONT_SMALL);
-
-			y = getHeight() / 2 - Theme.FONT_SMALL.getHeight();
-			g.drawString("The screen is too small", getWidth() / 2, y,
-				Graphics.HCENTER | Graphics.BASELINE);
-
-			y += Theme.FONT_SMALL.getHeight() * 2;
-			g.drawString("for the theme " + theme.getName() + "!",
-				getWidth() / 2, y, Graphics.HCENTER | Graphics.BASELINE);
-
+			drawScreenTooSmallMessage(g);
+		} else if (itemImageFullscreen) {
+			screenyItemImageFullscreen.draw(g);
 		} else {
 			screenyState.draw(g);
 			screenyItem.draw(g);
@@ -606,13 +607,19 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	}
 
 	protected void pointerPressed(int x, int y) {
-		screenyState.pointerPressed(x, y, this);
-		screenyItem.pointerPressed(x, y, this);
+		if (itemImageFullscreen) {
+			handleActionPressed(KeyBindings.ACTION_IMAGE);
+		} else {
+			screenyState.pointerPressed(x, y, this);
+			screenyItem.pointerPressed(x, y, this);
+		}
 	}
 
 	protected void pointerReleased(int x, int y) {
-		screenyState.pointerReleased(x, y, this);
-		screenyItem.pointerReleased(x, y, this);
+		if (!itemImageFullscreen) {
+			screenyState.pointerReleased(x, y, this);
+			screenyItem.pointerReleased(x, y, this);
+		}
 	}
 
 	protected void sizeChanged(int w, int h) {
@@ -677,6 +684,24 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		return enabled;
 	}
 
+	private void drawScreenTooSmallMessage(Graphics g) {
+
+		g.setColor(0xFFFFFF);
+		g.fillRect(0, 0, getWidth(), getHeight());
+
+		g.setColor(0);
+		g.setFont(Theme.FONT_SMALL);
+
+		int y = getHeight() / 2 - Theme.FONT_SMALL.getHeight();
+		g.drawString("The screen is too small", getWidth() / 2, y,
+			Graphics.HCENTER | Graphics.BASELINE);
+
+		y += Theme.FONT_SMALL.getHeight() * 2;
+		g.drawString("for the theme " + theme.getName() + "!", getWidth() / 2,
+			y, Graphics.HCENTER | Graphics.BASELINE);
+
+	}
+
 	private void initScreenies() {
 
 		int w, h, x, y, anchor;
@@ -685,6 +710,14 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			return;
 
 		try {
+
+			x = 0;
+			y = 0;
+			w = getWidth();
+			h = getHeight();
+			anchor = Screeny.TOP_LEFT;
+			screenyItemImageFullscreen.initRepresentation(x, y, anchor, w, h);
+
 			// ////// playback, volume, repeat and shuffle ////// //
 
 			anchor = Screeny.TOP_LEFT;

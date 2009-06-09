@@ -22,16 +22,24 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
-import remuco.ui.Theme;
 
+/**
+ * A slider screeny display a {@link SliderState} and issues lower and raise
+ * actions (from {@link KeyBindings}) on pointer interaction.
+ * 
+ */
 public final class SliderScreeny extends Screeny {
 
 	public static final int TYPE_VOLUME = 0;
+
+	private final int actionLower, actionRaise;
+
+	/** Last action issued by pointer pressed (-1 means no active action). */
+	private int activeAction = -1;
 
 	/** The images that make up the slider */
 	private Image imgLeft, imgOn, imgOff, imgRight;
@@ -45,57 +53,70 @@ public final class SliderScreeny extends Screeny {
 	/** Number of steps (pixel) displayable in the progress bar */
 	private int resolution;
 
-	// private final boolean displayLength;
-
-	private final int type;
-
 	/** x position for first use of ({@link #imgOn} or {@link #imgOff}) */
 	private int xBar;
 
-	public SliderScreeny(PlayerInfo player, int type) {
+	/**
+	 * Create a new slider screeny.
+	 * 
+	 * @param player
+	 * @param imgIdLeft
+	 *            ID of the image for the left part/border
+	 * @param imgIdFilled
+	 *            ID of the image for the filled part
+	 * @param imgIdUnfilled
+	 *            ID of the image for the unfilled part
+	 * @param imgIdRight
+	 *            ID of the image for the right part/border
+	 * @param actionLower
+	 *            action (from {@link KeyBindings}) to issue if the left or
+	 *            filled part is pressed - lowers the slider
+	 * @param actionRaise
+	 *            action (from {@link KeyBindings}) to issue if the right or
+	 *            unfilled part is pressed - raises the slider
+	 */
+	public SliderScreeny(PlayerInfo player, int imgIdLeft, int imgIdFilled,
+			int imgIdUnfilled, int imgIdRight, int actionLower, int actionRaise) {
 
 		super(player);
 
-		switch (type) {
+		imgLeftID = imgIdLeft;
+		imgOnID = imgIdFilled;
+		imgOffID = imgIdUnfilled;
+		imgRightID = imgIdRight;
 
-		case TYPE_VOLUME:
-			imgLeftID = Theme.RTE_STATE_VOLUME_LEFT;
-			imgOnID = Theme.RTE_STATE_VOLUME_ON;
-			imgOffID = Theme.RTE_STATE_VOLUME_OFF;
-			imgRightID = Theme.RTE_STATE_VOLUME_RIGHT;
-			break;
-
-		default:
-			throw new IllegalArgumentException();
-		}
-
-		this.type = type;
-
+		this.actionLower = actionLower;
+		this.actionRaise = actionRaise;
 	}
 
 	public void pointerPressed(int px, int py, IActionListener actionListener) {
-		
+
 		if (!isInScreeny(px, py)) {
 			return;
+		}
+
+		if (activeAction != -1) {
+			// unlikely, but safety first
+			actionListener.handleActionReleased(activeAction);
 		}
 
 		// convert position to number of filled pixels (based on resolution):
 		final int filled = (int) ((float) resolution / length * position);
 
 		if (px < getX() + xBar + filled) {
-			actionListener.handleActionPressed(KeyBindings.ACTION_VOLDOWN);
+			activeAction = actionLower;
 		} else {
-			actionListener.handleActionPressed(KeyBindings.ACTION_VOLUP);
+			activeAction = actionRaise;
 		}
+		actionListener.handleActionPressed(activeAction);
 	}
 
 	public void pointerReleased(int px, int py, IActionListener actionListener) {
 
-		// stop any running volume adjustments (also if pointer has been
-		// released outside the area of this screeny)
-		actionListener.handleActionReleased(KeyBindings.ACTION_VOLDOWN);
-		actionListener.handleActionReleased(KeyBindings.ACTION_VOLUP);
-
+		if (activeAction != -1) {
+			actionListener.handleActionReleased(activeAction);
+			activeAction = -1;
+		}
 	}
 
 	protected void dataUpdated() {
@@ -106,15 +127,9 @@ public final class SliderScreeny extends Screeny {
 		if (length <= 0) {
 			length = 1;
 		}
-
 	}
 
 	protected void initRepresentation() throws ScreenyException {
-
-		if (type == TYPE_VOLUME && !player.supports(Feature.KNOWN_VOLUME)) {
-			setImage(INVISIBLE);
-			return;
-		}
 
 		imgLeft = theme.getImg(imgLeftID);
 		imgOn = theme.getImg(imgOnID);
@@ -136,7 +151,6 @@ public final class SliderScreeny extends Screeny {
 
 		// do not use TOP_RIGHT because this gets handled wrong by Nokia 5310
 		g.drawImage(imgRight, wLeft + resolution, 0, TOP_LEFT);
-
 	}
 
 	protected void updateRepresentation() {
@@ -152,7 +166,5 @@ public final class SliderScreeny extends Screeny {
 		for (int i = filled; i < resolution; i++, x++) {
 			g.drawImage(imgOff, x, 0, TOP_LEFT);
 		}
-
 	}
-
 }
