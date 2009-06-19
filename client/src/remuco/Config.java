@@ -63,6 +63,9 @@ public final class Config {
 	/** Available screen size for a canvas screen. */
 	public static final int SCREEN_WIDTH, SCREEN_HEIGHT;
 
+	/** Indicates if the current device supports pointer events. */
+	public static final boolean TOUCHSCREEN;
+
 	/** Indicates if UTF-8 is supported. */
 	public static final boolean UTF8;
 
@@ -91,6 +94,7 @@ public final class Config {
 		};
 		SCREEN_WIDTH = c.getWidth();
 		SCREEN_HEIGHT = c.getHeight();
+		TOUCHSCREEN = c.hasPointerEvents();
 
 		// check encoding support
 
