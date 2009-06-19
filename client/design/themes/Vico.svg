@@ -28,9 +28,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.375"
-     inkscape:cx="151.37235"
-     inkscape:cy="368.76724"
+     inkscape:zoom="2.84375"
+     inkscape:cx="47.339448"
+     inkscape:cy="376.18331"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -305,14 +305,14 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        width="20"
        height="26"
        id="image2701"
-       x="225.57144"
-       y="184.36218" />
+       x="225.07144"
+       y="184.86218" />
     <image
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAB wElEQVRIx82VsY4aMRCGP3uNsaWNVtqIggoKqOiQVpeCgu4CL4BEzb4BD5CGd+BRqC4VV9AhOk5C F0R3ERRoGwSbFLAryB3cJdoiI7kZjz/N7xmPBfCLDE2SsSnXdbMFdrvdbIFKqWyBjuNkDJQZA4UU AHiex9f7+78GPDx85+XnyxlQHDtHSsm/yBdSkjAAlDxlKKXEUYofz8+MHx/fBQVBQLVaRUpBwgBQ o9EIgGKxyJe7O+ZPTyS+W/bJdfns+4zHYxaLxXmGx3Qdx8EYg87lSHy3LKc1xhgcx7mIT9tGKXUE 5vNX79L3fdbrNQD6BFRKXcRLKWVaEGMtWmsSX7I8z6Pf71MqlVKf1hpjLUqpi9hUslIKay35fP5C QhAEhGGI67oMh8N0T2uNPQNel6x1KqHVatHr9QDY7/cMBoP0YKFQeFPy66KcJCfNboxJg2u12qt7 /bMootFoXB2w1lrCMKTdbhPHMZ1Oh+12e7P6Trlc/iaE4K11OByYTCbM53Pq9TrL5ZLVasW1eCEE otlsfugLsNZSqVSYzWa3h0Mcxx96s1EUMZ1O3582u90u2/EVRVG2wM1mkylQ/Pf/8m8Ggl9P3z0N WAAAAABJRU5ErkJggg== "
        width="20"
        height="26"
        id="image2714"
-       x="225.57144"
+       x="225.07144"
        y="212.86218" />
     <image
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA YklEQVRIx+3VuQ0AMQhEUa6QUlyR+8+JnDjA28QPLHkp4GmQRqAicgQcE3giM1lwzsmCEcGC7g6D BoNqCoPKNicMTqhjjAMntMtrgyf8V34B7G4W3Huz4FqLBauKvTbX/+UPEXMRCfINoqkAAAAASUVO RK5CYII= "
@@ -320,7 +320,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        height="26"
        id="image2727"
        x="248.07144"
-       y="184.36218" />
+       y="184.86218" />
     <image
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAC TklEQVRIx82VsU7jQBCGv51dx2scHMWxazquOHgBBCefxPEAlFTcE/Aa1FDSHB0lFaKgpkJIySEk OIkaBSkoDhQJ2LniFCuJoXNxK420mn/m1+zM7IwCxlR4hIqPqdfr1RLu7OxUS2iMqZZQa10xoVRM qETNKOr1Rb5trOP7Pvf3f2h32iWnRqPBytcVft/ckKb9OUI12zkigjEGx3HQWjOPB8EiG+vrBEFA 0Ai4vLwkTQfT/opp0VrQxqCNQbTMYHEc8WNzk2YYoo0hiiK+JwlxHBU25vz8fCaCOI75srxMq9Xi 9vaWCa61Znt7m7u7O1qtFr7vMxqNSNMUESnsjMjsk7TWuK6LtRZjDBPccRzOzs4Yj8f83N1ldXWV p6cnfh0f47puYVdqG2NMQSgiTPAsy8iyDKUUWmusteR5TrfbLQL5MEIA11qs56G1Zh43xhS49bwy PlFM/nSz2cT3fTzPIwgCrLUEQUC/3+ft7Q0RwXVdPM8rXvHhTwmCgL29PcIwJAxDtNZsbW2xtrbG 1dUVJycn5Hk+k2PXdZlPmYgIIkKv1+P09JQoivB9H2stcRyTpikXFxdFdCJCrVbDWkutVit0U/Lv Mh6Pub6+Zn9/n+FwiOu6tNttDg4OeHx8RClVFGlhYWGmcNNSKkqn0+Hw8JAkSTg6OqLX683kSUTI 85yXlxcGg0EphypJktIKEBEcx2E4HJY6QCnF0tISWZbR7XZLNibP85JTnue8v79/OlEeHh4+nzaj 0aja8fX6+lot4fPzc6WE6r/fy38B1lWrB2I58ngAAAAASUVORK5CYII= "
        width="20"
@@ -473,7 +473,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        y="156.86218" />
     <image
        y="156.86218"
-       x="248.07144"
+       x="250.26375"
        id="image2477"
        height="26"
        width="8"
@@ -486,7 +486,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        width="17"
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAaCAYAAABRqrc5AAAACXBIWXMAAAsTAAALEwEAmpwYAAAB R0lEQVQ4y82VsWoCQRBA355X5HYEf8GUEUtt7c0n2JjfMF9lZZFDhDQ5VCSChfbCVSJyinrqXYok ReJKDvaKbDkMb98wM7sKSLE8Djkct1gs2kNarZY9xHVde0ihUMgB4uQAUY7KAaLsu+w6BpP7cplo u2Wz2XA6nf6EqGq1ejWxz50OIsJsNuMtCAjDkDiOSdP0lomhHKW48zxq9ToPlQrj8ZjRaMRqteJ8 PmdrsdYa0RoA0ZrHZpN6rcaL7xMEQTYT7XmIyI+YiPDUbjMcDjNCRJBfO3U4HHjt9zHl3y7ny+Ry uTCZTOj1esznc0z5RpNSqYRozWKxoNvt8j6dEkURSZKYTUzB5XKJ7/sMBgPCMCRJks/HxzEPpmo0 Gsbme57Hfr/POrFm+vF4vHnzFeRb1Wp34ji2h+x2O3vIer22hqh/8+98AAoCcFnSyXO/AAAAAElF TkSuQmCC " />
     <rect
-       style="opacity:1;fill:#afaeae;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#afaeae;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3251"
        width="1.0000004"
        height="0.99999738"
@@ -500,7 +500,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3253"
        style="opacity:1;fill:#c4c3c3;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
-       style="opacity:1;fill:#c4c3c3;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#c4c3c3;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3255"
        width="1.0000004"
        height="0.99999738"
@@ -540,9 +540,9 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        height="0.99999738"
        width="1.0000004"
        id="rect3265"
-       style="opacity:1;fill:#ababab;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="opacity:1;fill:#ababab;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
-       style="opacity:1;fill:#8b8b8b;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#8b8b8b;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3267"
        width="1.0000004"
        height="0.99999738"
@@ -554,7 +554,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        height="0.99999738"
        width="1.0000004"
        id="rect3269"
-       style="opacity:1;fill:#afaeae;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="opacity:1;fill:#afaeae;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        style="opacity:1;fill:#c4c3c3;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3271"
@@ -613,7 +613,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        y="165.86218" />
     <image
        y="156.86218"
-       x="-285.07144"
+       x="-291.07144"
        id="image3287"
        height="26"
        width="8"
@@ -624,7 +624,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        width="8"
        height="26"
        id="image3289"
-       x="-266.07144"
+       x="-270.07144"
        y="156.86218"
        transform="scale(-1,1)" />
     <image
@@ -632,12 +632,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        width="17"
        height="26"
        id="image3291"
-       x="-280.57144"
+       x="-286.57144"
        y="156.86218"
        transform="scale(-1,1)" />
     <rect
        y="166.86218"
-       x="-268.57144"
+       x="-274.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3293"
@@ -648,12 +648,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3295"
        width="1.0000004"
        height="0.99999738"
-       x="-268.57144"
+       x="-274.57144"
        y="167.86218"
        transform="scale(-1,1)" />
     <rect
        y="168.86218"
-       x="-268.57144"
+       x="-274.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3297"
@@ -664,12 +664,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3299"
        width="1.0000004"
        height="0.99999738"
-       x="-268.57144"
+       x="-274.57144"
        y="169.86218"
        transform="scale(-1,1)" />
     <rect
        y="170.86218"
-       x="-268.57144"
+       x="-274.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3301"
@@ -680,12 +680,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3303"
        width="1.0000004"
        height="0.99999738"
-       x="-268.57144"
+       x="-274.57144"
        y="171.86218"
        transform="scale(-1,1)" />
     <rect
        y="172.86218"
-       x="-268.57144"
+       x="-274.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3305"
@@ -696,12 +696,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3307"
        width="1.0000004"
        height="0.99999738"
-       x="-268.57144"
+       x="-274.57144"
        y="173.86218"
        transform="scale(-1,1)" />
     <rect
        y="173.86218"
-       x="-267.57144"
+       x="-273.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3309"
@@ -712,12 +712,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3311"
        width="1.0000004"
        height="0.99999738"
-       x="-267.57144"
+       x="-273.57144"
        y="166.86218"
        transform="scale(-1,1)" />
     <rect
        y="167.86218"
-       x="-267.57144"
+       x="-273.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3313"
@@ -728,12 +728,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3315"
        width="1.0000004"
        height="0.99999738"
-       x="-267.57144"
+       x="-273.57144"
        y="168.86218"
        transform="scale(-1,1)" />
     <rect
        y="169.86218"
-       x="-267.57144"
+       x="-273.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3317"
@@ -744,12 +744,12 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3319"
        width="1.0000004"
        height="0.99999738"
-       x="-267.57144"
+       x="-273.57144"
        y="170.86218"
        transform="scale(-1,1)" />
     <rect
        y="171.86218"
-       x="-267.57144"
+       x="-273.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3321"
@@ -760,7 +760,7 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3323"
        width="1.0000004"
        height="0.99999738"
-       x="-267.57144"
+       x="-273.57144"
        y="172.86218"
        transform="scale(-1,1)" />
     <rect
@@ -768,17 +768,72 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        id="rect3325"
        width="1.0000004"
        height="0.99999738"
-       x="-268.57144"
+       x="-274.57144"
        y="165.86218"
        transform="scale(-1,1)" />
     <rect
        y="165.86218"
-       x="-267.57144"
+       x="-273.57144"
        height="0.99999738"
        width="1.0000004"
        id="rect3327"
        style="opacity:1;fill:#696969;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        transform="scale(-1,1)" />
+    <image
+       y="156.86218"
+       x="293.57144"
+       id="image2525"
+       height="26"
+       width="20"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA YklEQVRIx+3VuQ0AMQhEUa6QUlyR+8+JnDjA28QPLHkp4GmQRqAicgQcE3giM1lwzsmCEcGC7g6D BoNqCoPKNicMTqhjjAMntMtrgyf8V34B7G4W3Huz4FqLBauKvTbX/+UPEXMRCfINoqkAAAAASUVO RK5CYII= " />
+    <image
+       y="156.86218"
+       x="339.07144"
+       id="image2533"
+       height="26"
+       width="20"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA YklEQVRIx+3VuQ0AMQhEUa6QUlyR+8+JnDjA28QPLHkp4GmQRqAicgQcE3giM1lwzsmCEcGC7g6D BoNqCoPKNicMTqhjjAMntMtrgyf8V34B7G4W3Huz4FqLBauKvTbX/+UPEXMRCfINoqkAAAAASUVO RK5CYII= " />
+    <image
+       y="156.86218"
+       x="361.07144"
+       id="image2535"
+       height="26"
+       width="20"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAaCAYAAAC3g3x9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA YklEQVRIx+3VuQ0AMQhEUa6QUlyR+8+JnDjA28QPLHkp4GmQRqAicgQcE3giM1lwzsmCEcGC7g6D BoNqCoPKNicMTqhjjAMntMtrgyf8V34B7G4W3Huz4FqLBauKvTbX/+UPEXMRCfINoqkAAAAASUVO RK5CYII= " />
+    <path
+       sodipodi:type="arc"
+       style="fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3398)"
+       id="path2529"
+       sodipodi:cx="28.75"
+       sodipodi:cy="55.5"
+       sodipodi:rx="4.25"
+       sodipodi:ry="4"
+       d="M 33,55.5 A 4.25,4 0 1 1 24.5,55.5 A 4.25,4 0 1 1 33,55.5 z"
+       transform="matrix(1.1764706,0,0,1.25,269.74791,100.48718)" />
+    <text
+       xml:space="preserve"
+       style="font-size:16.6631794px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:1;fill:#eeeeec;fill-opacity:1;stroke:#babdb6;stroke-width:0.41657948px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;enable-background:new;font-family:Arab;-inkscape-font-specification:Arab"
+       x="214.0177"
+       y="167.85681"
+       id="text2551"
+       transform="matrix(0.7025821,-0.7116027,0.7116027,0.7025821,78.071442,212.86218)"><tspan
+         sodipodi:role="line"
+         id="tspan2553"
+         x="214.0177"
+         y="167.85681"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;stroke-width:0.41657948;font-family:Sans;-inkscape-font-specification:Sans Bold">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.25826454px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#eeeeec;fill-opacity:1;stroke:#babdb6;stroke-width:0.38145664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;enable-background:new;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold"
+       x="266.7731"
+       y="-40.853413"
+       id="text3325"
+       transform="matrix(1.0794198,0,0,0.9264236,78.071442,212.86218)"><tspan
+         sodipodi:role="line"
+         id="tspan3327"
+         x="266.7731"
+         y="-40.853413"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;stroke-width:0.38145664;font-family:Nimbus Sans L;-inkscape-font-specification:Nimbus Sans L Bold">T</tspan></text>
   </g>
   <g
      style="opacity:1;display:none"
@@ -786,169 +841,113 @@ This theme makes use of some icons from a VLC skin.</dc:description>
      id="layer2"
      inkscape:groupmode="layer">
     <rect
-       inkscape:label="#rect3240"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.border.n"
-       width="1"
-       height="1"
-       x="233"
-       y="0" />
-    <rect
        inkscape:label="#rect3242"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.border.w"
+       id="rte.state.left"
        width="1"
-       height="1"
+       height="26"
        x="117"
-       y="11.5" />
-    <rect
-       inkscape:label="#rect3244"
-       y="25"
-       x="117"
-       height="1"
-       width="1"
-       id="rte.state.border.sw"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       inkscape:label="#rect3246"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.border.s"
-       width="1"
-       height="1"
-       x="232.5"
-       y="25" />
+       y="2.6171874e-06" />
     <rect
        inkscape:label="state.playback.stop"
-       y="-55"
+       y="-55.999996"
        x="118"
-       height="24"
+       height="26"
        width="24"
-       id="rte.state.playback.stop"
+       id="rte.button.playback.stop"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="#rect3292"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.playback.pause"
+       id="rte.button.playback.pause"
        width="24"
-       height="24"
+       height="25.999998"
        x="118"
-       y="1" />
+       y="2.6171874e-06" />
     <rect
        inkscape:label="#rect3294"
-       y="-27"
+       y="-27.999996"
        x="118"
-       height="24"
+       height="25.999996"
        width="24"
-       id="rte.state.playback.play"
+       id="rte.button.playback.play"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="state.repeat.on"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.repeat.on"
+       id="rte.button.repeat.on"
        width="20"
-       height="24"
-       x="147.5"
-       y="1" />
+       height="25.999998"
+       x="147"
+       y="0" />
     <rect
        inkscape:label="state.repeat.off"
-       y="-27.5"
-       x="147.5"
-       height="24"
+       y="-28"
+       x="147"
+       height="26"
        width="20"
-       id="rte.state.repeat.off"
+       id="rte.button.repeat.off"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="state.shuffle.on"
-       y="1"
+       y="2.6171874e-06"
        x="170"
-       height="24"
+       height="25.999998"
        width="20"
-       id="rte.state.shuffle.on"
+       id="rte.button.shuffle.on"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="state.shuffle.off"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.shuffle.off"
+       id="rte.button.shuffle.off"
        width="20"
-       height="24"
+       height="25.999996"
        x="170"
-       y="-27.5" />
+       y="-27.999996" />
     <rect
        inkscape:label="volume.left"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.volume.left"
+       id="rte.slider.volume.left"
        width="20"
-       height="24.027838"
+       height="25.999998"
        x="200"
-       y="1" />
+       y="2.6171874e-06" />
     <rect
        inkscape:label="volume.on"
-       y="1"
+       y="2.6171874e-06"
        x="221.5"
-       height="24"
+       height="25.999998"
        width="1"
-       id="rte.state.volume.on"
+       id="rte.slider.volume.on"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="volume.off"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.volume.off"
+       id="rte.slider.volume.off"
        width="1"
-       height="24"
+       height="25.999998"
        x="224"
-       y="1" />
+       y="2.6171874e-06" />
     <rect
        inkscape:label="volume.right"
-       y="1"
+       y="2.6171874e-06"
        x="226"
-       height="24"
+       height="26.000002"
        width="10"
-       id="rte.state.volume.right"
+       id="rte.slider.volume.right"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       inkscape:label="#rect3320"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.border.nw"
-       width="1"
-       height="1"
-       x="117"
-       y="0" />
-    <rect
-       inkscape:label="#rect3322"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.state.border.ne"
-       width="1"
-       height="1"
-       x="236"
-       y="0" />
     <rect
        inkscape:label="#rect3328"
-       y="16"
+       y="2.6171874e-06"
        x="236"
-       height="1"
+       height="25.999998"
        width="1"
-       id="rte.state.border.e"
+       id="rte.state.right"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       inkscape:label="#rect3330"
-       y="25"
-       x="236"
-       height="1"
-       width="1"
-       id="rte.state.border.se"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       inkscape:label="#rect3334"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.border.sw"
-       width="8"
-       height="8"
-       x="77"
-       y="33" />
     <rect
        inkscape:label="#rect3340"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.rating.on"
+       id="rte.icon.rating.on"
        width="12"
        height="12"
        x="23"
@@ -957,9 +956,9 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rte.state.spacer"
        width="2"
-       height="24"
+       height="25.999998"
        x="193"
-       y="1"
+       y="2.6171874e-06"
        inkscape:label="state.spacer.h" />
     <rect
        inkscape:label="#rect2505"
@@ -967,24 +966,16 @@ This theme makes use of some icons from a VLC skin.</dc:description>
        x="36"
        height="12"
        width="12"
-       id="rte.item.rating.off"
+       id="rte.icon.rating.off"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        inkscape:label="#rect2511"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.color.bg.item"
+       id="rte.color.bg"
        width="1"
        height="1"
        x="89"
        y="25" />
-    <rect
-       y="25"
-       x="121"
-       height="1"
-       width="1"
-       id="rte.color.bg.state"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:label="#rect2511" />
     <rect
        y="117.24767"
        x="80.983574"
@@ -1028,76 +1019,68 @@ This theme makes use of some icons from a VLC skin.</dc:description>
          id="tspan2537"
          sodipodi:role="line" /></text>
     <rect
-       inkscape:label="#rect3336"
-       y="33"
-       x="95"
-       height="8"
-       width="8"
-       id="rte.item.border.se"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       inkscape:label="#rect3338"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.border.ne"
-       width="8"
-       height="8"
-       x="95"
-       y="15" />
-    <rect
-       inkscape:label="#rect3332"
-       y="15"
-       x="77"
-       height="8"
-       width="8"
-       id="rte.item.border.nw"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    <rect
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.border.w"
-       width="8"
-       height="1"
-       x="77"
-       y="25"
-       inkscape:label="#rect3332" />
-    <rect
-       y="25"
-       x="95"
-       height="1"
-       width="8"
-       id="rte.item.border.e"
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:label="#rect3338" />
-    <rect
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.border.n"
-       width="1"
-       height="8"
-       x="89"
-       y="15"
-       inkscape:label="#rect3332" />
-    <rect
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.item.border.s"
-       width="1"
-       height="8"
-       x="89"
-       y="33"
-       inkscape:label="#rect3336" />
-    <rect
-       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rte.next"
-       width="26"
-       height="24"
-       x="152"
-       y="-55"
+       id="rte.button.next"
+       width="22"
+       height="26.000004"
+       x="157"
+       y="-56.000004"
        inkscape:label="#rect3294" />
     <rect
        inkscape:label="#rect3294"
-       y="-55"
-       x="180"
-       height="24"
-       width="26"
-       id="rte.prev"
+       y="-56"
+       x="185"
+       height="26"
+       width="22"
+       id="rte.button.prev"
        style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <rect
+       inkscape:label="#rect3294"
+       y="-56"
+       x="173"
+       height="26.000004"
+       width="1"
+       id="rte.buttonbar.spacer"
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <rect
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rte.buttonbar.left"
+       width="1"
+       height="26.000004"
+       x="151"
+       y="-56"
+       inkscape:label="#rect3294" />
+    <rect
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rte.buttonbar.right"
+       width="1"
+       height="26.000004"
+       x="212"
+       y="-56"
+       inkscape:label="#rect3294" />
+    <rect
+       y="-55.999996"
+       x="215.5"
+       height="25.999996"
+       width="20"
+       id="rte.button.rate"
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:label="state.shuffle.off" />
+    <rect
+       y="-56"
+       x="261"
+       height="25.999996"
+       width="20"
+       id="rte.button.fullscreen"
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:label="state.shuffle.off" />
+    <rect
+       inkscape:label="state.shuffle.off"
+       style="opacity:0.30172412;fill:#28c111;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rte.button.tags"
+       width="20"
+       height="25.999996"
+       x="283"
+       y="-56" />
   </g>
 </svg>

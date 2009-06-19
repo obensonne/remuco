@@ -1,4 +1,44 @@
 #!/usr/bin/python
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""Remuco client theme builder.
+
+This tool reads in an SVG and exports and checks Remuco theme elements. Theme
+elements are areas in the SVG occupied by the objects whose ID starts with
+'rte.' (see layer 'Mask'). Before building a theme make sure the SVG's mask
+layer is hidden.
+
+Usage:
+   theme-tool --all
+   theme-tool [--dpi=DPI] --svg=SVG_FILE --name=NAME
+
+Examples:
+   $ ./theme-tool --all
+   $ ./theme-tool --svg=Purple.svg --name=Purple
+   $ ./theme-tool --dpi=135 --svg=Purple.svg --name=Purple-XXL
+   
+Default DPI is 90. Bigger/smaller DPI values produce bigger/smaller images.
+"""
 
 import Image
 import os
@@ -8,82 +48,90 @@ import subprocess
 import sys
 
 ELEMENTS = (
-    "rte.color.bg.state", "rte.color.bg.item", "rte.color.text.album",
-    "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title",
-    "rte.item.border.e", "rte.item.border.n", "rte.item.border.ne",
-    "rte.item.border.nw", "rte.item.border.s", "rte.item.border.se",
-    "rte.item.border.sw", "rte.item.border.w", "rte.item.rating.off",
-    "rte.item.rating.on", "rte.state.border.e", "rte.state.border.n",
-    "rte.state.border.ne", "rte.state.border.nw", "rte.state.border.s",
-    "rte.state.border.se", "rte.state.border.sw", "rte.state.border.w",
-    "rte.state.playback.pause", "rte.state.playback.play",
-    "rte.state.playback.stop", "rte.state.repeat.off", "rte.state.repeat.on",
-    "rte.state.shuffle.off", "rte.state.shuffle.on", "rte.state.spacer",
-    "rte.state.volume.left", "rte.state.volume.off", "rte.state.volume.on",
-    "rte.state.volume.right", "rte.next", "rte.prev"
+    # bottom bar elements
+    "rte.buttonbar.left", "rte.buttonbar.spacer", "rte.buttonbar.right",
+    "rte.button.fullscreen", "rte.button.next", "rte.button.prev",
+    "rte.button.rate", "rte.button.tags",
+     
+    # top bar elements
+    "rte.state.left", "rte.state.spacer", "rte.state.right",
+    "rte.button.playback.pause", "rte.button.playback.play",
+    "rte.button.playback.stop",
+    "rte.button.repeat.off", "rte.button.repeat.on",
+    "rte.button.shuffle.off", "rte.button.shuffle.on",
+    "rte.slider.volume.left", "rte.slider.volume.off", "rte.slider.volume.on",
+    "rte.slider.volume.right",
+    
+    # colors
+    "rte.color.bg", "rte.color.text.album", "rte.color.text.artist",
+    "rte.color.text.other", "rte.color.text.title",
+    
+    # misc icons
+    "rte.icon.rating.off", "rte.icon.rating.on"
 )
 
 SAME_WIDTH = (
-    ( "rte.item.border.e", "rte.item.border.ne", "rte.item.border.se" ),
-    ( "rte.item.border.w", "rte.item.border.nw", "rte.item.border.sw" ),
-    ( "rte.state.border.e", "rte.state.border.ne", "rte.state.border.se" ),
-    ( "rte.state.border.w", "rte.state.border.nw", "rte.state.border.sw" ),
-    ( "rte.item.rating.on", "rte.item.rating.off" ),
-    ( "rte.state.playback.pause", "rte.state.playback.play",
-      "rte.state.playback.stop" ),
-    ( "rte.state.repeat.off", "rte.state.repeat.on" ),
-    ( "rte.state.shuffle.off", "rte.state.shuffle.on" ),
-    ( "rte.state.volume.off", "rte.state.volume.on" )
-    
+    ( "rte.icon.rating.off", "rte.icon.rating.on" ),
+    ( "rte.button.playback.pause", "rte.button.playback.play",
+      "rte.button.playback.stop" ),
+    ( "rte.button.repeat.off", "rte.button.repeat.on" ),
+    ( "rte.button.shuffle.off", "rte.button.shuffle.on" ),
+    ( "rte.slider.volume.off", "rte.slider.volume.on" )
 )
 
 SAME_HEIGHT = (
-    ( "rte.item.border.n", "rte.item.border.ne", "rte.item.border.nw" ),
-    ( "rte.item.border.s", "rte.item.border.se", "rte.item.border.sw" ),
-    ( "rte.state.border.n", "rte.state.border.ne", "rte.state.border.nw" ),
-    ( "rte.state.border.s", "rte.state.border.se", "rte.state.border.sw" ),
-    ( "rte.state.playback.pause", "rte.state.playback.play",
-      "rte.state.playback.stop", "rte.state.repeat.off",
-      "rte.state.repeat.on", "rte.state.shuffle.off",
-      "rte.state.shuffle.on", "rte.state.spacer", "rte.state.volume.left",
-      "rte.state.volume.on", "rte.state.volume.off", "rte.state.volume.right" ),
-    ( "rte.item.rating.on", "rte.item.rating.off" ),
-    ( "rte.next", "rte.prev" )
+    ( "rte.buttonbar.left", "rte.buttonbar.spacer", "rte.buttonbar.right",
+      "rte.button.fullscreen", "rte.button.next", "rte.button.prev",
+      "rte.button.rate", "rte.button.tags" ),
+    ( "rte.state.left", "rte.state.spacer", "rte.state.right",
+      "rte.button.playback.pause", "rte.button.playback.play",
+      "rte.button.playback.stop",
+      "rte.button.repeat.off", "rte.button.repeat.on",
+      "rte.button.shuffle.off", "rte.button.shuffle.on",
+      "rte.slider.volume.left", "rte.slider.volume.off", "rte.slider.volume.on",
+      "rte.slider.volume.right" ),
+    ( "rte.icon.rating.off", "rte.icon.rating.on" )
 )
 
 ONE_PIXEL = (
-    "rte.color.bg.state", "rte.color.bg.item", "rte.color.text.album",
-    "rte.color.text.artist", "rte.color.text.other", "rte.color.text.title"
+    "rte.color.bg", "rte.color.text.album", "rte.color.text.artist",
+    "rte.color.text.other", "rte.color.text.title"
 )
 
 WIDTH_SPANNING_ELEMENTS = (
-    "rte.state.border.w", "rte.state.playback.pause", "rte.state.spacer",
-    "rte.state.repeat.off", "rte.state.spacer", "rte.state.shuffle.off",
-    "rte.state.spacer", "rte.state.volume.left",
-    10, 10, "rte.state.volume.right", "rte.state.border.e"
+    "rte.state.left",
+    "rte.button.playback.pause", "rte.state.spacer",
+    "rte.button.repeat.off", "rte.state.spacer",
+    "rte.button.shuffle.off", "rte.state.spacer",
+    "rte.slider.volume.left", 10, 10, "rte.slider.volume.right",
+    "rte.state.right"
 )
 
 HEIGHT_SPANNING_ELEMENTS = (
-    "rte.state.border.n", "rte.state.playback.pause", "rte.state.border.s",
-    "rte.item.border.n", 60, "rte.item.rating.on", "rte.item.border.s"
+    "rte.state.left", 60, "rte.icon.rating.off", "rte.buttonbar.left"
 )
 
+DPI_DEFAULT=90
+
+# -----------------------------------------------------------------------------
+
 def exit_err(msg):
+    """Print out error and exit."""
     print(msg)
     print("FAILED")
     sys.exit(1)
 
-def get_size(dir, elem):
-    """Get the size of the theme element 'elem' located in 'dir'."""
+def get_size(dir, file_name):
+    """Get size of the image file 'file_name' located in 'dir'."""
 
-    file = os.path.join(dir, "%s.png" % elem)
+    file = os.path.join(dir, "%s.png" % file_name)
     try:
         return Image.open(file).size
     except IOError, e:
         exit_err("--| could not open '%s' (%s)" % (file, e))
 
-def get_available_theme_elements(svg):
-    """Inspects 'svg' for alvailable theme elements."""
+def list_elements(svg):
+    """Inspect 'svg' for alvailable theme elements."""
 
     p = subprocess.Popen(["inkscape", "--query-all", svg],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -104,13 +152,15 @@ def get_available_theme_elements(svg):
     elems.sort()
     return tuple(elems)
     
-def export_theme_elements(svg, dir):
-    """Exports all theme elements from 'svg' into 'dir'."""
+def export_elements(svg, dpi, dir):
+    """Export all theme elements from 'svg' with DPI 'dpi' into 'dir'."""
 
     for elem in ELEMENTS:
         elem_file = os.path.join(dir, "%s.png" % elem)
-        print("    %s" % elem)        
-        p = subprocess.Popen(["inkscape", "-i", elem, "-f", svg, "-d", "90",
+        print("    %s" % elem)
+        if elem in ONE_PIXEL:
+            dpi = str(DPI_DEFAULT)
+        p = subprocess.Popen(["inkscape", "-i", elem, "-f", svg, "-d", dpi,
                               "-e", elem_file],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              universal_newlines=True)
@@ -123,18 +173,41 @@ def export_theme_elements(svg, dir):
                      (elem, svg, err))
         
 
-def build(svg):
+def generate_java_enum():
+    """For easy copy and paste when theme elements change (see Theme.java)."""
+    
+    out = ""
+    i = 0
+    for elem in ELEMENTS:
+        elem = elem.replace(".", "_")
+        elem = elem.upper()
+        if elem.startswith("RTE_COLOR"):
+            elem = elem.replace("RTE_COLOR", "RTC")
+        out += "%s = %d, " % (elem, i)
+        i += 1
+        
+    print out
 
-    dir = "build/%s" % os.path.splitext(svg)[0]
+def build_one(svg, dpi, name):
+    """Build a theme from 'svg' with DPI 'dpi' and target name 'name'."""
+
+    dpi = str(dpi)
+
+    print("--> building  theme %s (%s with DPI=%s)" % (name, svg, dpi))
+
+    if not os.path.isfile(svg):
+        exit_err("--| no such file: '%s'" % svg)
+        
+    dir = "build/%s" % name
     
     if os.path.exists(dir):
-        print("--> remove old theme dir '%s'" % dir)
+        print("--> remove build dir '%s'" % dir)
         try:
             shutil.rmtree(dir)
         except OSError, e:
             exit_err("--| failed to remove '%s' (%s)" % (dir, e))
         
-    print("--> create new theme dir '%s'" % dir)
+    print("--> create build dir '%s'" % dir)
     try:
         os.mkdir(dir)
     except OSError, e:
@@ -142,7 +215,7 @@ def build(svg):
         
     print("--> inspect svg")
 
-    elems = get_available_theme_elements(svg)
+    elems = list_elements(svg)
 
     print("--> check list of theme elements")
     
@@ -162,7 +235,7 @@ def build(svg):
 
     print("--> export theme elements")
 
-    export_theme_elements(svg, dir)
+    export_elements(svg, dpi, dir)
 
     print("--> validate size of theme elements")
 
@@ -204,7 +277,7 @@ def build(svg):
             minw += size[0]
             
     minh = 0
-    for elem in WIDTH_SPANNING_ELEMENTS:
+    for elem in HEIGHT_SPANNING_ELEMENTS:
         if isinstance(elem, int):
             minh += elem
         else:
@@ -215,14 +288,49 @@ def build(svg):
     
     print("--> finished, good job :)")
 
+def build_all():
+    """Build all default themes."""
+    
+    all = [("Purple.svg", 90, "Lilac"), ("Purple.svg", 117, "Lilac-XL"),
+           ("Frog.svg", 90, "Frog"), ("Frog.svg", 117, "Frog-XL"),
+           ("Vilanco.svg", 90, "Vico"), ("Emong.svg", 90, "Emo")]
 
-if __name__ == "__main__":
+    for svg, dpi, name in all:
+        build_one(svg, dpi, name)
 
-    try:
-        svg = sys.argv[1]
-    except IndexError:
-        svg = None
+def main():
+
+    svg = None
+    name = None
+    dpi=DPI_DEFAULT
+    
+    for arg in sys.argv[1:]:
+        if arg.startswith("--dpi="):
+            dpi=arg.split("=")[1]
+        elif arg.startswith("--svg="):
+            svg = arg.split("=")[1]
+        elif arg.startswith("--name="):
+            name = arg.split("=")[1]
+        elif arg ==  "--all":
+            svg = "all"
+        elif arg == "--java":
+            print_elements_in_java_style()
+            sys.exit(os.EX_OK)
+        else:
+            print(__doc__)
+            print("Unknown option: %s" % arg)
+            sys.exit(os.EX_USAGE)
+    
+    if svg is None:
+        print(__doc__)
+        print("Need a theme file!")
+        sys.exit(os.EX_USAGE)
         
+    if name is None and svg != "all":
+        print(__doc__)
+        print("Need a theme name!")
+        sys.exit(os.EX_USAGE)
+    
     if not os.path.exists("build"):
         print("--> create build dir")
         try:
@@ -231,14 +339,12 @@ if __name__ == "__main__":
             exit_err("--| failed to create build dir (%s)" % e)
 
     if svg == "all":
-        x, dirs, files = os.walk(".").next()
+        build_all()
     else:
-        files = [ "%s.svg" % sys.argv[1] ]
-        
-    for svg in files:
-        if not svg.endswith(".svg"):
-            continue
-        if not os.path.isfile(svg):
-            exit_err("--| no such file: '%s'" % svg)
-        print("--> building  theme %s" % svg)
-        build(svg)
+        build_one(svg, dpi, name)
+
+# -----------------------------------------------------------------------------
+
+if __name__ == "__main__":
+
+    main()
