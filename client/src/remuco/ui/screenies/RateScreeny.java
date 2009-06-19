@@ -25,10 +25,11 @@ import javax.microedition.lcdui.Image;
 
 import remuco.player.Item;
 import remuco.player.PlayerInfo;
-import remuco.ui.IActionListener;
-import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
+/**
+ * A screeny to display the rating of an item.
+ */
 public final class RateScreeny extends Screeny {
 
 	private int rating;
@@ -39,33 +40,8 @@ public final class RateScreeny extends Screeny {
 
 	private int ratingWidth, ratingHeight;
 
-	/**
-	 * Create new rate screeny. The given player info <code>player</code> is
-	 * used to get the maximum rating value. The player info is expected to be
-	 * valid the whole lifetime of the screeny. The screeny does not care about
-	 * changes within the player info. If there are changes, the class which
-	 * uses this screeny must care about this by calling
-	 * {@link #initRepresentation(int, int, int, int, int)}.
-	 * 
-	 * @param player
-	 *            the player info
-	 */
 	public RateScreeny(PlayerInfo player) {
-
 		super(player);
-	}
-
-	public void pointerPressed(int px, int py, IActionListener actionListener) {
-
-		if (!isInScreeny(px, py)) {
-			return;
-		}
-
-		if (px < getPreviousX() + rating * ratingWidth) {
-			actionListener.handleActionPressed(KeyBindings.ACTION_RATEDOWN);
-		} else {
-			actionListener.handleActionPressed(KeyBindings.ACTION_RATEUP);
-		}
 	}
 
 	protected void dataUpdated() {
@@ -88,8 +64,8 @@ public final class RateScreeny extends Screeny {
 			return;
 		}
 
-		ratingOn = theme.getImg(Theme.RTE_ITEM_RATING_ON);
-		ratingOff = theme.getImg(Theme.RTE_ITEM_RATING_OFF);
+		ratingOn = theme.getImg(Theme.RTE_ICON_RATING_ON);
+		ratingOff = theme.getImg(Theme.RTE_ICON_RATING_OFF);
 
 		// scale rate images if needed (may happen if the remote player has a
 		// wide rating range)
@@ -103,7 +79,7 @@ public final class RateScreeny extends Screeny {
 
 		setImage(Image.createImage(ratingMax * ratingWidth, ratingHeight));
 
-		g.setColor(theme.getColor(Theme.RTC_BG_ITEM));
+		g.setColor(theme.getColor(Theme.RTC_BG));
 		g.fillRect(0, 0, width, height);
 
 	}
@@ -111,9 +87,6 @@ public final class RateScreeny extends Screeny {
 	protected void updateRepresentation() {
 
 		int x;
-
-		if (ratingMax == 0)
-			return;
 
 		x = 0;
 		for (int j = 1; j <= rating; j++) {

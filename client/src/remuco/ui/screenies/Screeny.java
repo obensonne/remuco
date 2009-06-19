@@ -49,18 +49,24 @@ import remuco.util.Log;
  * a screeny user must ensure that this method gets called before the above
  * mentioned <code>update(..)</code> method gets called the first time.
  * <p>
- * Simple summary: The input of a screeny is some data and the output is a
- * corresponding image which can be drawn with {@link #draw(Graphics)} into an
- * {@link Graphics} object.
+ * <h5>Simple summary:</h5>
+ * The input of a screeny is some data and the output is a corresponding image
+ * which can be drawn with {@link #draw(Graphics)} into an {@link Graphics}
+ * object.
  * <p>
- * Notes for subclasses:<br>
+ * <h5>Special types of screenies:</h5>
+ * Conceptually there are 2 special types of screenies: container screenies
+ * (e.g. {@link StateScreeny}) and generic screenies (e.g. {@link ButtonScreeny}
+ * ). Container screenies are screenies which contain screenies themselves.
+ * Generic screenies are screenies whose appearance and behavior (pointer
+ * handling) is configured by constructor parameters.
+ * <p>
+ * <h5>Notes for subclasses:</h5>
  * Whenever the data to present by a screeny gets updated,
- * {@link #dataUpdated()} will be called. However this is just for notification,
- * the actual updating of the screeny's representation image must be done in
- * {@link #updateRepresentation()}.
- * 
- * @author Oben Sonne
- * 
+ * {@link #dataUpdated()} will be called. However this is just for notification
+ * and mainly intended for <em>container</em> screenies to forward the data
+ * update to sub screenies. The actual updating of the screeny's representation
+ * image must be done later, in {@link #updateRepresentation()}.
  */
 public abstract class Screeny {
 
@@ -543,10 +549,12 @@ public abstract class Screeny {
 		} else {
 
 			if (i.getWidth() > width)
-				throw new ScreenyException("screeny too large (width)");
+				throw new ScreenyException("screeny too width, have " + width
+						+ ", need " + i.getWidth());
 
 			if (i.getHeight() > height)
-				throw new ScreenyException("screeny too alrge (height)");
+				throw new ScreenyException("screeny too high, have " + height
+						+ ", need " + i.getHeight());
 
 			width = i.getWidth();
 			height = i.getHeight();

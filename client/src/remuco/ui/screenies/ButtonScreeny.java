@@ -7,6 +7,11 @@ import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 import remuco.util.Log;
 
+/**
+ * A generic screeny to display a button (which may have multiple states). It
+ * issues pressed and released actions (from {@link KeyBindings}) on pointer
+ * interaction.
+ */
 public class ButtonScreeny extends Screeny {
 
 	private static final Object DUMMY_VALUES[] = { new Object() };

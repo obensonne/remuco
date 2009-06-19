@@ -28,9 +28,8 @@ import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 
 /**
- * A slider screeny display a {@link SliderState} and issues lower and raise
+ * A generic screeny to display a {@link SliderState}. It issues lower and raise
  * actions (from {@link KeyBindings}) on pointer interaction.
- * 
  */
 public final class SliderScreeny extends Screeny {
 
@@ -142,7 +141,7 @@ public final class SliderScreeny extends Screeny {
 		xBar = wLeft;
 		resolution = width - wLeft - wRight;
 		if (resolution < 5) {
-			throw new ScreenyException("screen to small for volume bar");
+			throw new ScreenyException("screen to small for slider");
 		}
 
 		setImage(Image.createImage(width, imgLeft.getHeight()));

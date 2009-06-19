@@ -53,5 +53,10 @@ public class Feature {
 	public static final int REQ_MLIB = 1 << 28;
 
 	public static final int SHUTDOWN = 1 << 30;
+	
+	// --- combined features ---
+	
+	public static final int COMB_REPEAT = CTRL_REPEAT | KNOWN_REPEAT;
+	public static final int COMB_SHUFFLE = CTRL_SHUFFLE | KNOWN_SHUFFLE;
 
 }

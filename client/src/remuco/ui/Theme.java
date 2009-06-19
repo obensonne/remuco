@@ -29,6 +29,8 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.Config;
+import remuco.ui.screenies.Screeny;
+import remuco.ui.screenies.ScreenyException;
 import remuco.util.Log;
 
 public final class Theme {
@@ -45,68 +47,76 @@ public final class Theme {
 	public static final Font FONT_SMALL = Font.getFont(Font.FACE_PROPORTIONAL,
 		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
+	/** Font for an item's album */
 	public static final Font FONT_ALBUM = FONT_SMALL;
 
-	/** Font for a item's artist */
+	/** Font for an item's artist */
 	public static final Font FONT_ARTIST = FONT_NORMAL;
-
-	/** Font for a item's title */
-	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
-		Font.STYLE_BOLD, Font.SIZE_LARGE);
 
 	/** Font for progress value */
 	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
 		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
+	/** Font for an item's title */
+	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
+		Font.STYLE_BOLD, Font.SIZE_LARGE);
+
 	/** Font for a volume level */
 	public static final Font FONT_VOLUME = Font.getFont(Font.FACE_MONOSPACE,
 		Font.STYLE_PLAIN, Font.SIZE_LARGE);
 
-	/** Theme color ID */
-	public static final byte RTC_BG_STATE = 0, RTC_BG_ITEM = 1,
-			RTC_TEXT_ALBUM = 2, RTC_TEXT_ARTIST = 3, RTC_TEXT_OTHER = 4,
-			RTC_TEXT_TITLE = 5;
+	public static final int LINE_GAP = FONT_SMALL.getHeight() / 2;
 
-	/** Theme element ID */
-	public static final byte RTE_ITEM_BORDER_E = 6, RTE_ITEM_BORDER_N = 7,
-			RTE_ITEM_BORDER_NE = 8, RTE_ITEM_BORDER_NW = 9,
-			RTE_ITEM_BORDER_S = 10, RTE_ITEM_BORDER_SE = 11,
-			RTE_ITEM_BORDER_SW = 12, RTE_ITEM_BORDER_W = 13,
-			RTE_ITEM_RATING_OFF = 14, RTE_ITEM_RATING_ON = 15,
-			RTE_STATE_BORDER_E = 16, RTE_STATE_BORDER_N = 17,
-			RTE_STATE_BORDER_NE = 18, RTE_STATE_BORDER_NW = 19,
-			RTE_STATE_BORDER_S = 20, RTE_STATE_BORDER_SE = 21,
-			RTE_STATE_BORDER_SW = 22, RTE_STATE_BORDER_W = 23,
-			RTE_STATE_PLAYBACK_PAUSE = 24, RTE_STATE_PLAYBACK_PLAY = 25,
-			RTE_STATE_PLAYBACK_STOP = 26, RTE_STATE_REPEAT_OFF = 27,
-			RTE_STATE_REPEAT_ON = 28, RTE_STATE_SHUFFLE_OFF = 29,
-			RTE_STATE_SHUFFLE_ON = 30, RTE_STATE_SPACER = 31,
-			RTE_STATE_VOLUME_LEFT = 32, RTE_STATE_VOLUME_OFF = 33,
-			RTE_STATE_VOLUME_ON = 34, RTE_STATE_VOLUME_RIGHT = 35,
-			RTE_NEXT = 36, RTE_PREV = 37;
+	/**
+	 * Theme element ID (<code>RTE_..</code>) or color ID (<code>RTC_..</code>)
+	 */
+	public static final byte RTE_BUTTONBAR_LEFT = 0, RTE_BUTTONBAR_SPACER = 1,
+			RTE_BUTTONBAR_RIGHT = 2, RTE_BUTTON_FULLSCREEN = 3,
+			RTE_BUTTON_NEXT = 4, RTE_BUTTON_PREV = 5, RTE_BUTTON_RATE = 6,
+			RTE_BUTTON_TAGS = 7, RTE_STATE_LEFT = 8, RTE_STATE_SPACER = 9,
+			RTE_STATE_RIGHT = 10, RTE_BUTTON_PLAYBACK_PAUSE = 11,
+			RTE_BUTTON_PLAYBACK_PLAY = 12, RTE_BUTTON_PLAYBACK_STOP = 13,
+			RTE_BUTTON_REPEAT_OFF = 14, RTE_BUTTON_REPEAT_ON = 15,
+			RTE_BUTTON_SHUFFLE_OFF = 16, RTE_BUTTON_SHUFFLE_ON = 17,
+			RTE_SLIDER_VOLUME_LEFT = 18, RTE_SLIDER_VOLUME_OFF = 19,
+			RTE_SLIDER_VOLUME_ON = 20, RTE_SLIDER_VOLUME_RIGHT = 21,
+			RTC_BG = 22, RTC_TEXT_ALBUM = 23, RTC_TEXT_ARTIST = 24,
+			RTC_TEXT_OTHER = 25, RTC_TEXT_TITLE = 26, RTE_ICON_RATING_OFF = 27,
+			RTE_ICON_RATING_ON = 28;
 
 	/** Name of the default theme to load. */
 	private static final String DEFAULT = "Vilanco";
 
 	private static final Image IMG_FALLBACK;
 
-	/** Theme element file name (without extension) */
-	private static final String[] IMG_NAME = { "rte.color.bg.state",
-			"rte.color.bg.item", "rte.color.text.album",
-			"rte.color.text.artist", "rte.color.text.other",
-			"rte.color.text.title", "rte.item.border.e", "rte.item.border.n",
-			"rte.item.border.ne", "rte.item.border.nw", "rte.item.border.s",
-			"rte.item.border.se", "rte.item.border.sw", "rte.item.border.w",
-			"rte.item.rating.off", "rte.item.rating.on", "rte.state.border.e",
-			"rte.state.border.n", "rte.state.border.ne", "rte.state.border.nw",
-			"rte.state.border.s", "rte.state.border.se", "rte.state.border.sw",
-			"rte.state.border.w", "rte.state.playback.pause",
-			"rte.state.playback.play", "rte.state.playback.stop",
-			"rte.state.repeat.off", "rte.state.repeat.on",
-			"rte.state.shuffle.off", "rte.state.shuffle.on",
-			"rte.state.spacer", "rte.state.volume.left",
-			"rte.state.volume.off", "rte.state.volume.on",
-			"rte.state.volume.right", "rte.next", "rte.prev" };
+	/** Theme element file names (without extension) */
+	private static final String[] IMG_NAME = {
+
+			// button bar elements
+			"rte.buttonbar.left",
+			"rte.buttonbar.spacer",
+			"rte.buttonbar.right",
+			"rte.button.fullscreen",
+			"rte.button.next",
+			"rte.button.prev",
+			"rte.button.rate",
+			"rte.button.tags",
+
+			// state bar elements
+			"rte.state.left", "rte.state.spacer", "rte.state.right",
+			"rte.button.playback.pause", "rte.button.playback.play",
+			"rte.button.playback.stop", "rte.button.repeat.off",
+			"rte.button.repeat.on", "rte.button.shuffle.off",
+			"rte.button.shuffle.on", "rte.slider.volume.left",
+			"rte.slider.volume.off", "rte.slider.volume.on",
+			"rte.slider.volume.right",
+
+			// colors
+			"rte.color.bg", "rte.color.text.album", "rte.color.text.artist",
+			"rte.color.text.other", "rte.color.text.title",
+
+			// misc icons
+			"rte.icon.rating.off", "rte.icon.rating.on" };
 
 	private static Theme instance = null;
 
@@ -411,7 +421,7 @@ public final class Theme {
 
 		final int suggested = display.getBestImageWidth(Display.LIST_ELEMENT);
 
-		for (int i = LIST_ICON_SIZES.length - 1; i >= 0 ; i--) {
+		for (int i = LIST_ICON_SIZES.length - 1; i >= 0; i--) {
 			if (suggested >= LIST_ICON_SIZES[i]) {
 				size = LIST_ICON_SIZES[i];
 				break;
@@ -452,6 +462,67 @@ public final class Theme {
 		// load default theme
 
 		load(null);
+
+	}
+
+	/**
+	 * Calculate uniform gaps between images given a fixed overall width for the
+	 * images.
+	 * 
+	 * @param width
+	 *            the complete width available
+	 * @param imgIDs
+	 *            IDs of the images to distribute equally in the given width
+	 * @return an array of gaps - gap <em>i</em> is the gap width right of image
+	 *         <em>i</em> (hence, this array is one element shorter than
+	 *         <em>imgIDs</em>)
+	 * @throws ScreenyException
+	 *             if there is no space for gaps
+	 */
+	public int[] calculateGaps(int width, int imgWidth[])
+			throws ScreenyException {
+
+		if (imgWidth.length < 2) {
+			return new int[0];
+		}
+		int widthSum = 0;
+		for (int i = 0; i < imgWidth.length; i++) {
+			widthSum += imgWidth[i];
+		}
+		if (widthSum >= width + imgWidth.length * 2) {
+			throw new ScreenyException("no space for gaps");
+		}
+		int gaps[] = new int[imgWidth.length - 1];
+		for (int i = 0; i < gaps.length; i++) {
+			gaps[i] = (width - widthSum) / gaps.length;
+		}
+		gaps[gaps.length - 1] += (width - widthSum) % gaps.length;
+
+		return gaps;
+	}
+
+	/**
+	 * Calculate uniform gaps between screenies given a fixed overall width for
+	 * the screenies.
+	 * 
+	 * @param width
+	 *            the complete width available
+	 * @param screenies
+	 *            screenes to distribute equally
+	 * @return an array of gaps - gap <em>i</em> is the gap width right of
+	 *         screeny <em>i</em> (hence, this array is one element shorter than
+	 *         <em>scrennies</em>)
+	 * @throws ScreenyException
+	 *             if there is no space for gaps
+	 */
+	public int[] calculateGaps(int width, Vector screenies)
+			throws ScreenyException {
+
+		int imgWidth[] = new int[screenies.size()];
+		for (int i = 0; i < imgWidth.length; i++) {
+			imgWidth[i] = ((Screeny) screenies.elementAt(i)).getWidth();
+		}
+		return calculateGaps(width, imgWidth);
 
 	}
 

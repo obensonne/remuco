@@ -27,8 +27,8 @@ import remuco.player.PlayerInfo;
 import remuco.ui.Theme;
 
 /**
- * An image screeny displays an image in its center. If the image to display is
- * bigger than the screeny's area, it gets scaled down.
+ * A generic screeny to display images. Images get displayed centered. If an
+ * image to display is bigger than the screeny's area, it gets scaled down.
  */
 public final class ImageScreeny extends Screeny {
 
@@ -42,7 +42,7 @@ public final class ImageScreeny extends Screeny {
 
 		// fill with background color
 
-		g.setColor(theme.getColor(Theme.RTC_BG_ITEM));
+		g.setColor(theme.getColor(Theme.RTC_BG));
 		g.fillRect(0, 0, width, height);
 
 	}
@@ -51,7 +51,7 @@ public final class ImageScreeny extends Screeny {
 
 		Image img = (Image) data;
 
-		g.setColor(theme.getColor(Theme.RTC_BG_ITEM));
+		g.setColor(theme.getColor(Theme.RTC_BG));
 		g.fillRect(0, 0, width, height);
 
 		if (img == null)

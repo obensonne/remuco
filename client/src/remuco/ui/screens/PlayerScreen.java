@@ -51,18 +51,15 @@ import remuco.ui.KeyBindings;
 import remuco.ui.MediaBrowser;
 import remuco.ui.RepeatedControl;
 import remuco.ui.Theme;
+import remuco.ui.screenies.ButtonBarScreeny;
 import remuco.ui.screenies.ImageScreeny;
 import remuco.ui.screenies.ItemScreeny;
+import remuco.ui.screenies.ProgressScreeny;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.ui.screenies.StateScreeny;
 import remuco.util.Log;
 
-/*
- * Eventuell nochmal aufteilen in reine grafische klasse (PlayerScreen) und
- * eine Klasse, die die ganzen Kommandos, KeyEvents und SubScreens handhabt
- * (PlayerHandler).
- */
 public final class PlayerScreen extends Canvas implements IItemListener,
 		IStateListener, IProgressListener, CommandListener, IActionListener {
 
@@ -127,9 +124,13 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	private boolean screenTooSmall = false;
 
+	private final ButtonBarScreeny screenyButtons;
+
 	private final ItemScreeny screenyItem;
 
 	private final ImageScreeny screenyItemImageFullscreen;
+
+	private final ProgressScreeny screenyProgress;
 
 	private final StateScreeny screenyState;
 
@@ -193,6 +194,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		screenyState = new StateScreeny(player.info);
 		screenyItemImageFullscreen = new ImageScreeny(player.info);
 		screenyItem = new ItemScreeny(player.info);
+		screenyButtons = new ButtonBarScreeny(player.info);
+		screenyProgress = new ProgressScreeny(player.info);
 
 		screenKeyConfig = new KeyBindingsScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
@@ -212,7 +215,6 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		 * this here already.
 		 */
 		initScreenies();
-
 	}
 
 	/**
@@ -392,11 +394,11 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				break;
 			}
 
-			rating = player.item.getRating() - 1;
 			ratingMax = player.info.getMaxRating();
-			if (player.item.isNone() || ratingMax == 0 || rating < 0)
+			if (player.item.isNone() || ratingMax == 0)
 				break;
-
+			rating = player.item.getRating() == 0 ? ratingMax
+					: player.item.getRating() - 1;
 			player.item.setRating(rating);
 			player.ctrlRate(rating);
 
@@ -410,11 +412,11 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				break;
 			}
 
-			rating = player.item.getRating() + 1;
 			ratingMax = player.info.getMaxRating();
-			if (player.item.isNone() || ratingMax == 0 || rating > ratingMax)
+			if (player.item.isNone() || ratingMax == 0)
 				break;
-
+			rating = player.item.getRating() == ratingMax ? 0
+					: player.item.getRating() + 1;
 			player.item.setRating(rating);
 			player.ctrlRate(rating);
 
@@ -559,8 +561,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	public void notifyProgressChanged() {
 
-		screenyItem.updateData(player.progress);
-		repaint(screenyItem);
+		screenyProgress.updateData(player.progress);
+		repaint(screenyProgress);
 
 	}
 
@@ -603,22 +605,29 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		} else {
 			screenyState.draw(g);
 			screenyItem.draw(g);
+			screenyProgress.draw(g);
+			screenyButtons.draw(g);
 		}
 	}
 
 	protected void pointerPressed(int x, int y) {
-		if (itemImageFullscreen) {
+
+		if (screenTooSmall) { // ignore pointer events
+			commandAction(CMD_THEMES, this);
+		} else if (itemImageFullscreen) {
 			handleActionPressed(KeyBindings.ACTION_IMAGE);
 		} else {
 			screenyState.pointerPressed(x, y, this);
 			screenyItem.pointerPressed(x, y, this);
+			screenyButtons.pointerPressed(x, y, this);
 		}
 	}
 
 	protected void pointerReleased(int x, int y) {
-		if (!itemImageFullscreen) {
+		if (!itemImageFullscreen && !screenTooSmall) {
 			screenyState.pointerReleased(x, y, this);
 			screenyItem.pointerReleased(x, y, this);
+			screenyButtons.pointerReleased(x, y, this);
 		}
 	}
 
@@ -723,9 +732,27 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			anchor = Screeny.TOP_LEFT;
 			x = 0;
 			w = getWidth();
-			h = getHeight() / 4; // max 1/4 for state
+			h = getHeight() / 3; // max 1/4 for state
 			y = 0;
 			screenyState.initRepresentation(x, y, anchor, w, h);
+
+			// ////// button bar ////// //
+
+			anchor = Screeny.BOTTOM_LEFT;
+			x = 0;
+			w = getWidth();
+			h = getHeight() / 3; // max 1/4 for button bar
+			y = getHeight();
+			screenyButtons.initRepresentation(x, y, anchor, w, h);
+
+			// ////// progress ////// //
+
+			anchor = Screeny.BOTTOM_LEFT;
+			x = 0;
+			w = getWidth();
+			h = getHeight() / 4; // max 1/5 for progress
+			y = screenyButtons.getPreviousY();
+			screenyProgress.initRepresentation(x, y, anchor, w, h);
 
 			// ////// item ////// //
 
@@ -733,7 +760,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			x = 0;
 			w = getWidth();
 			y = screenyState.getNextY();
-			h = getHeight() - y;
+			h = screenyProgress.getPreviousY() - y;
 			screenyItem.initRepresentation(x, y, anchor, w, h);
 
 			screenTooSmall = false;
@@ -748,7 +775,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	/** Request a repaint for the region occupied by a screeny. */
 	private void repaint(Screeny s) {
 
-		repaint(s.getX(), s.getY(), s.getWidth(), s.getHeight());
+		repaint(s.getPreviousX(), s.getPreviousY(), s.getWidth(), s.getHeight());
 	}
 
 	private void startSeek(int direction) {

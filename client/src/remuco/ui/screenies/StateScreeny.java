@@ -22,19 +22,24 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
+import remuco.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
 import remuco.player.State;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
+import remuco.util.Log;
 
+/**
+ * A container screeny to display the state of a player.
+ */
 public class StateScreeny extends Screeny {
 
 	/** Image IDs for the playback button screeny. */
 	private static final int BS_PLAYBACK_IMAGES[] = {
-			Theme.RTE_STATE_PLAYBACK_PAUSE, Theme.RTE_STATE_PLAYBACK_PLAY,
-			Theme.RTE_STATE_PLAYBACK_STOP };
+			Theme.RTE_BUTTON_PLAYBACK_PAUSE, Theme.RTE_BUTTON_PLAYBACK_PLAY,
+			Theme.RTE_BUTTON_PLAYBACK_STOP };
 
 	/** Values for the playback button screeny. */
 	private static final Object BS_PLAYBACK_VALUES[] = {
@@ -42,8 +47,8 @@ public class StateScreeny extends Screeny {
 			new Integer(State.PLAYBACK_PLAY), new Integer(State.PLAYBACK_STOP) };
 
 	/** Image IDs for the repeat button screeny. */
-	private static final int BS_REPEAT_IMAGES[] = { Theme.RTE_STATE_REPEAT_OFF,
-			Theme.RTE_STATE_REPEAT_ON };
+	private static final int BS_REPEAT_IMAGES[] = {
+			Theme.RTE_BUTTON_REPEAT_OFF, Theme.RTE_BUTTON_REPEAT_ON };
 
 	/** Values for the repeat button screeny. */
 	private static final Object BS_REPEAT_VALUES[] = { Boolean.FALSE,
@@ -51,7 +56,7 @@ public class StateScreeny extends Screeny {
 
 	/** Image IDs for the shuffle button screeny. */
 	private static final int BS_SHUFFLE_IMAGES[] = {
-			Theme.RTE_STATE_SHUFFLE_OFF, Theme.RTE_STATE_SHUFFLE_ON };
+			Theme.RTE_BUTTON_SHUFFLE_OFF, Theme.RTE_BUTTON_SHUFFLE_ON };
 
 	/** Values for the shuffle button screeny. */
 	private static final Object BS_SHUFFLE_VALUES[] = { Boolean.FALSE,
@@ -69,16 +74,23 @@ public class StateScreeny extends Screeny {
 
 		screenyPlayback = new ButtonScreeny(player, BS_PLAYBACK_VALUES,
 				BS_PLAYBACK_IMAGES, KeyBindings.ACTION_PLAYPAUSE);
-		screenyRepeat = new ButtonScreeny(player, BS_REPEAT_VALUES,
-				BS_REPEAT_IMAGES, KeyBindings.ACTION_REPEAT);
-		screenyShuffle = new ButtonScreeny(player, BS_SHUFFLE_VALUES,
-				BS_SHUFFLE_IMAGES, KeyBindings.ACTION_SHUFFLE);
-
-		screenyVolume = new SliderScreeny(player, Theme.RTE_STATE_VOLUME_LEFT,
-				Theme.RTE_STATE_VOLUME_ON, Theme.RTE_STATE_VOLUME_OFF,
-				Theme.RTE_STATE_VOLUME_RIGHT, KeyBindings.ACTION_VOLDOWN,
+		if (player.supports(Feature.COMB_REPEAT)) {
+			screenyRepeat = new ButtonScreeny(player, BS_REPEAT_VALUES,
+					BS_REPEAT_IMAGES, KeyBindings.ACTION_REPEAT);
+		} else {
+			screenyRepeat = null;
+		}
+		if (player.supports(Feature.COMB_SHUFFLE)) {
+			screenyShuffle = new ButtonScreeny(player, BS_SHUFFLE_VALUES,
+					BS_SHUFFLE_IMAGES, KeyBindings.ACTION_SHUFFLE);
+		} else {
+			screenyShuffle = null;
+		}
+		screenyVolume = new SliderScreeny(player, Theme.RTE_SLIDER_VOLUME_LEFT,
+				Theme.RTE_SLIDER_VOLUME_ON, Theme.RTE_SLIDER_VOLUME_OFF,
+				Theme.RTE_SLIDER_VOLUME_RIGHT, KeyBindings.ACTION_VOLDOWN,
 				KeyBindings.ACTION_VOLUP);
-		
+
 		sliderStateVolume = new SliderState();
 		sliderStateVolume.setLength(100);
 	}
@@ -87,8 +99,12 @@ public class StateScreeny extends Screeny {
 		final int rx = px - getPreviousX();
 		final int ry = py - getPreviousY();
 		screenyPlayback.pointerPressed(rx, ry, actionListener);
-		screenyRepeat.pointerPressed(rx, ry, actionListener);
-		screenyShuffle.pointerPressed(rx, ry, actionListener);
+		if (screenyRepeat != null) {
+			screenyRepeat.pointerPressed(rx, ry, actionListener);
+		}
+		if (screenyShuffle != null) {
+			screenyShuffle.pointerPressed(rx, ry, actionListener);
+		}
 		screenyVolume.pointerPressed(rx, ry, actionListener);
 	}
 
@@ -96,8 +112,12 @@ public class StateScreeny extends Screeny {
 		final int rx = px - getPreviousX();
 		final int ry = py - getPreviousY();
 		screenyPlayback.pointerReleased(rx, ry, actionListener);
-		screenyRepeat.pointerReleased(rx, ry, actionListener);
-		screenyShuffle.pointerReleased(rx, ry, actionListener);
+		if (screenyRepeat != null) {
+			screenyRepeat.pointerReleased(rx, ry, actionListener);
+		}
+		if (screenyShuffle != null) {
+			screenyShuffle.pointerReleased(rx, ry, actionListener);
+		}
 		screenyVolume.pointerReleased(rx, ry, actionListener);
 	}
 
@@ -106,9 +126,12 @@ public class StateScreeny extends Screeny {
 		State s = (State) data;
 
 		screenyPlayback.updateData(new Integer(s.getPlayback()));
-		screenyRepeat.updateData(s.isRepeat() ? Boolean.TRUE : Boolean.FALSE);
-		screenyShuffle.updateData(s.isShuffle() ? Boolean.TRUE : Boolean.FALSE);
-
+		if (screenyRepeat != null) {
+			screenyRepeat.updateData(new Boolean(s.isRepeat()));
+		}
+		if (screenyShuffle != null) {
+			screenyShuffle.updateData(new Boolean(s.isShuffle()));
+		}
 		sliderStateVolume.setPosition(s.getVolume());
 		screenyVolume.updateData(sliderStateVolume);
 
@@ -116,77 +139,63 @@ public class StateScreeny extends Screeny {
 
 	protected void initRepresentation() throws ScreenyException {
 
-		final Image spacer = theme.getImg(Theme.RTE_STATE_SPACER);
+		final Image imgLeft = theme.getImg(Theme.RTE_STATE_LEFT);
+		final Image imgSpacer = theme.getImg(Theme.RTE_STATE_SPACER);
+		final Image imgRight = theme.getImg(Theme.RTE_STATE_RIGHT);
 
-		final int h = theme.getImg(Theme.RTE_STATE_BORDER_N).getHeight()
-				+ spacer.getHeight()
-				+ theme.getImg(Theme.RTE_STATE_BORDER_S).getHeight();
+		final int h = imgLeft.getHeight();
 
 		setImage(Image.createImage(width, h));
 
-		final int clip[] = drawBorders(theme.getImg(Theme.RTE_STATE_BORDER_NW),
-			theme.getImg(Theme.RTE_STATE_BORDER_N),
-			theme.getImg(Theme.RTE_STATE_BORDER_NE),
-			theme.getImg(Theme.RTE_STATE_BORDER_W),
-			theme.getImg(Theme.RTE_STATE_BORDER_E),
-			theme.getImg(Theme.RTE_STATE_BORDER_SW),
-			theme.getImg(Theme.RTE_STATE_BORDER_S),
-			theme.getImg(Theme.RTE_STATE_BORDER_SE),
-			theme.getColor(Theme.RTC_BG_STATE));
+		final int wSpacer = imgSpacer.getWidth();
+		final int xEnd = width - imgRight.getWidth();
+		int x = 0;
+		g.drawImage(imgLeft, x, 0, TOP_LEFT);
+		x += imgLeft.getWidth();
 
-		int xOff = clip[0]; // x offset for elements
-		final int yOff = clip[1]; // y offset for elements
-		int wRest = clip[2]; // available width for elements
-		final int hRest = clip[3]; // available height for elements
+		screenyPlayback.initRepresentation(x, 0, TOP_LEFT, xEnd - x, h);
 
-		// ////// initially fill everything with spacer ////// //
+		x = screenyPlayback.getNextX();
+		g.drawImage(imgSpacer, x, 0, TOP_LEFT);
+		x += wSpacer;
 
-		final int wSpacer = spacer.getWidth();
-		for (int x = xOff; x < xOff + wRest; x += wSpacer) {
-			g.drawImage(spacer, x, yOff, TOP_LEFT);
+		if (screenyRepeat != null) {
+			screenyRepeat.initRepresentation(x, 0, TOP_LEFT, xEnd - x, h);
+
+			x = screenyRepeat.getNextX();
+			g.drawImage(imgSpacer, x, 0, TOP_LEFT);
+			x += wSpacer;
 		}
 
-		// ////// draw state elements ////// //
+		if (screenyShuffle != null) {
+			screenyShuffle.initRepresentation(x, 0, TOP_LEFT, xEnd - x, h);
 
-		int wGap;
-
-		xOff = clip[0];
-		screenyPlayback.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
-
-		if (screenyPlayback.getWidth() > 0) {
-			wGap = wSpacer;
-		} else {
-			wGap = 0;
+			x = screenyShuffle.getNextX();
+			g.drawImage(imgSpacer, x, 0, TOP_LEFT);
+			x += wSpacer;
 		}
-		wRest -= wGap + screenyPlayback.getWidth();
-		xOff = screenyPlayback.getNextX() + wGap;
-		screenyRepeat.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
 
-		if (screenyRepeat.getWidth() > 0) {
-			wGap = wSpacer;
-		} else {
-			wGap = 0;
-		}
-		wRest -= wGap + screenyRepeat.getWidth();
-		xOff = screenyRepeat.getNextX() + wGap;
-		screenyShuffle.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
+		screenyVolume.initRepresentation(x, 0, TOP_LEFT, xEnd - x, h);
 
-		if (screenyShuffle.getWidth() > 0) {
-			wGap = wSpacer;
-		} else {
-			wGap = 0;
+		x = screenyVolume.getNextX();
+		g.drawImage(imgRight, x, 0, TOP_LEFT);
+		x += imgRight.getWidth();
+
+		if (x != width) {
+			Log.bug("Bug in TS: " + x + "!=" + width);
 		}
-		wRest -= wGap + screenyShuffle.getWidth();
-		xOff = screenyShuffle.getNextX() + wGap;
-		screenyVolume.initRepresentation(xOff, yOff, TOP_LEFT, wRest, hRest);
 
 	}
 
 	protected void updateRepresentation() {
 
 		screenyPlayback.draw(g);
-		screenyRepeat.draw(g);
-		screenyShuffle.draw(g);
+		if (screenyRepeat != null) {
+			screenyRepeat.draw(g);
+		}
+		if (screenyShuffle != null) {
+			screenyShuffle.draw(g);
+		}
 		screenyVolume.draw(g);
 
 	}

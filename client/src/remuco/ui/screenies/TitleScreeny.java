@@ -25,16 +25,11 @@ import javax.microedition.lcdui.Image;
 
 import remuco.player.Item;
 import remuco.player.PlayerInfo;
-import remuco.ui.IActionListener;
-import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 
 /**
- * A screeny for meta information like title, artist, album and for an image of
- * an {@link Item}.
- * 
- * @author Oben Sonne
- * 
+ * A screeny to display meta information like title, artist, album and cover art
+ * of an {@link Item}.
  */
 public final class TitleScreeny extends Screeny {
 
@@ -52,20 +47,13 @@ public final class TitleScreeny extends Screeny {
 
 	}
 
-	public void pointerPressed(int px, int py, IActionListener actionListener) {
-		if (!isInScreeny(px, py)) {
-			return;
-		}
-		actionListener.handleActionPressed(KeyBindings.ACTION_IMAGE);
-	}
-
 	protected void initRepresentation() throws ScreenyException {
 
 		setImage(Image.createImage(width, height)); // occupy available space
 
 		colorAlbum = theme.getColor(Theme.RTC_TEXT_ALBUM);
 		colorArtist = theme.getColor(Theme.RTC_TEXT_ARTIST);
-		colorBg = theme.getColor(Theme.RTC_BG_ITEM);
+		colorBg = theme.getColor(Theme.RTC_BG);
 		// colorText = theme.getColor(Theme.RTC_TEXT_OTHER);
 		colorTitle = theme.getColor(Theme.RTC_TEXT_TITLE);
 
@@ -120,11 +108,11 @@ public final class TitleScreeny extends Screeny {
 			Theme.FONT_ALBUM);
 		y = drawStrings(sa, width, y);
 
-		// //// genre, length, year and image //////
+		// //// image //////
 
-		y += Theme.FONT_SMALL.getHeight() / 2;
+		y += Theme.LINE_GAP;
 
-		final int maxImgHeight = height - y;
+		final int maxImgHeight = height - Theme.LINE_GAP - y;
 		if (maxImgHeight < 32) // not enough space for an image
 			return;
 

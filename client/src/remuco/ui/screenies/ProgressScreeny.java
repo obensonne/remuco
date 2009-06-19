@@ -20,7 +20,6 @@
  */
 package remuco.ui.screenies;
 
-import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.player.Feature;
@@ -29,10 +28,7 @@ import remuco.player.Progress;
 import remuco.ui.Theme;
 
 /**
- * Sub screeny of an It
- * 
- * @author Oben Sonne
- * 
+ * A screeny to display the progress of an item.
  */
 public class ProgressScreeny extends Screeny {
 
@@ -46,6 +42,20 @@ public class ProgressScreeny extends Screeny {
 
 	}
 
+	// private Progress progress = new Progress();
+	//	
+	// private int rating = 0;
+	//	
+	// protected void dataUpdated() {
+	// if (data instanceof Progress) {
+	// progress = (Progress) data;
+	// } else if (data instanceof Item) {
+	// rating = ((Item) data).getRating();
+	// } else {
+	// Log.bug("Jun 17, 2009.11:19:06 PM");
+	// }
+	// }
+
 	protected void initRepresentation() throws ScreenyException {
 
 		if (!player.supports(Feature.KNOWN_PROGRESS)) {
@@ -55,14 +65,14 @@ public class ProgressScreeny extends Screeny {
 
 		final int fontHeight = Theme.FONT_PROGRESS.getHeight();
 
-		setImage(Image.createImage(width, fontHeight * 3 / 2));
+		setImage(Image.createImage(width, fontHeight + Theme.LINE_GAP));
 
 		xOff = width / 2;
 		yOff = fontHeight;
 
 		g.setFont(Theme.FONT_PROGRESS);
 
-		colorBG = theme.getColor(Theme.RTC_BG_ITEM);
+		colorBG = theme.getColor(Theme.RTC_BG);
 		colorFG = theme.getColor(Theme.RTC_TEXT_OTHER);
 
 	}
@@ -86,7 +96,7 @@ public class ProgressScreeny extends Screeny {
 			sb.append(p.getProgressFormatted());
 		}
 
-		sb.append(" - ");
+		sb.append("    -    ");
 
 		if (p.getLength() < 0) {
 			sb.append("???");
@@ -96,8 +106,7 @@ public class ProgressScreeny extends Screeny {
 
 		g.setColor(colorFG);
 
-		g.drawString(sb.toString(), xOff, yOff, Graphics.HCENTER
-				| Graphics.BASELINE);
+		g.drawString(sb.toString(), xOff, yOff, BOTTOM_CENTER);
 
 	}
 
