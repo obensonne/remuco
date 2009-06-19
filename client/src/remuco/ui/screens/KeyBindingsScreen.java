@@ -221,7 +221,13 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 		String keyName;
 
 		key = keyBindings.getKeyForAction(action);
-		keyName = (key != 0) ? screenKeyBinder.getKeyName(key) : "";
+		try {
+			keyName = (key != 0) ? screenKeyBinder.getKeyName(key) : "";
+		} catch (IllegalArgumentException e) {
+			// may happen on version change or device firmware update
+			keyBindings.release(key);
+			keyName = "";
+		}
 		set(action, KeyBindings.actionNames[action] + ": " + keyName, null);
 
 	}
