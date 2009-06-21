@@ -50,6 +50,8 @@ LA_PLAY = remuco.ListAction("Play")
 LA_ENQUEUE = remuco.ListAction("Enqueue")
 MLIB_LIST_ACTIONS = (LA_PLAY, LA_ENQUEUE)
 
+SEARCH_MASK = [ "Artist", "Album", "Title" ]
+
 # =============================================================================
 # constants
 # =============================================================================
@@ -70,8 +72,8 @@ class MPDAdapter(remuco.PlayerAdapter):
                                       volume_known=True,
                                       repeat_known=True,
                                       shuffle_known=True,
-                                      progress_known=True
-                                      )
+                                      progress_known=True,
+                                      search_mask=SEARCH_MASK)
         
         self.__mpd = mpd.MPDClient()
         
@@ -374,6 +376,29 @@ class MPDAdapter(remuco.PlayerAdapter):
                                 item_actions=item_actions,
                                 list_actions=list_actions)
         
+    def request_search(self, client, query):
+        
+        def idfun(song):
+            return song.get("file", "unknown")
+        
+        result_dicts = []
+        
+        for field, value in zip(SEARCH_MASK, query):
+            if not value:
+                continue
+            songs = self.__mpd.search(field, value)
+            result = {}
+            for song in songs:
+                result[idfun(song)] = song
+            result_dicts.append(result)
+            
+        result = self.__intersect_dicts(result_dicts)
+        
+        ids, names = self.__songs_to_item_list(result.values())
+        
+        self.reply_search_request(client, query, ids, names,
+                                  item_actions=MLIB_ITEM_ACTIONS)
+        
     # =========================================================================
     # internal methods
     # =========================================================================
@@ -510,6 +535,10 @@ class MPDAdapter(remuco.PlayerAdapter):
             log.warning("failed to get playlist content (%s): %s" % (name, e))
             songs = []
             
+        return self.__songs_to_item_list(songs)
+    
+    def __songs_to_item_list(self, songs):
+        
         ids, names = [], []
         
         for item in songs:
@@ -540,6 +569,23 @@ class MPDAdapter(remuco.PlayerAdapter):
                 return False
             
         return True
+    
+    def __intersect_dicts(self, dict_list):
+        """Creates an intersection of dictionaries based on keys."""
+        
+        if not dict_list:
+            return {}
+        
+        first, rest = dict_list[0], dict_list[1:]
+        keys_intersection = set(first.keys())
+        for other_dict in rest:
+            keys_intersection.intersection_update(set(other_dict.keys()))
+        
+        result = {}
+        for key in keys_intersection:
+            result[key] = first[key]
+
+        return result
     
     def __batch_cmd(self, cmd, params):
         
