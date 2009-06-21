@@ -34,7 +34,8 @@
 #
 # Put this script with name 'volume' into a player adapter's configuration
 # directory (e.g. ~/.config/remuco/fooplay) to disable the player's volume
-# control and enable volume control as done here.
+# control and enable volume control as done here. To use this volume script for
+# all players, put it into ~/.config/remuco.
 # 
 # If this script does not work correctly, have a look into 'man amixer' for how
 # to tweak the lines below.

@@ -110,7 +110,9 @@ class Config(object):
         
         ###### custom volume command ######
         
-        cmd = os.path.join(self.__dir_config, "volume")
+        cmd = os.path.join(xdg_config, "remuco", "volume")
+        if not os.path.isfile(cmd):
+            cmd = os.path.join(self.__dir_config, "volume")
         if not os.path.isfile(cmd):
             log.debug("custom volume command does not exist (%s)" % cmd)
             self.__custom_volume_cmd = None
