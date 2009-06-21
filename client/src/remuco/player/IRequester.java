@@ -31,5 +31,7 @@ public interface IRequester {
 	public void handlePlaylist(ItemList playlist);
 
 	public void handleQueue(ItemList queue);
+	
+	public void handleSearch(ItemList search);
 
 }

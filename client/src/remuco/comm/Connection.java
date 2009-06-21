@@ -55,7 +55,7 @@ public final class Connection implements Runnable {
 	private static final byte[] PREFIX = { (byte) 0xFF, (byte) 0xFF,
 			(byte) 0xFF, (byte) 0xFF };
 
-	private static final byte[] PROTO_VERSION = { (byte) 0x08 };
+	private static final byte[] PROTO_VERSION = { (byte) 0x09 };
 
 	private static final byte[] SUFFIX = { (byte) 0xFE, (byte) 0xFE,
 			(byte) 0xFE, (byte) 0xFE };

@@ -80,6 +80,7 @@ REQ_PLAYLIST = _REQ + 1
 REQ_QUEUE = _REQ + 2
 REQ_MLIB = _REQ + 3
 REQ_FILES = _REQ + 4
+REQ_SEARCH = _REQ + 5
 
 # =============================================================================
 # internal messages

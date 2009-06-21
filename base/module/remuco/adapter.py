@@ -189,6 +189,7 @@ class PlayerAdapter(object):
         * action_queue_item()
         * action_mlib_item()
         * action_mlib_list()
+        * action_search_item()
         
         Player adapters only need to implement only a *subset* of these
         methods - depending on what is possible and what makes sense.
@@ -204,6 +205,7 @@ class PlayerAdapter(object):
         * request_playlist()
         * request_queue()
         * request_mlib()
+        * request_search()
     
         As above, only override the methods which make sense for the
         corresponding media player.
@@ -215,6 +217,7 @@ class PlayerAdapter(object):
         * reply_playlist_request()
         * reply_queue_request()
         * reply_mlib_request()
+        * reply_search_request()
         
     ===========================================================================
     Methods to call to synchronize media player state information with clients:
@@ -249,7 +252,8 @@ class PlayerAdapter(object):
     
     def __init__(self, name, playback_known=False, volume_known=False,
                  repeat_known=False, shuffle_known=False, progress_known=False,
-                 max_rating=0, poll=2.5, file_actions=None, mime_types=None):
+                 max_rating=0, poll=2.5, file_actions=None, mime_types=None,
+                 search_mask=None):
         """Create a new player adapter and configure its capabilities.
         
         Just does some early initializations. Real job starts with start().
@@ -287,6 +291,10 @@ class PlayerAdapter(object):
             'audio/mp3' or 'video/quicktime' (setting this to None means all
             mime types are supported) - this keyword is only relevant if the
             method action_files() gets overridden
+        @keyword search_mask:
+             list of fields to search the players library for (e.g. artist,
+             genre, any, ...) - if set method request_search() should be
+             overridden
         
         @attention: When overriding, call super class implementation first!
         
@@ -312,7 +320,8 @@ class PlayerAdapter(object):
         flags = self.__util_calc_flags(playback_known, volume_known,
             repeat_known, shuffle_known, progress_known)
         
-        self.__info = PlayerInfo(name, flags, max_rating, file_actions)
+        self.__info = PlayerInfo(name, flags, max_rating, file_actions,
+                                 search_mask)
         
         self.__sync_triggers = {}
         
@@ -690,6 +699,22 @@ class PlayerAdapter(object):
         """
         log.error("** BUG ** action_mlib_list() not implemented")
     
+    def action_search_item(self, action_id, positions, ids):
+        """Do an action on one or more items from a search result.
+        
+        @param action_id:
+            ID of the action to do - this specifies one of the actions passed
+            previously to reply_search_request() by the keyword 'item_actions'
+        @param positions:
+            list of positions to apply the action to 
+        @param ids:
+            list of IDs to apply the action to
+            
+        @note: Override if list actions gets passed to reply_search_request().
+                
+        """
+        log.error("** BUG ** action_search_item() not implemented")
+    
     # =========================================================================
     # request interface 
     # =========================================================================
@@ -760,7 +785,21 @@ class PlayerAdapter(object):
         
         """
         log.error("** BUG ** in feature handling")
+    
+    def request_search(self, client, query):
+        """Request a list of items matching a search query.
         
+        @param client: 
+            the requesting client (needed for reply)
+        @param query:
+            a list of search query values corresponding with the search mask
+            specified with keyword 'search_mask' in PlayerAdapter.__init__().
+            
+        @see: reply_search_request() for sending back the result
+        
+        """
+        log.error("** BUG ** in feature handling")
+    
     # =========================================================================
     # player side synchronization
     # =========================================================================    
@@ -1009,6 +1048,33 @@ class PlayerAdapter(object):
         
         gobject.idle_add(self.__reply, client, msg, "mlib")
         
+    def reply_search_request(self, client, query, ids, names, item_actions=None):
+        """Send the reply to a search request back to the client.
+        
+        @param client:
+            the client to reply to
+        @param query:
+            query parameters of the requested search
+        @param ids:
+            IDs of the items in the search result
+        @param names:
+            names of the items in the search result
+        @keyword item_actions:
+            a list of ItemAction which can be applied to items in the search
+            result
+        
+        @see: request_search()
+        
+        """ 
+        if self.__stopped:
+            return
+        
+        result = ItemList(query, None, ids, names, item_actions, None)
+        
+        msg = net.build_message(message.REQ_SEARCH, result)
+        
+        gobject.idle_add(self.__reply, client, msg, "search")
+        
     def __reply_files_request(self, client, path, nested, ids, names):
 
         files = ItemList(path, nested, ids, names, None, None)
@@ -1243,6 +1309,14 @@ class PlayerAdapter(object):
             nested, ids, names = self.__filelib.get_level(request.path)
             
             self.__reply_files_request(client, request.path, nested, ids, names)
+            
+        elif id == message.REQ_SEARCH:
+            
+            request = serial.unpack(Request, bindata)    
+            if request is None:
+                return
+            
+            self.request_search(client, request.path)
             
         else:
             log.error("** BUG ** unexpected request message: %d" % id)

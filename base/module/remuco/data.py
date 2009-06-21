@@ -38,11 +38,12 @@ from remuco import serial
 class PlayerInfo(serial.Serializable):
     """ Parameter of the player info message sent to clients."""
     
-    def __init__(self, name, flags, max_rating, file_item_actions):
+    def __init__(self, name, flags, max_rating, file_item_actions, search_mask):
         
         self.name = name
         self.flags = flags
         self.max_rating = max_rating
+        self.search_mask = search_mask or []
         
         self.fia_ids = []
         self.fia_labels = []
@@ -59,12 +60,12 @@ class PlayerInfo(serial.Serializable):
     def get_fmt(self):
         return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
-                serial.TYPE_AS)
+                serial.TYPE_AS, serial.TYPE_AS)
         
     def get_data(self):
         return (self.name, self.flags, self.max_rating,
                 self.fia_ids, self.fia_labels, self.fia_multiples,
-                self.fia_helps)
+                self.fia_helps, self.search_mask)
 
 class PlayerState(serial.Serializable):
     """ Parameter of the state sync message sent to clients."""

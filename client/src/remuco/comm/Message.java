@@ -73,6 +73,7 @@ public final class Message {
 	public static final int REQ_QUEUE = REQ + 2;
 	public static final int REQ_MLIB = REQ + 3;
 	public static final int REQ_FILES = REQ + 4;
+	public static final int REQ_SEARCH = REQ + 5;
 
 	public static boolean isRequest(int id) {
 		return id >= REQ && id < REQ + 100;

@@ -77,7 +77,7 @@ class ClientConnection(object):
     
     IO_PREFIX = '\xff\xff\xff\xff'
     IO_SUFFIX = '\xfe\xfe\xfe\xfe'
-    IO_PROTO_VERSION = '\x08'
+    IO_PROTO_VERSION = '\x09'
     IO_HELLO = "%s%s%s" % (IO_PREFIX, IO_PROTO_VERSION, IO_SUFFIX) # hello msg
     
     def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping):

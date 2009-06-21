@@ -35,6 +35,8 @@ public final class ItemList implements ISerializable {
 
 	public static final int TYPE_QUEUE = Message.REQ_QUEUE;
 
+	public static final int TYPE_SEARCH = Message.REQ_SEARCH;
+
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS, SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
@@ -48,9 +50,9 @@ public final class ItemList implements ISerializable {
 	private final SerialAtom[] atoms;
 
 	private boolean haveItemActionsMultiple = false;
-	
+
 	private boolean haveItemActions = false;
-	
+
 	private boolean haveListActions = false;
 
 	private final Vector actions;
@@ -91,7 +93,7 @@ public final class ItemList implements ISerializable {
 
 		haveListActions = false;
 		haveItemActions = fileActions.size() > 0;
-		
+
 		final Enumeration e = fileActions.elements();
 		while (e.hasMoreElements()) {
 			final ItemAction ia = (ItemAction) e.nextElement();
@@ -100,7 +102,7 @@ public final class ItemList implements ISerializable {
 				break;
 			}
 		}
-		
+
 	}
 
 	public SerialAtom[] getAtoms() {
@@ -157,6 +159,9 @@ public final class ItemList implements ISerializable {
 		if (isQueue()) {
 			return "Queue";
 		}
+		if (isSearch()) {
+			return "Search Results";
+		}
 		if (isRoot()) {
 			if (isMediaLib()) {
 				return "Library";
@@ -191,7 +196,8 @@ public final class ItemList implements ISerializable {
 	}
 
 	/**
-	 * Get the item list's path.
+	 * Get the item list's path. When the item list is a search result, the path
+	 * lists the search query parameters.
 	 * 
 	 * @return the path elements (never <code>null</code>)
 	 */
@@ -268,6 +274,10 @@ public final class ItemList implements ISerializable {
 		return type == TYPE_QUEUE;
 	}
 
+	public boolean isSearch() {
+		return type == TYPE_SEARCH;
+	}
+
 	public boolean isRoot() {
 		return path == null || path.length == 0;
 	}
@@ -286,7 +296,7 @@ public final class ItemList implements ISerializable {
 		int off;
 
 		actions.removeAllElements();
-		
+
 		off = 8;
 		haveListActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {

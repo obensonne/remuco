@@ -31,7 +31,8 @@ public class PlayerInfo implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
 			SerialAtom.TYPE_I, SerialAtom.TYPE_Y, SerialAtom.TYPE_AI,
-			SerialAtom.TYPE_AS, SerialAtom.TYPE_AB, SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_AS, SerialAtom.TYPE_AB, SerialAtom.TYPE_AS,
+			SerialAtom.TYPE_AS };
 
 	private final SerialAtom[] atoms;
 
@@ -42,6 +43,8 @@ public class PlayerInfo implements ISerializable {
 	private int maxRating = 0;
 
 	private String name = "Remuco";
+
+	private String searchMask[] = {};
 
 	public PlayerInfo() {
 
@@ -67,6 +70,10 @@ public class PlayerInfo implements ISerializable {
 		return name;
 	}
 
+	public String[] getSearchMask() {
+		return searchMask;
+	}
+
 	public void notifyAtomsUpdated() throws BinaryDataExecption {
 
 		name = atoms[0].s;
@@ -81,6 +88,7 @@ public class PlayerInfo implements ISerializable {
 					atoms[off + 3].as[i]));
 		}
 
+		searchMask = atoms[7].as;
 	}
 
 	public boolean supports(int feature) {

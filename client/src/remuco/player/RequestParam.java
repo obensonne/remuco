@@ -44,7 +44,7 @@ public class RequestParam implements ISerializable {
 		atoms[0].s = id;
 	}
 
-	/** Request for a file system or media lib level. */
+	/** Request for a file system or media lib level or search. */
 	public RequestParam(String path[]) {
 		this();
 		atoms[1].as = path;
