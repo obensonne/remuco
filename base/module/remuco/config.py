@@ -108,6 +108,19 @@ class Config(object):
             if not "--remuco-log-stdout" in sys.argv:
                 log.set_file(self.__file_log)
         
+        ###### custom volume command ######
+        
+        cmd = os.path.join(self.__dir_config, "volume")
+        if not os.path.isfile(cmd):
+            log.debug("custom volume command does not exist (%s)" % cmd)
+            self.__custom_volume_cmd = None
+        elif not os.access(cmd, os.X_OK):
+            log.warning("custom volume command (%s) is not executable" % cmd)
+            self.__custom_volume_cmd = None
+        else:
+            log.info("using custom volume command (%s)" % cmd)
+            self.__custom_volume_cmd = cmd
+        
         ###### load configuration ######
         
         self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
@@ -602,6 +615,16 @@ class Config(object):
         return self.__file_log
     
     log_file = property(__pget_log_file, None, None, __pget_log_file.__doc__)
+    
+    # === property: custom_volume_cmd ===
+    
+    def __pget_custom_volume_cmd(self):
+        """Used internally (read-only)"""
+        return self.__custom_volume_cmd
+    
+    custom_volume_cmd = property(__pget_custom_volume_cmd, None, None,
+                                 __pget_custom_volume_cmd.__doc__)
+
 
 def get_system_shutdown_command():
         

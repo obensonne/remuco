@@ -21,6 +21,8 @@
 # =============================================================================
 
 import inspect
+import os
+import os.path
 import subprocess
 import urllib
 import urlparse
@@ -436,10 +438,14 @@ class PlayerAdapter(object):
     
     def __poll(self):
         
+        if self.config.custom_volume_cmd:
+            self.__update_volume_custom()
+        
         try:
             self.poll()
         except NotImplementedError:
-            return False
+            # poll again if custom volume is used, otherwise not
+            return bool(self.config.custom_volume_cmd)
         
         return True
     
@@ -582,6 +588,20 @@ class PlayerAdapter(object):
                
         """
         log.error("** BUG ** in feature handling")
+        
+    def __ctrl_volume_custom(self, direction):
+        """Adjust volume using custom volume command (instead of player)."""
+        
+        if direction < 0:
+            arg = "down"
+        elif direction > 0:
+            arg = "up"
+        else:
+            arg = "mute"
+        
+        self.__util_run_custom_volume_command(arg)
+        
+        gobject.idle_add(self.__update_volume_custom)
         
     def __ctrl_shutdown_system(self):
         
@@ -879,7 +899,27 @@ class PlayerAdapter(object):
         @note: Call to synchronize player state with remote clients.
         
         """
+        if self.config.custom_volume_cmd:
+            # ignore if custom command has been set
+            return
+        
         volume = int(volume)
+        change = self.__state.volume != volume
+        
+        if change:
+            self.__state.volume = volume
+            self.__sync_trigger(self.__sync_state)
+    
+    def __update_volume_custom(self):
+        """Set the current volume (use custom command instead of player)."""
+
+        out = self.__util_run_custom_volume_command(None)
+        try:
+            volume = int(out)
+        except ValueError:
+            log.warning("output of custom volume command malformed: '%s'" % out)
+            return
+        
         change = self.__state.volume != volume
         
         if change:
@@ -1206,7 +1246,10 @@ class PlayerAdapter(object):
             if control is None:
                 return
             
-            self.ctrl_volume(control.param)
+            if self.config.custom_volume_cmd:
+                self.__ctrl_volume_custom(control.param)
+            else:
+                self.ctrl_volume(control.param)
             
         elif id == message.CTRL_REPEAT:
             
@@ -1365,6 +1408,7 @@ class PlayerAdapter(object):
             
             ftc(playback_known, FT_KNOWN_PLAYBACK),
             ftc(volume_known, FT_KNOWN_VOLUME),
+            ftc(self.config.custom_volume_cmd, FT_KNOWN_VOLUME),
             ftc(repeat_known, FT_KNOWN_REPEAT),
             ftc(shuffle_known, FT_KNOWN_SHUFFLE),
             ftc(progress_known, FT_KNOWN_PROGRESS),
@@ -1373,6 +1417,7 @@ class PlayerAdapter(object):
 
             ftc(self.ctrl_toggle_playing, FT_CTRL_PLAYBACK),
             ftc(self.ctrl_volume, FT_CTRL_VOLUME),
+            ftc(self.config.custom_volume_cmd, FT_CTRL_VOLUME),
             ftc(self.ctrl_seek, FT_CTRL_SEEK),
             ftc(self.ctrl_tag, FT_CTRL_TAG),
             ftc(self.ctrl_rate, FT_CTRL_RATE),
@@ -1401,6 +1446,28 @@ class PlayerAdapter(object):
         log.debug("flags: %X" % flags)
         
         return flags
+    
+    def __util_run_custom_volume_command(self, arg):
+
+        args = [self.config.custom_volume_cmd]
+        if arg:
+            args.append(arg)
+            
+        try:
+            p = subprocess.Popen(args,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except OSError, e:
+            log.warning("failed to run custom volume command (%s)" % e)
+            return
+
+        p.wait()
+        out, err = p.communicate()
+        
+        if p.returncode != os.EX_OK:
+            log.warning("failed to run custom volume command:\n%s" % err)
+            return
+        
+        return out
 
     # =========================================================================
     # properties 
