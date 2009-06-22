@@ -162,19 +162,19 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		screenRoot = new CommandList("Media Browser");
 		if (player.info.supports(Feature.REQ_PL)) {
-			screenRoot.addCommand(CMD_PLAYLIST, theme.licNested);
+			screenRoot.addCommand(CMD_PLAYLIST, theme.licList);
 		}
 		if (player.info.supports(Feature.REQ_QU)) {
-			screenRoot.addCommand(CMD_QUEUE, theme.licNested);
+			screenRoot.addCommand(CMD_QUEUE, theme.licQueue);
 		}
 		if (player.info.supports(Feature.REQ_MLIB)) {
-			screenRoot.addCommand(CMD_MLIB, theme.licNested);
+			screenRoot.addCommand(CMD_MLIB, theme.licMLib);
 		}
 		if (player.info.getFileActions().size() > 0) {
-			screenRoot.addCommand(CMD_FILES, theme.licNested);
+			screenRoot.addCommand(CMD_FILES, theme.licFiles);
 		}
 		if (player.info.getSearchMask().length > 0) {
-			screenRoot.addCommand(CMD_SEARCH, theme.licNested);
+			screenRoot.addCommand(CMD_SEARCH, theme.licSearch);
 		}
 		screenRoot.addCommand(CMD.BACK);
 		screenRoot.setCommandListener(this);

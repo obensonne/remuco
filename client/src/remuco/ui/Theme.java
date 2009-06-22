@@ -393,8 +393,8 @@ public final class Theme {
 
 	/** List icon */
 	public final Image licBluetooth, licWifi, licItem, licItemMarked,
-			licNested, licAdd, licThemes, licKeys, licOff, licLog,
-			licDisconnect;
+			licList, licAdd, licThemes, licKeys, licOff, licLog,
+			licDisconnect, licQueue, licSearch, licMLib, licFiles;
 
 	private String current = null;
 
@@ -433,19 +433,19 @@ public final class Theme {
 
 		licBluetooth = loadImage("/icons/bluetooth_" + size + ".png", size);
 		licWifi = loadImage("/icons/wifi_" + size + ".png", size);
-		// TODO provide multiple size icons for item and ploblist
-		licItem = loadImage("/icons/item.png", size);
-		// LIC_ITEM_GREEN = loadImage("/item_green.png", size);
-		licItemMarked = loadImage("/icons/item_blue.png", size);
-		// LIC_ITEM = loadImage("/plob_" + size + ".png", size);
-		licNested = loadImage("/icons/list.png", size);
-		// LIC_NESTED = loadImage("/ploblist_" + size + ".png", size);
+		licItem = loadImage("/icons/item_" + size + ".png", size);
+		licItemMarked = loadImage("/icons/item_blue_" + size + ".png", size);
+		licList = loadImage("/icons/list_" + size + ".png", size);
+		licQueue = loadImage("/icons/queue_" + size + ".png", size);
+		licMLib = loadImage("/icons/mlib_" + size + ".png", size);
+		licFiles = loadImage("/icons/files_" + size + ".png", size);
+		licSearch = loadImage("/icons/search_" + size + ".png", size);
 		licAdd = loadImage("/icons/add_" + size + ".png", size);
 		licThemes = loadImage("/icons/theme_" + size + ".png", size);
 		licKeys = loadImage("/icons/keys_" + size + ".png", size);
 		licOff = loadImage("/icons/off_" + size + ".png", size);
 		licDisconnect = loadImage("/icons/disconnect_" + size + ".png", size);
-		licLog = licNested;
+		licLog = licList;
 
 		// logo icons
 

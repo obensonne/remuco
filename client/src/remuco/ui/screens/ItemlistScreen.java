@@ -30,6 +30,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
@@ -108,7 +109,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			this.issue.setLabel(a.label);
 			this.issue.setText(issue + "\n");
-			this.element.setImage(a.isListAction() ? theme.licNested
+			this.element.setImage(a.isListAction() ? theme.licList
 					: theme.licItemMarked);
 			this.solution.setText(solution);
 			this.display.setCurrent(this);
@@ -178,9 +179,11 @@ public final class ItemlistScreen extends List implements CommandListener {
 		// set up content
 
 		setTitle(list.getName());
+		
+		final Image licNested = list.isFiles() ? theme.licFiles : theme.licList;
 
 		for (int i = 0; i < numNested; i++) {
-			append(list.getNested(i), theme.licNested);
+			append(list.getNested(i), licNested);
 		}
 		for (int i = 0; i < numItems; i++) {
 			append(list.getItemName(i), theme.licItem);
@@ -268,7 +271,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 				toggleItemMark(index - numNested);
 				updateItemIcons();
 			}
-			
+
 		} else if (actionCommands.containsKey(c)) {
 
 			handleAction((AbstractAction) actionCommands.get(c));
