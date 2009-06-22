@@ -85,7 +85,7 @@ public final class Theme {
 			RTE_ICON_RATING_ON = 28;
 
 	/** Name of the default theme to load. */
-	private static final String DEFAULT = "Vilanco";
+	private static final String DEFAULT = "Vico";
 
 	private static final Image IMG_FALLBACK;
 
