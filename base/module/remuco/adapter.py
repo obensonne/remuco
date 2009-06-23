@@ -90,6 +90,9 @@ class ListAction(object):
     
     id = property(__pget_id, None, None, __pget_id.__doc__)
     
+    def is_la_id(id):
+        return id < 0
+    
 class ItemAction(object):
     """Item related action for a client's media browser.
     
@@ -144,6 +147,9 @@ class ItemAction(object):
         return self.__id
     
     id = property(__pget_id, None, None, __pget_id.__doc__)
+    
+    def is_ia_id(id):
+        return id > 0
     
 # =============================================================================
 # player adapter
@@ -1300,11 +1306,11 @@ class PlayerAdapter(object):
             
             self.action_queue_item(a.id, a.positions, a.items)
             
-        elif id == message.ACT_MLIB and a.id < 0:
+        elif id == message.ACT_MLIB and ListAction.is_la_id(a.id):
             
             self.action_mlib_list(a.id, a.path)
                 
-        elif id == message.ACT_MLIB and a.id > 0:
+        elif id == message.ACT_MLIB and ItemAction.is_ia_id(a.id):
             
             self.action_mlib_item(a.id, a.path, a.positions, a.items)
                 
@@ -1314,6 +1320,10 @@ class PlayerAdapter(object):
             
             self.action_files(a.id, a.items, uris)
         
+        elif id == message.ACT_SEARCH:
+            
+            self.action_search_item(a.id, a.positions, a.items)
+            
         else:
             log.error("** BUG ** unexpected action message: %d" % id)
             

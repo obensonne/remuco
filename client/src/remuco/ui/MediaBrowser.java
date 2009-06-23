@@ -301,6 +301,8 @@ public final class MediaBrowser implements CommandListener, IRequester,
 			player.actionMediaLib(a);
 		} else if (list.isFiles()) {
 			player.actionFiles(a);
+		} else if (list.isSearch()) {
+			player.actionSearch(a);
 		} else {
 			Log.bug("Mar 13, 2009.10:55:05 PM");
 		}

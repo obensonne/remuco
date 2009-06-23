@@ -128,6 +128,12 @@ public final class Player {
 
 	}
 
+	public void actionSearch(ActionParam a) {
+
+		action(Message.ACT_SEARCH, a);
+
+	}
+
 	public void ctrlNext() {
 
 		ctrl(Message.CTRL_NEXT);

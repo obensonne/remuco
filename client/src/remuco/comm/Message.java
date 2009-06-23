@@ -65,6 +65,7 @@ public final class Message {
 	public static final int ACT_QUEUE = ACT + 1;
 	public static final int ACT_MEDIALIB = ACT + 2;
 	public static final int ACT_FILES = ACT + 3;
+	public static final int ACT_SEARCH = ACT + 4;
 
 	private static final int REQ = 500;
 

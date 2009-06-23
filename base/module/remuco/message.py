@@ -68,6 +68,7 @@ ACT_PLAYLIST = _ACT
 ACT_QUEUE = _ACT + 1
 ACT_MLIB = _ACT + 2
 ACT_FILES = _ACT + 3
+ACT_SEARCH = _ACT + 4
 
 # =============================================================================
 # request messages
