@@ -319,7 +319,9 @@ class MPDAdapter(remuco.PlayerAdapter):
         else:
             log.error("** BUG ** unexpected mlib list action")
     
+    def action_search_item(self, action_id, positions, ids):
         
+        self.action_mlib_item(action_id, [], positions, ids)
         
     # =========================================================================
     # request interface
@@ -378,9 +380,9 @@ class MPDAdapter(remuco.PlayerAdapter):
         
     def request_search(self, client, query):
         
-        def idfun(song):
-            return song.get("file", "unknown")
-        
+        if not self.__check_and_refresh_connection():
+            return
+
         result_dicts = []
         
         for field, value in zip(SEARCH_MASK, query):
@@ -389,7 +391,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             songs = self.__mpd.search(field, value)
             result = {}
             for song in songs:
-                result[idfun(song)] = song
+                result[song.get("file", "unknown")] = song
             result_dicts.append(result)
             
         result = self.__intersect_dicts(result_dicts)

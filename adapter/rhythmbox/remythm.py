@@ -81,6 +81,10 @@ SECTION_LIBRARY = "Library"
 COVER_FILE_NAMES = ("folder", "front", "album", "cover")
 COVER_FILE_TYPES = ("png", "jpeg", "jpg")
 
+SEARCH_MASK = ("Artist", "Title", "Album", "Genre")
+SEARCH_PROPS = (rhythmdb.PROP_ARTIST, rhythmdb.PROP_TITLE, rhythmdb.PROP_ALBUM,
+                rhythmdb.PROP_GENRE)
+
 # =============================================================================
 # actions
 # =============================================================================
@@ -94,6 +98,7 @@ PLAYLIST_ACTIONS = (IA_JUMP, IA_ENQUEUE)
 QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
 MLIB_LIST_ACTIONS = (LA_PLAY,)
 MLIB_ITEM_ACTIONS = (IA_ENQUEUE, IA_JUMP)
+SEARCH_ACTIONS = (IA_ENQUEUE,)
 
 # =============================================================================
 # player adapter
@@ -111,7 +116,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                                       volume_known=True,
                                       repeat_known=True,
                                       shuffle_known=True,
-                                      progress_known=True)
+                                      progress_known=True,
+                                      search_mask=SEARCH_MASK)
         
         self.__item_id = None
         self.__item_entry = None
@@ -357,7 +363,14 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
     
-    
+    def action_search_item(self, action_id, positions, ids):
+        
+        if action_id == IA_ENQUEUE.id:
+            
+            self.__enqueue_items(ids)
+            
+        else:
+            log.error("** BUG ** unexpected action: %d" % action_id)
     
     # =========================================================================
     # request interface
@@ -371,7 +384,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         try:
             qm = self.__playlist_sc.get_entry_view().props.model 
-            ids, names = self.__get_items_from_qmodel(qm)
+            ids, names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to get playlist items: %s" % e)
             ids, names = [], []
@@ -385,7 +398,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         qm = sc.props.query_model
 
         try:
-            ids, names = self.__get_items_from_qmodel(qm)
+            ids, names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to get queue items: %s" % e)
             ids, names = [], []
@@ -437,7 +450,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         qm = sc.get_entry_view().props.model
             
         try:
-            ids, names = self.__get_items_from_qmodel(qm)
+            ids, names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to list items: %s" % e)
             ids, names = [], []
@@ -445,6 +458,35 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         self.reply_mlib_request(client, path, nested, ids, names,
                                 item_actions=MLIB_ITEM_ACTIONS)
         
+    def request_search(self, client, query):
+        
+        def eval(entry):
+            match = True
+            for key in query_stripped:
+                val = db.entry_get(entry, key).lower()
+                if val.find(query_stripped[key]) < 0:
+                    match = False
+                    break
+            if match:
+                id, name = self.__get_list_item_from_entry(entry)
+                ids.append(id)
+                names.append(name)
+        
+        query_stripped = {} # stripped query dict
+        
+        for key, val in zip(SEARCH_PROPS, query):
+            if val.strip():
+                query_stripped[key] = val.lower()
+
+        ids, names = [], [] # result lists
+        
+        if query_stripped:
+            db = self.__shell.props.db
+            db.entry_foreach(eval)
+            
+        self.reply_search_request(client, query, ids, names,
+                                  item_actions=SEARCH_ACTIONS)
+
     # ==========================================================================
     # callbacks
     # ==========================================================================
@@ -467,7 +509,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         if entry is not None and id is not None:
 
-            info = self.__get_item_info(entry)
+            info = self.__get_item_from_entry(entry)
     
             img_data = db.entry_request_extra_metadata(entry, "rb:coverArt")
             if img_data is None:
@@ -552,14 +594,12 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             log.debug("remove %s from queue" % id_to_remove_from_queue)
             self.__shell.remove_from_queue(id_to_remove_from_queue)
 
-    def __get_items_from_qmodel(self, qmodel):
+    def __get_item_list_from_qmodel(self, qmodel):
         """Get all items in a query model.
         
         @return: 2 lists - IDs and names of the items
         """
         
-        db = self.__shell.props.db
-
         ids = []
         names = []
 
@@ -567,23 +607,34 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             return (ids, names)
 
         for row in qmodel:
-            uri = db.entry_get(row[0], rhythmdb.PROP_LOCATION)
-            ids.append(uri)
-            artist = db.entry_get(row[0], rhythmdb.PROP_ARTIST)
-            title = db.entry_get(row[0], rhythmdb.PROP_TITLE)
-            if artist and title:
-                names.append("%s - %s" % (artist, title))
-            elif title:
-                names.append(title)
-            elif artist:
-                names.append(artist)
-            else:
-                names.append("Unknown")
+            id, name = self.__get_list_item_from_entry(row[0])
+            ids.append(id)
+            names.append(name)
 
         return (ids, names)
+    
+    def __get_list_item_from_entry(self, entry):
+        """Get Remuco list item from a Rhythmbox entry.
+        
+        @return: ID and name
+        """
+        
+        db = self.__shell.props.db
 
-    def __get_item_info(self, entry):
-        """Get meta information for an item.
+        id = db.entry_get(entry, rhythmdb.PROP_LOCATION)
+        
+        artist = db.entry_get(entry, rhythmdb.PROP_ARTIST)
+        title = db.entry_get(entry, rhythmdb.PROP_TITLE)
+        
+        if artist and title:
+            name = "%s - %s" % (artist, title)
+        else:
+            name = title or artist or "Unknown"
+        
+        return id, name
+
+    def __get_item_from_entry(self, entry):
+        """Get a Remuco item from a Rhythmbox entry.
         
         @return: meta information (dictionary) - also if entry is None (in this
                  case dummy information is returned)
