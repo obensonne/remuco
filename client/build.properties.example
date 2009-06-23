@@ -4,6 +4,8 @@
 
 # You do not need all of the tools listed here. Read the 'Needed if:' comments
 # to check which tools you need to configure here.
+#
+# See 'setup.sh' for automatically setup the client build environment.
 
 # Home of Sun's WTK.
 # Download: http://java.sun.com/products/sjwtoolkit/
@@ -12,7 +14,7 @@
 #    - option 'dist.preverifier' is set to 'wtk'
 #    - option 'run.preverifier' is set to 'wtk'
 #    - WTK libraries are used below in section 'API libs'
-wtk.home=${user.home}/opt/wtk-2.5.2
+wtk.home=${basedir}/tools/wtk-2.5.2
 
 # Home of MicroEmu.
 # Download: http://www.microemu.org/
@@ -20,16 +22,16 @@ wtk.home=${user.home}/opt/wtk-2.5.2
 # Needed if:
 #    - target 'run.microemu' gets called
 #    - MicroEmu libraries are used below in section 'API libs'
-microemu.home=${user.home}/opt/microemulator-2.0.3
+microemu.home=${basedir}/tools/microemulator-2.0.3
 
 # BlueCove JAR
 # Download: http://bluecove.org/
 # Required version: >= 2.1
 # Needed if:
 #    - target 'run.microemu' gets called and Bluetooth shall be enabled
-microemu.bluecove.jar=${user.home}/opt/bluecove/bluecove-2.1.0.jar
+microemu.bluecove.jar=${basedir}/tools/bluecove/bluecove-2.1.0.jar
 # Additionally needed on systems with a BlueZ stack:
-microemu.bluecove-gpl.jar=${user.home}/opt/bluecove/bluecove-gpl-2.1.0.jar
+microemu.bluecove-gpl.jar=${basedir}/tools/bluecove/bluecove-gpl-2.1.0.jar
 
 # ProGuard JAR (containing the ProGuard Ant task)
 # Download: http://proguard.sourceforge.net/
@@ -37,7 +39,7 @@ microemu.bluecove-gpl.jar=${user.home}/opt/bluecove/bluecove-gpl-2.1.0.jar
 # Needed if:
 #    - the option 'dist.preverifier' is set to 'proguard'
 #    - the option 'run.preverifier' is set to 'proguard'
-proguard.jar=${user.home}/opt/proguard-4.2/lib/proguard.jar
+proguard.jar=${basedir}/tools/proguard4.2/lib/proguard.jar
 
 # =============================================================================
 # API libs

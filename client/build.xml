@@ -13,8 +13,8 @@
      Building the client:
      ^^^^^^^^^^^^^^^^^^^^
      
-     Create a file 'build.properties' (use 'build.properties.example' as a
-     template) and edit it as described within that file.
+     Create a file 'build.properties' (either manually using
+     'build.properties.example' or automatically using 'setup.sh').
 
      Run one of the public targets starting with 'dist' ('opti' means
      optimized, 'noop' means non-optimized).
@@ -26,8 +26,8 @@
      Running the client in the emulator:
      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      
-     Create a file 'build.properties' (use 'build.properties.example' as a
-     template) and edit it as described within that file.
+     Create a file 'build.properties' (either manually using
+     'build.properties.example' or automatically using 'setup.sh').
 
      Run target 'run.microemu' to run the client in the MicroEmu emulator.
 
