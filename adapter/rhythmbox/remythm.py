@@ -24,6 +24,7 @@
 
 import time
 
+import gconf
 import gobject
 
 import rb, rhythmdb
@@ -72,14 +73,23 @@ class RemucoPlugin(rb.Plugin):
 # =============================================================================
 
 PLAYORDER_SHUFFLE = "shuffle"
-PLAYORDER_SHUFFLE_ALT = "random" # starts with ..
+PLAYORDER_SHUFFLE_ALT = "random-by-age-and-rating"
 PLAYORDER_REPEAT = "linear-loop"
 PLAYORDER_NORMAL = "linear"
 
-SECTION_LIBRARY = "Library"
+PLAYERORDER_TOGGLE_MAP_REPEAT = {
+    PLAYORDER_SHUFFLE: PLAYORDER_SHUFFLE_ALT,
+    PLAYORDER_SHUFFLE_ALT: PLAYORDER_SHUFFLE,
+    PLAYORDER_REPEAT: PLAYORDER_NORMAL,
+    PLAYORDER_NORMAL: PLAYORDER_REPEAT
+}
 
-COVER_FILE_NAMES = ("folder", "front", "album", "cover")
-COVER_FILE_TYPES = ("png", "jpeg", "jpg")
+PLAYERORDER_TOGGLE_MAP_SHUFFLE = {
+    PLAYORDER_SHUFFLE: PLAYORDER_NORMAL,
+    PLAYORDER_NORMAL: PLAYORDER_SHUFFLE,
+    PLAYORDER_SHUFFLE_ALT: PLAYORDER_REPEAT,
+    PLAYORDER_REPEAT: PLAYORDER_SHUFFLE_ALT
+}
 
 SEARCH_MASK = ("Artist", "Title", "Album", "Genre")
 SEARCH_PROPS = (rhythmdb.PROP_ARTIST, rhythmdb.PROP_TITLE, rhythmdb.PROP_ALBUM,
@@ -140,6 +150,9 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         sp = self.__shell.get_player()
         
+        # gconf is used to adjust repeat and shuffle
+        self.__gconf = gconf.client_get_default()
+        
         # shortcuts to RB data 
         
         self.__item_id = None
@@ -191,12 +204,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         
         order = sp.props.play_order
         
-        repeat = order == PLAYORDER_REPEAT or \
-                 order.startswith(PLAYORDER_SHUFFLE_ALT)
+        repeat = order == PLAYORDER_REPEAT or order == PLAYORDER_SHUFFLE_ALT
         self.update_repeat(repeat)
         
-        shuffle = order == PLAYORDER_SHUFFLE or \
-                  order.startswith(PLAYORDER_SHUFFLE_ALT)
+        shuffle = order == PLAYORDER_SHUFFLE or order == PLAYORDER_SHUFFLE_ALT
         self.update_shuffle(shuffle)
         
         # check volume
@@ -257,9 +268,32 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         except gobject.GError, e:
             log.debug("toggle play pause failed: %s" % str(e))
                 
-    # shuffle and repeat cannot be set:
-    # http://mail.gnome.org/archives/rhythmbox-devel/2008-April/msg00078.html
+    def ctrl_toggle_repeat(self):
+        
+        sp = self.__shell.get_player()
+        
+        now = sp.props.play_order
+        
+        next = PLAYERORDER_TOGGLE_MAP_REPEAT.get(now, now)
+            
+        self.__gconf.set_string("/apps/rhythmbox/state/play_order", next)
     
+        # update state within a short time (don't wait for scheduled poll)
+        gobject.idle_add(self.poll)
+        
+    def ctrl_toggle_shuffle(self):
+        
+        sp = self.__shell.get_player()
+        
+        now = sp.props.play_order
+        
+        next = PLAYERORDER_TOGGLE_MAP_SHUFFLE.get(now, now)
+        
+        self.__gconf.set_string("/apps/rhythmbox/state/play_order", next)
+    
+        # update state within a short time (don't wait for scheduled poll)
+        gobject.idle_add(self.poll)
+        
     def ctrl_seek(self, direction):
         
         sp = self.__shell.get_player()

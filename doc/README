@@ -46,6 +46,7 @@ MPD:
 
 Rhythmbox:
  * Rhythmbox >= 0.11.5
+ * Python modules: gconf
  
 Totem:
  * Totem >= 2.22
