@@ -35,7 +35,7 @@ from remuco import defs
 SEC = ConfigParser.DEFAULTSECT
 
 CONFIG_VERSION_MAJOR = "1"
-CONFIG_VERSION_MINOR = "1"
+CONFIG_VERSION_MINOR = "2"
 CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
@@ -46,6 +46,7 @@ KEY_ENDCODING = "player-encoding"
 KEY_LOGLEVEL = "log-level"
 KEY_IMAGE_SIZE = "image-size"
 KEY_IMAGE_TYPE = "image-type"
+KEY_LIST_LIMIT = "list-limit"
 KEY_PING = "ping-interval"
 KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
@@ -60,6 +61,7 @@ DEFAULTS = { # values as saved in config file
     KEY_LOGLEVEL: "INFO",
     KEY_IMAGE_SIZE: "200",
     KEY_IMAGE_TYPE: "JPEG",
+    KEY_LIST_LIMIT: "100",
     KEY_PING: "15",
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
@@ -449,6 +451,36 @@ class Config(object):
     
     image_type = property(__pget_image_type, __pset_image_type, None,
                           __pget_image_type.__doc__)
+    
+    # === property: list_limit ===
+    
+    def __pget_list_limit(self):
+        """Maximum length of item lists sent to clients.
+        
+        Default: 100
+        
+        Option name: 'list-limit'
+        
+        """
+        try:
+            limit = self.__cp.getint(SEC, KEY_LIST_LIMIT)
+        except (ValueError, AttributeError), e:
+            log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
+            return 100
+        
+        if limit < 0:
+            log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
+            return 100
+        
+        return limit
+    
+    def __pset_list_limit(self, value):
+        
+        self.__cp.set(SEC, KEY_LIST_LIMIT, str(value))
+        self.__save()
+    
+    list_limit = property(__pget_list_limit, __pset_list_limit, None,
+                          __pget_list_limit.__doc__)
     
     # === property: fb ===
     

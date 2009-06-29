@@ -346,6 +346,8 @@ class PlayerAdapter(object):
                 self.__config.fb_root_dirs, mime_types,
                 use_user_dirs=self.__config.fb_xdg_user_dirs, 
                 show_extensions=self.__config.fb_extensions)
+            
+        ItemList.MAX_LEN = self.__config.list_limit
         
         self.__manager = DummyManager()
         
