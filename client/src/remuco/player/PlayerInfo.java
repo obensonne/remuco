@@ -30,19 +30,21 @@ import remuco.comm.SerialAtom;
 public class PlayerInfo implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
-			SerialAtom.TYPE_I, SerialAtom.TYPE_Y, SerialAtom.TYPE_AI,
-			SerialAtom.TYPE_AS, SerialAtom.TYPE_AB, SerialAtom.TYPE_AS,
-			SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_I, SerialAtom.TYPE_Y, SerialAtom.TYPE_I,
+			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
+			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS };
 
 	private final SerialAtom[] atoms;
 
 	private final Vector fileActions;
 
-	private int flags = 0;
+	private int flags;
 
-	private int maxRating = 0;
+	private int maxRating;
 
 	private String name = "Remuco";
+
+	private int pageSize;
 
 	private String searchMask[] = {};
 
@@ -70,6 +72,10 @@ public class PlayerInfo implements ISerializable {
 		return name;
 	}
 
+	public int getPageSize() {
+		return pageSize;
+	}
+
 	public String[] getSearchMask() {
 		return searchMask;
 	}
@@ -79,16 +85,17 @@ public class PlayerInfo implements ISerializable {
 		name = atoms[0].s;
 		flags = atoms[1].i;
 		maxRating = atoms[2].y;
+		pageSize = atoms[3].i;
 
 		fileActions.removeAllElements();
-		int off = 3;
+		int off = 4;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			fileActions.addElement(new ItemAction(atoms[off].ai[i],
 					atoms[off + 1].as[i], atoms[off + 2].ab[i],
 					atoms[off + 3].as[i]));
 		}
 
-		searchMask = atoms[7].as;
+		searchMask = atoms[8].as;
 	}
 
 	public boolean supports(int feature) {

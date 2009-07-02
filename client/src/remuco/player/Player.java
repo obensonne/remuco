@@ -337,9 +337,10 @@ public final class Player {
 		reqCaller = null;
 	}
 
-	public void reqFiles(IRequester lr, String path[]) {
+	public void reqFiles(IRequester lr, String path[], int page) {
 
-		req(lr, Message.REQ_FILES, new RequestParam(path), pathToString(path));
+		req(lr, Message.REQ_FILES, new RequestParam(path, page),
+			pathToString(path));
 	}
 
 	public void reqItem(IRequester ir, String id) {
@@ -347,24 +348,26 @@ public final class Player {
 		req(ir, Message.REQ_ITEM, new RequestParam(id), id);
 	}
 
-	public void reqMLib(IRequester lr, String path[]) {
+	public void reqMLib(IRequester lr, String path[], int page) {
 
-		req(lr, Message.REQ_MLIB, new RequestParam(path), pathToString(path));
+		req(lr, Message.REQ_MLIB, new RequestParam(path, page),
+			pathToString(path));
 	}
 
-	public void reqPlaylist(IRequester lr) {
+	public void reqPlaylist(IRequester lr, int page) {
 
-		req(lr, Message.REQ_PLAYLIST, null, REQ_PARAM_ID_PLAYLIST);
+		req(lr, Message.REQ_PLAYLIST, new RequestParam(page),
+			REQ_PARAM_ID_PLAYLIST);
 	}
 
-	public void reqQueue(IRequester lr) {
+	public void reqQueue(IRequester lr, int page) {
 
-		req(lr, Message.REQ_QUEUE, null, REQ_PARAM_ID_QUEUE);
+		req(lr, Message.REQ_QUEUE, new RequestParam(page), REQ_PARAM_ID_QUEUE);
 	}
 
-	public void reqSearch(IRequester lr, String query[]) {
+	public void reqSearch(IRequester lr, String query[], int page) {
 
-		req(lr, Message.REQ_SEARCH, new RequestParam(query),
+		req(lr, Message.REQ_SEARCH, new RequestParam(query, page),
 			pathToString(query));
 	}
 

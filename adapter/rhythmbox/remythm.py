@@ -119,6 +119,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     def __init__(self):
         
         self.__shell = None
+        self.__gconf = None
         
         remuco.PlayerAdapter.__init__(self, "Rhythmbox",
                                       max_rating=5,
@@ -193,6 +194,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         # release shell
         
         self.__shell = None
+        self.__gconf = None
         
         log.debug("stop done")
         
@@ -410,42 +412,38 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
         if self.__playlist_sc is None:
-            self.reply_playlist_request(client, [], [])
+            reply.send()
             return
         
         try:
             qm = self.__playlist_sc.get_entry_view().props.model 
-            ids, names = self.__get_item_list_from_qmodel(qm)
+            reply.ids, reply.names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to get playlist items: %s" % e)
-            ids, names = [], []
         
-        self.reply_playlist_request(client, ids, names,
-                                    item_actions=PLAYLIST_ACTIONS)
+        reply.item_actions = PLAYLIST_ACTIONS
+        
+        reply.send()    
 
-    def request_queue(self, client):
+    def request_queue(self, reply):
         
         sc = self.__queue_sc
         qm = sc.props.query_model
 
         try:
-            ids, names = self.__get_item_list_from_qmodel(qm)
+            reply.ids, reply.names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to get queue items: %s" % e)
-            ids, names = [], []
         
-        self.reply_queue_request(client, ids, names,
-                                 item_actions=QUEUE_ACTIONS)
-
-    def request_mlib(self, client, path):
-
-        nested = []
-        ids = []
-        names = []
+        reply.item_actions = QUEUE_ACTIONS
         
+        reply.send()    
+
+    def request_mlib(self, reply, path):
+
         slm = self.__shell.props.sourcelist_model
         
         ### root ? ###
@@ -453,8 +451,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         if not path:
             for group in slm:
                 group_name = group[2]
-                nested.append(group_name)
-            self.reply_mlib_request(client, path, nested, ids, names)
+                reply.nested.append(group_name)
+            reply.send()
             return
         
         ### group ? ### Library, Playlists
@@ -466,10 +464,10 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                     for sc in group.iterchildren():
                         source_name = sc[2]
                         log.debug("append %s" % source_name)
-                        nested.append(source_name)
+                        reply.nested.append(source_name)
                     break
-            self.reply_mlib_request(client, path, nested, ids, names,
-                                        list_actions=MLIB_LIST_ACTIONS)
+            reply.list_actions = MLIB_LIST_ACTIONS
+            reply.send()
             return
             
         ### regular playlist (source) ! ### Library/???, Playlists/???
@@ -477,24 +475,23 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         sc = self.__mlib_path_to_source(path)
 
         if sc is None:
-            
-            self.reply_mlib_request(client, path, nested, ids, names)
+            reply.send()
             return
         
         qm = sc.get_entry_view().props.model
             
         try:
-            ids, names = self.__get_item_list_from_qmodel(qm)
+            reply.ids, reply.names = self.__get_item_list_from_qmodel(qm)
         except gobject.GError, e:
             log.warning("failed to list items: %s" % e)
-            ids, names = [], []
         
-        self.reply_mlib_request(client, path, nested, ids, names,
-                                item_actions=MLIB_ITEM_ACTIONS)
+        reply.item_actions = MLIB_ITEM_ACTIONS
         
-    def request_search(self, client, query):
+        reply.send()
         
-        def eval(entry):
+    def request_search(self, reply, query):
+        
+        def eval_entry(entry):
             match = True
             for key in query_stripped:
                 val = db.entry_get(entry, key).lower()
@@ -503,8 +500,8 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                     break
             if match:
                 id, name = self.__get_list_item_from_entry(entry)
-                ids.append(id)
-                names.append(name)
+                reply.ids.append(id)
+                reply.names.append(name)
         
         query_stripped = {} # stripped query dict
         
@@ -512,14 +509,13 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
             if val.strip():
                 query_stripped[key] = val.lower()
 
-        ids, names = [], [] # result lists
-        
         if query_stripped:
             db = self.__shell.props.db
-            db.entry_foreach(eval)
-            
-        self.reply_search_request(client, query, ids, names,
-                                  item_actions=SEARCH_ACTIONS)
+            db.entry_foreach(eval_entry)
+        
+        reply.item_actions = SEARCH_ACTIONS
+        
+        reply.send()
 
     # ==========================================================================
     # callbacks
@@ -734,7 +730,6 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         if id_now is not None:
             
             if sp.props.playing_from_queue:
-                queue = True
                 qmodel = self.__queue_sc.props.query_model
             elif self.__playlist_sc is not None:
                 qmodel = self.__playlist_sc.get_entry_view().props.model

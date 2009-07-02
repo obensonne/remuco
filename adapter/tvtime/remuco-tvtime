@@ -121,14 +121,11 @@ class TVtimeAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
-        ids, names = [], []
-
         if not self.__stations_file:
-            self.reply_playlist_request(client, ids, names)
+            reply.send()
             return
-        
         
         xdoc = minidom.parse(self.__stations_file)
         node = xdoc.getElementsByTagName("stationlist")[0]
@@ -139,11 +136,12 @@ class TVtimeAdapter(remuco.PlayerAdapter):
             active = node.getAttribute("active")
             if active == "0":
                 continue
-            ids.append(node.getAttribute("position"))
-            names.append(node.getAttribute("name"))
-            
-        self.reply_playlist_request(client, ids, names,
-                                    item_actions=PLAYLIST_ACTIONS)
+            reply.ids.append(node.getAttribute("position"))
+            reply.names.append(node.getAttribute("name"))
+        
+        reply.item_actions = PLAYLIST_ACTIONS
+        
+        reply.send()
 
     # =========================================================================
     # action interface

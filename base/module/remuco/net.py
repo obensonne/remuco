@@ -88,6 +88,9 @@ class ClientConnection(object):
         self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
         
+        # free to use cache data dict for external entities
+        self.cache = {}
+        
         # the following fields are used for iterative receiving on message data
         # see io_recv() and io_recv_buff()
         self.__rcv_buff_header = ReceiveBuffer()

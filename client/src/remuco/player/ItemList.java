@@ -26,6 +26,7 @@ import java.util.Vector;
 import remuco.comm.ISerializable;
 import remuco.comm.Message;
 import remuco.comm.SerialAtom;
+import remuco.util.Log;
 
 public final class ItemList implements ISerializable {
 
@@ -39,6 +40,7 @@ public final class ItemList implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS, SerialAtom.TYPE_AS,
+			SerialAtom.TYPE_I, SerialAtom.TYPE_I, SerialAtom.TYPE_I,
 			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
 			SerialAtom.TYPE_AS, SerialAtom.TYPE_AI, SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AS };
@@ -47,15 +49,17 @@ public final class ItemList implements ISerializable {
 
 	private static final String UNKNWON = "#~@X+.YO?/";
 
-	private final SerialAtom[] atoms;
+	private final Vector actions;
 
-	private boolean haveItemActionsMultiple = false;
+	private final SerialAtom[] atoms;
 
 	private boolean haveItemActions = false;
 
+	private boolean haveItemActionsMultiple = false;
+
 	private boolean haveListActions = false;
 
-	private final Vector actions;
+	private int page, pageMax, itemOffset;
 
 	private String path[], nested[], itemIDs[], itemNames[];
 
@@ -65,11 +69,6 @@ public final class ItemList implements ISerializable {
 	public ItemList(int type) {
 
 		atoms = SerialAtom.build(ATOMS_FMT);
-
-		path = null;
-		nested = null;
-		itemIDs = null;
-		itemNames = null;
 
 		actions = new Vector();
 
@@ -81,11 +80,6 @@ public final class ItemList implements ISerializable {
 	public ItemList(Vector fileActions) {
 
 		atoms = SerialAtom.build(ATOMS_FMT);
-
-		path = null;
-		nested = null;
-		itemIDs = null;
-		itemNames = null;
 
 		actions = fileActions;
 
@@ -105,21 +99,13 @@ public final class ItemList implements ISerializable {
 
 	}
 
-	public SerialAtom[] getAtoms() {
-		return atoms;
-	}
-
 	public Vector getActions() {
 		return actions;
 	}
 
-	// public Vector getItemActionsMultiple() {
-	// return itemActionsMultiple;
-	// }
-	//
-	// public Vector getItemActionsSingle() {
-	// return itemActionsSingle;
-	// }
+	public SerialAtom[] getAtoms() {
+		return atoms;
+	}
 
 	/** Get the ID of item <em>i</em> (starting from 0). */
 	public String getItemID(int i) {
@@ -146,6 +132,22 @@ public final class ItemList implements ISerializable {
 	}
 
 	/**
+	 * Get the absolute position of item <em>i</em> (may differ from <em>i</em>
+	 * due to paging).
+	 */
+	public int getItemPosAbsolute(int i) {
+		return itemOffset + i;
+	}
+
+	// public Vector getItemActionsMultiple() {
+	// return itemActionsMultiple;
+	// }
+	//
+	// public Vector getItemActionsSingle() {
+	// return itemActionsSingle;
+	// }
+
+	/**
 	 * Get the name of the item list (which is the last element in the list's
 	 * path).
 	 * 
@@ -153,24 +155,33 @@ public final class ItemList implements ISerializable {
 	 */
 	public String getName() {
 
+		final String name;
+
 		if (isPlaylist()) {
-			return "Playlist";
-		}
-		if (isQueue()) {
-			return "Queue";
-		}
-		if (isSearch()) {
-			return "Search Results";
-		}
-		if (isRoot()) {
+			name = "Playlist";
+		} else if (isQueue()) {
+			name = "Queue";
+		} else if (isSearch()) {
+			name = "Search Results";
+		} else if (isRoot()) {
 			if (isMediaLib()) {
-				return "Library";
+				name = "Library";
+			} else if (isFiles()) {
+				name = "Files";
+			} else {
+				Log.bug("Jul 1, 2009.5:25:17 PM");
+				name = "XXX";
 			}
-			if (isFiles()) {
-				return "Files";
-			}
+		} else { // media lib or files, not root
+			name = path[path.length - 1];
 		}
-		return path[path.length - 1];
+
+		if (pageMax != 0) {
+			return name + " " + (page + 1) + "/" + (pageMax + 1);
+		} else {
+			return name;
+		}
+
 	}
 
 	/** Get the name of the nested item list <em>i</em> (starting from 0). */
@@ -193,6 +204,14 @@ public final class ItemList implements ISerializable {
 	public int getNumNested() {
 
 		return nested != null ? nested.length : 0;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public int getPageMax() {
+		return pageMax;
 	}
 
 	/**
@@ -274,12 +293,16 @@ public final class ItemList implements ISerializable {
 		return type == TYPE_QUEUE;
 	}
 
-	public boolean isSearch() {
-		return type == TYPE_SEARCH;
-	}
-
+	/**
+	 * Check if the list is a root list, i.e. it has no parent list. This is
+	 * true for playlist, queue and the top level list of the media library.
+	 */
 	public boolean isRoot() {
 		return path == null || path.length == 0;
+	}
+
+	public boolean isSearch() {
+		return type == TYPE_SEARCH;
 	}
 
 	public void notifyAtomsUpdated() {
@@ -289,6 +312,10 @@ public final class ItemList implements ISerializable {
 		itemIDs = atoms[2].as;
 		itemNames = atoms[3].as;
 
+		itemOffset = atoms[4].i;
+		page = atoms[5].i;
+		pageMax = atoms[6].i;
+
 		if (type == TYPE_FILES) { // no dynamic actions
 			return;
 		}
@@ -297,14 +324,14 @@ public final class ItemList implements ISerializable {
 
 		actions.removeAllElements();
 
-		off = 8;
+		off = 11;
 		haveListActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			actions.addElement(new ListAction(atoms[off].ai[i],
 					atoms[off + 1].as[i], atoms[off + 2].as[i]));
 		}
 
-		off = 4;
+		off = 7;
 		haveItemActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			final ItemAction ia = new ItemAction(atoms[off].ai[i],

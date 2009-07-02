@@ -95,6 +95,8 @@ class MPRISAdapter(PlayerAdapter):
         self.__name = name
         
         self.__dbus_signal_handler = ()
+        self._mp_p = None
+        self._mp_t = None
         
         self._repeat = False
         self._shuffle = False
@@ -307,26 +309,25 @@ class MPRISAdapter(PlayerAdapter):
     # request interface 
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
         if not self.__can_tracklist:
-            self.reply_playlist_request(client, [], [])
+            reply.send()
             return
         
         tracks = self.__get_tracklist()
 
-        ids = []
-        names = []
         for track in tracks:
             id, info = self.__track2info(track)
-            artist = info.get(INFO_ARTIST) or "??"
-            title = info.get(INFO_TITLE) or "??"
+            artist = info.get(INFO_ARTIST, "???")
+            title = info.get(INFO_TITLE, "???")
             name = "%s - %s" % (artist, title)
-            ids.append(id)
-            names.append(name)
+            reply.ids.append(id)
+            reply.names.append(name)
         
-        self.reply_playlist_request(client, ids, names,
-                                    item_actions=self.__playlist_actions)
+        reply.item_actions = self.__playlist_actions
+        
+        reply.send()
 
     # =========================================================================
     # internal methods (may be overridden by subclasses to fix MPRIS issues) 
@@ -441,16 +442,16 @@ class MPRISAdapter(PlayerAdapter):
         """Get a list of track dicts of all tracks in the tracklist."""
         
         try:
-            len = self._mp_t.GetLength()
+            length = self._mp_t.GetLength()
         except DBusException, e:
             log.warning("dbus error: %s" % e)
-            len = 0
+            length = 0
         
-        if len == 0:
+        if length == 0:
             return []
         
         tracks = []
-        for i in range(0, len):
+        for i in range(0, length):
             try:
                 tracks.append(self._mp_t.GetMetadata(i))
             except DBusException, e:

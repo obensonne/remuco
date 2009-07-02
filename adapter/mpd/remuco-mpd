@@ -327,7 +327,7 @@ class MPDAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
         if not self.__check_and_refresh_connection():
             return
@@ -338,47 +338,40 @@ class MPDAdapter(remuco.PlayerAdapter):
             log.warning("failed to control MPD: %s" % e)
             playlist = []
         
-        ids = []
-        names = []
-        
         for song in playlist:
-            ids.append(song.get("file", "XXX"))
+            reply.ids.append(song.get("file", "XXX"))
             artist = song.get("artist", "??")
             title = song.get("title", "??")
-            names.append("%s - %s" % (artist, title))
+            reply.names.append("%s - %s" % (artist, title))
         
-        self.reply_playlist_request(client, ids, names,
-                                    item_actions=PLAYLIST_ACTIONS)
+        reply.item_actions = PLAYLIST_ACTIONS
+        
+        reply.send()
 
-    def request_mlib(self, client, path):
+    def request_mlib(self, reply, path):
         
         if not self.__check_and_refresh_connection():
             return
-
-        nested, ids, names = [], [], []
-        item_actions, list_actions = None, None
         
         if not path:
-            nested = [MLIB_FILES, MLIB_PLAYLISTS]
+            reply.nested = [MLIB_FILES, MLIB_PLAYLISTS]
         elif path[0] == MLIB_FILES:
-            nested, ids, names = self.__get_music_dir(path[1:])
-            item_actions = MLIB_ITEM_ACTIONS
+            reply.nested, reply.ids, reply.names = self.__get_music_dir(path[1:])
+            reply.item_actions = MLIB_ITEM_ACTIONS
         elif path[0] == MLIB_PLAYLISTS and len(path) == 1:
-            nested = self.__get_playlists()
-            list_actions = MLIB_LIST_ACTIONS
+            reply.nested = self.__get_playlists()
+            reply.list_actions = MLIB_LIST_ACTIONS
         elif path[0] == MLIB_PLAYLISTS and len(path) == 2:
-            ids, names = self.__get_playlist_content(path[1])
-            item_actions = MLIB_ITEM_ACTIONS
+            reply.ids, reply.names = self.__get_playlist_content(path[1])
+            reply.item_actions = MLIB_ITEM_ACTIONS
         elif path[0] == MLIB_PLAYLISTS:
             log.error("** BUG ** unexpected path depth for playlists")
         else:
             log.error("** BUG ** unexpected root list: %s" % path[0])
         
-        self.reply_mlib_request(client, path, nested, ids, names,
-                                item_actions=item_actions,
-                                list_actions=list_actions)
+        reply.send()
         
-    def request_search(self, client, query):
+    def request_search(self, reply, query):
         
         if not self.__check_and_refresh_connection():
             return
@@ -396,10 +389,11 @@ class MPDAdapter(remuco.PlayerAdapter):
             
         result = self.__intersect_dicts(result_dicts)
         
-        ids, names = self.__songs_to_item_list(result.values())
+        reply.ids, reply.names = self.__songs_to_item_list(result.values())
         
-        self.reply_search_request(client, query, ids, names,
-                                  item_actions=MLIB_ITEM_ACTIONS)
+        reply.item_actions = MLIB_ITEM_ACTIONS
+        
+        reply.send()
         
     # =========================================================================
     # internal methods

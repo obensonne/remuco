@@ -34,24 +34,26 @@ import remuco.util.Log;
 public class RequestParam implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
-			SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_AS, SerialAtom.TYPE_I };
 
 	private final SerialAtom[] atoms;
 
 	/** Request for an item. */
 	public RequestParam(String id) {
-		this();
+		this(0);
 		atoms[0].s = id;
 	}
 
 	/** Request for a file system or media lib level or search. */
-	public RequestParam(String path[]) {
-		this();
+	public RequestParam(String path[], int page) {
+		this(page);
 		atoms[1].as = path;
 	}
 
-	private RequestParam() {
+	/** Request for a playlist or queue. */
+	public RequestParam(int page) {
 		atoms = SerialAtom.build(ATOMS_FMT);
+		atoms[2].i = page;
 	}
 
 	public SerialAtom[] getAtoms() {

@@ -68,7 +68,7 @@ Logging:
 # imports
 #==============================================================================
 
-from remuco.adapter import PlayerAdapter, ItemAction, ListAction
+from remuco.adapter import PlayerAdapter, ItemAction, ListAction, ListReply
 from remuco.mpris import MPRISAdapter
 from remuco.config import Config
 from remuco.defs import *
@@ -78,7 +78,7 @@ from remuco.manager import Manager
 # exports
 #==============================================================================
 
-__all__ = ("PlayerAdapter", "MPRISAdapter",
+__all__ = ("PlayerAdapter", "MPRISAdapter", "ListReply",
            "ItemAction", "ListAction", "Manager", "Config",
            
            "INFO_ALBUM", "INFO_ARTIST", "INFO_GENRE", "INFO_LENGTH",

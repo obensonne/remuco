@@ -21,6 +21,7 @@
 # =============================================================================
 
 import inspect
+import math # for ceiling
 import os
 import os.path
 import subprocess
@@ -30,7 +31,6 @@ import urlparse
 import gobject
 
 from remuco import art
-from remuco import command
 from remuco import config
 from remuco import files
 from remuco import log
@@ -45,6 +45,158 @@ from remuco.data import PlayerInfo, PlayerState, Progress, ItemList, Item
 from remuco.data import Control, Action, Tagging, Request
 
 from remuco.manager import DummyManager
+
+class ListReply(object):
+    """Reply object for an item list request.
+    
+    A ListReply is the first parameter of the request methods
+    PlayerAdapter.request_playlist(), PlayerAdapter.request_queue(),
+    PlayerAdapter.request_mlib() and PlayerAdapter.request_search().
+    
+    Player adapters are supposed to use the list reply object to set the
+    reply data (using properties 'ids', 'names' and
+    'nested') and to send the reply to clients (using send()).
+    
+    """
+    PAGE_SIZE = 50
+    
+    def __init__(self, client, reply_msg_id, page, path=None):
+        """Create a new list reply.
+        
+        Used internally, not needed within player adapters.
+        
+        """
+        self.__client = client
+        self.__reply_msg_id = reply_msg_id
+        self.__page = page
+        self.__path = path
+        
+        self.__nested = []
+        self.__ids = []
+        self.__names = []
+        self.__list_actions = []
+        self.__item_actions = []
+    
+    def send(self):
+        """Send the requested item list to the requesting client."""
+        
+        ### paging ###
+        
+        len_all = len(self.__ids or []) + len(self.__nested or [])
+        page_max = max(math.ceil(len_all / ListReply.PAGE_SIZE) - 1, 0)
+        
+        index_start = self.__page * ListReply.PAGE_SIZE
+        index_end = index_start + ListReply.PAGE_SIZE
+        
+        nested, ids, names = [], [], []
+        item_offset = 0
+        
+        if self.__nested and index_start < len(self.__nested):
+            # page contains nested lists and maybe items
+            nested = self.__nested[index_start:index_end]
+            if len(nested) < ListReply.PAGE_SIZE:
+                # page contains nested lists and items
+                num_items = ListReply.PAGE_SIZE - len(nested)
+                ids = self.__ids[0:num_items]
+                names = self.__names[0:num_items]
+        else:
+            # page contains only items
+            index_start -= len(self.__nested)
+            index_end -= len(self.__nested)
+            ids = self.__ids[index_start:index_end]
+            names = self.__names[index_start:index_end]
+            item_offset = index_start
+        
+        
+        ### sending ###
+        
+        ilist = ItemList(self.__path, nested, ids, names, item_offset,
+                         self.__page, page_max,
+                         self.__item_actions, self.__list_actions)
+        
+        msg = net.build_message(self.__reply_msg_id, ilist)
+        
+        gobject.idle_add(self.__client.send, msg)
+
+    # === property: ids ===
+    
+    def __pget_ids(self):
+        """Reply data.
+        
+        Player adapters should set this to a list of IDs of the items contained
+        in the requested list.
+        
+        """
+        return self.__ids
+    
+    def __pset_ids(self, value):
+        self.__ids = value
+    
+    ids = property(__pget_ids, __pset_ids, None, __pget_ids.__doc__)
+
+    # === property: names ===
+    
+    def __pget_names(self):
+        """Reply data.
+        
+        Player adapters should set this to a list of names of the items
+        contained in the requested list. Good choice for a name is combination
+        of artist and title.
+        
+        """
+        return self.__names
+    
+    def __pset_names(self, value):
+        self.__names = value
+    
+    names = property(__pget_names, __pset_names, None, __pget_names.__doc__)
+
+    # === property: nested ===
+    
+    def __pget_nested(self):
+        """Reply data.
+        
+        Player adapters should set this to a list of names of the nested lists
+        contained in the requested list. To be used only for mlib requests (see
+        PlayerAdapter.request_mlib()).
+        
+        """
+        return self.__nested
+    
+    def __pset_nested(self, value):
+        self.__nested = value
+    
+    nested = property(__pget_nested, __pset_nested, None, __pget_nested.__doc__)
+
+    # === property: item_actions ===
+    
+    def __pget_item_actions(self):
+        """A list of actions clients can apply to items in the list.
+        
+        The list must contain ItemAction objects.
+        """
+        return self.__item_actions
+    
+    def __pset_item_actions(self, value):
+        self.__item_actions = value
+    
+    item_actions = property(__pget_item_actions, __pset_item_actions, None,
+                            __pget_item_actions.__doc__)
+
+    # === property: list_actions ===
+    
+    def __pget_list_actions(self):
+        """A list of actions clients can apply to nested lists in the list.
+        
+        The list must contain ListAction objects.
+        """
+        return self.__list_actions
+    
+    def __pset_list_actions(self, value):
+        self.__list_actions = value
+    
+    list_actions = property(__pget_list_actions, __pset_list_actions, None, __pget_list_actions.__doc__)
+
 
 # =============================================================================
 # media browser actions
@@ -80,7 +232,7 @@ class ListAction(object):
         
     def __str__(self):
         
-        return "(%d, %s)" % (self.__id, self.__label)
+        return "(%d, %s)" % (self.__id, self.label)
         
     # === property: id ===
     
@@ -89,9 +241,6 @@ class ListAction(object):
         return self.__id
     
     id = property(__pget_id, None, None, __pget_id.__doc__)
-    
-    def is_la_id(id):
-        return id < 0
     
 class ItemAction(object):
     """Item related action for a client's media browser.
@@ -138,7 +287,7 @@ class ItemAction(object):
         
     def __str__(self):
         
-        return "(%d, %s, %s)" % (self.id, self.label, self.__multiple)
+        return "(%d, %s, %s)" % (self.id, self.label, self.multiple)
         
     # === property: id ===
     
@@ -147,9 +296,6 @@ class ItemAction(object):
         return self.__id
     
     id = property(__pget_id, None, None, __pget_id.__doc__)
-    
-    def is_ia_id(id):
-        return id > 0
     
 # =============================================================================
 # player adapter
@@ -313,9 +459,11 @@ class PlayerAdapter(object):
         # init config (config inits logging)
         
         self.__config = config.Config(self.__name)
-
+        
         # init misc fields
         
+        ListReply.PAGE_SIZE = self.__config.list_limit
+
         serial.Bin.HOST_ENCODING = self.__config.encoding
         
         self.__clients = []
@@ -328,8 +476,8 @@ class PlayerAdapter(object):
         flags = self.__util_calc_flags(playback_known, volume_known,
             repeat_known, shuffle_known, progress_known)
         
-        self.__info = PlayerInfo(name, flags, max_rating, file_actions,
-                                 search_mask)
+        self.__info = PlayerInfo(name, flags, max_rating, ListReply.PAGE_SIZE,
+                                 file_actions, search_mask)
         
         self.__sync_triggers = {}
         
@@ -347,8 +495,6 @@ class PlayerAdapter(object):
                 use_user_dirs=self.__config.fb_xdg_user_dirs, 
                 show_extensions=self.__config.fb_extensions)
             
-        ItemList.MAX_LEN = self.__config.list_limit
-        
         self.__manager = DummyManager()
         
         log.debug("init done")
@@ -747,84 +893,85 @@ class PlayerAdapter(object):
     # request interface 
     # =========================================================================
     
-    def __request_item(self, client, id):
-        info = {}
-        info[INFO_TITLE] = "Sorry, item request is disabled."
-        self.__reply_item_request(client, "NoID", info)
-        
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         """Request the content of the currently active playlist.
         
-        @param client:
-            the requesting client (needed for reply)
+        @param reply:
+            a ListReply object
         
         @note: Override if it is possible and makes sense.
                
-        @see: reply_playlist_request() for sending back the result
-        
         """
         log.error("** BUG ** in feature handling")
 
-    def request_queue(self, client):
-        """Request the content of the play queue. 
+    def request_queue(self, reply):
+        """Request the content of the play queue.
         
-        @param client:
-            the requesting client (needed for reply)
+        @param reply:
+            a ListReply object
         
         @note: Override if it is possible and makes sense.
                
-        @see: reply_queue_request() for sending back the result
-        
         """
         log.error("** BUG ** in feature handling")
 
-    def request_mlib(self, client, path):
-        """Request contents of a specific level from the player's media library.
+    def request_mlib(self, reply, path):
+        """Request the content of a playlist from the player's media library.
         
-        @param client: the requesting client (needed for reply)
-        @param path: path of the requested level (string list)
-        
-        @note: path is a list of strings which describe a specific level in
-            the player's playlist tree. If path is an empty list, the root of
-            the player's library (all top level playlists) are requested.
+        @param reply:
+            a ListReply object
+        @param path: 
+            a path within a player's media library
+            
+        If path is an empty list, the root of the library (all top level
+        playlists) are requested. Otherwise path is set as illustrated in this
+        example:
 
-            A player may have a media library structure like this:
+        Consider a player with a media library structure like this:
 
-               |- Radio
-               |- Genres
-                  |- Jazz
-                  |- ...
-               |- Dynamic
-                  |- Never played
-                  |- Played recently
-                  |- ...
-               |- Playlists
-                  |- Party
-                     |- Sue's b-day
-                     |- ...
-               |- ...
+           |- Radio
+           |- Genres
+              |- Jazz
+              |- ...
+           |- Dynamic
+              |- Never played
+              |- Played recently
+              |- ...
+           |- Playlists
+              |- Party
+                 |- Sue's b-day
+                 |- ...
+           |- ...
 
-             Here possibles values for path are [ "Radio" ] or
-             [ "Playlists", "Party", "Sue's b-day" ] or ...
-               
+        If path is the empty list, all top level playlists are requests, e.g.
+        ['Radio', 'Genres', 'Dynamic', 'Playlists', ...]. Otherwise path may
+        specify a specific level in the library tree, e.g. [ 'Radio' ] or
+        [ 'Playlists', 'Party', 'Sue's b-day' ] or etc.
+    
         @note: Override if it is possible and makes sense.
                
-        @see: reply_list_request() for sending back the result
-        
         """
         log.error("** BUG ** in feature handling")
     
-    def request_search(self, client, query):
+    def request_search(self, reply, query):
         """Request a list of items matching a search query.
         
-        @param client: 
-            the requesting client (needed for reply)
+        @param reply:
+            a ListReply object
         @param query:
             a list of search query values corresponding with the search mask
-            specified with keyword 'search_mask' in PlayerAdapter.__init__().
+            specified with keyword 'search_mask' in PlayerAdapter.__init__()
             
-        @see: reply_search_request() for sending back the result
+        Example: If search mask was [ 'Artist', 'Title', 'Album' ], then
+        a query may look like this: [ 'Blondie', '', 'Best' ]. It is up to
+        player adapters how to interpret these values. However, good practice
+        is to interpret them as case insensitive, and-connected, non exact
+        matching search values. The given example would then reply a list
+        with all items where 'Blondie' is contained in the artist field and
+        'Best' is contained in the Album field.
         
+        @note: Override if it is possible and makes sense.
+               
         """
         log.error("** BUG ** in feature handling")
     
@@ -998,146 +1145,6 @@ class PlayerAdapter(object):
             self.__sync_trigger(self.__sync_item)
             
     # =========================================================================
-    # request replies
-    # =========================================================================    
-
-    def __reply_item_request(self, client, id, info):
-        """Currently unused."""
-        
-        if self.__stopped:
-            return
-        
-        item = Item()
-        item.id = id
-        item.info = info
-
-        msg = net.build_message(message.REQ_ITEM, item)
-        
-        gobject.idle_add(self.__reply, client, msg, "item")
-        
-    def reply_playlist_request(self, client, ids, names, item_actions=None):
-        """Send the reply to a playlist request back to the client.
-        
-        @param client:
-            the client to reply to
-        @param ids:
-            IDs of the items contained in the playlist
-        @param names:
-            names of the items contained in the playlist
-        @keyword item_actions:
-            a list of ItemAction which can be applied to items in the playlist
-        
-        @see: request_playlist()
-        
-        """ 
-        if self.__stopped:
-            return
-        
-        playlist = ItemList(None, None, ids, names, item_actions, None)
-        
-        msg = net.build_message(message.REQ_PLAYLIST, playlist)
-        
-        gobject.idle_add(self.__reply, client, msg, "playlist")
-    
-    def reply_queue_request(self, client, ids, names, item_actions=None):
-        """Send the reply to a queue request back to the client.
-        
-        @param client:
-            the client to reply to
-        @param ids:
-            IDs of the items contained in the queue
-        @param names:
-            names of the items contained in the queue
-        @keyword item_actions:
-            a list of ItemAction which can be applied to items in the queue
-        
-        @see: request_queue()
-        
-        """ 
-        if self.__stopped:
-            return
-        
-        queue = ItemList(None, None, ids, names, item_actions, None)
-        
-        msg = net.build_message(message.REQ_QUEUE, queue)
-        
-        gobject.idle_add(self.__reply, client, msg, "queue")
-    
-    def reply_mlib_request(self, client, path, nested, ids, names,
-                               item_actions=None, list_actions=None):
-        """Send the reply to a media library request back to the client.
-        
-        @param client:
-            the client to reply to
-        @param path:
-            path of the requested library level
-        @param nested:
-            names of nested lists at the requested path
-        @param ids:
-            IDs of the items at the requested path
-        @param names:
-            names of the items at the requested path
-        @keyword item_actions:
-            a list of ItemAction which can be applied to items at the
-            requested path 
-        @keyword list_actions:
-            a list of ListAction which can be applied to nested lists at the
-            requested path 
-        
-        @see: request_mlib()
-        
-        """ 
-        if self.__stopped:
-            return
-        
-        lib = ItemList(path, nested, ids, names, item_actions, list_actions)
-        
-        msg = net.build_message(message.REQ_MLIB, lib)
-        
-        gobject.idle_add(self.__reply, client, msg, "mlib")
-        
-    def reply_search_request(self, client, query, ids, names, item_actions=None):
-        """Send the reply to a search request back to the client.
-        
-        @param client:
-            the client to reply to
-        @param query:
-            query parameters of the requested search
-        @param ids:
-            IDs of the items in the search result
-        @param names:
-            names of the items in the search result
-        @keyword item_actions:
-            a list of ItemAction which can be applied to items in the search
-            result
-        
-        @see: request_search()
-        
-        """ 
-        if self.__stopped:
-            return
-        
-        result = ItemList(query, None, ids, names, item_actions, None)
-        
-        msg = net.build_message(message.REQ_SEARCH, result)
-        
-        gobject.idle_add(self.__reply, client, msg, "search")
-        
-    def __reply_files_request(self, client, path, nested, ids, names):
-
-        files = ItemList(path, nested, ids, names, None, None)
-        
-        msg = net.build_message(message.REQ_FILES, files)
-        
-        gobject.idle_add(self.__reply, client, msg, "files")
-        
-    def __reply(self, client, msg, name):
-
-        log.debug("send %s reply to %s" % (name, client))
-        
-        client.send(msg)
-    
-    # =========================================================================
     # synchronization (outbound communication)
     # =========================================================================
     
@@ -1295,7 +1302,7 @@ class PlayerAdapter(object):
             log.error("** BUG ** unexpected control message: %d" % id)
             
     def __handle_message_action(self, id, bindata):
-    
+        
         a = serial.unpack(Action, bindata)
         if a is None:
             return
@@ -1308,11 +1315,11 @@ class PlayerAdapter(object):
             
             self.action_queue_item(a.id, a.positions, a.items)
             
-        elif id == message.ACT_MLIB and ListAction.is_la_id(a.id):
+        elif id == message.ACT_MLIB and a.id < 0: # list action id
             
             self.action_mlib_list(a.id, a.path)
                 
-        elif id == message.ACT_MLIB and ItemAction.is_ia_id(a.id):
+        elif id == message.ACT_MLIB and a.id > 0: # item action id
             
             self.action_mlib_item(a.id, a.path, a.positions, a.items)
                 
@@ -1331,47 +1338,34 @@ class PlayerAdapter(object):
             
     def __handle_message_request(self, client, id, bindata):
 
-        if id == message.REQ_ITEM:
-            
-            request = serial.unpack(Request, bindata)    
-            if request is None:
-                return
-            
-            self.__request_item(client, request.id)
+        request = serial.unpack(Request, bindata)    
+        if request is None:
+            return
         
-        elif id == message.REQ_PLAYLIST:
+        reply = ListReply(client, id, request.page, path=request.path)
+        
+        if id == message.REQ_PLAYLIST:
             
-            self.request_playlist(client)
+            self.request_playlist(reply)
             
         elif id == message.REQ_QUEUE:
             
-            self.request_queue(client)
+            self.request_queue(reply)
             
         elif id == message.REQ_MLIB:
             
-            request = serial.unpack(Request, bindata)    
-            if request is None:
-                return
-            
-            self.request_mlib(client, request.path)
+            self.request_mlib(reply, request.path)
             
         elif id == message.REQ_FILES:
             
-            request = serial.unpack(Request, bindata)    
-            if request is None:
-                return
+            reply.nested, reply.ids, reply.names = \
+                self.__filelib.get_level(request.path)
             
-            nested, ids, names = self.__filelib.get_level(request.path)
-            
-            self.__reply_files_request(client, request.path, nested, ids, names)
+            reply.send()
             
         elif id == message.REQ_SEARCH:
             
-            request = serial.unpack(Request, bindata)    
-            if request is None:
-                return
-            
-            self.request_search(client, request.path)
+            self.request_search(reply, request.path)
             
         else:
             log.error("** BUG ** unexpected request message: %d" % id)
@@ -1441,7 +1435,6 @@ class PlayerAdapter(object):
         
             # --- request features ---
 
-            ftc(self.__request_item, FT_REQ_ITEM),
             ftc(self.request_playlist, FT_REQ_PL),
             ftc(self.request_queue, FT_REQ_QU),
             ftc(self.request_mlib, FT_REQ_MLIB),

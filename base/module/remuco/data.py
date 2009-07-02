@@ -27,9 +27,10 @@ import Image
 import urlparse
 import urllib
 
-from remuco import command
 from remuco import log
 from remuco import serial
+
+# TODO: remove help fields
 
 # =============================================================================
 # outgoing data (to clients)
@@ -38,13 +39,14 @@ from remuco import serial
 class PlayerInfo(serial.Serializable):
     """ Parameter of the player info message sent to clients."""
     
-    def __init__(self, name, flags, max_rating, file_item_actions, search_mask):
+    def __init__(self, name, flags, max_rating, page_size, file_item_actions,
+                 search_mask):
         
         self.name = name
         self.flags = flags
         self.max_rating = max_rating
-        self.search_mask = search_mask or []
-        
+        self.page_size = page_size
+
         self.fia_ids = []
         self.fia_labels = []
         self.fia_multiples = []
@@ -55,15 +57,17 @@ class PlayerInfo(serial.Serializable):
             self.fia_multiples.append(action.multiple);
             self.fia_helps.append(action.help);
             
+        self.search_mask = search_mask or []
+        
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y,
+        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y, serial.TYPE_I,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
                 serial.TYPE_AS, serial.TYPE_AS)
         
     def get_data(self):
-        return (self.name, self.flags, self.max_rating,
+        return (self.name, self.flags, self.max_rating, self.page_size,
                 self.fia_ids, self.fia_labels, self.fia_multiples,
                 self.fia_helps, self.search_mask)
 
@@ -204,15 +208,16 @@ class Item(serial.Serializable):
 class ItemList(serial.Serializable):
     """ Parameter of a request reply message sent to clients."""
     
-    MAX_LEN = 100
-    
-    def __init__(self, path, nested, plob_ids, plob_names, item_actions,
-                 list_actions):
+    def __init__(self, path, nested, item_ids, item_names, item_offset,
+                 page, page_max, item_actions, list_actions):
         
         self.path = path or []
         self.nested = nested or []
-        self.items = plob_ids or []
-        self.names = plob_names or []
+        self.item_ids = item_ids or []
+        self.item_names = item_names or []
+        self.item_offset = item_offset
+        self.page = page or 0
+        self.page_max = page_max or 0
 
         self.ia_ids = []
         self.ia_labels = []
@@ -231,11 +236,12 @@ class ItemList(serial.Serializable):
             self.la_ids.append(action.id);
             self.la_labels.append(action.label);
             self.la_helps.append(action.help);
-        
+            
     def __str__(self):
         
-        return "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
-                self.path, self.nested, self.items, self.names,
+        return "(%s, %s, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s)" % (
+                self.path, self.nested, self.item_ids, self.item_names,
+                self.item_offset, self.page, self.page_max,
                 self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
                 self.la_ids, self.la_labels, self.la_helps)
         
@@ -243,12 +249,13 @@ class ItemList(serial.Serializable):
         
     def get_fmt(self):
         return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS,
+                serial.TYPE_I, serial.TYPE_I, serial.TYPE_I,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB, serial.TYPE_AS,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AS)
         
     def get_data(self):
-        ml = ItemList.MAX_LEN
-        return (self.path, self.nested[:ml], self.items[:ml], self.names[:ml],
+        return (self.path, self.nested, self.item_ids, self.item_names,
+                self.item_offset, self.page, self.page_max,
                 self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
                 self.la_ids, self.la_labels, self.la_helps)
 
@@ -256,7 +263,6 @@ class ItemList(serial.Serializable):
 # =============================================================================
 # incoming data (from clients)
 # =============================================================================
-
 
 class Control(serial.Serializable):
     """ Parameter of control messages from clients with integer arguments."""
@@ -314,12 +320,13 @@ class Request(serial.Serializable):
         
         self.id = None
         self.path = None
+        self.page = 0
         
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_AS)
+        return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_I)
         
     def set_data(self, data):
-        self.id, self.path = data
+        self.id, self.path, self.page = data
 

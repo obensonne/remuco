@@ -45,7 +45,7 @@ FT_CTRL_FULLSCREEN = 1 << 20
         
 # --- request features ---
 
-FT_REQ_ITEM = 1 << 25
+FT_REQ_ITEM = 1 << 25 # obsolete
 FT_REQ_PL = 1 << 26
 FT_REQ_QU = 1 << 27
 FT_REQ_MLIB = 1 << 28

@@ -74,10 +74,11 @@ class FooPlayAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
-        self.reply_playlist_request(client, ["1", "2"],
-                ["Joe - Joe's Song", "Sue - Sue's Song"])
+        reply.ids = ["1", "2"]
+        reply.names = ["Joe - Joe's Song", "Sue - Sue's Song"]
+        reply.send()
 
     # ...
     

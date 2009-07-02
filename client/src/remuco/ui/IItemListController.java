@@ -32,4 +32,6 @@ public interface IItemListController {
 	public void ilcRoot(ItemlistScreen ils);
 
 	public void ilcShowNested(ItemlistScreen ils, String path[]);
+	
+	public void ilcGotoPage(ItemlistScreen ils, int page);
 }

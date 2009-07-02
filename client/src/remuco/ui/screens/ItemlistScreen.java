@@ -120,6 +120,12 @@ public final class ItemlistScreen extends List implements CommandListener {
 		}
 	}
 
+	private static final Command CMD_PAGE_UP = new Command("Page up",
+		Command.SCREEN, 8);
+
+	private static final Command CMD_PAGE_DOWN = new Command("Page down",
+		Command.SCREEN, 9);
+
 	private static final Command CMD_MARK_ALL = new Command("Mark all",
 			Command.SCREEN, 10);
 
@@ -179,7 +185,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 		// set up content
 
 		setTitle(list.getName());
-		
+
 		final Image licNested = list.isFiles() ? theme.licFiles : theme.licList;
 
 		for (int i = 0; i < numNested; i++) {
@@ -199,6 +205,13 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		if (numItems > 0) {
 			addCommand(CMD_MARK_ALL);
+		}
+		
+		if (list.getPage() > 0) {
+			addCommand(CMD_PAGE_UP);
+		}
+		if (list.getPage() < list.getPageMax()) {
+			addCommand(CMD_PAGE_DOWN);
 		}
 
 		actionCommands = new Hashtable(list.getActions().size());
@@ -254,6 +267,14 @@ public final class ItemlistScreen extends List implements CommandListener {
 			toggleItemMark(MARK_ALL);
 			updateItemIcons();
 
+		} else if (c == CMD_PAGE_UP) {
+			
+			listener.ilcGotoPage(this, list.getPage() - 1);
+			
+		} else if (c == CMD_PAGE_DOWN) {
+			
+			listener.ilcGotoPage(this, list.getPage() + 1);
+			
 		} else if (c == CMD.SELECT && d == this) {
 
 			final int index = getSelectedIndex();
@@ -376,7 +397,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 					final int itemNo = index - numNested;
 
-					positions = new int[] { itemNo };
+					positions = new int[] { list.getItemPosAbsolute(itemNo) };
 					ids = new String[] { list.getItemID(itemNo) };
 
 				} else { // use all user marked items
@@ -388,7 +409,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 					for (int i = 0; i < numItems; i++) {
 
 						if (itemMarkedFlags[i]) {
-							positions[n] = i;
+							positions[n] = list.getItemPosAbsolute(i);
 							ids[n] = list.getItemID(i);
 							n++;
 						}

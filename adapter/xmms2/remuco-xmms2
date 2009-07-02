@@ -74,7 +74,7 @@ class ItemListRequest():
     def __init__(self, client, pa, path):
         """Create a new item list request.
         
-        @param client: the requesting client
+        @param reply: the request's ListReply object
         @param pa: XMMS2Adapter
         @param path: path of the requested item list
         
@@ -84,9 +84,7 @@ class ItemListRequest():
         self.__ids_iter = 0
         self.__ids_int = []
         
-        self.__client = client
-        self.__ids = []
-        self.__names = []
+        self.__reply = client
         
         self.__path = path
         
@@ -117,21 +115,20 @@ class ItemListRequest():
         If all item names have been collected, the original request is replied.
          
         """
-        
         if self.__ids_iter < len(self.__ids_int):
             # proceed in getting item names
             id = self.__ids_int[self.__ids_iter]
             self.__pa._x2.medialib_get_info(id, cb=self.__handle_name)
-            return
-        
-        if self.__path[0] == PLAYLIST_ID_ACTIVE:
+            
+        elif self.__path[0] == PLAYLIST_ID_ACTIVE:
             # have all item names, reply playlist request
-            self.__pa.reply_playlist_request(self.__client, self.__ids,
-                self.__names, item_actions=PLAYLIST_ITEM_ACTIONS)
+            self.__reply.item_actions = PLAYLIST_ITEM_ACTIONS
+            self.__reply.send()
+            
         else:
             # have all item names, reply mlib list request
-            self.__pa.reply_mlib_request(self.__client, self.__path, [],
-                self.__ids, self.__names, item_actions=MLIB_ITEM_ACTIONS)
+            self.__reply.item_actions = MLIB_ITEM_ACTIONS
+            self.__reply.send()
             
             
     def __handle_name(self, result):
@@ -143,12 +140,12 @@ class ItemListRequest():
         minfo = result.value()
 
         id = str(self.__ids_int[self.__ids_iter])
-        artist = minfo.get("artist", "??")
-        title = minfo.get("title", "??")
+        artist = minfo.get("artist", "???")
+        title = minfo.get("title", "???")
         name = "%s - %s" % (artist, title)
         
-        self.__ids.append(id)
-        self.__names.append(name)
+        self.__reply.ids.append(id)
+        self.__reply.names.append(name)
         
         self.__ids_iter += 1
         self.__request_next_name()
@@ -161,14 +158,14 @@ class ItemListRequest():
 
         list = result.value()
         
-        nested = []
+        self.__reply.nested = []
         
         for name in list:
             if not name.startswith("_"):
-                nested.append(name)
+                self.__reply.nested.append(name)
         
-        self.__pa.reply_mlib_request(self.__client, self.__path, nested, [], [],
-                                     list_actions=MLIB_LIST_ACTIONS)
+        self.__reply.list_actions = MLIB_LIST_ACTIONS
+        self.__reply.send()
     
 # =============================================================================
 # player adapter
@@ -381,13 +378,13 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     # request interface 
     # =========================================================================
     
-    def request_playlist(self, client):
+    def request_playlist(self, reply):
         
-        ItemListRequest(client, self, [PLAYLIST_ID_ACTIVE])
+        ItemListRequest(reply, self, [PLAYLIST_ID_ACTIVE])
 
-    def request_mlib(self, client, path):
+    def request_mlib(self, reply, path):
         
-        ItemListRequest(client, self, path)
+        ItemListRequest(reply, self, path)
         
     # =========================================================================
     # internal methods
