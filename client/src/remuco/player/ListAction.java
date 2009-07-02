@@ -28,8 +28,8 @@ package remuco.player;
  */
 public class ListAction extends AbstractAction {
 
-	public ListAction(int id, String label, String desc) {
-		super(id, label, desc);
+	public ListAction(int id, String label) {
+		super(id, label);
 	}
 
 	public boolean isItemAction() {

@@ -32,7 +32,7 @@ public class PlayerInfo implements ISerializable {
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
 			SerialAtom.TYPE_I, SerialAtom.TYPE_Y, SerialAtom.TYPE_I,
 			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
-			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_AS };
 
 	private final SerialAtom[] atoms;
 
@@ -91,11 +91,10 @@ public class PlayerInfo implements ISerializable {
 		int off = 4;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			fileActions.addElement(new ItemAction(atoms[off].ai[i],
-					atoms[off + 1].as[i], atoms[off + 2].ab[i],
-					atoms[off + 3].as[i]));
+					atoms[off + 1].as[i], atoms[off + 2].ab[i]));
 		}
 
-		searchMask = atoms[8].as;
+		searchMask = atoms[7].as;
 	}
 
 	public boolean supports(int feature) {

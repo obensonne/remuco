@@ -233,7 +233,6 @@ class ListAction(object):
         self.__id = ListAction.__id_counter
         
         self.label = label
-        self.help = None
         
     def __str__(self):
         
@@ -286,7 +285,6 @@ class ItemAction(object):
         self.__id = ItemAction.__id_counter
         
         self.label = label
-        self.help = None
         
         self.multiple = multiple
         

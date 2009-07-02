@@ -50,12 +50,10 @@ class PlayerInfo(serial.Serializable):
         self.fia_ids = []
         self.fia_labels = []
         self.fia_multiples = []
-        self.fia_helps = []
         for action in file_item_actions or []:
             self.fia_ids.append(action.id);
             self.fia_labels.append(action.label);
             self.fia_multiples.append(action.multiple);
-            self.fia_helps.append(action.help);
             
         self.search_mask = search_mask or []
         
@@ -64,12 +62,12 @@ class PlayerInfo(serial.Serializable):
     def get_fmt(self):
         return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y, serial.TYPE_I,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
-                serial.TYPE_AS, serial.TYPE_AS)
+                serial.TYPE_AS)
         
     def get_data(self):
         return (self.name, self.flags, self.max_rating, self.page_size,
                 self.fia_ids, self.fia_labels, self.fia_multiples,
-                self.fia_helps, self.search_mask)
+                self.search_mask)
 
 class PlayerState(serial.Serializable):
     """ Parameter of the state sync message sent to clients."""
@@ -222,42 +220,38 @@ class ItemList(serial.Serializable):
         self.ia_ids = []
         self.ia_labels = []
         self.ia_multiples = []
-        self.ia_helps = []
         for action in item_actions or []:
             self.ia_ids.append(action.id);
             self.ia_labels.append(action.label);
             self.ia_multiples.append(action.multiple);
-            self.ia_helps.append(action.help);
         
         self.la_ids = []
         self.la_labels = []
-        self.la_helps = []
         for action in list_actions or []:
             self.la_ids.append(action.id);
             self.la_labels.append(action.label);
-            self.la_helps.append(action.help);
             
     def __str__(self):
         
         return "(%s, %s, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s)" % (
                 self.path, self.nested, self.item_ids, self.item_names,
                 self.item_offset, self.page, self.page_max,
-                self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
-                self.la_ids, self.la_labels, self.la_helps)
+                self.ia_ids, self.ia_labels, self.ia_multiples,
+                self.la_ids, self.la_labels)
         
     # === serial interface ===
         
     def get_fmt(self):
         return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS,
                 serial.TYPE_I, serial.TYPE_I, serial.TYPE_I,
-                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB, serial.TYPE_AS,
-                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AS)
+                serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
+                serial.TYPE_AI, serial.TYPE_AS)
         
     def get_data(self):
         return (self.path, self.nested, self.item_ids, self.item_names,
                 self.item_offset, self.page, self.page_max,
-                self.ia_ids, self.ia_labels, self.ia_multiples, self.ia_helps,
-                self.la_ids, self.la_labels, self.la_helps)
+                self.ia_ids, self.ia_labels, self.ia_multiples,
+                self.la_ids, self.la_labels)
 
 
 # =============================================================================

@@ -22,8 +22,6 @@ package remuco.player;
 
 public abstract class AbstractAction {
 
-	public final String desc;
-
 	public final int id;
 
 	public final String label;
@@ -32,11 +30,10 @@ public abstract class AbstractAction {
 
 	private boolean enabled = true;
 
-	public AbstractAction(int id, String label, String desc) {
+	public AbstractAction(int id, String label) {
 
 		this.id = id;
 		this.label = label;
-		this.desc = desc;
 	}
 
 	public void disbale(String reason) {

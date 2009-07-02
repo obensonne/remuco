@@ -30,9 +30,9 @@ public class ItemAction extends AbstractAction {
 
 	public final boolean multiple;
 
-	public ItemAction(int id, String label, boolean multiple, String desc) {
+	public ItemAction(int id, String label, boolean multiple) {
 
-		super(id, label, desc);
+		super(id, label);
 
 		this.multiple = multiple;
 	}

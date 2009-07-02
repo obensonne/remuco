@@ -42,8 +42,7 @@ public final class ItemList implements ISerializable {
 			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS, SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_I, SerialAtom.TYPE_I, SerialAtom.TYPE_I,
 			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
-			SerialAtom.TYPE_AS, SerialAtom.TYPE_AI, SerialAtom.TYPE_AS,
-			SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS };
 
 	private static final int TYPE_FILES = Message.REQ_FILES;
 
@@ -324,19 +323,18 @@ public final class ItemList implements ISerializable {
 
 		actions.removeAllElements();
 
-		off = 11;
+		off = 10;
 		haveListActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			actions.addElement(new ListAction(atoms[off].ai[i],
-					atoms[off + 1].as[i], atoms[off + 2].as[i]));
+					atoms[off + 1].as[i]));
 		}
 
 		off = 7;
 		haveItemActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			final ItemAction ia = new ItemAction(atoms[off].ai[i],
-					atoms[off + 1].as[i], atoms[off + 2].ab[i],
-					atoms[off + 3].as[i]);
+					atoms[off + 1].as[i], atoms[off + 2].ab[i]);
 			actions.addElement(ia);
 			if (ia.multiple) {
 				haveItemActionsMultiple = true;
