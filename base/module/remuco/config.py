@@ -61,7 +61,7 @@ DEFAULTS = { # values as saved in config file
     KEY_LOGLEVEL: "INFO",
     KEY_IMAGE_SIZE: "200",
     KEY_IMAGE_TYPE: "JPEG",
-    KEY_LIST_LIMIT: "100",
+    KEY_LIST_LIMIT: "50",
     KEY_PING: "15",
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
@@ -455,9 +455,9 @@ class Config(object):
     # === property: list_limit ===
     
     def __pget_list_limit(self):
-        """Maximum length of item lists sent to clients.
+        """Maximum length of item list pages sent to clients.
         
-        Default: 100
+        Default: 50
         
         Option name: 'list-limit'
         
@@ -466,11 +466,11 @@ class Config(object):
             limit = self.__cp.getint(SEC, KEY_LIST_LIMIT)
         except (ValueError, AttributeError), e:
             log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
-            return 100
+            return 50
         
         if limit < 0:
             log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
-            return 100
+            return 50
         
         return limit
     
