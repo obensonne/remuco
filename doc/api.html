@@ -1,12 +1,12 @@
 
-<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: package remuco</title>
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.8.2)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.0)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
@@ -21,6 +21,9 @@ Class&nbsp;<a href="#MPRISAdapter">MPRISAdapter</a>:<br>
 &nbsp;<br>
 Classes&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;and&nbsp;<a href="#ListAction">ListAction</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Classes&nbsp;to&nbsp;define&nbsp;actions&nbsp;clients&nbsp;may&nbsp;execute&nbsp;in&nbsp;their&nbsp;media&nbsp;browser.&nbsp;<br>
+&nbsp;<br>
+Class&nbsp;<a href="#ListReply">ListReply</a>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Used&nbsp;by&nbsp;player&nbsp;adapters&nbsp;to&nbsp;reply&nbsp;requests&nbsp;for&nbsp;playlists&nbsp;and&nbsp;other&nbsp;lists.<br>
 &nbsp;<br>
 Class&nbsp;<a href="#Manager">Manager</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Helper&nbsp;class&nbsp;for&nbsp;managing&nbsp;the&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
@@ -57,18 +60,17 @@ Logging:<br>
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="api.html">adapter</a><br>
 <a href="api.html">art</a><br>
-<a href="api.html">command</a><br>
 <a href="api.html">config</a><br>
-</td><td width="25%" valign=top><a href="api.html">data</a><br>
-<a href="api.html">defs</a><br>
+<a href="api.html">data</a><br>
+</td><td width="25%" valign=top><a href="api.html">defs</a><br>
 <a href="api.html">features</a><br>
 <a href="api.html">files</a><br>
-</td><td width="25%" valign=top><a href="api.html">log</a><br>
-<a href="api.html">manager</a><br>
+<a href="api.html">log</a><br>
+</td><td width="25%" valign=top><a href="api.html">manager</a><br>
 <a href="api.html">message</a><br>
 <a href="api.html">mpris</a><br>
-</td><td width="25%" valign=top><a href="api.html">net</a><br>
-<a href="api.html">serial</a><br>
+<a href="api.html">net</a><br>
+</td><td width="25%" valign=top><a href="api.html">serial</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -82,6 +84,7 @@ Logging:<br>
 <dl>
 <dt><font face="helvetica, arial"><a href="api.html#ItemAction">remuco.adapter.ItemAction</a>
 </font></dt><dt><font face="helvetica, arial"><a href="api.html#ListAction">remuco.adapter.ListAction</a>
+</font></dt><dt><font face="helvetica, arial"><a href="api.html#ListReply">remuco.adapter.ListReply</a>
 </font></dt><dt><font face="helvetica, arial"><a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>
 </font></dt><dd>
 <dl>
@@ -161,6 +164,9 @@ Usually&nbsp;this&nbsp;is&nbsp;~/.config/remuco/PLAYER.<br>
 &nbsp;<br>
 @note:&nbsp;read-only</tt></dd>
 </dl>
+<dl><dt><strong>custom_volume_cmd</strong></dt>
+<dd><tt>Used&nbsp;internally&nbsp;(read-only)</tt></dd>
+</dl>
 <dl><dt><strong>encoding</strong></dt>
 <dd><tt>Encoding&nbsp;of&nbsp;strings&nbsp;coming&nbsp;from&nbsp;and&nbsp;passed&nbsp;to&nbsp;the&nbsp;player&nbsp;(adapter).<br>
 &nbsp;<br>
@@ -220,6 +226,13 @@ Default:&nbsp;"JPEG"<br>
 Possible&nbsp;values:&nbsp;"JPEG",&nbsp;"PNG"<br>
 &nbsp;<br>
 Option&nbsp;name:&nbsp;'image-type'</tt></dd>
+</dl>
+<dl><dt><strong>list_limit</strong></dt>
+<dd><tt>Maximum&nbsp;length&nbsp;of&nbsp;item&nbsp;list&nbsp;pages&nbsp;sent&nbsp;to&nbsp;clients.<br>
+&nbsp;<br>
+Default:&nbsp;50<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'list-limit'</tt></dd>
 </dl>
 <dl><dt><strong>log_file</strong></dt>
 <dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;log&nbsp;file.<br>
@@ -354,6 +367,72 @@ Data descriptors defined here:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ListReply">class <strong>ListReply</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Reply&nbsp;<a href="api.html#object">object</a>&nbsp;for&nbsp;an&nbsp;item&nbsp;list&nbsp;request.<br>
+&nbsp;<br>
+A&nbsp;<a href="#ListReply">ListReply</a>&nbsp;is&nbsp;the&nbsp;first&nbsp;parameter&nbsp;of&nbsp;the&nbsp;request&nbsp;methods<br>
+<a href="#PlayerAdapter">PlayerAdapter</a>.request_playlist(),&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.request_queue(),<br>
+<a href="#PlayerAdapter">PlayerAdapter</a>.request_mlib()&nbsp;and&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.request_search().<br>
+&nbsp;<br>
+Player&nbsp;adapters&nbsp;are&nbsp;supposed&nbsp;to&nbsp;use&nbsp;the&nbsp;list&nbsp;reply&nbsp;<a href="api.html#object">object</a>&nbsp;to&nbsp;set&nbsp;the<br>
+reply&nbsp;data&nbsp;(using&nbsp;properties&nbsp;'ids',&nbsp;'names',&nbsp;'item_actions'&nbsp;and<br>
+'nested',&nbsp;'list_actions')&nbsp;and&nbsp;to&nbsp;send&nbsp;the&nbsp;reply&nbsp;to&nbsp;clients&nbsp;(using&nbsp;<a href="#ListReply-send">send</a>()).<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ListReply-__init__"><strong>__init__</strong></a>(self, client, reply_msg_id, page, path<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;list&nbsp;reply.<br>
+&nbsp;<br>
+Used&nbsp;internally,&nbsp;not&nbsp;needed&nbsp;within&nbsp;player&nbsp;adapters.</tt></dd></dl>
+
+<dl><dt><a name="ListReply-send"><strong>send</strong></a>(self)</dt><dd><tt>Send&nbsp;the&nbsp;requested&nbsp;item&nbsp;list&nbsp;to&nbsp;the&nbsp;requesting&nbsp;client.</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>ids</strong></dt>
+<dd><tt>IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;a&nbsp;list.<br>
+&nbsp;<br>
+Player&nbsp;adapters&nbsp;should&nbsp;set&nbsp;this&nbsp;to&nbsp;a&nbsp;list&nbsp;of&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained<br>
+in&nbsp;the&nbsp;requested&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>item_actions</strong></dt>
+<dd><tt>A&nbsp;list&nbsp;of&nbsp;actions&nbsp;clients&nbsp;can&nbsp;apply&nbsp;to&nbsp;items&nbsp;in&nbsp;the&nbsp;list.<br>
+&nbsp;<br>
+The&nbsp;list&nbsp;must&nbsp;contain&nbsp;ItemAction&nbsp;objects.</tt></dd>
+</dl>
+<dl><dt><strong>list_actions</strong></dt>
+<dd><tt>A&nbsp;list&nbsp;of&nbsp;actions&nbsp;clients&nbsp;can&nbsp;apply&nbsp;to&nbsp;nested&nbsp;lists&nbsp;in&nbsp;the&nbsp;list.<br>
+&nbsp;<br>
+The&nbsp;list&nbsp;must&nbsp;contain&nbsp;ListAction&nbsp;objects.</tt></dd>
+</dl>
+<dl><dt><strong>names</strong></dt>
+<dd><tt>Names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;a&nbsp;list.<br>
+&nbsp;<br>
+Player&nbsp;adapters&nbsp;should&nbsp;set&nbsp;this&nbsp;to&nbsp;a&nbsp;list&nbsp;of&nbsp;names&nbsp;of&nbsp;the&nbsp;items<br>
+contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;list.&nbsp;Good&nbsp;choice&nbsp;for&nbsp;a&nbsp;name&nbsp;is&nbsp;combination<br>
+of&nbsp;artist&nbsp;and&nbsp;title.</tt></dd>
+</dl>
+<dl><dt><strong>nested</strong></dt>
+<dd><tt>Names&nbsp;of&nbsp;nested&nbsp;lists&nbsp;contained&nbsp;in&nbsp;a&nbsp;list.<br>
+&nbsp;<br>
+Player&nbsp;adapters&nbsp;should&nbsp;set&nbsp;this&nbsp;to&nbsp;a&nbsp;list&nbsp;of&nbsp;names&nbsp;of&nbsp;the&nbsp;nested&nbsp;lists<br>
+contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;list.&nbsp;To&nbsp;be&nbsp;used&nbsp;only&nbsp;for&nbsp;mlib&nbsp;requests&nbsp;(see<br>
+PlayerAdapter.request_mlib()).</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>PAGE_SIZE</strong> = 50</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="MPRISAdapter">class <strong>MPRISAdapter</strong></a>(<a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -386,7 +465,7 @@ Methods defined here:<br>
 
 <dl><dt><a name="MPRISAdapter-poll"><strong>poll</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="MPRISAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt></dl>
+<dl><dt><a name="MPRISAdapter-request_playlist"><strong>request_playlist</strong></a>(self, reply)</dt></dl>
 
 <dl><dt><a name="MPRISAdapter-start"><strong>start</strong></a>(self)</dt></dl>
 
@@ -402,7 +481,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_mlib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;library&nbsp;path&nbsp;that&nbsp;contains&nbsp;the&nbsp;items<br>
 @param&nbsp;positions:<br>
@@ -410,17 +489,17 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_mlib_request().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-action_mlib_list"><strong>action_mlib_list</strong></a>(self, action_id, path)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;a&nbsp;list&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_mlib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_mlib_request().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
@@ -430,13 +509,25 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_queue_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#MPRISAdapter-reply_queue_request">reply_queue_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_queue_request().</tt></dd></dl>
+
+<dl><dt><a name="MPRISAdapter-action_search_item"><strong>action_search_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;a&nbsp;search&nbsp;result.<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_search_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+@param&nbsp;positions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -476,93 +567,64 @@ then&nbsp;looks&nbsp;into&nbsp;the&nbsp;user's&nbsp;thumbnail&nbsp;directory&nbs
 @return:&nbsp;an&nbsp;image&nbsp;file&nbsp;name&nbsp;(which&nbsp;can&nbsp;be&nbsp;used&nbsp;for&nbsp;<a href="#MPRISAdapter-update_item">update_item</a>())&nbsp;or<br>
 &nbsp;&nbsp;&nbsp;&nbsp;None&nbsp;if&nbsp;no&nbsp;image&nbsp;file&nbsp;has&nbsp;been&nbsp;found&nbsp;or&nbsp;if&nbsp;'resource'&nbsp;is&nbsp;not&nbsp;local</tt></dd></dl>
 
-<dl><dt><a name="MPRISAdapter-reply_mlib_request"><strong>reply_mlib_request</strong></a>(self, client, path, nested, ids, names, item_actions<font color="#909090">=None</font>, list_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;media&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="MPRISAdapter-request_mlib"><strong>request_mlib</strong></a>(self, reply, path)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;path:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
-@param&nbsp;nested:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;nested&nbsp;lists&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;at&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;path&nbsp;<br>
-@keyword&nbsp;list_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ListAction">ListAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;nested&nbsp;lists&nbsp;at&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;path&nbsp;<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
+@param&nbsp;path:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;path&nbsp;within&nbsp;a&nbsp;player's&nbsp;media&nbsp;library<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;library&nbsp;(all&nbsp;top&nbsp;level<br>
+playlists)&nbsp;are&nbsp;requested.&nbsp;Otherwise&nbsp;path&nbsp;is&nbsp;set&nbsp;as&nbsp;illustrated&nbsp;in&nbsp;this<br>
+example:<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#MPRISAdapter-request_mlib">request_mlib</a>()</tt></dd></dl>
+Consider&nbsp;a&nbsp;player&nbsp;with&nbsp;a&nbsp;media&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Jazz<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Dynamic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Never&nbsp;played<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Played&nbsp;recently<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Playlists<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Party<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Sue's&nbsp;b-day<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;<br>
+If&nbsp;path&nbsp;is&nbsp;the&nbsp;empty&nbsp;list,&nbsp;all&nbsp;top&nbsp;level&nbsp;playlists&nbsp;are&nbsp;requests,&nbsp;e.g.<br>
+['Radio',&nbsp;'Genres',&nbsp;'Dynamic',&nbsp;'Playlists',&nbsp;...].&nbsp;Otherwise&nbsp;path&nbsp;may<br>
+specify&nbsp;a&nbsp;specific&nbsp;level&nbsp;in&nbsp;the&nbsp;library&nbsp;tree,&nbsp;e.g.&nbsp;[&nbsp;'Radio'&nbsp;]&nbsp;or<br>
+[&nbsp;'Playlists',&nbsp;'Party',&nbsp;'Sue's&nbsp;b-day'&nbsp;]&nbsp;or&nbsp;etc.<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="MPRISAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="MPRISAdapter-request_queue"><strong>request_queue</strong></a>(self, reply)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;in&nbsp;the&nbsp;playlist<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
 &nbsp;<br>
-@see:&nbsp;<a href="#MPRISAdapter-request_playlist">request_playlist</a>()</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="MPRISAdapter-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="MPRISAdapter-request_search"><strong>request_search</strong></a>(self, reply, query)</dt><dd><tt>Request&nbsp;a&nbsp;list&nbsp;of&nbsp;items&nbsp;matching&nbsp;a&nbsp;search&nbsp;query.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;in&nbsp;the&nbsp;queue<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
+@param&nbsp;query:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;search&nbsp;query&nbsp;values&nbsp;corresponding&nbsp;with&nbsp;the&nbsp;search&nbsp;mask<br>
+&nbsp;&nbsp;&nbsp;&nbsp;specified&nbsp;with&nbsp;keyword&nbsp;'search_mask'&nbsp;in&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.<a href="#MPRISAdapter-__init__">__init__</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Example:&nbsp;If&nbsp;search&nbsp;mask&nbsp;was&nbsp;[&nbsp;'Artist',&nbsp;'Title',&nbsp;'Album'&nbsp;],&nbsp;then<br>
+a&nbsp;query&nbsp;may&nbsp;look&nbsp;like&nbsp;this:&nbsp;[&nbsp;'Blondie',&nbsp;'',&nbsp;'Best'&nbsp;].&nbsp;It&nbsp;is&nbsp;up&nbsp;to<br>
+player&nbsp;adapters&nbsp;how&nbsp;to&nbsp;interpret&nbsp;these&nbsp;values.&nbsp;However,&nbsp;good&nbsp;practice<br>
+is&nbsp;to&nbsp;interpret&nbsp;them&nbsp;as&nbsp;case&nbsp;insensitive,&nbsp;and-connected,&nbsp;non&nbsp;exact<br>
+matching&nbsp;search&nbsp;values.&nbsp;The&nbsp;given&nbsp;example&nbsp;would&nbsp;then&nbsp;reply&nbsp;a&nbsp;list<br>
+with&nbsp;all&nbsp;items&nbsp;where&nbsp;'Blondie'&nbsp;is&nbsp;contained&nbsp;in&nbsp;the&nbsp;artist&nbsp;field&nbsp;and<br>
+'Best'&nbsp;is&nbsp;contained&nbsp;in&nbsp;the&nbsp;Album&nbsp;field.<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#MPRISAdapter-request_queue">request_queue</a>()</tt></dd></dl>
-
-<dl><dt><a name="MPRISAdapter-request_mlib"><strong>request_mlib</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
-&nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-@param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
-&nbsp;<br>
-@note:&nbsp;path&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;which&nbsp;describe&nbsp;a&nbsp;specific&nbsp;level&nbsp;in<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;playlist&nbsp;tree.&nbsp;If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the&nbsp;root&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;library&nbsp;(all&nbsp;top&nbsp;level&nbsp;playlists)&nbsp;are&nbsp;requested.<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;player&nbsp;may&nbsp;have&nbsp;a&nbsp;media&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Jazz<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Dynamic<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Never&nbsp;played<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Played&nbsp;recently<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Playlists<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Party<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Sue's&nbsp;b-day<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
-
-<dl><dt><a name="MPRISAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
-&nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;<a href="#MPRISAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-update_item"><strong>update_item</strong></a>(self, id, info, img)</dt><dd><tt>Set&nbsp;currently&nbsp;played&nbsp;item.<br>
 &nbsp;<br>
@@ -767,6 +829,7 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;play
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_queue_item">action_queue_item</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_mlib_item">action_mlib_item</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_mlib_list">action_mlib_list</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_search_item">action_search_item</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Player&nbsp;adapters&nbsp;only&nbsp;need&nbsp;to&nbsp;implement&nbsp;only&nbsp;a&nbsp;*subset*&nbsp;of&nbsp;these<br>
 &nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;-&nbsp;depending&nbsp;on&nbsp;what&nbsp;is&nbsp;possible&nbsp;and&nbsp;what&nbsp;makes&nbsp;sense.<br>
@@ -782,6 +845,7 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nb
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_mlib">request_mlib</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-request_search">request_search</a>()<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;As&nbsp;above,&nbsp;only&nbsp;override&nbsp;the&nbsp;methods&nbsp;which&nbsp;make&nbsp;sense&nbsp;for&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.<br>
@@ -790,9 +854,10 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nb
 Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;respond&nbsp;to&nbsp;the&nbsp;requests&nbsp;above:<br>
 ===========================================================================<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_playlist_request()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_queue_request()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_mlib_request()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_search_request()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 ===========================================================================<br>
 Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;synchronize&nbsp;media&nbsp;player&nbsp;state&nbsp;information&nbsp;with&nbsp;clients:<br>
@@ -820,7 +885,7 @@ Finally&nbsp;some&nbsp;utility&nbsp;methods:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-find_image">find_image</a>()<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, playback_known<font color="#909090">=False</font>, volume_known<font color="#909090">=False</font>, repeat_known<font color="#909090">=False</font>, shuffle_known<font color="#909090">=False</font>, progress_known<font color="#909090">=False</font>, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>, file_actions<font color="#909090">=None</font>, mime_types<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player&nbsp;adapter&nbsp;and&nbsp;configure&nbsp;its&nbsp;capabilities.<br>
+<dl><dt><a name="PlayerAdapter-__init__"><strong>__init__</strong></a>(self, name, playback_known<font color="#909090">=False</font>, volume_known<font color="#909090">=False</font>, repeat_known<font color="#909090">=False</font>, shuffle_known<font color="#909090">=False</font>, progress_known<font color="#909090">=False</font>, max_rating<font color="#909090">=0</font>, poll<font color="#909090">=2.5</font>, file_actions<font color="#909090">=None</font>, mime_types<font color="#909090">=None</font>, search_mask<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;player&nbsp;adapter&nbsp;and&nbsp;configure&nbsp;its&nbsp;capabilities.<br>
 &nbsp;<br>
 Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbsp;starts&nbsp;with&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
 &nbsp;<br>
@@ -857,6 +922,10 @@ Just&nbsp;does&nbsp;some&nbsp;early&nbsp;initializations.&nbsp;Real&nbsp;job&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;'audio/mp3'&nbsp;or&nbsp;'video/quicktime'&nbsp;(setting&nbsp;this&nbsp;to&nbsp;None&nbsp;means&nbsp;all<br>
 &nbsp;&nbsp;&nbsp;&nbsp;mime&nbsp;types&nbsp;are&nbsp;supported)&nbsp;-&nbsp;this&nbsp;keyword&nbsp;is&nbsp;only&nbsp;relevant&nbsp;if&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;method&nbsp;<a href="#PlayerAdapter-action_files">action_files</a>()&nbsp;gets&nbsp;overridden<br>
+@keyword&nbsp;search_mask:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;fields&nbsp;to&nbsp;search&nbsp;the&nbsp;players&nbsp;library&nbsp;for&nbsp;(e.g.&nbsp;artist,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;genre,&nbsp;any,&nbsp;...)&nbsp;-&nbsp;if&nbsp;set&nbsp;method&nbsp;<a href="#PlayerAdapter-request_search">request_search</a>()&nbsp;should&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;overridden<br>
 &nbsp;<br>
 @attention:&nbsp;When&nbsp;overriding,&nbsp;call&nbsp;super&nbsp;class&nbsp;implementation&nbsp;first!</tt></dd></dl>
 
@@ -888,7 +957,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_mlib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;library&nbsp;path&nbsp;that&nbsp;contains&nbsp;the&nbsp;items<br>
 @param&nbsp;positions:<br>
@@ -896,17 +965,17 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_mlib_request().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_mlib_list"><strong>action_mlib_list</strong></a>(self, action_id, path)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;a&nbsp;list&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_mlib_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'list_actions'<br>
 @param&nbsp;path:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;specifying&nbsp;the&nbsp;list&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_mlib_request">reply_mlib_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_mlib_request().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_playlist_item"><strong>action_playlist_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;playlist.<br>
 &nbsp;<br>
@@ -916,13 +985,13 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_playlist_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_playlist_request().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-action_queue_item"><strong>action_queue_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
@@ -932,13 +1001,25 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @param&nbsp;action_id:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_queue_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
 @param&nbsp;positions:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
 @param&nbsp;ids:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
 &nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>().</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;item&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_queue_request().</tt></dd></dl>
+
+<dl><dt><a name="PlayerAdapter-action_search_item"><strong>action_search_item</strong></a>(self, action_id, positions, ids)</dt><dd><tt>Do&nbsp;an&nbsp;action&nbsp;on&nbsp;one&nbsp;or&nbsp;more&nbsp;items&nbsp;from&nbsp;a&nbsp;search&nbsp;result.<br>
+&nbsp;<br>
+@param&nbsp;action_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;action&nbsp;to&nbsp;do&nbsp;-&nbsp;this&nbsp;specifies&nbsp;one&nbsp;of&nbsp;the&nbsp;actions&nbsp;passed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;previously&nbsp;to&nbsp;reply_search_request()&nbsp;by&nbsp;the&nbsp;keyword&nbsp;'item_actions'<br>
+@param&nbsp;positions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;positions&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to&nbsp;<br>
+@param&nbsp;ids:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;IDs&nbsp;to&nbsp;apply&nbsp;the&nbsp;action&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -1035,102 +1116,71 @@ the&nbsp;current&nbsp;item&nbsp;and&nbsp;then&nbsp;call&nbsp;<a href="#PlayerAda
 to&nbsp;poll&nbsp;any&nbsp;other&nbsp;player&nbsp;state&nbsp;information&nbsp;when&nbsp;a&nbsp;player&nbsp;does&nbsp;not<br>
 provide&nbsp;signals&nbsp;for&nbsp;all&nbsp;or&nbsp;certain&nbsp;state&nbsp;information&nbsp;changes.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_mlib_request"><strong>reply_mlib_request</strong></a>(self, client, path, nested, ids, names, item_actions<font color="#909090">=None</font>, list_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;media&nbsp;library&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-request_mlib"><strong>request_mlib</strong></a>(self, reply, path)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;a&nbsp;playlist&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;path:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;library&nbsp;level<br>
-@param&nbsp;nested:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;nested&nbsp;lists&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;at&nbsp;the&nbsp;requested&nbsp;path<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;at&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;path&nbsp;<br>
-@keyword&nbsp;list_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ListAction">ListAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;nested&nbsp;lists&nbsp;at&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;path&nbsp;<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
+@param&nbsp;path:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;path&nbsp;within&nbsp;a&nbsp;player's&nbsp;media&nbsp;library<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;library&nbsp;(all&nbsp;top&nbsp;level<br>
+playlists)&nbsp;are&nbsp;requested.&nbsp;Otherwise&nbsp;path&nbsp;is&nbsp;set&nbsp;as&nbsp;illustrated&nbsp;in&nbsp;this<br>
+example:<br>
 &nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_mlib">request_mlib</a>()</tt></dd></dl>
+Consider&nbsp;a&nbsp;player&nbsp;with&nbsp;a&nbsp;media&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Jazz<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Dynamic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Never&nbsp;played<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Played&nbsp;recently<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;Playlists<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Party<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Sue's&nbsp;b-day<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
+&nbsp;<br>
+If&nbsp;path&nbsp;is&nbsp;the&nbsp;empty&nbsp;list,&nbsp;all&nbsp;top&nbsp;level&nbsp;playlists&nbsp;are&nbsp;requests,&nbsp;e.g.<br>
+['Radio',&nbsp;'Genres',&nbsp;'Dynamic',&nbsp;'Playlists',&nbsp;...].&nbsp;Otherwise&nbsp;path&nbsp;may<br>
+specify&nbsp;a&nbsp;specific&nbsp;level&nbsp;in&nbsp;the&nbsp;library&nbsp;tree,&nbsp;e.g.&nbsp;[&nbsp;'Radio'&nbsp;]&nbsp;or<br>
+[&nbsp;'Playlists',&nbsp;'Party',&nbsp;'Sue's&nbsp;b-day'&nbsp;]&nbsp;or&nbsp;etc.<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_playlist_request"><strong>reply_playlist_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;playlist&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-request_playlist"><strong>request_playlist</strong></a>(self, reply)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;playlist<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;in&nbsp;the&nbsp;playlist<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
 &nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_playlist">request_playlist</a>()</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-reply_queue_request"><strong>reply_queue_request</strong></a>(self, client, ids, names, item_actions<font color="#909090">=None</font>)</dt><dd><tt>Send&nbsp;the&nbsp;reply&nbsp;to&nbsp;a&nbsp;queue&nbsp;request&nbsp;back&nbsp;to&nbsp;the&nbsp;client.<br>
+<dl><dt><a name="PlayerAdapter-request_queue"><strong>request_queue</strong></a>(self, reply)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.<br>
 &nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;client&nbsp;to&nbsp;reply&nbsp;to<br>
-@param&nbsp;ids:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;IDs&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
-@param&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;names&nbsp;of&nbsp;the&nbsp;items&nbsp;contained&nbsp;in&nbsp;the&nbsp;queue<br>
-@keyword&nbsp;item_actions:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#ItemAction">ItemAction</a>&nbsp;which&nbsp;can&nbsp;be&nbsp;applied&nbsp;to&nbsp;items&nbsp;in&nbsp;the&nbsp;queue<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
 &nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-request_queue">request_queue</a>()</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-request_mlib"><strong>request_mlib</strong></a>(self, client, path)</dt><dd><tt>Request&nbsp;contents&nbsp;of&nbsp;a&nbsp;specific&nbsp;level&nbsp;from&nbsp;the&nbsp;player's&nbsp;media&nbsp;library.<br>
+<dl><dt><a name="PlayerAdapter-request_search"><strong>request_search</strong></a>(self, reply, query)</dt><dd><tt>Request&nbsp;a&nbsp;list&nbsp;of&nbsp;items&nbsp;matching&nbsp;a&nbsp;search&nbsp;query.<br>
 &nbsp;<br>
-@param&nbsp;client:&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-@param&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;level&nbsp;(string&nbsp;list)<br>
+@param&nbsp;reply:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;<a href="#ListReply">ListReply</a>&nbsp;<a href="api.html#object">object</a><br>
+@param&nbsp;query:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;search&nbsp;query&nbsp;values&nbsp;corresponding&nbsp;with&nbsp;the&nbsp;search&nbsp;mask<br>
+&nbsp;&nbsp;&nbsp;&nbsp;specified&nbsp;with&nbsp;keyword&nbsp;'search_mask'&nbsp;in&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.<a href="#PlayerAdapter-__init__">__init__</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Example:&nbsp;If&nbsp;search&nbsp;mask&nbsp;was&nbsp;[&nbsp;'Artist',&nbsp;'Title',&nbsp;'Album'&nbsp;],&nbsp;then<br>
+a&nbsp;query&nbsp;may&nbsp;look&nbsp;like&nbsp;this:&nbsp;[&nbsp;'Blondie',&nbsp;'',&nbsp;'Best'&nbsp;].&nbsp;It&nbsp;is&nbsp;up&nbsp;to<br>
+player&nbsp;adapters&nbsp;how&nbsp;to&nbsp;interpret&nbsp;these&nbsp;values.&nbsp;However,&nbsp;good&nbsp;practice<br>
+is&nbsp;to&nbsp;interpret&nbsp;them&nbsp;as&nbsp;case&nbsp;insensitive,&nbsp;and-connected,&nbsp;non&nbsp;exact<br>
+matching&nbsp;search&nbsp;values.&nbsp;The&nbsp;given&nbsp;example&nbsp;would&nbsp;then&nbsp;reply&nbsp;a&nbsp;list<br>
+with&nbsp;all&nbsp;items&nbsp;where&nbsp;'Blondie'&nbsp;is&nbsp;contained&nbsp;in&nbsp;the&nbsp;artist&nbsp;field&nbsp;and<br>
+'Best'&nbsp;is&nbsp;contained&nbsp;in&nbsp;the&nbsp;Album&nbsp;field.<br>
 &nbsp;<br>
-@note:&nbsp;path&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;which&nbsp;describe&nbsp;a&nbsp;specific&nbsp;level&nbsp;in<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;playlist&nbsp;tree.&nbsp;If&nbsp;path&nbsp;is&nbsp;an&nbsp;empty&nbsp;list,&nbsp;the&nbsp;root&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;player's&nbsp;library&nbsp;(all&nbsp;top&nbsp;level&nbsp;playlists)&nbsp;are&nbsp;requested.<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;player&nbsp;may&nbsp;have&nbsp;a&nbsp;media&nbsp;library&nbsp;structure&nbsp;like&nbsp;this:<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Radio<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Genres<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Jazz<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Dynamic<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Never&nbsp;played<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Played&nbsp;recently<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Playlists<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Party<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Sue's&nbsp;b-day<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;...<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here&nbsp;possibles&nbsp;values&nbsp;for&nbsp;path&nbsp;are&nbsp;[&nbsp;"Radio"&nbsp;]&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;"Playlists",&nbsp;"Party",&nbsp;"Sue's&nbsp;b-day"&nbsp;]&nbsp;or&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;reply_list_request()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-request_playlist"><strong>request_playlist</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;currently&nbsp;active&nbsp;playlist.<br>
-&nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
-
-<dl><dt><a name="PlayerAdapter-request_queue"><strong>request_queue</strong></a>(self, client)</dt><dd><tt>Request&nbsp;the&nbsp;content&nbsp;of&nbsp;the&nbsp;play&nbsp;queue.&nbsp;<br>
-&nbsp;<br>
-@param&nbsp;client:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;requesting&nbsp;client&nbsp;(needed&nbsp;for&nbsp;reply)<br>
-&nbsp;<br>
-@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-@see:&nbsp;<a href="#PlayerAdapter-reply_queue_request">reply_queue_request</a>()&nbsp;for&nbsp;sending&nbsp;back&nbsp;the&nbsp;result</tt></dd></dl>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-start"><strong>start</strong></a>(self)</dt><dd><tt>Start&nbsp;the&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
@@ -1140,7 +1190,7 @@ provide&nbsp;signals&nbsp;for&nbsp;all&nbsp;or&nbsp;certain&nbsp;state&nbsp;info
 &nbsp;<br>
 Disconnects&nbsp;all&nbsp;clients&nbsp;and&nbsp;shuts&nbsp;down&nbsp;the&nbsp;Bluetooth&nbsp;and&nbsp;WiFi&nbsp;server.<br>
 Also&nbsp;ignores&nbsp;any&nbsp;subsequent&nbsp;calls&nbsp;to&nbsp;an&nbsp;update&nbsp;or&nbsp;reply&nbsp;method&nbsp;(e.g.<br>
-<a href="#PlayerAdapter-update_volume">update_volume</a>(),&nbsp;...,&nbsp;<a href="#PlayerAdapter-reply_playlist_request">reply_playlist_request</a>(),&nbsp;...).&nbsp;<br>
+<a href="#PlayerAdapter-update_volume">update_volume</a>(),&nbsp;...,&nbsp;reply_playlist_request(),&nbsp;...).&nbsp;<br>
 &nbsp;<br>
 @note:&nbsp;The&nbsp;same&nbsp;player&nbsp;adapter&nbsp;instance&nbsp;can&nbsp;be&nbsp;started&nbsp;again&nbsp;with<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#PlayerAdapter-start">start</a>().<br>
@@ -1262,6 +1312,6 @@ to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
 <strong>PLAYBACK_PAUSE</strong> = 1<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
 <strong>PLAYBACK_STOP</strong> = 0<br>
-<strong>__all__</strong> = ('PlayerAdapter', 'MPRISAdapter', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP')<br>
-<strong>__version__</strong> = '0.8.2'</td></tr></table>
+<strong>__all__</strong> = ('PlayerAdapter', 'MPRISAdapter', 'ListReply', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP')<br>
+<strong>__version__</strong> = '0.9.0'</td></tr></table>
 </body></html>
