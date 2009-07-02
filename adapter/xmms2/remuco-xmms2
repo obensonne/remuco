@@ -30,6 +30,7 @@ import gobject
 
 import xmmsclient
 import xmmsclient.glib
+import xmmsclient.collections
 
 import remuco
 from remuco import log
@@ -50,6 +51,8 @@ ERROR_DISCONNECTED = "disconnected"
 
 PLAYLIST_ID_ACTIVE = "_active"
 
+SEARCH_MASK = ["Artist", "Title", "Album", "Genre"]
+
 # =============================================================================
 # actions
 # =============================================================================
@@ -69,9 +72,57 @@ MLIB_ITEM_ACTIONS = (IA_APPEND, IA_PLAY_NEXT)
 # helper classes
 # =============================================================================
 
+class SearchRequest():
+    """Class for handling a search request."""
+    
+    def __init__(self, reply, pa, query):
+        """Create a new search request.
+        
+        @param reply: the request's ListReply object
+        @param pa: XMMS2Adapter
+        @param query: search query
+        
+        """
+        coll = None
+        
+        for field, value in zip(SEARCH_MASK, query):
+            value = value.strip()
+            if not value:
+                continue
+            value = "*%s*" % value
+            field = field.lower()
+            coll = xmmsclient.collections.Match(coll, field=field, value=value)
+            
+        if coll is None:
+            reply.send()
+            return
+        
+        self.__reply = reply
+        self.__pa = pa
+        
+        self.__pa._x2.coll_query_infos(coll, ("artist", "title", "id"),
+                                       cb=self.__handle_result)
+        
+    def __handle_result(self, result):
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        items = result.value()
+        
+        for item in items:
+            self.__reply.ids.append(str(item["id"]))
+            artist = item.get("artist", "???")
+            title = item.get("title", "???")
+            self.__reply.names.append("%s- %s" % (artist, title))
+        
+        self.__reply.item_actions = MLIB_ITEM_ACTIONS
+        
+        self.__reply.send()
+
 class ItemListRequest():
     
-    def __init__(self, client, pa, path):
+    def __init__(self, reply, pa, path):
         """Create a new item list request.
         
         @param reply: the request's ListReply object
@@ -79,12 +130,11 @@ class ItemListRequest():
         @param path: path of the requested item list
         
         """
-        
         self.__pa = pa
         self.__ids_iter = 0
         self.__ids_int = []
         
-        self.__reply = client
+        self.__reply = reply
         
         self.__path = path
         
@@ -180,7 +230,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                                       shuffle_known=True,
                                       playback_known=True,
                                       volume_known=True,
-                                      progress_known=True)
+                                      progress_known=True,
+                                      search_mask=SEARCH_MASK)
         
         self.__state_playback = remuco.PLAYBACK_STOP
         self.__state_volume = 0
@@ -374,6 +425,10 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         else:
             log.error("** BUG ** unexpected action: %d" % action_id)
                 
+    def action_search_item(self, action_id, positions, ids):
+        
+        self.action_mlib_item(action_id, None, positions, ids)
+        
     # =========================================================================
     # request interface 
     # =========================================================================
@@ -386,12 +441,16 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
         ItemListRequest(reply, self, path)
         
+    def request_search(self, reply, query):
+        
+        SearchRequest(reply, self, query)
+    
     # =========================================================================
     # internal methods
     # =========================================================================
     
     def _check_result(self, result):
-        """ Check the result of a request send to XMMS2. """
+        """ Check the result of a request sent to XMMS2. """
         
         if not result.iserror():
             return True
