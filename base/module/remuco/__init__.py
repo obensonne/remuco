@@ -35,6 +35,9 @@ Class MPRISAdapter:
 Classes ItemAction and ListAction:
     Classes to define actions clients may execute in their media browser. 
 
+Class ListReply:
+    Used by player adapters to reply requests for playlists and other lists.
+
 Class Manager:
     Helper class for managing the life cycle of a player adapter.
 

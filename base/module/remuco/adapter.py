@@ -46,6 +46,10 @@ from remuco.data import Control, Action, Tagging, Request
 
 from remuco.manager import DummyManager
 
+# =============================================================================
+# reply class for requests
+# =============================================================================
+
 class ListReply(object):
     """Reply object for an item list request.
     
@@ -54,8 +58,8 @@ class ListReply(object):
     PlayerAdapter.request_mlib() and PlayerAdapter.request_search().
     
     Player adapters are supposed to use the list reply object to set the
-    reply data (using properties 'ids', 'names' and
-    'nested') and to send the reply to clients (using send()).
+    reply data (using properties 'ids', 'names', 'item_actions' and
+    'nested', 'list_actions') and to send the reply to clients (using send()).
     
     """
     PAGE_SIZE = 50
@@ -121,7 +125,7 @@ class ListReply(object):
     # === property: ids ===
     
     def __pget_ids(self):
-        """Reply data.
+        """IDs of the items contained in a list.
         
         Player adapters should set this to a list of IDs of the items contained
         in the requested list.
@@ -137,7 +141,7 @@ class ListReply(object):
     # === property: names ===
     
     def __pget_names(self):
-        """Reply data.
+        """Names of the items contained in a list.
         
         Player adapters should set this to a list of names of the items
         contained in the requested list. Good choice for a name is combination
@@ -154,7 +158,7 @@ class ListReply(object):
     # === property: nested ===
     
     def __pget_nested(self):
-        """Reply data.
+        """Names of nested lists contained in a list.
         
         Player adapters should set this to a list of names of the nested lists
         contained in the requested list. To be used only for mlib requests (see
@@ -195,7 +199,8 @@ class ListReply(object):
     def __pset_list_actions(self, value):
         self.__list_actions = value
     
-    list_actions = property(__pget_list_actions, __pset_list_actions, None, __pget_list_actions.__doc__)
+    list_actions = property(__pget_list_actions, __pset_list_actions, None,
+                            __pget_list_actions.__doc__)
 
 
 # =============================================================================
