@@ -34,7 +34,7 @@ class ServerTest(unittest.TestCase):
     def setUp(self):
         
         self.__ml = gobject.MainLoop()
-        self.__pi = PlayerInfo("xxx", 0, 0, None)
+        self.__pi = PlayerInfo("xxx", 0, 0, 44, None, ["1", "2"])
         self.__config = Config("unittest")
 
     def test_wifi(self):

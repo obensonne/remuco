@@ -165,7 +165,7 @@ class SerializationTest(unittest.TestCase):
         #print("")
         
         ia = remuco.ItemAction("ia_l", multiple=True)
-        pi = data.PlayerInfo("dings", 123, 4, [ia])
+        pi = data.PlayerInfo("dings", 123, 4, 20, [ia], ["sm1", "sm2"])
         
         #self.__serialize(pi)
         serial.pack(pi)
@@ -186,7 +186,7 @@ class SerializationTest(unittest.TestCase):
         la1 = remuco.ListAction("la1_l")
         las = [ la1 ]
         
-        il = data.ItemList(path, nested, ids, names, ias, las)
+        il = data.ItemList(path, nested, ids, names, 0, 1, 2, ias, las)
         
         #self.__serialize(il)
         serial.pack(il)
@@ -206,7 +206,7 @@ class SerializationTest(unittest.TestCase):
         #las = [ la1 ]
         las = None
         
-        il = data.ItemList(path, nested, ids, names, ias, las)
+        il = data.ItemList(path, nested, ids, names, 0, 1, 2, ias, las)
         
         #self.__serialize(il)
         serial.pack(il)
