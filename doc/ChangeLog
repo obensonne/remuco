@@ -1,6 +1,18 @@
-0.8.3	Oben Sonne <obensonne@googlemail.com>
+0.9.0	Oben Sonne <obensonne@googlemail.com>
 
-	* client: added basic touch-screen support
+	* all: added paging mechanism to item lists to enable clients to browse
+	  very long item lists
+	* all: added search feature
+	* base: volume control optionally controls master volume
+	* client: added touch-screen support
+	* client: fullscreen cover art is now real fullscreen
+	* client: dropped themes Korama and Chocolate, added 4 new themes for
+	  touchscreen devices
+	* client: added several new icons
+	* client: added script to automatically set up build environment
+	* mpd: implemented search feature
+	* rhythmbox: implemented search feature
+	* rhythmbox: added repeat and shuffle control
 
 0.8.2.1	Oben Sonne <obensonne@googlemail.com>
 

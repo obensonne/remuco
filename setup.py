@@ -85,12 +85,8 @@ pa_files["vlc"] = [
 
 # --- XMMS2 -------------------------------------------------------------------
 
-# set prefix may not be valid for XMMS2 -> use an XMMS2 specific prefix:
-PREFIX_XMMS2 = os.getenv("PREFIX_XMMS2", "/usr/")
-
 pa_files["xmms2"] = [
-    [],
-    ("%sshare/xmms2/scripts/startup.d" % PREFIX_XMMS2, ["remuco-xmms2"])
+    ["remuco-xmms2"]
 ]
 
 # =============================================================================
@@ -110,7 +106,7 @@ else:
     player_adapters = pa_selection.split(',')
     
 # =============================================================================
-# generate script and date file list (add prefix to pa_files)
+# generate script and data file list (add prefix to pa_files)
 # =============================================================================
 
 scripts = []
@@ -151,7 +147,7 @@ if install_client and os.path.exists("client/app"):
 # =============================================================================
 
 setup(name='remuco',
-      version='0.8.3',
+      version='0.9.0',
       description='Remuco is a remote control system for media players.',
       author='Oben Sonne',
       author_email='obensonne@googlemail.com',
