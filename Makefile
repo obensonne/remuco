@@ -34,7 +34,7 @@ uninstall: help
 
 install-base: clean
 	python base/module/install-check.py
-	REMUCO_ADAPTERS="" $(SETUP) --record install-base.log
+	REMUCO_COMPONENTS="" $(SETUP) --record install-base.log
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Installed Remuco base."
 	@echo "+-----------------------------------------------------------------+"
@@ -42,7 +42,7 @@ install-base: clean
 install-%: install-base
 	@IC=adapter/$(subst install-,,$@)/install-check.py ; \
 		[ ! -e $$IC ] || python $$IC
-	REMUCO_ADAPTERS=$(subst install-,,$@) $(SETUP) --record install-tmp.log
+	REMUCO_COMPONENTS=$(subst install-,,$@) $(SETUP) --record install-tmp.log
 	diff --suppress-common-lines -n \
 		install-base.log install-tmp.log \
 		| grep "^/" > install-$(subst install-,,$@).log

@@ -93,21 +93,34 @@ pa_files["xmms2"] = [
 # select player adapters to build/install (all by default)
 # =============================================================================
 
-pa_selection = os.getenv("REMUCO_ADAPTERS")
+components = os.getenv("REMUCO_COMPONENTS")
 
-if pa_selection is None:
-    # build/install all adapters
+if components is None:
+    # build/install everything
     player_adapters = pa_files.keys()
-elif pa_selection == "":
-    # build/install no adapters
+    client = True
+elif components == "adapters":
+    # build/install all player adapters
+    player_adapters = pa_files.keys()
+    client = False
+elif components == "":
+    # build/install no adapters, no client, only the base module
     player_adapters = []
+    client = False
 else:
-    # build/install selected adapters
-    player_adapters = pa_selection.split(',')
+    # build/install according to list selection
+    player_adapters = components.split(',')
+    try:
+        player_adapters.remove("client")
+        client = True
+    except ValueError:
+        client = False
     
 # =============================================================================
 # generate script and data file list (add prefix to pa_files)
 # =============================================================================
+
+print player_adapters
 
 scripts = []
 data_files = []
@@ -132,15 +145,9 @@ for pa in player_adapters:
 
 CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
 
-# do not install client if certain environment variables are set (used by
-# Makefile to suppress client installation)
-install_client = (os.getenv("REMUCO_ADAPTERS") is None and
-                  os.getenv("REMUCO_NO_CLIENT") is None)  
-
-if install_client and os.path.exists("client/app"):
+if client and os.path.exists("client/app"):
     data_files.append((CLIENT_DEST, ["client/app/remuco.jar",
                                      "client/app/remuco.jad"]))
-        
 
 # =============================================================================
 # setup
