@@ -27,6 +27,7 @@ import remuco.comm.ISerializable;
 import remuco.comm.Message;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
+import remuco.util.Tools;
 
 public final class ItemList implements ISerializable {
 
@@ -47,6 +48,24 @@ public final class ItemList implements ISerializable {
 	private static final int TYPE_FILES = Message.REQ_FILES;
 
 	private static final String UNKNWON = "#~@X+.YO?/";
+
+	/**
+	 * Some list names have a special format which needs to be changed before
+	 * displaying them on screen.
+	 */
+	private static String makeRawListNameNice(String raw) {
+
+		if (raw.indexOf('\n') < 0) {
+			return raw;
+		} else {
+			final String elems[] = Tools.splitString(raw, '\n', false);
+			final StringBuffer sb = new StringBuffer(elems[0]);
+			for (int i = 1; i < elems.length; i++) {
+				sb.append(" / ").append(elems[i]);
+			}
+			return sb.toString();
+		}
+	}
 
 	private final Vector actions;
 
@@ -172,7 +191,7 @@ public final class ItemList implements ISerializable {
 				name = "XXX";
 			}
 		} else { // media lib or files, not root
-			name = path[path.length - 1];
+			name = makeRawListNameNice(path[path.length - 1]);
 		}
 
 		if (pageMax != 0) {
@@ -187,7 +206,7 @@ public final class ItemList implements ISerializable {
 	public String getNested(int i) {
 
 		try {
-			return nested[i];
+			return makeRawListNameNice(nested[i]);
 		} catch (NullPointerException e) {
 			return UNKNWON;
 		} catch (ArrayIndexOutOfBoundsException e) {
