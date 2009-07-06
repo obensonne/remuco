@@ -211,6 +211,9 @@ class FileSystemLibrary(object):
             x, dirs, files = os.walk(dir).next()
         except StopIteration:
             return (nested, ids, names)
+        
+        dirs.sort()
+        files.sort()
               
         for entry in dirs:
             
@@ -250,7 +253,7 @@ class FileSystemLibrary(object):
             if not self.__show_extensions:
                 entry = os.path.splitext(entry)[0]
             names.append(entry)
-                        
+
         return (nested, ids, names)
     
   
