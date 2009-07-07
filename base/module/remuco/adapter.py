@@ -86,7 +86,8 @@ class ListReply(object):
         
         ### paging ###
         
-        len_all = len(self.__ids or []) + len(self.__nested or [])
+        # TODO: float may be removed in P3K
+        len_all = float(len(self.__ids or []) + len(self.__nested or []))
         page_max = max(math.ceil(len_all / ListReply.PAGE_SIZE) - 1, 0)
         
         index_start = self.__page * ListReply.PAGE_SIZE
@@ -121,6 +122,7 @@ class ListReply(object):
         msg = net.build_message(self.__reply_msg_id, ilist)
         
         gobject.idle_add(self.__client.send, msg)
+        
 
     # === property: ids ===
     
