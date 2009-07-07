@@ -463,6 +463,11 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                 if path[0] == group_name:
                     for sc in group.iterchildren():
                         source_name = sc[2]
+                        # FIXME: how to be l10n independent here?
+                        if source_name.startswith("Play Queue"):
+                            continue
+                        if source_name.startswith("Import Error"):
+                            continue
                         log.debug("append %s" % source_name)
                         reply.nested.append(source_name)
                     break
