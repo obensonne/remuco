@@ -20,7 +20,8 @@ Table of Contents
 2. Installation
 3. Usage
 4. Player Adapter Development
-5. Packager Information
+5. Client Development
+6. Packager Information
 A. General Information
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -79,13 +80,6 @@ Run
  
 to get instructions on how to install Remuco for one or more media players.
 
-Note: Please remove any Remuco version < 0.8.2. Installation process has
-      changed in 0.8.2 so that you otherwise might end up with multiple Remuco
-      installations on your system. If you do not have the install log files
-      anymore which lists all installed files, then look for files starting
-      with 'remuco-...' in /usr/local/bin and for a directory called 'remuco'
-      and a remuco egg info file in /usr/local/lib/python2.X/site-packages/.
-
 Next, install the client application on your mobile device. You find the
 required JAR and JAD files in the directory 'client/app'.
 How to install is device dependent - please consult the documentation of your
@@ -130,19 +124,34 @@ described in the file 'api.html'.
 
 To test the fooplay adapter, simply run it as a Python script. It requires the
 Python module 'remuco' which is available if you installed another player
-adapter before. Otherwise, just add '<package-root>/base/module' to PYTHONPATH
-before running the fooplay adapter.
+adapter before. Otherwise, just add '<pkg-root>/base/module' to PYTHONPATH
+before running the fooplay adapter. For instance
+
+$ PYTHONPATH=<pkg-root>/base/module <pkg-root>/adapter/fooplay/remuco-fooplay
+
+starts the fooplay adapter without installing anything. Try it, it's easy :)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. Packager Information
+5. Client Development
+
+As a quick start, change into the directory <pkg-root>/client and run setup.sh
+to set up the client build environment and to get further instructions.
+
+More detailed information can be found at:
+http://remuco.sourceforge.net/index.php/Client_Customization
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. Packager Information
 
 Packagers should not use the top level make file -- this is a wrapper around
-'setup.py'. Instead use setup.py directly, which install all Remuco components
-(base, player adapters and client binaries) by default. The client installation
-can be suppressed by setting the environment variable 'REMUCO_NO_CLIENT'.
+'setup.py'. Instead use setup.py directly, which installs all Remuco components
+(base, player adapters and client binaries) by default. To install only some
+components, the environment variable REMUCO_COMPONENTS may be set appropriately.
 Additionally some more environment variables may be used to adjust the
-installation process, just grep setup.py for 'os.getenv'.
+installation process. Just search for 'os.getenv' within setup.py to get more
+detailed information.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -190,7 +199,7 @@ directory remuco-trunk:
 
  $ svn co <SVN-ROOT>/trunk remuco-trunk
 
-Example A-2. Check out the source from release 0.8.0 into the directory
-remuco-0.8.0:
+Example A-2. Check out the source from release 0.9.0 into the directory
+remuco-0.9.0:
 
- $ svn co <SVN-ROOT>/tags/0.8.0 remuco-0.8.0
+ $ svn co <SVN-ROOT>/tags/0.9.0 remuco-0.9.0
