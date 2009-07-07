@@ -335,7 +335,7 @@
 
 	<target name="clean" description="--> clean project">
 		<delete dir="build" />
-		<delete dir="desgin/themes/build" />
+		<delete dir="design/themes/build" />
 		<delete dir="dist" />
 	</target>
 
