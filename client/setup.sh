@@ -35,6 +35,8 @@ TAR_PROGUARD=proguard4.3.tar.gz
 URL_PROGUARD=http://downloads.sourceforge.net/proguard/$TAR_PROGUARD
 DIR_PROGUARD=proguard4.3
 
+cd "`dirname $0`"
+
 mkdir -p tools/download
 
 get_tool() {
