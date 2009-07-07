@@ -52,7 +52,7 @@ mkdir $PKG/client
 
 cd client
 
-for ITEM in src res design *.example build.xml ; do
+for ITEM in src res design *.example build.xml setup.sh ; do
 	cp -r $ITEM ../$PKG/client/
 done
 
