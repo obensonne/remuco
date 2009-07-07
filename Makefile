@@ -14,13 +14,13 @@ help:
 	@echo "To install a player adapter (and required base components), run:"
 	@for PA in $(ADAPTERS); do echo "    make install-$$PA"; done
 	@echo
-	@echo "To uninstall a player adapter, run"
+	@echo "To uninstall a player adapter, run:"
 	@for PA in $(ADAPTERS); do echo "    make uninstall-$$PA"; done
 	@echo
-	@echo "To uninstall all components (base and player adapters), run"
+	@echo "To uninstall all components (base and player adapters), run:"
 	@echo "    make uninstall-all"
 	@echo
-	@echo "Of course, use 'sudo' when needed."
+	@echo "Of course, be root or use 'sudo' when needed."
 	@echo
 
 all: help
