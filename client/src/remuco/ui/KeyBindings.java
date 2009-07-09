@@ -83,10 +83,10 @@ public final class KeyBindings {
 	 * <code>i</code>.
 	 */
 	private static final int[] defaultBindings = new int[] { Canvas.KEY_NUM5,
-			Canvas.KEY_NUM8, Canvas.KEY_NUM2, Canvas.KEY_NUM6, Canvas.KEY_NUM4,
-			Canvas.KEY_NUM1, Canvas.KEY_POUND, Canvas.KEY_STAR,
-			Canvas.KEY_NUM3, Canvas.KEY_NUM0, Canvas.KEY_NUM7, Canvas.KEY_NUM9,
-			0 };
+			Canvas.KEY_NUM6, Canvas.KEY_NUM4, Canvas.KEY_NUM2, Canvas.KEY_NUM8,
+			Canvas.KEY_NUM0, Canvas.KEY_POUND, Canvas.KEY_STAR,
+			0 , Canvas.KEY_NUM1, Canvas.KEY_NUM7, Canvas.KEY_NUM9,
+			Canvas.KEY_NUM3 };
 
 	private KeyBindings() {
 
