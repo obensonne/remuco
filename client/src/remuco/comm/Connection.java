@@ -479,9 +479,8 @@ public final class Connection implements Runnable {
 				downPrivate();
 				url = null; // suppress reconnecting;
 				throw new UserException("Connecting failed",
-						"Server and client have incompatible versions. Either"
-								+ " use another server or another client "
-								+ "version. See the FAQ on the Remuco web site"
+						"Server and client have incompatible versions. See "
+								+ "the FAQ on the Remuco web site"
 								+ " for more information.");
 			}
 			if (readAndCompare(SUFFIX) < 0) {
