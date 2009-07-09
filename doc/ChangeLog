@@ -10,6 +10,7 @@
 	  touchscreen devices
 	* client: added several new icons
 	* client: added script to automatically set up build environment
+	* client: changed default key bindings
 	* xmms2: implemented search feature
 	* mpd: implemented search feature
 	* rhythmbox: implemented search feature
