@@ -152,7 +152,9 @@ public final class TitleScreeny extends Screeny {
 			details.append(bitrate).append('k');
 		}
 
-		g.drawString(details.toString(), width / 2, yDetails, TOP_CENTER);
+		if (details.length() > 0) {
+			g.drawString(details.toString(), width / 2, yDetails, TOP_CENTER);
+		}
 
 		// //// image //////
 
