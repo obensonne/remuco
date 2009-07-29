@@ -65,7 +65,11 @@ public final class Theme {
 	public static final Font FONT_VOLUME = Font.getFont(Font.FACE_MONOSPACE,
 		Font.STYLE_PLAIN, Font.SIZE_LARGE);
 
+	/** Half height of small font. */
 	public static final int LINE_GAP = FONT_SMALL.getHeight() / 2;
+	
+	/** Third height of small font. */
+	public static final int LINE_GAP_SMALL = FONT_SMALL.getHeight() / 3;
 
 	/**
 	 * Theme element ID (<code>RTE_..</code>) or color ID (<code>RTC_..</code>)

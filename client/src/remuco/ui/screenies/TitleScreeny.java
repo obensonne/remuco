@@ -33,7 +33,10 @@ import remuco.ui.Theme;
  */
 public final class TitleScreeny extends Screeny {
 
-	private int colorBg, colorArtist, colorAlbum, colorTitle; // colorText;
+	private int colorBg, colorArtist, colorAlbum, colorTitle, colorText;
+
+	/** Width dependent spacer string for values in item details line. */
+	private String detailsSpacer = "  ";
 
 	private final Item noPlob;
 
@@ -54,8 +57,14 @@ public final class TitleScreeny extends Screeny {
 		colorAlbum = theme.getColor(Theme.RTC_TEXT_ALBUM);
 		colorArtist = theme.getColor(Theme.RTC_TEXT_ARTIST);
 		colorBg = theme.getColor(Theme.RTC_BG);
-		// colorText = theme.getColor(Theme.RTC_TEXT_OTHER);
+		colorText = theme.getColor(Theme.RTC_TEXT_OTHER);
 		colorTitle = theme.getColor(Theme.RTC_TEXT_TITLE);
+
+		char ca[] = new char[(width / Theme.FONT_SMALL.charWidth(' ')) / 8];
+		for (int i = 0; i < ca.length; i++) {
+			ca[i] = ' ';
+		}
+		detailsSpacer = new String(ca);
 
 		noPlob.setMeta(Item.META_TITLE, player.getName());
 	}
@@ -107,12 +116,54 @@ public final class TitleScreeny extends Screeny {
 		sa = Theme.splitString(item.getMeta(Item.META_ALBUM), width,
 			Theme.FONT_ALBUM);
 		y = drawStrings(sa, width, y);
+		
+		y += Theme.LINE_GAP_SMALL; // top border for image
+
+		// //// details //////
+
+		final int yDetails = height - Theme.LINE_GAP - g.getFont().getHeight();
+		if (yDetails < y) {
+			// not enough space for item details
+			return;
+		}
+
+		g.setColor(colorText);
+		g.setFont(Theme.FONT_SMALL);
+
+		final StringBuffer details = new StringBuffer();
+
+		final String year = item.getMeta(Item.META_YEAR);
+		final String genre = item.getMeta(Item.META_GENRE);
+		final String bitrate = item.getMeta(Item.META_BITRATE);
+
+		if (year.length() > 0 && !year.equals("0")) {
+			details.append(year);
+		}
+		if (genre.length() > 0 && !genre.equalsIgnoreCase("unknown")) {
+			if (details.length() > 0) {
+				details.append(detailsSpacer);
+			}
+			details.append(genre);
+		}
+		if (bitrate.length() > 0 && !bitrate.equals("0")) {
+			if (details.length() > 0) {
+				details.append(detailsSpacer);
+			}
+			details.append(bitrate).append('k');
+		}
+
+		g.drawString(details.toString(), width / 2, yDetails, TOP_CENTER);
 
 		// //// image //////
 
-		y += Theme.LINE_GAP;
+		final int maxImgHeight;
 
-		final int maxImgHeight = height - Theme.LINE_GAP - y;
+		if (details.length() == 0) {
+			maxImgHeight = height - Theme.LINE_GAP - y;
+		} else {
+			maxImgHeight = yDetails - Theme.LINE_GAP_SMALL - y;
+		}
+
 		if (maxImgHeight < 32) // not enough space for an image
 			return;
 
@@ -136,7 +187,7 @@ public final class TitleScreeny extends Screeny {
 		final int fontHeight = g.getFont().getHeight();
 
 		for (int i = 0; i < sa.length; i++) {
-			g.drawString(sa[i], width / 2, y, Graphics.TOP | Graphics.HCENTER);
+			g.drawString(sa[i], width / 2, y, TOP_CENTER);
 			y += fontHeight;
 		}
 
