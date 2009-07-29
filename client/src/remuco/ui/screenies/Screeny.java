@@ -79,6 +79,9 @@ public abstract class Screeny {
 	/** Combination of {@link Graphics#BOTTOM} and {@link Graphics#RIGHT} */
 	public static final int BOTTOM_RIGHT = Graphics.BOTTOM | Graphics.RIGHT;
 
+	/** Combination of {@link Graphics#TOP} and {@link Graphics#HCENTER} */
+	public static final int TOP_CENTER = Graphics.TOP | Graphics.HCENTER;
+
 	/** Combination of {@link Graphics#TOP} and {@link Graphics#LEFT} */
 	public static final int TOP_LEFT = Graphics.TOP | Graphics.LEFT;
 
