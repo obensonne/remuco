@@ -306,28 +306,13 @@ public final class Config {
 	}
 
 	/**
-	 * Get the value of an application property (defined in the MIDlet's
-	 * manifest file).
-	 * 
-	 * @param key
-	 *            the property name to get the value of
-	 * @return the property's value or <code>null</code> if the property is not
-	 *         set
-	 */
-	public String getProperty(String key) {
-
-		return midlet.getAppProperty(key);
-
-	}
-
-	/**
 	 * Get a list of available themes.
 	 * 
 	 * @return the theme names or <code>null</code> if unknown
 	 */
 	public String[] getThemeList() {
 
-		final String list = getProperty(APP_PROP_THEMES);
+		final String list = midlet.getAppProperty(APP_PROP_THEMES);
 		if (list != null) {
 			return Tools.splitString(list, ',', true);
 		} else {
