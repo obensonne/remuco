@@ -155,6 +155,24 @@ public final class Tools {
 	}
 
 	/**
+	 * Get the first index of an object within an object array. Object equality
+	 * is checked by {@link Object#equals(Object)}.
+	 * 
+	 * @param array
+	 * @param element
+	 * @return the index number or -1 if <i>element</i> is not contained within
+	 *         <i>array</i>
+	 */
+	public static int getIndex(Object array[], Object element) {
+		for (int i = 0; i < array.length; i++) {
+			if (element.equals(array[i])) {
+				return i;
+			}
+		}
+		return 1;
+	}
+
+	/**
 	 * Sleep a while. {@link InterruptedException} gets caught but sleeping
 	 * won't be continued.
 	 * 
