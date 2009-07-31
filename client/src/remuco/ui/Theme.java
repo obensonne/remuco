@@ -29,11 +29,16 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.Config;
+import remuco.OptionDescriptor;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.util.Log;
 
 public final class Theme {
+
+	/** Small font */
+	public static final Font FONT_SMALL = Font.getFont(Font.FACE_PROPORTIONAL,
+		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
 	/** Large font */
 	public static final Font FONT_LARGE = Font.getFont(Font.FACE_PROPORTIONAL,
@@ -43,8 +48,8 @@ public final class Theme {
 	public static final Font FONT_NORMAL = Font.getFont(Font.FACE_PROPORTIONAL,
 		Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
 
-	/** Small font */
-	public static final Font FONT_SMALL = Font.getFont(Font.FACE_PROPORTIONAL,
+	/** Font for progress value */
+	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
 		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
 	/** Font for an item's album */
@@ -52,10 +57,6 @@ public final class Theme {
 
 	/** Font for an item's artist */
 	public static final Font FONT_ARTIST = FONT_NORMAL;
-
-	/** Font for progress value */
-	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
-		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
 	/** Font for an item's title */
 	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
@@ -67,9 +68,12 @@ public final class Theme {
 
 	/** Half height of small font. */
 	public static final int LINE_GAP = FONT_SMALL.getHeight() / 2;
-	
+
 	/** Third height of small font. */
 	public static final int LINE_GAP_SMALL = FONT_SMALL.getHeight() / 3;
+
+	public static final OptionDescriptor OD_THEME = new OptionDescriptor(
+			"theme", "Theme", "Vico", "Emo,Frog,Frog-XL,Lilac,Lilac-XL,Vico");
 
 	/**
 	 * Theme element ID (<code>RTE_..</code>) or color ID (<code>RTC_..</code>)
@@ -87,9 +91,6 @@ public final class Theme {
 			RTC_BG = 22, RTC_TEXT_ALBUM = 23, RTC_TEXT_ARTIST = 24,
 			RTC_TEXT_OTHER = 25, RTC_TEXT_TITLE = 26, RTE_ICON_RATING_OFF = 27,
 			RTE_ICON_RATING_ON = 28;
-
-	/** Name of the default theme to load. */
-	private static final String DEFAULT = "Vico";
 
 	private static final Image IMG_FALLBACK;
 
@@ -396,9 +397,11 @@ public final class Theme {
 			aicHmpf, aicYes;
 
 	/** List icon */
-	public final Image licBluetooth, licWifi, licItem, licItemMarked,
-			licList, licAdd, licThemes, licKeys, licOff, licLog,
-			licDisconnect, licQueue, licSearch, licMLib, licFiles;
+	public final Image licBluetooth, licWifi, licItem, licItemMarked, licList,
+			licAdd, licThemes, licKeys, licOff, licLog, licDisconnect,
+			licQueue, licSearch, licMLib, licFiles;
+
+	private final Config config;
 
 	private String current = null;
 
@@ -407,6 +410,8 @@ public final class Theme {
 	private final Image logos[];
 
 	private Theme(Display display) {
+
+		config = Config.getInstance();
 
 		img = new Image[IMG_NAME.length];
 
@@ -465,7 +470,7 @@ public final class Theme {
 
 		// load default theme
 
-		load(null);
+		load(config.getOption(OD_THEME));
 
 	}
 
@@ -574,48 +579,23 @@ public final class Theme {
 	}
 
 	/**
-	 * Get the name of the currently loaded theme.
-	 * 
-	 * @return the name
-	 */
-	public String getName() {
-		return current;
-	}
-
-	/**
 	 * Load a new theme.
 	 * 
 	 * @param name
-	 *            theme name (may be <code>null</code> - in this case the
-	 *            default theme gets loaded)
+	 *            theme name (one of {@link OptionDescriptor#choices} in
+	 *            {@link #OD_THEME})
 	 */
 	public void load(String name) {
 
-		if (name == null)
-			name = DEFAULT;
-
 		if (name.equals(current)) {
 			return;
-		}
-
-		final String themes[] = Config.getInstance().getThemeList();
-
-		int i;
-		for (i = 0; i < themes.length; i++) {
-			if (name.equals(themes[i])) {
-				break;
-			}
-		}
-		if (i == themes.length) {
-			// 'name' seems to be an old, invalid name from the config
-			name = themes[0];
 		}
 
 		current = name;
 
 		final String themeDir = "/themes/" + current + "/";
 
-		for (i = 0; i < img.length; i++) {
+		for (int i = 0; i < img.length; i++) {
 			img[i] = loadImage(themeDir + IMG_NAME[i] + ".png", 0);
 		}
 

@@ -43,6 +43,8 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.comm.Serial;
 import remuco.ui.KeyBindings;
+import remuco.ui.Theme;
+import remuco.ui.screenies.TitleScreeny;
 import remuco.util.Log;
 import remuco.util.Tools;
 
@@ -71,8 +73,6 @@ public final class Config {
 
 	/** Name of the application property that indicates emulation mode. */
 	protected static final String APP_PROP_EMULATION = "Remuco-emulation";
-
-	private static final String APP_PROP_THEMES = "Remuco-themes";
 
 	private static final char DEVICE_SPLITTER = ',';
 
@@ -173,14 +173,18 @@ public final class Config {
 		return null;
 	}
 
+	public final Vector optionDescriptors = new Vector();
+
 	private final Vector devices = new Vector();
 
 	private int[] keyBindings = new int[0];
 
 	private final boolean loadedSuccessfully;
 
-	/** MIDlet reference for access to application properties. */
+	/** MIDlet for application property access. */
 	private final MIDlet midlet;
+
+	private final Vector optionListener = new Vector();
 
 	/** Options loaded from / saved to a record store. */
 	private final Hashtable options = new Hashtable();
@@ -196,6 +200,8 @@ public final class Config {
 		this.midlet = midlet;
 
 		loadedSuccessfully = load();
+
+		initOptions();
 
 	}
 
@@ -238,6 +244,10 @@ public final class Config {
 
 	}
 
+	public void addOptionListener(IOptionListener ol) {
+		optionListener.addElement(ol);
+	}
+
 	/**
 	 * Delete a device from the list of known devices.
 	 * 
@@ -260,6 +270,10 @@ public final class Config {
 		}
 	}
 
+	public String getAppProperty(String name) {
+		return midlet.getAppProperty(name);
+	}
+
 	public int[] getKeyBindings() {
 		return keyBindings;
 	}
@@ -280,45 +294,14 @@ public final class Config {
 	/**
 	 * Get the value of a configuration option.
 	 * 
-	 * @param name
-	 *            the option to get the value of
-	 * @return the option's value or <code>null</code> if the option is not set
+	 * @param od
+	 *            the option's descriptor
+	 * @return the option's value or its default if the option is not set
 	 */
-	public String getOption(String name) {
+	public String getOption(OptionDescriptor od) {
 
-		return (String) options.get(name);
-
-	}
-
-	/**
-	 * Get the value of a configuration option.
-	 * 
-	 * @param name
-	 *            the option to get the value of
-	 * @param def
-	 *            the default alternative, if the option is not set
-	 * @return the option's value or it's default
-	 */
-	public String getOption(String name, String def) {
-
-		return (String) options.get(name);
-
-	}
-
-	/**
-	 * Get a list of available themes.
-	 * 
-	 * @return the theme names or <code>null</code> if unknown
-	 */
-	public String[] getThemeList() {
-
-		final String list = midlet.getAppProperty(APP_PROP_THEMES);
-		if (list != null) {
-			return Tools.splitString(list, ',', true);
-		} else {
-			Log.bug("Feb 22, 2009.5:37:00 PM");
-			return null;
-		}
+		final String val = (String) options.get(od.id);
+		return val != null ? val : od.def;
 
 	}
 
@@ -452,20 +435,27 @@ public final class Config {
 
 	/**
 	 * Set a configuration option which will be saved later when {@link #save()}
-	 * gets called.
+	 * gets called. After setting the option, all option listeners get notified
+	 * that the option <i>od</i> has changed.
 	 * 
-	 * @param name
-	 *            option name
+	 * @param od
+	 *            option's descriptor
 	 * @param value
 	 *            option value (use <code>null</code> to unset an option)
 	 */
-	public void setOption(String name, String value) {
+	public void setOption(OptionDescriptor od, String value) {
 
-		if (value == null)
-			options.remove(name);
+		if (value == null) {
+			options.remove(od.id);
+		} else {
+			options.put(od.id, value);
+		}
 
-		options.put(name, value);
-
+		final Enumeration enu = optionListener.elements();
+		while (enu.hasMoreElements()) {
+			IOptionListener ol = (IOptionListener) enu.nextElement();
+			ol.optionChanged(od);
+		}
 	}
 
 	protected boolean loadedSuccessfully() {
@@ -534,6 +524,41 @@ public final class Config {
 
 		options.put(OPTION_KEY_DEVS, val.toString());
 
+	}
+
+	/**
+	 * Collect all option descriptors and validate corresponding stored values.
+	 */
+	private void initOptions() {
+
+		optionDescriptors.addElement(TitleScreeny.OD_INFO_LEVEL);
+		optionDescriptors.addElement(Theme.OD_THEME);
+
+		final Enumeration enu = optionDescriptors.elements();
+
+		while (enu.hasMoreElements()) {
+
+			final OptionDescriptor od = (OptionDescriptor) enu.nextElement();
+
+			// check if stored values are still valid
+			if (od.type == OptionDescriptor.TYPE_CHOICE) {
+				final String stored = getOption(od);
+				if (stored != null && Tools.getIndex(od.choices, stored) < 0) {
+					options.put(od.id, null);
+				}
+			} else if (od.type == OptionDescriptor.TYPE_INT) {
+				final String stored = getOption(od);
+				try {
+					int i = Integer.parseInt(stored);
+					if (i < od.min || i > od.max) {
+						options.put(od.id, null);
+					}
+				} catch (NumberFormatException e) {
+					options.put(od.id, null);
+				}
+			}
+
+		}
 	}
 
 	/**

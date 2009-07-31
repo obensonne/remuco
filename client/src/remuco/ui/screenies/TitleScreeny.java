@@ -23,6 +23,8 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import remuco.Config;
+import remuco.OptionDescriptor;
 import remuco.player.Item;
 import remuco.player.PlayerInfo;
 import remuco.ui.Theme;
@@ -40,6 +42,15 @@ public final class TitleScreeny extends Screeny {
 
 	private final Item noPlob;
 
+	private static final String INFO_LEVEL_NORMAL = "Normal";
+	private static final String INFO_LEVEL_DETAILED = "Detailed";
+
+	public static final OptionDescriptor OD_INFO_LEVEL = new OptionDescriptor(
+			"item-info", "Item information level", INFO_LEVEL_NORMAL,
+			new String[] { INFO_LEVEL_NORMAL, INFO_LEVEL_DETAILED });
+
+	private boolean showDetails;
+
 	public TitleScreeny(PlayerInfo player) {
 
 		super(player);
@@ -47,7 +58,6 @@ public final class TitleScreeny extends Screeny {
 		noPlob = new Item();
 
 		data = noPlob;
-
 	}
 
 	protected void initRepresentation() throws ScreenyException {
@@ -67,6 +77,9 @@ public final class TitleScreeny extends Screeny {
 		detailsSpacer = new String(ca);
 
 		noPlob.setMeta(Item.META_TITLE, player.getName());
+
+		showDetails = Config.getInstance().getOption(OD_INFO_LEVEL).equals(
+			INFO_LEVEL_DETAILED);
 	}
 
 	protected void updateRepresentation() {
@@ -116,7 +129,7 @@ public final class TitleScreeny extends Screeny {
 		sa = Theme.splitString(item.getMeta(Item.META_ALBUM), width,
 			Theme.FONT_ALBUM);
 		y = drawStrings(sa, width, y);
-		
+
 		y += Theme.LINE_GAP_SMALL; // top border for image
 
 		// //// details //////
@@ -127,32 +140,10 @@ public final class TitleScreeny extends Screeny {
 			return;
 		}
 
-		g.setColor(colorText);
-		g.setFont(Theme.FONT_SMALL);
-
-		final StringBuffer details = new StringBuffer();
-
-		final String year = item.getMeta(Item.META_YEAR);
-		final String genre = item.getMeta(Item.META_GENRE);
-		final String bitrate = item.getMeta(Item.META_BITRATE);
-
-		if (year.length() > 0 && !year.equals("0")) {
-			details.append(year);
-		}
-		if (genre.length() > 0 && !genre.equalsIgnoreCase("unknown")) {
-			if (details.length() > 0) {
-				details.append(detailsSpacer);
-			}
-			details.append(genre);
-		}
-		if (bitrate.length() > 0 && !bitrate.equals("0")) {
-			if (details.length() > 0) {
-				details.append(detailsSpacer);
-			}
-			details.append(bitrate).append('k');
-		}
-
-		if (details.length() > 0) {
+		final String details = buildDetailsString(item);
+		if (showDetails && details != null) {
+			g.setColor(colorText);
+			g.setFont(Theme.FONT_SMALL);
 			g.drawString(details.toString(), width / 2, yDetails, TOP_CENTER);
 		}
 
@@ -160,7 +151,7 @@ public final class TitleScreeny extends Screeny {
 
 		final int maxImgHeight;
 
-		if (details.length() == 0) {
+		if (!showDetails || details == null) {
 			maxImgHeight = height - Theme.LINE_GAP - y;
 		} else {
 			maxImgHeight = yDetails - Theme.LINE_GAP_SMALL - y;
@@ -184,6 +175,37 @@ public final class TitleScreeny extends Screeny {
 
 	}
 
+	/**
+	 * Build a nice item details line string. Returns <code>null</code> if there
+	 * are no details.
+	 */
+	private String buildDetailsString(Item item) {
+
+		final StringBuffer details = new StringBuffer();
+
+		final String year = item.getMeta(Item.META_YEAR);
+		final String genre = item.getMeta(Item.META_GENRE);
+		final String bitrate = item.getMeta(Item.META_BITRATE);
+
+		if (year.length() > 0 && !year.equals("0")) {
+			details.append(year);
+		}
+		if (genre.length() > 0 && !genre.equalsIgnoreCase("unknown")) {
+			if (details.length() > 0) {
+				details.append(detailsSpacer);
+			}
+			details.append(genre);
+		}
+		if (bitrate.length() > 0 && !bitrate.equals("0")) {
+			if (details.length() > 0) {
+				details.append(detailsSpacer);
+			}
+			details.append(bitrate).append('k');
+		}
+
+		return details.length() > 0 ? details.toString() : null;
+	}
+
 	private int drawStrings(String[] sa, int width, int y) {
 
 		final int fontHeight = g.getFont().getHeight();
@@ -195,4 +217,5 @@ public final class TitleScreeny extends Screeny {
 
 		return y;
 	}
+
 }

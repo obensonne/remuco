@@ -30,9 +30,10 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.List;
 
 import remuco.Config;
+import remuco.IOptionListener;
+import remuco.OptionDescriptor;
 import remuco.Remuco;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.Connection;
@@ -58,10 +59,12 @@ import remuco.ui.screenies.ProgressScreeny;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.ui.screenies.StateScreeny;
+import remuco.ui.screenies.TitleScreeny;
 import remuco.util.Log;
 
 public final class PlayerScreen extends Canvas implements IItemListener,
-		IStateListener, IProgressListener, CommandListener, IActionListener {
+		IStateListener, IProgressListener, CommandListener, IActionListener,
+		IOptionListener {
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
@@ -76,16 +79,13 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private static final Command CMD_MEDIA = new Command("Media",
 			Command.SCREEN, 1);
 
-	private static final Command CMD_OPTIONS = new Command("More",
-			Command.BACK, 2);
+	private static final Command CMD_MENU = new Command("Menu", Command.BACK, 2);
+
+	private static final Command CMD_OPTIONS = new Command("Options",
+			Command.SCREEN, 3);
 
 	private static final Command CMD_SHUTDOWN_HOST = new Command(
 			"Shutdown Host", Command.SCREEN, 95);
-
-	private static final Command CMD_THEMES = new Command("Themes",
-			Command.SCREEN, 1);
-
-	private static final String CONFIG_OPTION_THEME = "theme";
 
 	private static final int SEEK_DELAY = 600;
 
@@ -114,13 +114,12 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	/** Screen to configure key setup */
 	private final KeyBindingsScreen screenKeyConfig;
 
-	private final CommandList screenOptions;
+	private final CommandList screenMenu;
+
+	private final OptionsScreen screenOptions;
 
 	/** Screen to edit the meta information of a item */
 	private final TagEditorScreen screenTagEditor;
-
-	/** Screen to select a theme */
-	private final List screenThemeSelection;
 
 	private boolean screenTooSmall = false;
 
@@ -153,13 +152,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		this.display = display;
 		this.conn = conn;
 
-		config = Config.getInstance();
-
 		timer = Remuco.getGlobalTimer();
 
 		theme = Theme.getInstance();
-
-		theme.load(config.getOption(CONFIG_OPTION_THEME));
 
 		player = new Player(conn, pinfo);
 
@@ -170,26 +165,17 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		if (pinfo.supportsMediaBrowser()) {
 			super.addCommand(CMD_MEDIA);
 		}
-		super.addCommand(CMD_OPTIONS);
+		super.addCommand(CMD_MENU);
 		super.setCommandListener(this);
 
-		screenOptions = new CommandList("Options");
-		screenOptions.addCommand(CMD_THEMES, theme.licThemes);
-		screenOptions.addCommand(CMD_KEYS, theme.licKeys);
+		screenMenu = new CommandList("Options");
+		screenMenu.addCommand(CMD_KEYS, theme.licKeys);
 		if (pinfo.supports(Feature.SHUTDOWN)) {
-			screenOptions.addCommand(CMD_SHUTDOWN_HOST, theme.licOff);
+			screenMenu.addCommand(CMD_SHUTDOWN_HOST, theme.licOff);
 		}
-		screenOptions.addCommand(CMD.BACK);
-		screenOptions.setCommandListener(this);
-
-		screenThemeSelection = new List("Themes", List.IMPLICIT);
-		final String[] themes = config.getThemeList();
-		for (int i = 0; i < themes.length; i++) {
-			screenThemeSelection.append(themes[i], theme.licThemes);
-		}
-		screenThemeSelection.setSelectCommand(CMD.SELECT);
-		screenThemeSelection.addCommand(CMD.BACK);
-		screenThemeSelection.setCommandListener(this);
+		screenMenu.addCommand(CMD.BACK);
+		screenMenu.addCommand(CMD_OPTIONS, theme.licThemes);
+		screenMenu.setCommandListener(this);
 
 		screenyState = new StateScreeny(player.info);
 		screenyItemImageFullscreen = new ImageScreeny(player.info);
@@ -200,6 +186,10 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		screenKeyConfig = new KeyBindingsScreen(this, display);
 		screenKeyConfig.addCommand(CMD.BACK);
 
+		screenOptions = new OptionsScreen();
+		screenOptions.addCommand(CMD.BACK);
+		screenOptions.setCommandListener(this);
+
 		screenTagEditor = new TagEditorScreen();
 		screenTagEditor.addCommand(CMD.BACK);
 		screenTagEditor.addCommand(CMD.OK);
@@ -208,6 +198,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		alertFeature = new Alert("", "", null, AlertType.INFO);
 
 		mediaBrowser = new MediaBrowser(this, display, player);
+
+		config = Config.getInstance();
+		config.addOptionListener(this);
 
 		/*
 		 * Some devices do not call sizeChanged() when this screen is shown the
@@ -225,19 +218,19 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		if (cmd == CMD.BACK) {
 
-			screenOptions.addCommand(CMD_DISCONNECT, theme.licDisconnect);
+			screenMenu.addCommand(CMD_DISCONNECT, theme.licDisconnect);
 
 		} else if (cmd == CMD.EXIT) {
 
-			screenOptions.addCommand(cmd, theme.licOff);
+			screenMenu.addCommand(cmd, theme.licOff);
 
 		} else if (cmd == CMD.LOG) {
 
-			screenOptions.addCommand(cmd, theme.licLog);
+			screenMenu.addCommand(cmd, theme.licLog);
 
 		} else {
 
-			screenOptions.addCommand(cmd, theme.licItem);
+			screenMenu.addCommand(cmd, theme.licItem);
 		}
 
 	}
@@ -248,11 +241,11 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			mediaBrowser.showYourself();
 
-		} else if (c == CMD_OPTIONS) {
+		} else if (c == CMD_MENU) {
 
-			display.setCurrent(screenOptions);
+			display.setCurrent(screenMenu);
 
-		} else if (c == CMD.BACK && d == screenOptions) { // OPTIONS //
+		} else if (c == CMD.BACK && d == screenMenu) { // OPTIONS //
 
 			display.setCurrent(this);
 
@@ -264,16 +257,13 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				Log.bug("Feb 2, 2009.7:30:08 PM");
 			}
 
-		} else if (c == CMD_THEMES) {
+		} else if (c == CMD_OPTIONS) {
 
-			// preselect the current theme in the theme selection
-			for (int i = 0; i < screenThemeSelection.size(); i++) {
-				if (screenThemeSelection.getString(i).equals(theme.getName())) {
-					screenThemeSelection.setSelectedIndex(i, true);
-					break;
-				}
-			}
-			display.setCurrent(screenThemeSelection);
+			display.setCurrent(screenOptions);
+
+		} else if (c == CMD.BACK && d == screenOptions) {
+
+			display.setCurrent(this);
 
 		} else if (c == CMD_SHUTDOWN_HOST) {
 
@@ -283,22 +273,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			display.setCurrent(screenKeyConfig);
 
-		} else if (c == CMD.SELECT && d == screenThemeSelection) { // THEMES
-			// //
-
-			final String name = screenThemeSelection.getString(screenThemeSelection.getSelectedIndex());
-			theme.load(name);
-			initScreenies(); // let new theme take effect
-			config.setOption(CONFIG_OPTION_THEME, name);
-			display.setCurrent(this);
-
-		} else if (c == CMD.BACK && d == screenThemeSelection) {
-
-			display.setCurrent(screenOptions);
-
 		} else if (c == CMD.BACK && d == screenKeyConfig) { // KEYS //
 
-			display.setCurrent(screenOptions);
+			display.setCurrent(screenMenu);
 
 		} else if (c == CMD.BACK && d == screenTagEditor) { // TAGS //
 
@@ -572,6 +549,17 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		repaint(screenyState);
 	}
 
+	public void optionChanged(OptionDescriptor od) {
+
+		if (od == Theme.OD_THEME) {
+			theme.load(config.getOption(Theme.OD_THEME));
+			initScreenies();
+		} else if (od == TitleScreeny.OD_INFO_LEVEL) {
+			initScreenies();
+		}
+
+	}
+
 	/** Set an <em>external</em> command listener. */
 	public void setCommandListener(CommandListener l) {
 		externalCommandListener = l;
@@ -613,7 +601,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	protected void pointerPressed(int x, int y) {
 
 		if (screenTooSmall) { // ignore pointer events
-			commandAction(CMD_THEMES, this);
+			commandAction(CMD_OPTIONS, this);
 		} else if (itemImageFullscreen) {
 			handleActionPressed(KeyBindings.ACTION_IMAGE);
 		} else {
@@ -706,8 +694,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			Graphics.HCENTER | Graphics.BASELINE);
 
 		y += Theme.FONT_SMALL.getHeight() * 2;
-		g.drawString("for the theme " + theme.getName() + "!", getWidth() / 2,
-			y, Graphics.HCENTER | Graphics.BASELINE);
+
+		g.drawString("for the theme " + config.getOption(Theme.OD_THEME) + "!",
+			getWidth() / 2, y, Graphics.HCENTER | Graphics.BASELINE);
 
 	}
 
