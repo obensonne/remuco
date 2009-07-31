@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+# Script to download and extract client files of a specific Remuco version.
+#
+# This script is intened to be a client package replacement for distributions
+# where the actual client binary files are not supposed to be in the
+# repositories.
+
+VERSION=0.9.0
+PKG=remuco-$VERSION
+TARBALL=$PKG.tar.gz
+URL=http://downloads.sourceforge.net/remuco/$TARBALL
+
+die() {
+	echo "$1"
+	exit 1
+}
+
+cat << EOF
+-------------------------------------------------------------------------------
+Remuco Client Download
+
+This script downloads the client application files compatible with the
+installed Remuco player adapters (version $VERSION).
+
+Please press ENTER to proceed or CTRL-C to cancel.
+-------------------------------------------------------------------------------
+EOF
+
+read INPUT
+
+echo "Remove old temporary files ..."
+rm -rf /var/tmp/$TARBALL /var/tmp/$PKG || die "failed"
+
+echo "Downloading tarball ..."
+wget $URL -O /var/tmp/$TARBALL || die "failed" 
+
+echo "Unpacking tarball ..."
+tar zxf /var/tmp/$TARBALL -C /var/tmp/ || die "failed"
+
+cat << EOF
+-------------------------------------------------------------------------------
+Done.
+
+The client files to install on your mobile device are located in:
+/var/tmp/$PKG/client/app/
+
+For more information visit:
+http://remuco.sourceforge.net/index.php/Getting_Started 
+-------------------------------------------------------------------------------
+EOF
