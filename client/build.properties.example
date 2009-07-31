@@ -96,20 +96,8 @@ run.debug=yes
 #run.proguard.optimize=yes
 run.proguard.optimize=no
 
-# Device to use when emulating with WTK.
-run.emulator.wtk.device=DefaultColorPhone
-#run.emulator.wtk.device=DefaultGrayPhone
-#run.emulator.wtk.device=MediaControlSkin
-#run.emulator.wtk.device=QwertyDevice
-
 # Security domain to use when emulating with WTK.
 #run.emulator.wtk.domain=untrusted
 #run.emulator.wtk.domain=trusted
 #run.emulator.wtk.domain=minimum
 run.emulator.wtk.domain=maximum
-
-# Device to use when emulating with MicroEmu.
-#run.emulator.microemu.device=default
-run.emulator.microemu.device=large
-#run.emulator.microemu.device=minimum
-#run.emulator.microemu.device=resizable

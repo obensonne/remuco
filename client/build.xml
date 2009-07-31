@@ -118,7 +118,17 @@
 	<pathconvert property="themes" pathsep="," refid="themes">
 		<map from="${basedir}/res/themes/" to="" />
 	</pathconvert>
-
+	
+	<loadfile property="themes.hardcoded" srcfile="src/remuco/ui/Theme.java">
+		<filterchain>
+			<linecontains>
+				<contains value="${themes}"/>
+			</linecontains>
+		</filterchain>
+	</loadfile>
+	
+	<fail unless="themes.hardcoded" message="theme list needs to be updated"/>
+	
 	<!-- =================== Build ======================================== -->
 
 	<target name="compile">
@@ -202,7 +212,6 @@
 	</target>
 
 	<target name="manifest">
-		<echo message="Themes: ${themes}" />
 		<condition property="emulation-flag" value="true" else="false">
 			<isset property="emulation" />
 		</condition>
@@ -220,11 +229,14 @@
 			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
 			<attribute name="MIDlet-Version" value="${midlet.version}" />
 			<attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
+			<!--
+			<attribute name="MIDlet-Permissions"
+			           value="javax.microedition.io.Connector.bluetooth.client,javax.microedition.io.Connector.socket" />
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client" />
+			 -->
 			<attribute name="Remuco-emulation" value="${emulation-flag}" />
-			<attribute name="Remuco-themes" value="${themes}" />
-			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />			
+			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />
 		</manifest>
 	</target>
 
@@ -299,26 +311,50 @@
 
 	<target name="run.prepare" depends="clean,configure.emulation,jad" />
 
-	<target name="run.wtk"
-	        depends="run.prepare"
-	        description="--> run the client in the WTK emulator">
+	<target name="run.wtk" depends="run.prepare">
 		<exec executable="${wtk.home}/bin/emulator" dir="build/jar">
 			<arg value="-Xprefs:${basedir}/wtk-emulator.properties" />
 			<arg value="-Xdomain:${run.emulator.wtk.domain}" />
-			<arg value="-Xdevice:${run.emulator.wtk.device}" />
+			<arg value="-Xdevice:${wtk.device}" />
 			<arg value="-Xdescriptor:${midlet.jad}" />
 		</exec>
 	</target>
 
-	<target name="run.microemu"
-	        depends="run.prepare"
-	        description="--> run the client in the MicroEmu emulator">
+	<target name="run.wtk.default"
+	        description="--> run client in WTK emulator (default skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="DefaultColorPhone" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.media"
+	        description="--> run client in WTK emulator (media skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="MediaControlSkin" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.gray"
+	        description="--> run client in WTK emulator (gray size)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="DefaultGrayPhone" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.qwerty"
+	        description="--> run client in WTK emulator (qwerty skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="QwertyDevice" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu" depends="run.prepare">
 		<java fork="yes" classname="org.microemu.app.Main">
 			<arg value="build/jar/${midlet.jad}" />
 			<arg value="--device" />
-			<arg value="org/microemu/device/${run.emulator.microemu.device}/device.xml" />
+			<arg value="org/microemu/device/${microemu.device}/device.xml" />
 			<classpath>
-				<pathelement location="${microemu.home}/devices/microemu-device-${run.emulator.microemu.device}.jar" />
+				<pathelement location="${microemu.home}/devices/microemu-device-${microemu.device}.jar" />
 				<pathelement location="${microemu.home}/microemulator.jar" />
 				<pathelement location="${microemu.bluecove.jar}" />
 				<pathelement location="${microemu.bluecove-gpl.jar}" />
@@ -326,8 +362,29 @@
 		</java>
 	</target>
 
+	<target name="run.microemu.default"
+	        description="--> run client in MicroEmu emulator (default size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="default" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu.large"
+	        description="--> run client in MicroEmu emulator (large size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="large" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu.minimum"
+	        description="--> run client in MicroEmu emulator (minimum size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="minimum" />
+		</antcall>
+	</target>
+
 	<target name="run"
-	        description="--> run the client in the configured default emulator">
+	        description="--> run client in configured default emulator">
 		<antcall target="run.${run.emulator}" />
 	</target>
 
