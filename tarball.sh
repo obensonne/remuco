@@ -74,38 +74,26 @@ find $PKG -type f -name "install*.log" | xargs rm -f
 tar zcf tarballs/$PKG.tar.gz $PKG
 
 # -----------------------------------------------------------------------------
-# extra package: client source + binaries
+# extra package: client binaries
 # -----------------------------------------------------------------------------
 
 PKG_CLIENT=remuco-client-$VERSION
 
 rm -rf $PKG_CLIENT
 
-cp -r $PKG $PKG_CLIENT
+mkdir $PKG_CLIENT
 
-cd $PKG_CLIENT
+cp $PKG/client/app/remuco.jad $PKG/client/app/remuco.jar $PKG_CLIENT/
 
-ls -1 | grep -v "client" | xargs rm -rf
-mv client/* .
-rmdir client
-
-cat > README << EOF
-Remuco client sources and binaries.
+cat > $PKG_CLIENT/README << EOF
+This package contains the Remuco client application only. It is identical to
+the one contained in the main package 'remuco-$VERSION'.
 
 Please visit http://remuco.sourceforge.net/index.php/Getting_Started for
 installation and usage instructions.
 EOF
 
-cd ..
-
 tar zcf tarballs/$PKG_CLIENT.tar.gz $PKG_CLIENT
-
-# -----------------------------------------------------------------------------
-# extra package: client JAR and JAD
-# -----------------------------------------------------------------------------
-
-cp $PKG_CLIENT/app/remuco.jar tarballs/remuco.jar
-cp $PKG_CLIENT/app/remuco.jad tarballs/remuco.jad
 
 # -----------------------------------------------------------------------------
 # extra package: server source
