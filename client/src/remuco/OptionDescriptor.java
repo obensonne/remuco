@@ -47,8 +47,7 @@ public class OptionDescriptor {
 	/** Option type. */
 	public final int type;
 
-	public OptionDescriptor(String id, String label, int def, int min, int max,
-			IOptionListener ol) {
+	public OptionDescriptor(String id, String label, int def, int min, int max) {
 		this(TYPE_INT, id, label, String.valueOf(def), min, max, null);
 	}
 
