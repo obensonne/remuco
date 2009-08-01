@@ -39,13 +39,11 @@ from remuco import serial
 class PlayerInfo(serial.Serializable):
     """ Parameter of the player info message sent to clients."""
     
-    def __init__(self, name, flags, max_rating, page_size, file_item_actions,
-                 search_mask):
+    def __init__(self, name, flags, max_rating, file_item_actions, search_mask):
         
         self.name = name
         self.flags = flags
         self.max_rating = max_rating
-        self.page_size = page_size
 
         self.fia_ids = []
         self.fia_labels = []
@@ -60,12 +58,12 @@ class PlayerInfo(serial.Serializable):
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y, serial.TYPE_I,
+        return (serial.TYPE_S, serial.TYPE_I, serial.TYPE_Y,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
                 serial.TYPE_AS)
         
     def get_data(self):
-        return (self.name, self.flags, self.max_rating, self.page_size,
+        return (self.name, self.flags, self.max_rating,
                 self.fia_ids, self.fia_labels, self.fia_multiples,
                 self.search_mask)
 
@@ -119,53 +117,15 @@ class Progress(serial.Serializable):
 class Item(serial.Serializable):
     """ Parameter of the item sync message sent to clients."""
     
-    def __init__(self, img_size=0, img_type="JPEG"):
+    def __init__(self, id, info, img, img_size, img_type):
         
-        self.id = None
-        self.__info_orig = None
-        self.__info_list = None
-        self.__img_orig = None
-        self.__img_bin = None
-        self.__img_size = img_size
-        self.__img_type = img_type
+        self.__id = id
+        self.__info = self.__flatten_info(info)
+        self.__img = self.__thumbnail_img(img, img_size, img_type)
         
     def __str__(self):
         
-        return "(%s, %s, %s)" % (self.id, self.__info_orig, self.__img_orig)
-
-    # === property: img ===
-    
-    def __pget_img(self):
-        return self.__img_orig
-    
-    def __pset_img(self, img):
-        self.__img_orig = img
-        self.__img_bin = self.__thumbnail(img)
-    
-    img = property(__pget_img, __pset_img, None, None)
-        
-    # === property: info ===
-    
-    def __pget_info(self):
-        return self.__info_orig
-    
-    def __pset_info(self, info_dict):
-        
-        self.__info_orig = info_dict
-        self.__info_list = []
-        
-        if not info_dict:
-            return
-        
-        for key in info_dict.keys():
-            val = info_dict.get(key)
-            if val is not None:
-                self.__info_list.append(key)
-                if not isinstance(val, basestring):
-                    val = str(val)
-                self.__info_list.append(val)
-    
-    info = property(__pget_info, __pset_info, None, None)
+        return "(%s, %s, %s)" % (self.id, self.__info, self.__img)
 
     # === serial interface ===
     
@@ -173,13 +133,30 @@ class Item(serial.Serializable):
         return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_AY)
         
     def get_data(self):
-        return (self.id, self.__info_list, self.__img_bin)
+        return (self.__id, self.__info, self.__img)
     
     # === misc ===
 
-    def __thumbnail(self, img):
+    def __flatten_info(self, info_dict):
+        
+        info_list = []
+        
+        if not info_dict:
+            return info_list
+        
+        for key in info_dict.keys():
+            val = info_dict.get(key)
+            if val is not None:
+                info_list.append(key)
+                if not isinstance(val, basestring):
+                    val = str(val)
+                info_list.append(val)
+                
+        return info_list
+
+    def __thumbnail_img(self, img, img_size, img_type):
     
-        if not self.__img_size:
+        if img_size == 0:
             return []
     
         if isinstance(img, basestring) and img.startswith("file://"):
@@ -192,9 +169,9 @@ class Item(serial.Serializable):
         try:
             if not isinstance(img, Image.Image):
                 img = Image.open(img)
-            img.thumbnail((self.__img_size, self.__img_size))
+            img.thumbnail((img_size, img_size))
             file_tmp = tempfile.TemporaryFile()
-            img.save(file_tmp, self.__img_type)
+            img.save(file_tmp, img_type)
             file_tmp.seek(0)
             thumb = file_tmp.read()
             file_tmp.close()
@@ -257,6 +234,23 @@ class ItemList(serial.Serializable):
 # =============================================================================
 # incoming data (from clients)
 # =============================================================================
+
+class ClientInfo(serial.Serializable):
+    """ Parameter of a client info messages from a client."""
+
+    def __init__(self):
+        
+        self.img_size = 0
+        self.img_type = None
+        self.page_size = 0
+
+    # === serial interface ===
+        
+    def get_fmt(self):
+        return (serial.TYPE_I, serial.TYPE_S, serial.TYPE_I)
+        
+    def set_data(self, data):
+        self.img_size, self.img_type, self.page_size = data
 
 class Control(serial.Serializable):
     """ Parameter of control messages from clients with integer arguments."""

@@ -33,6 +33,9 @@ import javax.microedition.io.SocketConnection;
 import javax.microedition.io.StreamConnection;
 
 import remuco.ClientInfo;
+import remuco.Config;
+import remuco.IOptionListener;
+import remuco.OptionDescriptor;
 import remuco.Remuco;
 import remuco.UserException;
 import remuco.player.PlayerInfo;
@@ -48,20 +51,20 @@ import remuco.util.Tools;
  * @author Oben Sonne
  * 
  */
-public final class Connection implements Runnable {
+public final class Connection implements Runnable, IOptionListener {
 
 	private static final int HELLO_TIMEOUT = 2000;
 
 	private static final byte[] PREFIX = { (byte) 0xFF, (byte) 0xFF,
 			(byte) 0xFF, (byte) 0xFF };
 
-	private static final byte[] PROTO_VERSION = { (byte) 0x09 };
+	private static final byte[] PROTO_VERSION = { (byte) 0x0A };
 
 	private static final byte[] SUFFIX = { (byte) 0xFE, (byte) 0xFE,
 			(byte) 0xFE, (byte) 0xFE };
 
 	private static final int HELLO_LEN = PREFIX.length + PROTO_VERSION.length
-			+ SUFFIX.length;
+	+ SUFFIX.length;
 
 	private boolean closed = false;
 
@@ -144,6 +147,19 @@ public final class Connection implements Runnable {
 		connectionListenerNotifiedAboutError = true;
 
 		downPrivate();
+	}
+
+	public void optionChanged(OptionDescriptor od) {
+
+		if (od == ClientInfo.OD_IMG_SIZE || od == ClientInfo.OD_PAGE_SIZE
+				|| od == ClientInfo.OD_IMG_TYPE) {
+
+			final Message m = new Message();
+			m.id = Message.CONN_CINFO;
+			m.data = Serial.out(new ClientInfo());
+			send(m);
+		}
+
 	}
 
 	public void run() {
@@ -504,7 +520,7 @@ public final class Connection implements Runnable {
 		final Message msgCI = new Message();
 
 		msgCI.id = Message.CONN_CINFO;
-		msgCI.data = Serial.out(ClientInfo.getInstance());
+		msgCI.data = Serial.out(new ClientInfo());
 
 		try {
 			sendPrivate(msgCI);
@@ -530,7 +546,9 @@ public final class Connection implements Runnable {
 					"Received player description data is malformed.", e);
 		}
 
+		// now we are ready to handle changes in client info config
+		Config.getInstance().addOptionListener(this);
+		
 		return pinfo;
-
 	}
 }

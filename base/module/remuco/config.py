@@ -35,7 +35,7 @@ from remuco import defs
 SEC = ConfigParser.DEFAULTSECT
 
 CONFIG_VERSION_MAJOR = "1"
-CONFIG_VERSION_MINOR = "2"
+CONFIG_VERSION_MINOR = "3"
 CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
@@ -44,9 +44,6 @@ KEY_WIFI = "wifi-enabled"
 KEY_WIFI_PORT = "wifi-port"
 KEY_ENDCODING = "player-encoding"
 KEY_LOGLEVEL = "log-level"
-KEY_IMAGE_SIZE = "image-size"
-KEY_IMAGE_TYPE = "image-type"
-KEY_LIST_LIMIT = "list-limit"
 KEY_PING = "ping-interval"
 KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
@@ -59,9 +56,6 @@ DEFAULTS = { # values as saved in config file
     KEY_WIFI_PORT: "34271",
     KEY_ENDCODING: "UTF8",
     KEY_LOGLEVEL: "INFO",
-    KEY_IMAGE_SIZE: "200",
-    KEY_IMAGE_TYPE: "JPEG",
-    KEY_LIST_LIMIT: "50",
     KEY_PING: "15",
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
@@ -395,93 +389,6 @@ class Config(object):
     
     ping = property(__pget_ping, __pset_ping, None, __pget_ping.__doc__)
 
-    # === property: image_size ===
-    
-    def __pget_image_size(self):
-        """Size of images sent to clients.
-        
-        A size of 0 disables images.
-        
-        Default: 200
-        
-        Option name: 'image-size'
-
-        """
-        try:
-            return self.__cp.getint(SEC, KEY_IMAGE_SIZE)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_IMAGE_SIZE, e))
-            return 200
-    
-    def __pset_image_size(self, value):
-        
-        self.__cp.set(SEC, KEY_IMAGE_SIZE, str(value))
-        self.__save()
-    
-    image_size = property(__pget_image_size, __pset_image_size, None,
-                          __pget_image_size.__doc__)
-    
-    # === property: image_type ===
-    
-    def __pget_image_type(self):
-        """Type of images sent to clients.
-        
-        Default: "JPEG"
-        Possible values: "JPEG", "PNG"
-        
-        Option name: 'image-type'
-
-        """
-        try:
-            val = self.__cp.get(SEC, KEY_IMAGE_TYPE)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_IMAGE_TYPE, e))
-            val = "JPEG"
-            
-        if not val in ("JPEG", "PNG"):
-            log.warning("config '%s' has invalid value" % KEY_IMAGE_TYPE)
-            val ="JPEG"
-            
-        return val
-    
-    def __pset_image_type(self, value):
-        
-        self.__cp.set(SEC, KEY_IMAGE_TYPE, value)
-        self.__save()
-    
-    image_type = property(__pget_image_type, __pset_image_type, None,
-                          __pget_image_type.__doc__)
-    
-    # === property: list_limit ===
-    
-    def __pget_list_limit(self):
-        """Maximum length of item list pages sent to clients.
-        
-        Default: 50
-        
-        Option name: 'list-limit'
-        
-        """
-        try:
-            limit = self.__cp.getint(SEC, KEY_LIST_LIMIT)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
-            return 50
-        
-        if limit < 0:
-            log.warning("config '%s' malformed (%s)" % (KEY_LIST_LIMIT, e))
-            return 50
-        
-        return limit
-    
-    def __pset_list_limit(self, value):
-        
-        self.__cp.set(SEC, KEY_LIST_LIMIT, str(value))
-        self.__save()
-    
-    list_limit = property(__pget_list_limit, __pset_list_limit, None,
-                          __pget_list_limit.__doc__)
-    
     # === property: fb ===
     
     def __pget_fb(self):

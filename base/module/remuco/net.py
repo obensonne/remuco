@@ -30,6 +30,7 @@ import gobject
 from remuco import log
 from remuco import message
 from remuco import serial
+from remuco.data import ClientInfo
 
 def build_message(id, serializable):
     """Create a message ready to send on a socket.
@@ -77,7 +78,7 @@ class ClientConnection(object):
     
     IO_PREFIX = '\xff\xff\xff\xff'
     IO_SUFFIX = '\xfe\xfe\xfe\xfe'
-    IO_PROTO_VERSION = '\x09'
+    IO_PROTO_VERSION = '\x0a'
     IO_HELLO = "%s%s%s" % (IO_PREFIX, IO_PROTO_VERSION, IO_SUFFIX) # hello msg
     
     def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping):
@@ -88,8 +89,8 @@ class ClientConnection(object):
         self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
         
-        # free to use cache data dict for external entities
-        self.cache = {}
+        # client info
+        self.info = ClientInfo()
         
         # the following fields are used for iterative receiving on message data
         # see io_recv() and io_recv_buff()
@@ -221,13 +222,17 @@ class ClientConnection(object):
             
             log.debug("received client info from %s" % self)
             
-            self.__clients.append(self)
+            serial.unpack(self.info, msg_data)
             
-            log.debug("sending player info to %s" % self)
+            if not self in self.__clients: # initial client info
             
-            self.send(self.__pinfo_msg)
-            
-            self.__msg_handler_fn(self, message.PRIV_INITIAL_SYNC, None)
+                self.__clients.append(self)
+                
+                log.debug("sending player info to %s" % self)
+                
+                self.send(self.__pinfo_msg)
+                
+                self.__msg_handler_fn(self, message.PRIV_INITIAL_SYNC, None)
             
         else:
             

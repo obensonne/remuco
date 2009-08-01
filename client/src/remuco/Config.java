@@ -64,6 +64,8 @@ public final class Config {
 
 	/** Available screen size for a canvas screen. */
 	public static final int SCREEN_WIDTH, SCREEN_HEIGHT;
+	
+	public static final int IMG_MAX_SIZE;
 
 	/** Indicates if the current device supports pointer events. */
 	public static final boolean TOUCHSCREEN;
@@ -94,6 +96,7 @@ public final class Config {
 		};
 		SCREEN_WIDTH = c.getWidth();
 		SCREEN_HEIGHT = c.getHeight();
+		IMG_MAX_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 		TOUCHSCREEN = c.hasPointerEvents();
 
 		// check encoding support
@@ -531,8 +534,11 @@ public final class Config {
 	 */
 	private void initOptions() {
 
-		optionDescriptors.addElement(TitleScreeny.OD_INFO_LEVEL);
 		optionDescriptors.addElement(Theme.OD_THEME);
+		optionDescriptors.addElement(TitleScreeny.OD_INFO_LEVEL);
+		optionDescriptors.addElement(ClientInfo.OD_PAGE_SIZE);
+		optionDescriptors.addElement(ClientInfo.OD_IMG_SIZE);
+		optionDescriptors.addElement(ClientInfo.OD_IMG_TYPE);
 
 		final Enumeration enu = optionDescriptors.elements();
 

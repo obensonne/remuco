@@ -26,6 +26,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.Ticker;
 
 import remuco.Config;
 import remuco.OptionDescriptor;
@@ -62,6 +63,8 @@ public class OptionsScreen extends Form {
 		ow2od = new Hashtable();
 
 		config = Config.getInstance();
+
+		setTicker(new Ticker("Changes get applied immediately."));
 
 		for (int i = 0; i < config.optionDescriptors.size(); i++) {
 
@@ -108,22 +111,33 @@ public class OptionsScreen extends Form {
 
 	private void optionWidgetChanged(Item ow) {
 
-		Log.debug("item state change");
-
 		final OptionDescriptor od = (OptionDescriptor) ow2od.get(ow);
 
 		if (ow instanceof ChoiceGroup) {
+			
 			final int index = ((ChoiceGroup) ow).getSelectedIndex();
 			config.setOption(od, od.choices[index]);
+			
 		} else if (ow instanceof TextField) {
+			
 			String val = ((TextField) ow).getString();
 			if (od.type == OptionDescriptor.TYPE_INT) {
-				int i = Integer.parseInt(val);
-				i = i < od.min ? od.min : (i > od.max ? od.max : i);
-				val = String.valueOf(i);
-				((TextField) ow).setString(val);
+				try {
+					int i = Integer.parseInt(val);
+					if (i < od.min) {
+						val = String.valueOf(od.min);
+						((TextField) ow).setString(val);
+					} else if (i > od.max) {
+						val = String.valueOf(od.max);
+						((TextField) ow).setString(val);
+					}
+				} catch (NumberFormatException e) {
+					val = od.def;
+					((TextField) ow).setString(val);
+				}
 			}
 			config.setOption(od, val);
+			
 		} else {
 			Log.bug("Jul 30, 2009.8:26:44 PM");
 		}

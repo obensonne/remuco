@@ -21,33 +21,35 @@
 package remuco;
 
 import remuco.comm.ISerializable;
-import remuco.comm.Serial;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
 
 public final class ClientInfo implements ISerializable {
 
+	public static final OptionDescriptor OD_IMG_SIZE = new OptionDescriptor(
+			"img-size", "Image size", Math.min(200, Config.IMG_MAX_SIZE), 0,
+			Config.IMG_MAX_SIZE);
+
+	public static final OptionDescriptor OD_IMG_TYPE = new OptionDescriptor(
+			"img-type", "Image type", "JPEG", "JPEG,PNG");
+
+	public static final OptionDescriptor OD_PAGE_SIZE = new OptionDescriptor(
+			"page-size", "Page size of lists", 50, 10, 10000);
+
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
-			SerialAtom.TYPE_I, SerialAtom.TYPE_S };
-
-	private static ClientInfo instance = null;
-
-	public static ClientInfo getInstance() {
-		if (instance == null) {
-			instance = new ClientInfo();
-		}
-		return instance;
-	}
+		SerialAtom.TYPE_S, SerialAtom.TYPE_I };
 
 	private final SerialAtom[] atoms;
 
-	private ClientInfo() {
+	public ClientInfo() {
 
 		atoms = SerialAtom.build(ATOMS_FMT);
 
-		atoms[0].i = Config.SCREEN_WIDTH;
-		atoms[1].i = Config.SCREEN_HEIGHT;
-		atoms[2].s = Serial.ENCODING;
+		final Config config = Config.getInstance();
+
+		atoms[0].i = Integer.parseInt(config.getOption(OD_IMG_SIZE));
+		atoms[1].s = config.getOption(OD_IMG_TYPE);
+		atoms[2].i = Integer.parseInt(config.getOption(OD_PAGE_SIZE));
 
 	}
 

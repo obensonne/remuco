@@ -62,8 +62,6 @@ class ListReply(object):
     'nested', 'list_actions') and to send the reply to clients (using send()).
     
     """
-    PAGE_SIZE = 50
-    
     def __init__(self, client, reply_msg_id, page, path=None):
         """Create a new list reply.
         
@@ -86,12 +84,13 @@ class ListReply(object):
         
         ### paging ###
         
+        page_size = self.__client.info.page_size
         # TODO: float may be removed in P3K
         len_all = float(len(self.__ids or []) + len(self.__nested or []))
-        page_max = max(math.ceil(len_all / ListReply.PAGE_SIZE) - 1, 0)
+        page_max = max(math.ceil(len_all / page_size) - 1, 0)
         
-        index_start = self.__page * ListReply.PAGE_SIZE
-        index_end = index_start + ListReply.PAGE_SIZE
+        index_start = self.__page * page_size
+        index_end = index_start + page_size
         
         nested, ids, names = [], [], []
         item_offset = 0
@@ -99,9 +98,9 @@ class ListReply(object):
         if self.__nested and index_start < len(self.__nested):
             # page contains nested lists and maybe items
             nested = self.__nested[index_start:index_end]
-            if len(nested) < ListReply.PAGE_SIZE:
+            if len(nested) < page_size:
                 # page contains nested lists and items
-                num_items = ListReply.PAGE_SIZE - len(nested)
+                num_items = page_size - len(nested)
                 ids = self.__ids[0:num_items]
                 names = self.__names[0:num_items]
         else:
@@ -467,22 +466,21 @@ class PlayerAdapter(object):
         
         # init misc fields
         
-        ListReply.PAGE_SIZE = self.__config.list_limit
-
         serial.Bin.HOST_ENCODING = self.__config.encoding
         
         self.__clients = []
         
         self.__state = PlayerState()
         self.__progress = Progress()
-        self.__item = Item(img_size=self.__config.image_size,
-                           img_type=self.__config.image_type)
+        self.__item_id = None
+        self.__item_info = None
+        self.__item_img = None
         
         flags = self.__util_calc_flags(playback_known, volume_known,
             repeat_known, shuffle_known, progress_known)
         
-        self.__info = PlayerInfo(name, flags, max_rating, ListReply.PAGE_SIZE,
-                                 file_actions, search_mask)
+        self.__info = PlayerInfo(name, flags, max_rating, file_actions,
+                                 search_mask)
         
         self.__sync_triggers = {}
         
@@ -1139,14 +1137,14 @@ class PlayerAdapter(object):
         
         log.debug("new item: (%s, %s %s)" % (id, info, img))
         
-        change = self.__item.id != id
-        change |= self.__item.info != info
-        change |= self.__item.img != img
+        change = self.__item_id != id
+        change |= self.__item_info != info
+        change |= self.__item_img != img
         
         if change:
-            self.__item.id = id
-            self.__item.info = info
-            self.__item.img = img
+            self.__item_id = id
+            self.__item_info = info
+            self.__item_img = img
             self.__sync_trigger(self.__sync_item)
             
     # =========================================================================
@@ -1167,39 +1165,49 @@ class PlayerAdapter(object):
         
     def __sync_state(self):
         
+        del self.__sync_triggers[self.__sync_state]
+
+        log.debug("broadcast new state to clients: %s" % self.__state)
+        
         msg = net.build_message(message.SYNC_STATE, self.__state)
         
-        self.__sync(msg, self.__sync_state, "state", self.__state)
+        if msg is None:
+            return
+        
+        for c in self.__clients: c.send(msg)
         
         return False
     
     def __sync_progress(self):
         
+        del self.__sync_triggers[self.__sync_progress]
+        
+        log.debug("broadcast new progress to clients: %s" % self.__progress)
+        
         msg = net.build_message(message.SYNC_PROGRESS, self.__progress)
         
-        self.__sync(msg, self.__sync_progress, "progress", self.__progress)
+        if msg is None:
+            return
+        
+        for c in self.__clients: c.send(msg)
         
         return False
     
     def __sync_item(self):
 
-        msg = net.build_message(message.SYNC_ITEM, self.__item)
+        del self.__sync_triggers[self.__sync_item]
         
-        self.__sync(msg, self.__sync_item, "item", self.__item)
+        log.debug("broadcast new item to clients: %s" % self.__item_id)
+        
+        for c in self.__clients:
+            
+            msg = net.build_message(message.SYNC_ITEM, self.__item(c))
+            
+            if msg is not None:
+                c.send(msg)
         
         return False
     
-    def __sync(self, msg, sync_fn, name, data):
-        
-        del self.__sync_triggers[sync_fn]
-        
-        if msg is None:
-            return
-        
-        log.debug("broadcast new %s to clients: %s" % (name, data))
-        
-        for c in self.__clients: c.send(msg)
-        
     # =========================================================================
     # handling client message (inbound communication)
     # =========================================================================
@@ -1232,7 +1240,7 @@ class PlayerAdapter(object):
             msg = net.build_message(message.SYNC_PROGRESS, self.__progress)
             client.send(msg)
             
-            msg = net.build_message(message.SYNC_ITEM, self.__item)
+            msg = net.build_message(message.SYNC_ITEM, self.__item(client))
             client.send(msg)
             
         else:
@@ -1379,6 +1387,12 @@ class PlayerAdapter(object):
     # miscellaneous 
     # =========================================================================
     
+    def __item(self, client):
+        """Creates a client specific item object."""
+        
+        return Item(self.__item_id, self.__item_info, self.__item_img,
+                    client.info.img_size, client.info.img_type)
+        
     def __util_files_to_uris(self, files):
         
         def file_to_uri(file):
@@ -1396,7 +1410,7 @@ class PlayerAdapter(object):
     
     def __util_calc_flags(self, playback_known, volume_known, repeat_known,
                           shuffle_known, progress_known):
-        """ Check player adapter capabilities.
+        """Check player adapter capabilities.
         
         Most capabilities get detected by testing which methods have been
         overridden by a subclassing player adapter.
