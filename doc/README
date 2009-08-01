@@ -88,7 +88,7 @@ mobile device.
 Note: If you installed Remuco using packages for your distribution, the client
       files are either located in /usr/share/remuco/client/ or need to get
       downloaded manually:
-      http://downloads.sourceforge.net/remuco/remuco-0.9.0.tar.gz
+      http://downloads.sourceforge.net/remuco/remuco-0.9.1.tar.gz
       Make sure the installed server version and the version of the downloaded
       tarball match! 
 
@@ -206,7 +206,7 @@ directory remuco-trunk:
 
  $ svn co <SVN-ROOT>/trunk remuco-trunk
 
-Example A-2. Check out the source from release 0.9.0 into the directory
-remuco-0.9.0:
+Example A-2. Check out the source from release 0.9.1 into the directory
+remuco-0.9.1:
 
- $ svn co <SVN-ROOT>/tags/0.9.0 remuco-0.9.0
+ $ svn co <SVN-ROOT>/tags/0.9.1 remuco-0.9.1

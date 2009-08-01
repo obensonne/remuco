@@ -37,5 +37,5 @@ INFO_TITLE = "title"
 INFO_TRACK = "track"
 INFO_YEAR = "year"
 
-REMUCO_VERSION = "0.9.0"
+REMUCO_VERSION = "0.9.1"
 
