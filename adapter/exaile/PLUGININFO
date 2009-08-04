@@ -1,0 +1,5 @@
+Version="0.9.1"
+Authors=["Oben Sonne <obensonne@googlemail.com>"]
+Name="Remuco"
+Description="Exaile adapter for Remuco (and vice versa)."
+
