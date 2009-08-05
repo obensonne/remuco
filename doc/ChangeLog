@@ -1,5 +1,6 @@
 0.9.1	Oben Sonne <obensonne@googlemail.com>
 
+	* exaile: added Exaile 3 adapter
 	* client: added options screen
 	* client: optionally show detailed item information
 	* client: size and type of cover art image are now configured on the client
