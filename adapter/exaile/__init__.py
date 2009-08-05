@@ -30,6 +30,10 @@ from remuco import log
 import xl.event
 import xl.settings
 
+IA_JUMP = remuco.ItemAction("Jump to")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
+
 class ExaileAdapter(remuco.PlayerAdapter):
     
     def __init__(self, exaile):
@@ -56,7 +60,9 @@ class ExaileAdapter(remuco.PlayerAdapter):
             xl.event.add_callback(self.__notify_playback_change, event)
         
         self.__update_track(self.__ex.player.current)
+        self.__update_position()
         self.__update_playback()
+        # other updates via poll()
         
         log.debug("here we go")
         
@@ -87,7 +93,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
             self.__ex.queue.play()
             
         # when playing after stopped, the 'playback_player_start' is missed
-        gobject.idle_add(self.__update_playback())
+        gobject.idle_add(self.__update_playback)
             
     def ctrl_toggle_repeat(self):
         
@@ -108,6 +114,8 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         """
         self.__ex.queue.next()
+        q = self.__ex.queue
+        print("type: %s, dir: %s" % (type(q), dir(q)))
     
     def ctrl_previous(self):
         """Play the previous item. 
@@ -188,6 +196,32 @@ class ExaileAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
+    def request_playlist(self, reply):
+        
+        tracks = self.__ex.queue.current_playlist.get_ordered_tracks()
+        
+        reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
+        
+        reply.item_actions = PLAYLIST_ACTIONS
+        
+        reply.send()
+
+    # =========================================================================
+    # action interface
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
+        
+        if action_id == IA_JUMP.id:
+            # TODO: recheck this once Exaile 3 final is released
+            track = self.__ex.collection.get_track_by_loc(ids[0])
+            self.__ex.queue.next(track=track)
+            self.__ex.queue.current_playlist.set_current_pos(positions[0])
+            #self.__ex.queue.set_current_pos(positions[0])
+            
+        else:
+            log.error("** BUG ** unexpected playlist item action")
+
     # =========================================================================
     # internal methods
     # =========================================================================
@@ -198,6 +232,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
         log.debug("track change: %s" % data)
         self.__update_track(data)
         self.__update_progress()
+        self.__update_position()
     
     def __notify_playback_change(self, type, object, data):
         """Callback on playback change."""
@@ -277,6 +312,31 @@ class ExaileAdapter(remuco.PlayerAdapter):
             pos = self.__ex.player.get_time()
         
         self.update_progress(pos, len)
+        
+    def __update_position(self):
+        
+        pl = self.__ex.queue.current_playlist
+        
+        self.update_position(pl.get_current_pos())
+        
+    def __tracklist_to_itemlist(self, track_list):
+        
+        ids = []
+        names = []
+        
+        for track in track_list:
+            
+            ids.append(track.get_loc())
+            artist = track.get_tag("artist")
+            if artist:
+                artist = artist[0]
+            title = track.get_tag("title")
+            if title:
+                title = title[0]
+            name = "%s - %s" % (artist or "???", title or "???") 
+            names.append(name)
+        
+        return ids, names
         
 # =============================================================================
 # Exaile plugin interface
