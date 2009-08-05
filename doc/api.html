@@ -6,7 +6,7 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.0)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.1)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py</a></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
@@ -210,30 +210,6 @@ Default:&nbsp;True<br>
 &nbsp;<br>
 Option&nbsp;name:&nbsp;'file-browser-use-xdg-user-dirs'</tt></dd>
 </dl>
-<dl><dt><strong>image_size</strong></dt>
-<dd><tt>Size&nbsp;of&nbsp;images&nbsp;sent&nbsp;to&nbsp;clients.<br>
-&nbsp;<br>
-A&nbsp;size&nbsp;of&nbsp;0&nbsp;disables&nbsp;images.<br>
-&nbsp;<br>
-Default:&nbsp;200<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'image-size'</tt></dd>
-</dl>
-<dl><dt><strong>image_type</strong></dt>
-<dd><tt>Type&nbsp;of&nbsp;images&nbsp;sent&nbsp;to&nbsp;clients.<br>
-&nbsp;<br>
-Default:&nbsp;"JPEG"<br>
-Possible&nbsp;values:&nbsp;"JPEG",&nbsp;"PNG"<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'image-type'</tt></dd>
-</dl>
-<dl><dt><strong>list_limit</strong></dt>
-<dd><tt>Maximum&nbsp;length&nbsp;of&nbsp;item&nbsp;list&nbsp;pages&nbsp;sent&nbsp;to&nbsp;clients.<br>
-&nbsp;<br>
-Default:&nbsp;50<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'list-limit'</tt></dd>
-</dl>
 <dl><dt><strong>log_file</strong></dt>
 <dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;log&nbsp;file.<br>
 &nbsp;<br>
@@ -425,10 +401,6 @@ Player&nbsp;adapters&nbsp;should&nbsp;set&nbsp;this&nbsp;to&nbsp;a&nbsp;list&nbs
 contained&nbsp;in&nbsp;the&nbsp;requested&nbsp;list.&nbsp;To&nbsp;be&nbsp;used&nbsp;only&nbsp;for&nbsp;mlib&nbsp;requests&nbsp;(see<br>
 PlayerAdapter.request_mlib()).</tt></dd>
 </dl>
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>PAGE_SIZE</strong> = 50</dl>
-
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -1313,5 +1285,5 @@ to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
 <strong>PLAYBACK_STOP</strong> = 0<br>
 <strong>__all__</strong> = ('PlayerAdapter', 'MPRISAdapter', 'ListReply', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP')<br>
-<strong>__version__</strong> = '0.9.0'</td></tr></table>
+<strong>__version__</strong> = '0.9.1'</td></tr></table>
 </body></html>
