@@ -37,6 +37,17 @@ pa_files["banshee"] = [
     ["remuco-banshee"]
 ]
 
+# --- Rhythmbox ---------------------------------------------------------------
+
+# set prefix may not be valid for Exaile -> use an Exaile specific prefix:
+PREFIX_EXAILE = os.getenv("PREFIX_EXAILE", "/usr/")
+
+pa_files["exaile"] = [
+    [],
+    ("%sshare/exaile/plugins/remex" % PREFIX_EXAILE,
+     ["PLUGININFO", "__init__.py"])
+]
+
 # --- FooPlay -----------------------------------------------------------------
 
 pa_files["fooplay"] = [
