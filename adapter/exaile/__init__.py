@@ -20,78 +20,86 @@
 #
 # =============================================================================
 
+"""Exaile adapter for Remuco, implemented as an Exaile plugin."""
+
+import gobject
+
 import remuco
 from remuco import log
+
+import xl.event
+import xl.settings
 
 class ExaileAdapter(remuco.PlayerAdapter):
     
     def __init__(self, exaile):
         
         remuco.PlayerAdapter.__init__(self, "Exaile",
+                                      max_rating=5,
                                       playback_known=True,
-                                      volume_known=True)
+                                      volume_known=True,
+                                      repeat_known=True,
+                                      shuffle_known=True,
+                                      progress_known=True)
         
         self.__ex = exaile
         
-    def start(self):
+    def start(self, event, exaile, ignore):
         
         remuco.PlayerAdapter.start(self)
-
+        
+        for event in ("playback_track_start", "playback_track_end"):
+            xl.event.add_callback(self.__notify_track_change, event)
+            
+        for event in ("playback_player_end", "playback_player_start",
+                      "playback_toggle_pause"):
+            xl.event.add_callback(self.__notify_playback_change, event)
+        
+        self.__update_track(self.__ex.player.current)
+        self.__update_playback()
+        
         log.debug("here we go")
         
     def stop(self):
         
         remuco.PlayerAdapter.stop(self)
+        
+        xl.event.remove_callback(self.__notify_track_change)
+        xl.event.remove_callback(self.__notify_playback_change)
 
         log.debug("bye, turning off the light")
         
     def poll(self):
         
-        import random
-        
-        volume = random.randint(0,100)
-        self.update_volume(volume)
-        
-        playing = random.randint(0,1)
-        if playing:
-            self.update_playback(remuco.PLAYBACK_PLAY)
-        else:
-            self.update_playback(remuco.PLAYBACK_PAUSE)
+        self.__update_repeat_and_shuffle()
+        self.__update_volume()
+        self.__update_progress()
         
     # =========================================================================
     # control interface
     # =========================================================================
     
     def ctrl_toggle_playing(self):
-        """Toggle play and pause. 
         
-        @note: Override if it is possible and makes sense.
-        
-        """
         if self.__ex.player.is_playing() or self.__ex.player.is_paused():
             self.__ex.player.toggle_pause()
         else:
             self.__ex.queue.play()
             
+        # when playing after stopped, the 'playback_player_start' is missed
+        gobject.idle_add(self.__update_playback())
+            
     def ctrl_toggle_repeat(self):
-        """Toggle repeat mode. 
         
-        @note: Override if it is possible and makes sense.
-        
-        @see: update_repeat()
-               
-        """
-        print(str(dir(self.__ex.player)))
+        repeat = not self.__ex.queue.current_playlist.is_repeat()
+        self.__ex.queue.current_playlist.set_repeat(repeat)
+        gobject.idle_add(self.__update_repeat_and_shuffle)
     
     def ctrl_toggle_shuffle(self):
-        """Toggle shuffle mode. 
         
-        @note: Override if it is possible and makes sense.
-        
-        @see: update_shuffle()
-               
-        """
-        print(str(dir(self.__ex)))
+        shuffle = not self.__ex.queue.current_playlist.is_random()
+        self.__ex.queue.current_playlist.set_random(shuffle)
+        gobject.idle_add(self.__update_repeat_and_shuffle)
     
     def ctrl_next(self):
         """Play the next item. 
@@ -125,16 +133,29 @@ class ExaileAdapter(remuco.PlayerAdapter):
         @note: Override if it is possible and makes sense.
         
         """
+        if not self.__ex.player.is_playing():
+            return
+        
+        track = self.__ex.player.current
+        if not track:
+            return
+        
+        pos = self.__ex.player.get_time()
+        pos = pos + direction * 5
+        pos = min(pos, track.get_duration())
+        pos = max(pos, 0)
+        
+        self.__ex.player.seek(pos)
+        
+        gobject.idle_add(self.__update_progress)
     
     def ctrl_rate(self, rating):
-        """Rate the currently played item. 
         
-        @param rating:
-            rating value (int)
+        track = self.__ex.player.current
+        if not track:
+            return
         
-        @note: Override if it is possible and makes sense.
-        
-        """
+        track.set_rating(rating)
     
     def ctrl_tag(self, id, tags):
         """Attach some tags to an item.
@@ -152,21 +173,111 @@ class ExaileAdapter(remuco.PlayerAdapter):
         """
     
     def ctrl_volume(self, direction):
-        """Adjust volume. 
         
-        @param volume:
-            * -1: decrease by some percent (5 is a good value)
-            *  0: mute volume
-            * +1: increase by some percent (5 is a good value)
-        
-        @note: Override if it is possible and makes sense.
-               
-        """
+        if direction == 0:
+            self.__ex.player.set_volume(0)
+        else:
+            volume = self.__ex.player.get_volume() + direction * 5
+            volume = min(volume, 100)
+            volume = max(volume, 0)
+            self.__ex.player.set_volume(volume)
+            
+        gobject.idle_add(self.__update_volume)
         
     # =========================================================================
     # request interface
     # =========================================================================
     
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
+    def __notify_track_change(self, type, object, data):
+        """Callback on track change."""
+        
+        log.debug("track change: %s" % data)
+        self.__update_track(data)
+        self.__update_progress()
+    
+    def __notify_playback_change(self, type, object, data):
+        """Callback on playback change."""
+        
+        self.__update_playback()
+        
+    def __update_playback(self):
+        """Update playback state."""
+        
+        if self.__ex.player.is_playing():
+            playback = remuco.PLAYBACK_PLAY
+        elif self.__ex.player.is_paused():
+            playback = remuco.PLAYBACK_PAUSE
+        else:
+            playback = remuco.PLAYBACK_STOP
+            
+        self.update_playback(playback)
+        
+    def __update_repeat_and_shuffle(self):
+        """Update repeat and shuffle state."""
+        
+        repeat = self.__ex.queue.current_playlist.is_repeat()
+        self.update_repeat(repeat)
+
+        shuffle = self.__ex.queue.current_playlist.is_random()
+        self.update_shuffle(shuffle)
+    
+    def __update_track(self, track):
+        """Update meta information of current track."""
+        
+        def get_tag(key):
+            val = track.get_tag(key)
+            if val:
+                try:
+                    val = val[0]
+                except IndexError:
+                    pass
+            return val
+        
+        if track is None:
+            id = None
+            info = None
+            img = None
+        else:
+            id = track.get_loc()
+            info = {}
+            info[remuco.INFO_ARTIST] = get_tag("artist")
+            info[remuco.INFO_ALBUM] = get_tag("album")
+            info[remuco.INFO_TITLE] = get_tag("title")
+            info[remuco.INFO_YEAR] = get_tag("date")
+            info[remuco.INFO_GENRE] = get_tag("genre")
+            info[remuco.INFO_BITRATE] = track.get_bitrate().replace('k','')
+            info[remuco.INFO_RATING] = track.get_rating()
+            info[remuco.INFO_LENGTH] = track.get_duration()
+            img = track.get_tag("arturl")
+            if not img:
+                img = self.find_image(id)
+            log.debug("img: %s" % img)
+            
+        self.update_item(id, info, img)
+        
+    def __update_volume(self):
+        """Update volume."""
+        
+        self.update_volume(self.__ex.player.get_volume())
+        
+    def __update_progress(self):
+        """Update play progress of current track."""
+        
+        track = self.__ex.player.current
+        
+        if not track:
+            len = 0
+            pos = 0
+        else:
+            len = track.get_duration()
+            pos = self.__ex.player.get_time()
+        
+        self.update_progress(pos, len)
+        
 # =============================================================================
 # Exaile plugin interface
 # =============================================================================
@@ -174,15 +285,16 @@ class ExaileAdapter(remuco.PlayerAdapter):
 ea = None
 
 def enable(exaile):
-    print "Hello, world!"
     global ea
     ea = ExaileAdapter(exaile)
-    ea.start()
-
+    if exaile.loading:
+        xl.event.add_callback(ea.start, "exaile_loaded")
+    else:
+        ea.start("exaile_loaded", exaile, None)
 
 def disable(exaile):
-    print "Goodbye. :("
     global ea
-    ea.stop()
-    ea = None
+    if ea:
+        ea.stop()
+        ea = None
 
