@@ -50,13 +50,9 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		private ItemlistScreen ils = null;
 
-		private final MediaBrowser outer;
-
 		public PostActionDialog(MediaBrowser outer) {
 
 			super("Action Done");
-
-			this.outer = outer;
 
 			final int layout;
 			layout = StringItem.LAYOUT_CENTER | StringItem.LAYOUT_NEWLINE_AFTER;
@@ -84,15 +80,8 @@ public final class MediaBrowser implements CommandListener, IRequester,
 		public void commandAction(Command c, Displayable d) {
 
 			if (c == CMD_LIST && ils != null) {
-				if (ils.getItemList().isPlaylist()) {
-					// playlist may have been changed by action
-					outer.commandAction(CMD_PLAYLIST, screenRoot);
-				} else if (ils.getItemList().isQueue()) {
-					// queue may have been changed by action
-					outer.commandAction(CMD_QUEUE, screenRoot);
-				} else {
-					display.setCurrent(ils);
-				}
+				ilcGotoPage(ils, ils.getItemList().getPage());
+				// display.setCurrent(ils); // do not reloads
 			} else {
 				display.setCurrent(parent);
 			}
