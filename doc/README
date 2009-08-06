@@ -41,6 +41,9 @@ Audacious:
 Banshee:
  * Banshee >= 1.4
 
+Exaile:
+ * Exaile >= 2.99.3 (3 alpha)
+
 MPD:
  * MPD >= 0.13.2
  * Python modules: mpd (>= 0.2)
