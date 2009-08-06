@@ -22,26 +22,44 @@
 
 """Exaile adapter for Remuco, implemented as an Exaile plugin."""
 
-import gobject
+import re
 
-import remuco
-from remuco import log
+import gobject
 
 import xl.event
 import xl.settings
 
-IA_JUMP = remuco.ItemAction("Jump to")
-IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
-IA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
-LA_ACTIVATE = remuco.ListAction("Activate")
+import remuco
+from remuco import log
 
-PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE, IA_ENQUEUE)
-QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
-MLIB_ITEM_ACTIONS = (IA_ENQUEUE, )
-MLIB_LIST_ACTIONS = (LA_ACTIVATE, )
+# =============================================================================
+# constants
+# =============================================================================
 
 PLAYLISTS_SMART = "Smart playlists"
 PLAYLISTS_CUSTOM = "Custom playlists"
+PLAYLISTS_OPEN = "Open playlists"
+
+# =============================================================================
+# actions
+# =============================================================================
+
+IA_JUMP = remuco.ItemAction("Jump to")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+IA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
+LA_OPEN = remuco.ListAction("Open")
+LA_ACTIVATE = remuco.ListAction("Activate")
+LA_CLOSE = remuco.ListAction("Close") # TODO: implement close action
+
+PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE, IA_ENQUEUE)
+QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
+MLIB_ITEM_ACTIONS = (IA_JUMP, IA_ENQUEUE, IA_REMOVE)
+MLIB_LIST_ACTIONS = (LA_OPEN,)
+MLIB_LIST_OPEN_ACTIONS = (LA_ACTIVATE,)
+
+# =============================================================================
+# player adapter
+# =============================================================================
 
 class ExaileAdapter(remuco.PlayerAdapter):
     
@@ -73,7 +91,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
         self.__update_playback()
         # other updates via poll()
         
-        log.debug("here we go")
+        log.debug("remuco exaile adapter started")
         
     def stop(self):
         
@@ -82,7 +100,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
         xl.event.remove_callback(self.__notify_track_change)
         xl.event.remove_callback(self.__notify_playback_change)
 
-        log.debug("bye, turning off the light")
+        log.debug("remuco exaile adapter stopped")
         
     def poll(self):
         
@@ -123,8 +141,6 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         """
         self.__ex.queue.next()
-        q = self.__ex.queue
-        print("type: %s, dir: %s" % (type(q), dir(q)))
     
     def ctrl_previous(self):
         """Play the previous item. 
@@ -229,7 +245,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         if not path:
             
-            reply.nested = (PLAYLISTS_SMART, PLAYLISTS_CUSTOM)
+            reply.nested = (PLAYLISTS_OPEN, PLAYLISTS_SMART, PLAYLISTS_CUSTOM)
             reply.send()
         
         elif path[0] == PLAYLISTS_SMART:
@@ -239,17 +255,27 @@ class ExaileAdapter(remuco.PlayerAdapter):
                 reply.list_actions = MLIB_LIST_ACTIONS
             else:
                 pl = self.__ex.smart_playlists.get_playlist(path[1])
-                tracks = pl.get_playlist(collection=self.__ex.collection)
-                reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
-                reply.item_actions = MLIB_ITEM_ACTIONS
+                reply.ids, reply.names = ["XXX"], ["This is a dynamic playlist!"] 
              
         elif path[0] == PLAYLISTS_CUSTOM:
         
             if len(path) == 1:
                 reply.nested = self.__ex.playlists.list_playlists()
-                #reply.list_actions = MLIB_LIST_ACTIONS
+                reply.list_actions = MLIB_LIST_ACTIONS
             else:
                 pl = self.__ex.playlists.get_playlist(path[1])
+                tracks = pl.get_ordered_tracks()
+                reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
+                
+        elif path[0] == PLAYLISTS_OPEN:
+                
+            
+            if len(path) == 1:
+                plo_list, pln_list = self.__get_open_playlists()
+                reply.nested = pln_list
+                reply.list_actions = MLIB_LIST_OPEN_ACTIONS
+            else:
+                pl, i = self.__get_open_playlist(path)
                 tracks = pl.get_ordered_tracks()
                 reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
                 reply.item_actions = MLIB_ITEM_ACTIONS
@@ -266,15 +292,11 @@ class ExaileAdapter(remuco.PlayerAdapter):
     def action_playlist_item(self, action_id, positions, ids):
         
         if action_id == IA_JUMP.id:
-            # TODO: recheck this once Exaile 3 final is released
             track = self.__ex.collection.get_track_by_loc(ids[0])
             self.__ex.queue.next(track=track)
             self.__ex.queue.current_playlist.set_current_pos(positions[0])
         elif action_id == IA_REMOVE.id:
-            positions.reverse()
-            for pos in positions:
-                log.debug("remove item %d" % pos)
-                self.__ex.queue.current_playlist.remove_tracks(pos, pos)
+            self.__remove_tracks_from_playlist(positions)
         elif action_id == IA_ENQUEUE.id:
             track_list = self.__ex.collection.get_tracks_by_locs(ids)
             self.__ex.queue.add_tracks(track_list)
@@ -284,24 +306,27 @@ class ExaileAdapter(remuco.PlayerAdapter):
     def action_queue_item(self, action_id, positions, ids):
         
         if action_id == IA_JUMP.id:
-            # TODO: recheck this once Exaile 3 final is released
             track = self.__ex.collection.get_track_by_loc(ids[0])
             self.__ex.queue.next(track=track)
-            self.__ex.queue.remove_tracks(positions[0], positions[0])
-            #self.__ex.queue.set_current_pos(positions[0])
+            self.__remove_tracks_from_playlist(positions, pl=self.__ex.queue)
         elif action_id == IA_REMOVE.id:
-            positions.reverse()
-            for pos in positions:
-                log.debug("remove item %d" % pos)
-                self.__ex.queue.remove_tracks(pos, pos)
+            self.__remove_tracks_from_playlist(positions, pl=self.__ex.queue)
         else:
             log.error("** BUG ** unexpected queue item action")
             
     def action_mlib_item(self, action_id, path, positions, ids):
         
-        if action_id == IA_ENQUEUE.id:
+        if action_id == IA_JUMP.id:
+            self.action_mlib_list(LA_ACTIVATE.id, path)
+            track = self.__ex.collection.get_track_by_loc(ids[0])
+            self.__ex.queue.next(track=track)
+            self.__ex.queue.current_playlist.set_current_pos(positions[0])
+        elif action_id == IA_ENQUEUE.id:
             track_list = self.__ex.collection.get_tracks_by_locs(ids)
             self.__ex.queue.add_tracks(track_list)
+        elif action_id == IA_REMOVE.id:
+            pl, i = self.__get_open_playlist(path)
+            self.__remove_tracks_from_playlist(positions, pl=pl)
         else:
             log.error("** BUG ** unexpected mlib item action")
 
@@ -309,29 +334,34 @@ class ExaileAdapter(remuco.PlayerAdapter):
 
         if action_id == LA_ACTIVATE.id:
             
-            pl = None
+            if path[0] == PLAYLISTS_OPEN:
+                pl, i = self.__get_open_playlist(path)
+                self.__ex.gui.main.playlist_notebook.set_current_page(i)
+            else:
+                log.error("** BUG ** unexpected mlib path %s" % path)
+                
+        elif action_id == LA_OPEN.id:
+            
             if path[0] == PLAYLISTS_SMART:
                 pl = self.__ex.smart_playlists.get_playlist(path[1])
+                pl = pl.get_playlist(self.__ex.collection)
+                self.__ex.gui.main.add_playlist(pl)
             elif path[0] == PLAYLISTS_CUSTOM:
                 pl = self.__ex.playlists.get_playlist(path[1])
+                self.__ex.gui.main.add_playlist(pl)
             else:
-                log.error("** BUG ** unexpected mlib path")
+                log.error("** BUG ** unexpected mlib path %s" % path)
             
-            if pl:
-                # this does not refelct in GUI, as a result,
-                # queue.current_playlist is a smart playlist (but we need
-                # an instance of it, a normal playlist)
-                self.__ex.queue.set_current_playlist(pl)
         else:
             log.error("** BUG ** unexpected mlib list action")
+            
     # =========================================================================
-    # internal methods
+    # callbacks
     # =========================================================================
     
     def __notify_track_change(self, type, object, data):
         """Callback on track change."""
         
-        log.debug("track change: %s" % data)
         self.__update_track(data)
         self.__update_progress()
         self.__update_position()
@@ -341,6 +371,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         self.__update_playback()
         
+    # =========================================================================
+    # helper methods
+    # =========================================================================
+
     def __update_playback(self):
         """Update playback state."""
         
@@ -392,7 +426,6 @@ class ExaileAdapter(remuco.PlayerAdapter):
             img = track.get_tag("arturl")
             if not img:
                 img = self.find_image(id)
-            log.debug("img: %s" % img)
             
         self.update_item(id, info, img)
         
@@ -416,12 +449,14 @@ class ExaileAdapter(remuco.PlayerAdapter):
         self.update_progress(pos, len)
         
     def __update_position(self):
+        """Update current playlist position."""
         
         pl = self.__ex.queue.current_playlist
         
         self.update_position(pl.get_current_pos())
         
     def __tracklist_to_itemlist(self, track_list):
+        """Convert a list if track objects to a Remuco item list."""
         
         ids = []
         names = []
@@ -439,9 +474,51 @@ class ExaileAdapter(remuco.PlayerAdapter):
             names.append(name)
         
         return ids, names
+    
+    def __get_open_playlists(self):
+        """Get open playlists.
         
+        Returns 2 lists, one with the playlist objects and one with the
+        playlist names (formatted appropriately to handle duplicates).
+        
+        """
+        nb = self.__ex.gui.main.playlist_notebook
+        plo_list = []
+        pln_list = []
+        for i in range(nb.get_n_pages()):
+            plo = nb.get_nth_page(i).playlist
+            plo_list.append(plo)
+            if plo == self.__ex.queue.current_playlist:
+                num = "(%d)" % (i+1)
+            else:
+                num = "[%d]" % (i+1)
+            pln_list.append("%s %s" % (num, plo.get_name()))
+        return plo_list, pln_list
+    
+    def __get_open_playlist(self, path):
+        """Get a playlist object and tab number of an open playlist."""
+        
+        plo_list, pln_list = self.__get_open_playlists()
+        i = int(re.match("[\(\[](\d+)[\)\]]", path[1]).group(1)) - 1 
+        try:
+            return plo_list[i], i
+        except IndexError:
+            return plo_list[0], 0
+    
+    def __remove_tracks_from_playlist(self, positions, pl=None):
+        """Remove tracks from a playlist given their positions. """
+        
+        if pl is None:
+            pl = self.__ex.queue.current_playlist
+            
+        revpos = positions[:]
+        revpos.reverse()
+        
+        for pos in revpos:
+            pl.remove_tracks(pos, pos)
+            
 # =============================================================================
-# Exaile plugin interface
+# plugin interface
 # =============================================================================
     
 ea = None
