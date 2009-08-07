@@ -40,6 +40,8 @@ PLAYLISTS_SMART = "Smart playlists"
 PLAYLISTS_CUSTOM = "Custom playlists"
 PLAYLISTS_OPEN = "Open playlists"
 
+SEARCH_MASK = ("Artist", "Album", "Title", "Genre")
+
 # =============================================================================
 # actions
 # =============================================================================
@@ -47,15 +49,21 @@ PLAYLISTS_OPEN = "Open playlists"
 IA_JUMP = remuco.ItemAction("Jump to")
 IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
 IA_ENQUEUE = remuco.ItemAction("Enqueue", multiple=True)
+IA_APPEND = remuco.ItemAction("Append", multiple=True)
+IA_REPLACE = remuco.ItemAction("Reset playlist", multiple=True)
+IA_NEW_PLAYLIST = remuco.ItemAction("New playlist", multiple=True)
+
 LA_OPEN = remuco.ListAction("Open")
 LA_ACTIVATE = remuco.ListAction("Activate")
-LA_CLOSE = remuco.ListAction("Close") # TODO: implement close action
+LA_CLOSE = remuco.ListAction("Close")
 
 PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE, IA_ENQUEUE)
 QUEUE_ACTIONS = (IA_JUMP, IA_REMOVE)
-MLIB_ITEM_ACTIONS = (IA_JUMP, IA_ENQUEUE, IA_REMOVE)
+MLIB_ITEM_ACTIONS = (IA_JUMP, IA_ENQUEUE, IA_APPEND, IA_REPLACE, IA_REMOVE,
+                     IA_NEW_PLAYLIST)
 MLIB_LIST_ACTIONS = (LA_OPEN,)
-MLIB_LIST_OPEN_ACTIONS = (LA_ACTIVATE,)
+MLIB_LIST_OPEN_ACTIONS = (LA_ACTIVATE, LA_CLOSE)
+SEARCH_ACTIONS = (IA_ENQUEUE, IA_APPEND, IA_REPLACE, IA_NEW_PLAYLIST)
 
 # =============================================================================
 # player adapter
@@ -71,11 +79,12 @@ class ExaileAdapter(remuco.PlayerAdapter):
                                       volume_known=True,
                                       repeat_known=True,
                                       shuffle_known=True,
-                                      progress_known=True)
+                                      progress_known=True,
+                                      search_mask=SEARCH_MASK)
         
         self.__ex = exaile
         
-    def start(self, event, exaile, ignore):
+    def start(self):
         
         remuco.PlayerAdapter.start(self)
         
@@ -190,21 +199,6 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         track.set_rating(rating)
     
-    def ctrl_tag(self, id, tags):
-        """Attach some tags to an item.
-        
-        @param id:
-            ID of the item to attach the tags to
-        @param tags:
-            a list of tags
-        
-        @note: Tags does not mean ID3 tags or similar. It means the general
-            idea of tags (e.g. like used at last.fm). 
-
-        @note: Override if it is possible and makes sense.
-               
-        """
-    
     def ctrl_volume(self, direction):
         
         if direction == 0:
@@ -285,21 +279,33 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         reply.send()
 
+    def request_search(self, reply, query):
+        
+        tracks = None
+        for key, val in zip(SEARCH_MASK, query):
+            val = val.strip()
+            if val:
+                expr = "%s=%s" % (key, val)
+                tracks = self.__ex.collection.search(expr, tracks=tracks)
+                
+        reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
+        reply.item_actions = SEARCH_ACTIONS
+        reply.send()
+    
     # =========================================================================
     # action interface
     # =========================================================================
     
     def action_playlist_item(self, action_id, positions, ids):
         
-        if action_id == IA_JUMP.id:
+        if self.__handle_generic_item_action(action_id, ids):
+            pass # we are done
+        elif action_id == IA_JUMP.id:
             track = self.__ex.collection.get_track_by_loc(ids[0])
             self.__ex.queue.next(track=track)
             self.__ex.queue.current_playlist.set_current_pos(positions[0])
         elif action_id == IA_REMOVE.id:
             self.__remove_tracks_from_playlist(positions)
-        elif action_id == IA_ENQUEUE.id:
-            track_list = self.__ex.collection.get_tracks_by_locs(ids)
-            self.__ex.queue.add_tracks(track_list)
         else:
             log.error("** BUG ** unexpected playlist item action")
 
@@ -316,14 +322,13 @@ class ExaileAdapter(remuco.PlayerAdapter):
             
     def action_mlib_item(self, action_id, path, positions, ids):
         
-        if action_id == IA_JUMP.id:
+        if self.__handle_generic_item_action(action_id, ids):
+            pass # we are done
+        elif action_id == IA_JUMP.id:
             self.action_mlib_list(LA_ACTIVATE.id, path)
             track = self.__ex.collection.get_track_by_loc(ids[0])
             self.__ex.queue.next(track=track)
             self.__ex.queue.current_playlist.set_current_pos(positions[0])
-        elif action_id == IA_ENQUEUE.id:
-            track_list = self.__ex.collection.get_tracks_by_locs(ids)
-            self.__ex.queue.add_tracks(track_list)
         elif action_id == IA_REMOVE.id:
             pl, i = self.__get_open_playlist(path)
             self.__remove_tracks_from_playlist(positions, pl=pl)
@@ -351,9 +356,22 @@ class ExaileAdapter(remuco.PlayerAdapter):
                 self.__ex.gui.main.add_playlist(pl)
             else:
                 log.error("** BUG ** unexpected mlib path %s" % path)
+        
+        elif action_id == LA_CLOSE.id:
             
+            pl, i = self.__get_open_playlist(path)
+            nb = self.__ex.gui.main.playlist_notebook
+            nb.remove_page(i)
+        
         else:
             log.error("** BUG ** unexpected mlib list action")
+            
+    def action_search_item(self, action_id, positions, ids):
+        
+        if self.__handle_generic_item_action(action_id, ids):
+            pass # we are done
+        else:
+            log.error("** BUG ** unexpected search item action")
             
     # =========================================================================
     # callbacks
@@ -455,6 +473,40 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         self.update_position(pl.get_current_pos())
         
+    def __handle_generic_item_action(self, action_id, ids):
+        """Process generic item actions.
+        
+        Actions: IA_ENQUEUE, IA_APPEND, IA_REPLACE, IA_NEW_PLAYLIST
+        
+        Generic item actions are processed independent of the list containing
+        the items (playlist, queue, mlib or search result).
+        
+        @return: True if action has been handled, False other wise 
+        """
+        
+        handled = True
+        
+        track_list = self.__ex.collection.get_tracks_by_locs(ids)
+        try:
+            while True:
+                track_list.remove(None)
+        except ValueError:
+            pass
+        
+        if action_id == IA_ENQUEUE.id:
+            self.__ex.queue.add_tracks(track_list)
+        elif action_id == IA_APPEND.id:
+            self.__ex.queue.current_playlist.add_tracks(track_list)
+        elif action_id == IA_REPLACE.id:
+            self.__ex.queue.current_playlist.set_tracks(track_list)
+        elif action_id == IA_NEW_PLAYLIST.id:
+            self.__ex.gui.main.add_playlist()
+            self.__ex.queue.current_playlist.add_tracks(track_list)
+        else:
+            handled = False
+        
+        return handled
+    
     def __tracklist_to_itemlist(self, track_list):
         """Convert a list if track objects to a Remuco item list."""
         
@@ -521,21 +573,24 @@ class ExaileAdapter(remuco.PlayerAdapter):
 # plugin interface
 # =============================================================================
     
-ea = None
+EA = None
 
 def enable(exaile):
-    global ea
-    ea = ExaileAdapter(exaile)
     if exaile.loading:
-        xl.event.add_callback(ea.start, "exaile_loaded")
+        xl.event.add_callback(_enable, "exaile_loaded")
     else:
-        ea.start("exaile_loaded", exaile, None)
+        _enable("exaile_loaded", exaile, None)
+
+def _enable(event, exaile, nothing):
+    global EA
+    EA = ExaileAdapter(exaile)
+    EA.start()
 
 def disable(exaile):
-    global ea
-    if ea:
-        ea.stop()
-        ea = None
+    global EA
+    if EA:
+        EA.stop()
+        EA = None
 
 def teardown(exaile):
     # teardown and disable are the same here
