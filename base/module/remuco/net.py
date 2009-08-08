@@ -29,6 +29,7 @@ import gobject
 
 from remuco import log
 from remuco import message
+from remuco import report
 from remuco import serial
 from remuco.data import ClientInfo
 
@@ -81,13 +82,15 @@ class ClientConnection(object):
     IO_PROTO_VERSION = '\x0a'
     IO_HELLO = "%s%s%s" % (IO_PREFIX, IO_PROTO_VERSION, IO_SUFFIX) # hello msg
     
-    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping):
+    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping,
+                 conn_type):
         
         self.__sock = sock
         self.__addr = addr
         self.__clients = clients
         self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
+        self.__conn_type = conn_type
         
         # client info
         self.info = ClientInfo()
@@ -223,6 +226,8 @@ class ClientConnection(object):
             log.debug("received client info from %s" % self)
             
             serial.unpack(self.info, msg_data)
+            
+            report.notify_client_connected(self.info.device, self.__conn_type)
             
             if not self in self.__clients: # initial client info
             
@@ -435,7 +440,8 @@ class _Server(object):
                 log.debug("connection request accepted")
                 client_sock.setblocking(0)
                 ClientConnection(client_sock, addr, self.__clients,
-                    self.__pinfo_msg, self.__msg_handler_fn, self.__ping_ival)
+                                 self.__pinfo_msg, self.__msg_handler_fn,
+                                 self.__ping_ival, self._get_type())
             except IOError, e:
                 log.error("accepting %s client failed: %s" %
                           (self._get_type(), e))

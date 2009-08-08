@@ -133,7 +133,7 @@ else:
 
 print player_adapters
 
-scripts = []
+scripts = ["scripts/remuco-report"]
 data_files = []
 
 for pa in player_adapters:

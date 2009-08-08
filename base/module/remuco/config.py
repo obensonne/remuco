@@ -580,6 +580,12 @@ def get_system_shutdown_command():
         return None
     
     return path
+
+def get_report_file():
+    """Get the name of the report file."""
+
+    return os.path.join(xdg_cache, "remuco", "report")
+    
         
 __all__ = (Config,)
 
