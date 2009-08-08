@@ -243,14 +243,18 @@ class ClientInfo(serial.Serializable):
         self.img_size = 0
         self.img_type = None
         self.page_size = 0
+        self.device = {}
 
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_I, serial.TYPE_S, serial.TYPE_I)
+        return (serial.TYPE_I, serial.TYPE_S, serial.TYPE_I,
+                serial.TYPE_AS, serial.TYPE_AS)
         
     def set_data(self, data):
-        self.img_size, self.img_type, self.page_size = data
+        self.img_size, self.img_type, self.page_size, dev_keys, dev_vals = data
+        for key, value in zip(dev_keys, dev_vals):
+            self.device[key] = value
 
 class Control(serial.Serializable):
     """ Parameter of control messages from clients with integer arguments."""

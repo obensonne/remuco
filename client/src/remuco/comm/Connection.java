@@ -156,7 +156,7 @@ public final class Connection implements Runnable, IOptionListener {
 
 			final Message m = new Message();
 			m.id = Message.CONN_CINFO;
-			m.data = Serial.out(new ClientInfo());
+			m.data = Serial.out(new ClientInfo(false));
 			send(m);
 		}
 
@@ -520,7 +520,7 @@ public final class Connection implements Runnable, IOptionListener {
 		final Message msgCI = new Message();
 
 		msgCI.id = Message.CONN_CINFO;
-		msgCI.data = Serial.out(new ClientInfo());
+		msgCI.data = Serial.out(new ClientInfo(true));
 
 		try {
 			sendPrivate(msgCI);
