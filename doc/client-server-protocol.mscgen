@@ -21,17 +21,20 @@ msc {
 	Server<=Adapter [ label = "update_...()" ] ;
 	Client<=Server [ label = "SYNC_..." ];
 	...;
-	--- [ label = "client requests data from player [4] " ];
+	--- [ label = "client requests list data from player [4] " ];
 	Client=>Server [ label = "REQ_..." ];
 	Server=>Adapter [ label = "request_...()" ];
-	Server<=Adapter [ label = "reply_..._request()" ];
+	Server<=Adapter [ label = "ListReply.send()" ];
 	Client<=Server [ label = "REQ_..." ];
 	...;
 	--- [ label = "client issues a media browser action [5] " ];
 	Client=>Server [ label = "ACT_..." ];
 	Server=>Adapter [ label = "action_...()" ];
 	...;
-	--- [ label = "player goes down [6] " ];
+	--- [ label = "client updates certain preferences [6] " ];
+	Client=>Server [ label = "CONN_CINFO" ];
+	...;
+	--- [ label = "player goes down [7] " ];
 	Server<=Adapter [ label="down()" ];
 	Client<=Server [ label="CONN_BYE" ];
 
