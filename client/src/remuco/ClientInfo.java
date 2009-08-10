@@ -23,10 +23,8 @@ package remuco;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import remuco.comm.BluetoothFactory;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
-import remuco.ui.Theme;
 import remuco.util.Log;
 
 public final class ClientInfo implements ISerializable {
@@ -99,9 +97,9 @@ public final class ClientInfo implements ISerializable {
 		info.put(key, value ? "yes" : "no");
 	}
 
-	private void addDeviceInfo(Hashtable info, String key, int value) {
-		info.put(key, String.valueOf(value));
-	}
+	// private void addDeviceInfo(Hashtable info, String key, int value) {
+	// info.put(key, String.valueOf(value));
+	// }
 
 	private void addDeviceInfo(Hashtable info, String key, String value) {
 		info.put(key, value);
