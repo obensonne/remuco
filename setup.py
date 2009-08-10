@@ -131,10 +131,10 @@ else:
 # generate script and data file list (add prefix to pa_files)
 # =============================================================================
 
-print player_adapters
+#print player_adapters
 
 scripts = ["scripts/remuco-report"]
-data_files = []
+data_files = [("share/man/man1", ["doc/remuco-report.1"])]
 
 for pa in player_adapters:
     
