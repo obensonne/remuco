@@ -22,16 +22,125 @@
 #
 # =============================================================================
 
-MSG=`python -m remuco.report`
+# -----------------------------------------------------------------------------
+# functions
+# -----------------------------------------------------------------------------
 
-if [ -t 1 ] ; then
-	echo
-	echo "$MSG"
-	echo
-elif [ -n "`which zenity`" ] ; then
-	zenity --info --title "Remuco Report" --text "$MSG"
+message() {
+	MPID=""
+	if [ "$UI" = "ZENI" ] ; then
+		if [ -z "$2" ] ; then
+			zenity --info --title="Remuco Report" --text="$1"
+		else
+			zenity --info --title="Remuco Report" --text="$1" &
+			MPID=$!
+		fi
+	elif [ "$UI" = "KDIA" ] ; then
+		if [ -z "$2" ] ; then
+			kdialog --title="Remuco Report" --msgbox="$1" 
+		else
+			kdialog --title="Remuco Report" --msgbox="$1" &
+			MPID=$! 
+		fi
+	else
+		echo $1
+		echo
+	fi
+	
+}
+
+# -----------------------------------------------------------------------------
+# constants
+# -----------------------------------------------------------------------------
+
+DEVICE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/remuco/devices"
+
+if [ -n "`which zenity`" ] ; then
+	UI="ZENI"
 elif [ -n "`which kdialog`" ] ; then
-	kdialog --title "Remuco Report" --msgbox "$MSG"
+	UI="KDIA"
 else
-	echo "$MSG"
+	UI="TERM"
 fi
+
+#UI="ZENI"
+
+# -----------------------------------------------------------------------------
+# here we go
+# -----------------------------------------------------------------------------
+
+if [ -e "$DEVICE_FILE" ] ; then
+	DATA=`cat $DEVICE_FILE | grep -v "^#" | grep -v "^ *$"`
+else
+	DATA=""
+fi
+
+MSG_NO_DATA=\
+"Until now no client devices have been logged on this computer. There is "\
+"nothing to report.\n\nPlease try again later, once a Remuco client has "\
+"connected to this computer. Thanks!"
+
+if [ -z "$DATA" ] ; then
+	message "$MSG_NO_DATA"
+	exit
+fi
+
+MSG_INTRO=\
+"This tool sends the names of seen Remuco client devices to "\
+"remuco.sourceforge.net. It is a kind of survey to compile a list of Remuco "\
+"compatible devices.\n\nTHE FOLLOWING INFORMATION WILL BE SUBMITTED:"
+
+if [ "$UI" = "ZENI" ] ; then
+	TEXT="$MSG_INTRO\n\n$DATA\n\nPress OK to submit this report data now."
+	zenity --question --title="Remuco Report" --text="$TEXT"
+	[ $? = 0 ] || exit
+elif [ "$UI" = "KDIA" ] ; then
+	TEXT="$MSG_INTRO\n\n$DATA\n\nDo you want ot submit this data now?"
+	kdialog --title "Remuco Report" --yesno "$TEXT"
+	[ $? = 0 ] || exit
+else
+	echo "===================================================================="
+	echo "$MSG_INTRO"
+	echo
+	echo "$DATA"
+	echo
+	echo "Do you want to submit this data now? [Y/n]"
+	read REPLY
+	[ -z "$REPLY" -o "$REPLY" = "Y" -o "$REPLY" = "y" -o "$REPLY" = "yes" ] || exit
+fi
+
+message "Submitting data ...\n\nPlease stand by." "sub"
+
+# send data
+python -m remuco.report 2>&1
+OK=$?
+
+echo
+
+# kill progress dialog
+[ -z "$MPID" ] || kill $MPID > /dev/null 2>&1
+
+MSG_SUCCESS=\
+"Successfully submitted the device information.\n\nThank you for your "\
+"contribution! Please run this tools again, once a new client device has "\
+"connected."
+
+MSG_FAILED=\
+"Submitting the data failed. Please try again later.\n\nIf you run this tool "\
+"in a terminal, you'll see some error output."
+
+MSG_FAILED_T1=\
+"Submitting the data failed. Please inspect the error output and/or try "\
+"again later."
+
+if [ $OK != 0 ] ; then
+	if [ -t 1 ] ; then
+		message "$MSG_FAILED_T1" 
+	else
+		message "$MSG_FAILED"
+	fi
+	exit 1
+else
+	message "$MSG_SUCCESS"
+fi
+
