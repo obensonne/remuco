@@ -129,12 +129,7 @@ public final class ClientInfo implements ISerializable {
 		addDeviceInfo(info, "name", SYS_PROPS_DEVICE);
 		addDeviceInfo(info, "touchscreen", Config.TOUCHSCREEN);
 		addDeviceInfo(info, "utf8", Config.UTF8);
-		addDeviceInfo(info, "bluetooth", BluetoothFactory.BLUETOOTH);
-		addDeviceInfo(info, "canvas-width", Config.SCREEN_WIDTH);
-		addDeviceInfo(info, "canvas-height", Config.SCREEN_HEIGHT);
-
 		addDeviceInfo(info, "version", config.getAppProperty("MIDlet-Version"));
-		addDeviceInfo(info, "theme", config.getOption(Theme.OD_THEME));
 
 		return info;
 	}
