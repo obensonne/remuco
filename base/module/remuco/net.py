@@ -227,10 +227,12 @@ class ClientConnection(object):
             
             serial.unpack(self.info, msg_data)
             
-            report.notify_client_connected(self.info.device, self.__conn_type)
-            
             if not self in self.__clients: # initial client info
             
+                device = self.info.device.copy()
+                device["conn"] = self.__conn_type
+                report.log_device(device)
+                
                 self.__clients.append(self)
                 
                 log.debug("sending player info to %s" % self)

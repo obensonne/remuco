@@ -31,20 +31,18 @@ remuco-report \- report Remuco client device information
 is a duplex remote control system for Linux media players and mobile devices equipped with Bluetooth or WiFi.  
 .PP
 .I remuco-report 
-is a tool to report Remuco client device information to the Remuco developers. It opens a mail composition window and prepares it for sending a mail. This mail contains information about the devices which previously connected to this computer.
-.PP
-The purpose of sending client device information to the developers is to support them in setting up a list of compatible devices.
+is a tool to report Remuco client device information to the Remuco developers. It is used for a kind of survey to compile a list of Remuco compatible devices. Your participation is highly appreciated! 
 .PP
 This tool does
 .I not
-send any data automatically.
+send any data automatically! It shows the data it is going to send and asks the user for a final confirmation.
+.PP
+.I remuco-report
+uses zenity, kdialog or simply stdout/in for user interaction, whatever is available.
 .PP
 .SH FILES
 .TP
-.I $XDG_CACHE_HOME/remuco/report or $HOME/.cache/remuco/report
-Contains the report data to mail. It gets updated whenever a new client device
-connects to this computer. 
-.SH SEE ALSO
-xdg-open(1) - this tool is used to open a mail composition window
+.I $XDG_CACHE_HOME/remuco/devices or $HOME/.cache/remuco/devices
+Contains information about the devices seen. It gets updated whenever a new client device connects to this computer. 
 .SH AUTHOR
 This manual page was written by Oben Sonne <obensonne@googlemail.com>.

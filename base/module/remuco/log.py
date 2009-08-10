@@ -71,6 +71,8 @@ def set_file(file):
             return
         new_handler.setFormatter(_config.FMT)
         print("Log output will be stored in %s" % file)
+        print("Contribute to Remuco: Please run 'remuco-report' once a client "
+              "has connected, thanks!")
     
     _config.logga.removeHandler(_config.handler)
     _config.handler = new_handler or _config.handler_default

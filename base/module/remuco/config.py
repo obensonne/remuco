@@ -32,6 +32,8 @@ from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 from remuco import log
 from remuco import defs
 
+DEVICE_FILE = os.path.join(xdg_cache, "remuco", "devices")
+
 SEC = ConfigParser.DEFAULTSECT
 
 CONFIG_VERSION_MAJOR = "1"
@@ -581,11 +583,5 @@ def get_system_shutdown_command():
     
     return path
 
-def get_report_file():
-    """Get the name of the report file."""
-
-    return os.path.join(xdg_cache, "remuco", "report")
-    
-        
 __all__ = (Config,)
 
