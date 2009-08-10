@@ -1,5 +1,6 @@
 0.9.1	Oben Sonne <obensonne@googlemail.com>
 
+	* base: added client device info report tool 'remuco-report'
 	* exaile: added Exaile 3 adapter
 	* client: added options screen
 	* client: optionally show detailed item information
