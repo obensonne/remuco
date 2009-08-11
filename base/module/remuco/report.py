@@ -23,6 +23,7 @@
 """Remuco report handler."""
 
 import httplib
+import os
 import os.path
 import urllib
 
@@ -30,6 +31,7 @@ import dbus
 from dbus.exceptions import DBusException
 
 from remuco.config import DEVICE_FILE
+from remuco import dictool
 from remuco import log
 
 __HOST = "remuco.sourceforge.net"
@@ -44,31 +46,22 @@ __DEVICE_FILE_COMMENT = """# Seen Remuco client devices.
 """
 
 # Fields of a client device info to log.
-__FIELDS = ("version", "conn", "name")
+__FIELDS = ("name", "version", "conn", "utf8", "touch")
 
 def log_device(device):
     """Log a client device."""
     
-    new_device = ""
-    for key in __FIELDS:
-        new_device += "%s:%s," % (key, device.get(key,"unknown"))
-    new_device = new_device.strip(",")
+    device = dictool.dict_to_string(device, keys=__FIELDS)
     
-    device_list = __load_device_list(flat=True)
+    seen_devices = dictool.read_dicts_from_file(DEVICE_FILE, flat=True,
+                                                keys=__FIELDS)
     
-    if not new_device in device_list:
+    if not device in seen_devices:
         __user_notification("New Remuco Client",
                             "Please run the tool <b>remuco-report</b> !")
-        device_list.append(new_device)
-        lines = [__DEVICE_FILE_COMMENT] + device_list
-        try:
-            fp = open(DEVICE_FILE, "w")
-            for line in lines:
-                fp.write("%s\n" % line)
-            fp.close()
-        except IOError, e:
-            log.warning("failed to write to %s (%s)" % (DEVICE_FILE, e))
-            return
+        seen_devices.append(device)
+        dictool.write_dicts_to_file(DEVICE_FILE, seen_devices,
+                                    comment=__DEVICE_FILE_COMMENT)
 
 def __user_notification(summary, text):
     """Notify the user that a new device has been loggend."""
@@ -102,50 +95,6 @@ def __user_notification(summary, text):
         log.warning("user notification failed (%s)" % e)
         return
 
-def __load_device_list(flat=True):
-    """Load all known devices from the device file.
-    
-    @keyword flat: if True, then devices are flat strings, if False, devices
-        are dictionaries with the fields listed in __FIELDS.
-        
-    @return: the list of devices
-    
-    """
-    lines = []
-    if os.path.exists(DEVICE_FILE):
-        try:
-            fp = open(DEVICE_FILE, "r")
-            lines = fp.readlines()
-            fp.close()
-        except IOError, e:
-            log.warning("failed to open %s (%s)" % (DEVICE_FILE, e))
-    
-    device_list_flat = []
-    for line in lines:
-        line = line.replace("\n", "")
-        line = line.strip(" ")
-        if line.startswith("#") or len(line) == 0:
-            continue
-        device_list_flat.append(line)
-    
-    if flat:
-        return device_list_flat
-    
-    device_list = []
-    for device_flat in device_list_flat:
-        device = {}
-        try:
-            fields = device_flat.split(",", len(__FIELDS) - 1)
-            for field in fields:
-                #print field
-                key, value = field.split(":", 1)
-                device[key] = value
-            device_list.append(device)
-        except ValueError:
-            log.warning("bug or bad line in device file: %s" % device_flat)
-
-    return device_list
-    
 def __send_device(device):
     """Send a single device."""
         
@@ -161,8 +110,7 @@ def __send_device(device):
         response = conn.getresponse()
     except IOError, e:
         return -1, str(e) 
-    data = response.read()
-    #print(str(data))
+    response.read() # needed ?
     conn.close()
     
     return response.status, response.reason
@@ -173,13 +121,13 @@ def __send_devices():
     @return: True if sending was successful, False if something failed
     """
     
-    device_list = __load_device_list(flat=False)
-
+    device_list = dictool.read_dicts_from_file(DEVICE_FILE, flat=False,
+                                               keys=__FIELDS)
     ok = True
 
     for device in device_list:
         # add a simple watchword marking this report as a real one
-        device["watchword"] = "sun_is_shining"
+        device["ww"] = "sun_is_shining"
         status, reason = __send_device(device)
         if status != httplib.OK:
             print("-> failed (%s - %s)" % (status, reason))
@@ -194,6 +142,18 @@ def __send_devices():
 if __name__ == '__main__':
     
     import sys
-    ok = __send_devices()
-    sys.exit(int(not ok))
+    if len(sys.argv) == 2:
+        if sys.argv[1] == "send":
+            ok = __send_devices()
+            if ok:
+                sys.exit(os.EX_OK)
+            else:
+                sys.exit(os.EX_TEMPFAIL)
+        elif sys.argv[1] == "dump":
+            devices = dictool.read_dicts_from_file(DEVICE_FILE, flat=True)
+            for dev in devices:
+                print(dev)
+            sys.exit(os.EX_OK)
+    
+    sys.exit(os.EX_USAGE)
 
