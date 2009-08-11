@@ -22,41 +22,46 @@
 
 import unittest
 
-import gobject
+from remuco import dictool
 
-from remuco.data import PlayerInfo
-from remuco.net import WifiServer, BluetoothServer
-from remuco.config import Config
+class DicToolTest(unittest.TestCase):
 
-
-class ServerTest(unittest.TestCase):
 
     def setUp(self):
-        
-        self.__ml = gobject.MainLoop()
-        self.__pi = PlayerInfo("xxx", 0, 0, None, ["1", "2"])
-        self.__config = Config("unittest")
+        pass
 
-    def test_wifi(self):
-        
-        s = WifiServer([], self.__pi, None, self.__config)
-        
-        gobject.timeout_add(2000, self.__stop, s)
-        
-        self.__ml.run()
 
-    def test_bluetooth(self):
-        
-        s = BluetoothServer([], self.__pi, None, self.__config)
-        
-        gobject.timeout_add(2000, self.__stop, s)
-        
-        self.__ml.run()
+    def tearDown(self):
+        pass
 
-    def __stop(self, s):
+    def test_it(self):
         
-        s.down()
-        self.__ml.quit()
+        keys = ("a", "c", "b")
+        dic1 = { "a": "1:d", "b": "2", "d": "4", "c": "3" }
+        dic3 = { "a": "1", "b": "2,0", "d": "4", "c": "3" }
+        
+        flat = dictool.dict_to_string(dic1)
+        dic2 = dictool.string_to_dict(flat)
+        assert dic1 == dic2
+        
+        flat = dictool.dict_to_string(dic1, keys=keys)
+        assert flat == "a:1:d,c:3,b:2"
+        dic2 = dictool.string_to_dict(flat)
+        assert dic1 != dic2
+        
+        flat = dictool.dict_to_string(dic3, keys=keys)
+        assert flat == "a:1,c:3,b:2_0"
+        
+        l1 = [dic1,dic2]
+        dictool.write_dicts_to_file("/var/tmp/dictest", l1, comment="# hallo")
+        l2 = dictool.read_dicts_from_file("/var/tmp/dictest")
+        assert l1 == l2
+        
+        dictool.write_dicts_to_file("/var/tmp/dictest", [dic1,dic2,dic3,flat],
+                                    comment="# hallo", keys=["a"])
+        l = dictool.read_dicts_from_file("/var/tmp/dictest")
+        
+        l = dictool.read_dicts_from_file("/var/tmp/non_existent")
         
 if __name__ == "__main__":
     

@@ -27,6 +27,7 @@ import remuco.log
 #remuco.log.set_level(remuco.log.INFO)
 remuco.log.set_level(remuco.log.WARNING)
 
+from testdictool import DicToolTest
 from testserial import SerializationTest
 from testnet import ServerTest
 from testfiles import FilesTest

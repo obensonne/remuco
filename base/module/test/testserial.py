@@ -165,7 +165,7 @@ class SerializationTest(unittest.TestCase):
         #print("")
         
         ia = remuco.ItemAction("ia_l", multiple=True)
-        pi = data.PlayerInfo("dings", 123, 4, 20, [ia], ["sm1", "sm2"])
+        pi = data.PlayerInfo("dings", 123, 4, [ia], ["sm1", "sm2"])
         
         #self.__serialize(pi)
         serial.pack(pi)
