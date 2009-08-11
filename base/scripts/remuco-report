@@ -69,11 +69,7 @@ fi
 # here we go
 # -----------------------------------------------------------------------------
 
-if [ -e "$DEVICE_FILE" ] ; then
-	DATA=`cat $DEVICE_FILE | grep -v "^#" | grep -v "^ *$"`
-else
-	DATA=""
-fi
+DATA=`python -m remuco.report dump`
 
 MSG_NO_DATA=\
 "Until now no client devices have been logged on this computer. There is "\
@@ -112,7 +108,7 @@ fi
 message "Submitting data ...\n\nPlease stand by." "sub"
 
 # send data
-python -m remuco.report 2>&1
+python -m remuco.report send 2>&1
 OK=$?
 
 echo
