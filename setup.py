@@ -128,13 +128,24 @@ else:
         client = False
     
 # =============================================================================
-# generate script and data file list (add prefix to pa_files)
+# compile general script and data file list
 # =============================================================================
 
-#print player_adapters
+scripts = []
 
-scripts = ["scripts/remuco-report"]
+try:
+    x, dirs, files = os.walk("base/scripts").next()
+except StopIteration:
+    pass
+
+for script in files:
+    scripts.append("base/scripts/%s" % script)
+
 data_files = [("share/man/man1", ["doc/remuco-report.1"])]
+
+# =============================================================================
+# compile player adapter related script and data file list
+# =============================================================================
 
 for pa in player_adapters:
     
@@ -151,7 +162,7 @@ for pa in player_adapters:
         data_files.append((tup[0], group))
 
 # =============================================================================
-# client binaries
+# compile client related data file list
 # =============================================================================
 
 CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
