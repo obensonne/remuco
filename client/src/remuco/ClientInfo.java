@@ -125,7 +125,7 @@ public final class ClientInfo implements ISerializable {
 		final Hashtable info = new Hashtable();
 
 		addDeviceInfo(info, "name", SYS_PROPS_DEVICE);
-		addDeviceInfo(info, "touchscreen", Config.TOUCHSCREEN);
+		addDeviceInfo(info, "touch", Config.TOUCHSCREEN);
 		addDeviceInfo(info, "utf8", Config.UTF8);
 		addDeviceInfo(info, "version", config.getAppProperty("MIDlet-Version"));
 
