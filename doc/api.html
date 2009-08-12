@@ -63,14 +63,16 @@ Logging:<br>
 <a href="api.html">config</a><br>
 <a href="api.html">data</a><br>
 </td><td width="25%" valign=top><a href="api.html">defs</a><br>
+<a href="api.html">dictool</a><br>
 <a href="api.html">features</a><br>
 <a href="api.html">files</a><br>
-<a href="api.html">log</a><br>
-</td><td width="25%" valign=top><a href="api.html">manager</a><br>
+</td><td width="25%" valign=top><a href="api.html">log</a><br>
+<a href="api.html">manager</a><br>
 <a href="api.html">message</a><br>
 <a href="api.html">mpris</a><br>
-<a href="api.html">net</a><br>
-</td><td width="25%" valign=top><a href="api.html">serial</a><br>
+</td><td width="25%" valign=top><a href="api.html">net</a><br>
+<a href="api.html">report</a><br>
+<a href="api.html">serial</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -357,9 +359,16 @@ reply&nbsp;data&nbsp;(using&nbsp;properties&nbsp;'ids',&nbsp;'names',&nbsp;'item
 'nested',&nbsp;'list_actions')&nbsp;and&nbsp;to&nbsp;send&nbsp;the&nbsp;reply&nbsp;to&nbsp;clients&nbsp;(using&nbsp;<a href="#ListReply-send">send</a>()).<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="ListReply-__init__"><strong>__init__</strong></a>(self, client, reply_msg_id, page, path<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;list&nbsp;reply.<br>
+<dl><dt><a name="ListReply-__init__"><strong>__init__</strong></a>(self, client, request_id, reply_msg_id, page, path<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;list&nbsp;reply.<br>
 &nbsp;<br>
-Used&nbsp;internally,&nbsp;not&nbsp;needed&nbsp;within&nbsp;player&nbsp;adapters.</tt></dd></dl>
+Used&nbsp;internally,&nbsp;not&nbsp;needed&nbsp;within&nbsp;player&nbsp;adapters.<br>
+&nbsp;<br>
+@param&nbsp;client:&nbsp;the&nbsp;client&nbsp;to&nbsp;send&nbsp;the&nbsp;reply&nbsp;to<br>
+@param&nbsp;request_id:&nbsp;the&nbsp;request's&nbsp;ID<br>
+@param&nbsp;reply_msg_id:&nbsp;the&nbsp;message&nbsp;ID&nbsp;of&nbsp;the&nbsp;client's&nbsp;request<br>
+@param&nbsp;page:&nbsp;page&nbsp;of&nbsp;the&nbsp;requested&nbsp;list<br>
+&nbsp;<br>
+@keyword&nbsp;path:&nbsp;path&nbsp;of&nbsp;the&nbsp;requested&nbsp;list,&nbsp;if&nbsp;there&nbsp;is&nbsp;one</tt></dd></dl>
 
 <dl><dt><a name="ListReply-send"><strong>send</strong></a>(self)</dt><dd><tt>Send&nbsp;the&nbsp;requested&nbsp;item&nbsp;list&nbsp;to&nbsp;the&nbsp;requesting&nbsp;client.</tt></dd></dl>
 
