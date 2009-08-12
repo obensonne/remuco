@@ -53,6 +53,10 @@ theme.list=Vico,Emo,Frog,Frog-XL,Lilac,Lilac-XL
 # icon size.
 theme.lics=12,16,22,24,32,48
 
+# Size of the application logo.
+# Possible values: 12, 16, 24, 32, 48
+logo.size=12
+
 # =============================================================================
 # API libs
 # =============================================================================
@@ -82,10 +86,6 @@ dist.debug=no
 # Whether to optimize and obfuscate the byte code when using ProGuard.
 #dist.proguard.optimize=no
 dist.proguard.optimize=yes
-
-# Size of the application logo.
-# Possible values: 12, 16, 24, 32, 48
-logo.size=12
 
 # =============================================================================
 # Configurations for targets 'run', 'run.wtk' and 'run.microemu'
