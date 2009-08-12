@@ -17,12 +17,12 @@ fi
 # preparations
 # -----------------------------------------------------------------------------
 
-PKG=remuco-$VERSION
+PKG_DEFAULT=remuco-$VERSION
 
-rm -rf tarballs build dist $PKG || exit 1
+rm -rf tarballs build dist $PKG_DEFAULT || exit 1
 
 mkdir tarballs
-mkdir $PKG
+mkdir $PKG_DEFAULT
 
 # -----------------------------------------------------------------------------
 # update api.html
@@ -41,24 +41,24 @@ sed -i doc/api.html -e "s,[_a-z\.]\+\.html,api.html,g"
 # -----------------------------------------------------------------------------
 
 for ITEM in base adapter doc setup.py Makefile ; do
-	cp -r $ITEM $PKG/
+	cp -r $ITEM $PKG_DEFAULT/
 done
 
 # -----------------------------------------------------------------------------
 # client
 # -----------------------------------------------------------------------------
 
-mkdir $PKG/client
+mkdir $PKG_DEFAULT/client
 
 cd client
 
 for ITEM in src res design *.example build.xml setup.sh libgen ; do
-	cp -r $ITEM ../$PKG/client/
+	cp -r $ITEM ../$PKG_DEFAULT/client/
 done
 
-mkdir ../$PKG/client/app
+mkdir ../$PKG_DEFAULT/client/app
 ant dist
-cp dist/remuco.jar dist/remuco.jad ../$PKG/client/app
+cp dist/remuco.jar dist/remuco.jad ../$PKG_DEFAULT/client/app
 
 cd ..
 
@@ -66,49 +66,28 @@ cd ..
 # clean up and package
 # -----------------------------------------------------------------------------
 
-find $PKG -type d -name ".svn" | xargs rm -rf
-find $PKG -type f -name "*.pyc" | xargs rm -f
-find $PKG -type f -name "*~" | xargs rm -f
-find $PKG -type f -name "install*.log" | xargs rm -f
+find $PKG_DEFAULT -type d -name ".svn" | xargs rm -rf
+find $PKG_DEFAULT -type f -name "*.pyc" | xargs rm -f
+find $PKG_DEFAULT -type f -name "*.pyo" | xargs rm -f
+find $PKG_DEFAULT -type f -name "*~" | xargs rm -f
+find $PKG_DEFAULT -type f -name "install*.log" | xargs rm -f
 
-tar zcf tarballs/$PKG.tar.gz $PKG
-
-# -----------------------------------------------------------------------------
-# extra package: client binaries
-# -----------------------------------------------------------------------------
-
-PKG_CLIENT=remuco-client-$VERSION
-
-rm -rf $PKG_CLIENT
-
-mkdir $PKG_CLIENT
-
-cp $PKG/client/app/remuco.jad $PKG/client/app/remuco.jar $PKG_CLIENT/
-
-cat > $PKG_CLIENT/README << EOF
-This package contains the Remuco client application only. It is identical to
-the one contained in the main package 'remuco-$VERSION'.
-
-Please visit http://remuco.sourceforge.net/index.php/Getting_Started for
-installation and usage instructions.
-EOF
-
-tar zcf tarballs/$PKG_CLIENT.tar.gz $PKG_CLIENT
+tar zcf tarballs/$PKG_DEFAULT.tar.gz $PKG_DEFAULT
 
 # -----------------------------------------------------------------------------
 # extra package: server source
 # -----------------------------------------------------------------------------
 
-PKG_SERVER=remuco-server-$VERSION
+PKG_SOURCE=remuco-source-$VERSION
 
-rm -rf $PKG_SERVER
+rm -rf $PKG_SOURCE
 
-cp -r $PKG $PKG_SERVER
+cp -r $PKG_DEFAULT $PKG_SOURCE
 
-rm -rf $PKG_SERVER/client
+rm -rf $PKG_SOURCE/client/app
 
-tar zcf tarballs/$PKG_SERVER.tar.gz $PKG_SERVER
+tar zcf tarballs/$PKG_SOURCE.tar.gz $PKG_SOURCE
 
 # -----------------------------------------------------------------------------
 
-rm -rf $PKG $PKG_CLIENT $PKG_SERVER
+rm -rf $PKG_DEFAULT $PKG_SOURCE
