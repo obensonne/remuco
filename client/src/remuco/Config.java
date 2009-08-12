@@ -32,6 +32,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.InvalidRecordIDException;
@@ -56,25 +57,24 @@ import remuco.util.Tools;
  */
 public final class Config {
 
+	public static final String DEVICE_NAME;
+
 	/** Device type marker. */
 	public static final String DEVICE_TYPE_BLUETOOTH = "B";
 
 	/** Device type marker. */
 	public static final String DEVICE_TYPE_INET = "I";
 
+	public static final int IMG_MAX_SIZE;
+
 	/** Available screen size for a canvas screen. */
 	public static final int SCREEN_WIDTH, SCREEN_HEIGHT;
-	
-	public static final int IMG_MAX_SIZE;
 
 	/** Indicates if the current device supports pointer events. */
 	public static final boolean TOUCHSCREEN;
 
 	/** Indicates if UTF-8 is supported. */
 	public static final boolean UTF8;
-
-	/** Name of the application property that indicates emulation mode. */
-	protected static final String APP_PROP_EMULATION = "Remuco-emulation";
 
 	private static final char DEVICE_SPLITTER = ',';
 
@@ -113,6 +113,23 @@ public final class Config {
 		}
 
 		UTF8 = b;
+
+		// device name
+
+		String dn = "unknown";
+
+		final String props[] = { "device.model", "microedition.platform" };
+		for (int i = 0; i < props.length; i++) {
+			try {
+				dn = System.getProperty(props[i]);
+				if (dn != null) {
+					break;
+				}
+			} catch (Exception e) {
+			}
+		}
+
+		DEVICE_NAME = dn;
 
 	}
 
@@ -178,14 +195,14 @@ public final class Config {
 
 	public final Vector optionDescriptors = new Vector();
 
+	/** Recommended list icon size. */
+	public final int SUGGESTED_LICS;
+
 	private final Vector devices = new Vector();
 
 	private int[] keyBindings = new int[0];
 
 	private final boolean loadedSuccessfully;
-
-	/** MIDlet for application property access. */
-	private final MIDlet midlet;
 
 	private final Vector optionListener = new Vector();
 
@@ -196,11 +213,12 @@ public final class Config {
 	 * Create a new configuration.
 	 * 
 	 * @param midlet
-	 *            the MIDlet to use for access to application properties
+	 *            the MIDlet to use for access certain information
 	 */
 	private Config(MIDlet midlet) {
 
-		this.midlet = midlet;
+		SUGGESTED_LICS = Display.getDisplay(midlet).getBestImageHeight(
+			Display.LIST_ELEMENT);
 
 		loadedSuccessfully = load();
 
@@ -271,10 +289,6 @@ public final class Config {
 			devices.removeElementAt(pos);
 			devices.removeElementAt(pos);
 		}
-	}
-
-	public String getAppProperty(String name) {
-		return midlet.getAppProperty(name);
 	}
 
 	public int[] getKeyBindings() {

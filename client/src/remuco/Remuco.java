@@ -35,7 +35,6 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 import remuco.comm.Connection;
 import remuco.ui.CMD;
-import remuco.ui.Theme;
 import remuco.ui.UI;
 import remuco.util.FormLogger;
 import remuco.util.Log;
@@ -57,7 +56,9 @@ public class Remuco extends MIDlet implements CommandListener {
 	/**
 	 * @emulator If <code>true</code>, the client runs inside the WTK emulator.
 	 */
-	public static boolean EMULATION = false;
+	public static final boolean EMULATION;
+
+	public static final String VERSION = "@VERSION@";
 
 	/** Command for the log form to run the garbage collector */
 	private static final Command CMD_RUNGC = new Command("Run GC",
@@ -68,6 +69,10 @@ public class Remuco extends MIDlet implements CommandListener {
 			Command.SCREEN, 1);
 
 	private static Timer GLOBAL_TIMER = null;
+
+	static {
+		EMULATION = "@EMULATION@".equalsIgnoreCase("true") ? true : false;
+	}
 
 	/**
 	 * Get the global (main loop) timer.
@@ -136,20 +141,9 @@ public class Remuco extends MIDlet implements CommandListener {
 
 	public Remuco() {
 
-		final String emu = this.getAppProperty(Config.APP_PROP_EMULATION);
-
-		EMULATION = emu != null && emu.equalsIgnoreCase("true");
-
-		// get the display
-
 		display = Display.getDisplay(this);
 
 		// set up logging
-
-		logSysInfoForm = new Form("System Info");
-		logSysInfoForm.addCommand(CMD_RUNGC);
-		logSysInfoForm.addCommand(CMD.BACK);
-		logSysInfoForm.setCommandListener(this);
 
 		logForm = new Form("Log");
 		logForm.addCommand(CMD.BACK);
@@ -162,15 +156,18 @@ public class Remuco extends MIDlet implements CommandListener {
 			Log.setOut(new FormLogger(logForm));
 		}
 
-		// load the configuration
+		// init configuration
 
 		Config.init(this);
 
 		config = Config.getInstance();
 
-		Theme.init(display);
-
 		// set up some displayables
+
+		logSysInfoForm = new Form("System Info");
+		logSysInfoForm.addCommand(CMD_RUNGC);
+		logSysInfoForm.addCommand(CMD.BACK);
+		logSysInfoForm.setCommandListener(this);
 
 		alertLoadConfig = new Alert("Error");
 		alertLoadConfig.setString("Erros while loading configuration. "
@@ -311,14 +308,20 @@ public class Remuco extends MIDlet implements CommandListener {
 		final StringBuffer sb = new StringBuffer(200);
 
 		sb.append("--- Memory --- \n");
-		sb.append("Total : ").append(memTotal).append(" KB\n");
-		sb.append("Used  : ").append(memUsed).append(" KB\n");
-		sb.append("Free  : ").append(memFree).append(" KB\n");
+		sb.append("Total ").append(memTotal).append(" KB\n");
+		sb.append("Used  ").append(memUsed).append(" KB\n");
+		sb.append("Free  ").append(memFree).append(" KB\n");
 		sb.append("--- Misc --- \n");
-		sb.append("UTF-8 : ");
-		sb.append(Config.UTF8 ? "yes" : "no").append("\n");
-		sb.append("Time  : ");
-		sb.append(System.currentTimeMillis());
+		sb.append("Version: ").append(VERSION);
+		sb.append('\n');
+		sb.append("UTF-8: ").append(Config.UTF8 ? "yes" : "no");
+		sb.append('\n');
+		sb.append("Device: ").append(Config.DEVICE_NAME);
+		sb.append('\n');
+		sb.append("Best list icon size: ").append(config.SUGGESTED_LICS);
+		sb.append('\n');
+		sb.append("Time: ").append(System.currentTimeMillis());
+		sb.append('\n');
 
 		logSysInfoForm.deleteAll();
 		logSysInfoForm.append(sb.toString());

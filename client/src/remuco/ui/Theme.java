@@ -23,7 +23,6 @@ package remuco.ui;
 import java.io.IOException;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -33,6 +32,7 @@ import remuco.OptionDescriptor;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.util.Log;
+import remuco.util.Tools;
 
 public final class Theme {
 
@@ -40,27 +40,27 @@ public final class Theme {
 	public static final Font FONT_SMALL = Font.getFont(Font.FACE_PROPORTIONAL,
 		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
-	/** Large font */
-	public static final Font FONT_LARGE = Font.getFont(Font.FACE_PROPORTIONAL,
-		Font.STYLE_PLAIN, Font.SIZE_LARGE);
-
 	/** Normal font */
 	public static final Font FONT_NORMAL = Font.getFont(Font.FACE_PROPORTIONAL,
 		Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
 
-	/** Font for progress value */
-	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
-		Font.STYLE_PLAIN, Font.SIZE_SMALL);
-
-	/** Font for an item's album */
-	public static final Font FONT_ALBUM = FONT_SMALL;
+	/** Large font */
+	public static final Font FONT_LARGE = Font.getFont(Font.FACE_PROPORTIONAL,
+		Font.STYLE_PLAIN, Font.SIZE_LARGE);
 
 	/** Font for an item's artist */
 	public static final Font FONT_ARTIST = FONT_NORMAL;
 
+	/** Font for an item's album */
+	public static final Font FONT_ALBUM = FONT_SMALL;
+
 	/** Font for an item's title */
 	public static final Font FONT_TITLE = Font.getFont(Font.FACE_PROPORTIONAL,
 		Font.STYLE_BOLD, Font.SIZE_LARGE);
+
+	/** Font for progress value */
+	public static final Font FONT_PROGRESS = Font.getFont(Font.FACE_MONOSPACE,
+		Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
 	/** Font for a volume level */
 	public static final Font FONT_VOLUME = Font.getFont(Font.FACE_MONOSPACE,
@@ -72,8 +72,7 @@ public final class Theme {
 	/** Third height of small font. */
 	public static final int LINE_GAP_SMALL = FONT_SMALL.getHeight() / 3;
 
-	public static final OptionDescriptor OD_THEME = new OptionDescriptor(
-			"theme", "Theme", "Vico", "Emo,Frog,Frog-XL,Lilac,Lilac-XL,Vico");
+	public static final OptionDescriptor OD_THEME;
 
 	/**
 	 * Theme element ID (<code>RTE_..</code>) or color ID (<code>RTC_..</code>)
@@ -125,8 +124,8 @@ public final class Theme {
 
 	private static Theme instance = null;
 
-	private static final int LIST_ICON_SIZES[] = new int[] { 12, 16, 22, 24,
-			32, 48 };
+	/** Available list icons sizes. */
+	private static final int LICS[];
 
 	static {
 
@@ -139,6 +138,27 @@ public final class Theme {
 		g.setColor(0);
 		g.drawLine(0, 0, 20 - 1, 20 - 1);
 		g.drawLine(20 - 1, 0, 0, 20 - 1);
+
+		// //// create option descriptor //////
+
+		final String themes[] = Tools.splitString("@THEMES@", ',', true);
+
+		OD_THEME = new OptionDescriptor("theme", "Theme", themes[0], themes);
+
+		// //// list icon sizes //////
+
+		final String sa[] = Tools.splitString("@LICS@", ',', true);
+
+		LICS = new int[sa.length];
+
+		for (int i = 0; i < sa.length; i++) {
+			try {
+				LICS[i] = Integer.parseInt(sa[i]);
+			} catch (NumberFormatException e) {
+				Log.bug("Aug 12, 2009.6:17:11 PM");
+				LICS[i] = 12;
+			}
+		}
 
 	}
 
@@ -153,22 +173,12 @@ public final class Theme {
 		return FONT_SMALL;
 	}
 
-	/**
-	 * Get the singleton theme instance. <em>Must not</em> get called from a
-	 * static context!
-	 * 
-	 * @return the theme
-	 */
+	/** Get the singleton theme instance. */
 	public static Theme getInstance() {
-		return instance;
-	}
-
-	public static void init(Display display) {
-
 		if (instance == null) {
-			instance = new Theme(display);
+			instance = new Theme();
 		}
-
+		return instance;
 	}
 
 	/**
@@ -392,6 +402,12 @@ public final class Theme {
 		}
 	}
 
+	/** Load a list icon for the given list icon size. */
+	private static Image loadListIcon(String name, int size) {
+		return loadImage("/icons/" + size + "/" + name + "_" + size + ".png",
+			size);
+	}
+
 	/** Alert icon */
 	public final Image aicBluetooth, aicWifi, aicConnecting, aicRefresh,
 			aicHmpf, aicYes;
@@ -409,7 +425,7 @@ public final class Theme {
 
 	private final Image logos[];
 
-	private Theme(Display display) {
+	private Theme() {
 
 		config = Config.getInstance();
 
@@ -417,43 +433,38 @@ public final class Theme {
 
 		// alert icons //
 
-		aicBluetooth = loadImage("/icons/bluetooth_48.png", 48);
-		aicWifi = loadImage("/icons/wifi_48.png", 48);
-		aicConnecting = loadImage("/icons/connecting_48.png", 48);
-		aicRefresh = loadImage("/icons/refresh_48.png", 48);
-		aicHmpf = loadImage("/icons/hmpf_48.png", 48);
-		aicYes = loadImage("/icons/yes_48.png", 48);
+		aicBluetooth = loadImage("/icons/uni/bluetooth.png", 48);
+		aicWifi = loadImage("/icons/uni/wifi.png", 48);
+		aicConnecting = loadImage("/icons/uni/connecting.png", 48);
+		aicRefresh = loadImage("/icons/uni/refresh.png", 48);
+		aicHmpf = loadImage("/icons/uni/hmpf.png", 48);
+		aicYes = loadImage("/icons/uni/yes.png", 48);
 
 		// list icons //
 
 		int size = -1;
 
-		final int suggested = display.getBestImageWidth(Display.LIST_ELEMENT);
-
-		for (int i = LIST_ICON_SIZES.length - 1; i >= 0; i--) {
-			if (suggested >= LIST_ICON_SIZES[i]) {
-				size = LIST_ICON_SIZES[i];
+		for (int i = LICS.length - 1; i >= 0; i--) {
+			size = LICS[i];
+			if (config.SUGGESTED_LICS >= LICS[i]) {
 				break;
 			}
 		}
-		if (size == -1) {
-			size = LIST_ICON_SIZES[0];
-		}
 
-		licBluetooth = loadImage("/icons/bluetooth_" + size + ".png", size);
-		licWifi = loadImage("/icons/wifi_" + size + ".png", size);
-		licItem = loadImage("/icons/item_" + size + ".png", size);
-		licItemMarked = loadImage("/icons/item_blue_" + size + ".png", size);
-		licList = loadImage("/icons/list_" + size + ".png", size);
-		licQueue = loadImage("/icons/queue_" + size + ".png", size);
-		licMLib = loadImage("/icons/mlib_" + size + ".png", size);
-		licFiles = loadImage("/icons/files_" + size + ".png", size);
-		licSearch = loadImage("/icons/search_" + size + ".png", size);
-		licAdd = loadImage("/icons/add_" + size + ".png", size);
-		licThemes = loadImage("/icons/theme_" + size + ".png", size);
-		licKeys = loadImage("/icons/keys_" + size + ".png", size);
-		licOff = loadImage("/icons/off_" + size + ".png", size);
-		licDisconnect = loadImage("/icons/disconnect_" + size + ".png", size);
+		licBluetooth = loadListIcon("bluetooth", size);
+		licWifi = loadListIcon("wifi", size);
+		licItem = loadListIcon("item", size);
+		licItemMarked = loadListIcon("item_blue", size);
+		licList = loadListIcon("list", size);
+		licQueue = loadListIcon("queue", size);
+		licMLib = loadListIcon("mlib", size);
+		licFiles = loadListIcon("files", size);
+		licSearch = loadListIcon("search", size);
+		licAdd = loadListIcon("add", size);
+		licThemes = loadListIcon("theme", size);
+		licKeys = loadListIcon("keys", size);
+		licOff = loadListIcon("off", size);
+		licDisconnect = loadListIcon("disconnect", size);
 		licLog = licList;
 
 		// logo icons
@@ -462,11 +473,10 @@ public final class Theme {
 
 		logos = new Image[sizes.length];
 
-		for (int i = 0; i < sizes.length - 1; i++) {
-			logos[i] = loadImage("/icons/remuco_" + sizes[i] + ".png", sizes[i]);
-
+		for (int i = 0; i < sizes.length; i++) {
+			logos[i] = loadImage("/icons/uni/remuco_" + sizes[i] + ".png",
+				sizes[i]);
 		}
-		logos[sizes.length - 1] = loadImage("/icons/tp.png", 1);
 
 		// load default theme
 

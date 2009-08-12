@@ -111,28 +111,40 @@
 
 	<!-- =================== Themes ======================================= -->
 
-	<dirset dir="res/themes" id="themes">
-		<depth min="0" max="0" />
-	</dirset>
-
-	<pathconvert property="themes" pathsep="," refid="themes">
-		<map from="${basedir}/res/themes/" to="" />
+	<pathconvert property="include.themes" pathsep=",">
+		<dirset dir="res/themes" includes="${theme.list}" />
+		<mapper type="regexp" from="^(.*)$$" to="\1/**/*" />
+		<map from="${basedir}/res/" to="" />
 	</pathconvert>
-	
-	<loadfile property="themes.hardcoded" srcfile="src/remuco/ui/Theme.java">
-		<filterchain>
-			<linecontains>
-				<contains value="${themes}"/>
-			</linecontains>
-		</filterchain>
-	</loadfile>
-	
-	<fail unless="themes.hardcoded" message="theme list needs to be updated"/>
-	
+
+	<pathconvert property="include.icons" pathsep=",">
+		<dirset dir="res/icons" includes="${theme.lics},uni" />
+		<mapper type="regexp" from="^(.*)$$" to="\1/**/*" />
+		<map from="${basedir}/res/" to="" />
+	</pathconvert>
+
+	<property name="res.include" value="${include.themes},${include.icons}" />
+
 	<!-- =================== Build ======================================== -->
 
-	<target name="compile">
+	<target name="preprocess">
 		<fail unless="configured" />
+		<condition property="emulation-flag" value="true" else="false">
+			<isset property="emulation" />
+		</condition>
+		<mkdir dir="build/sources" />
+		<copy todir="build/sources">
+			<fileset dir="src" includes="remuco/**/*.java" />
+			<filterset>
+				<filter token="VERSION" value="${midlet.version}" />
+				<filter token="THEMES" value="${theme.list}" />
+				<filter token="LICS" value="${theme.lics}" />
+				<filter token="EMULATION" value="${emulation-flag}" />
+			</filterset>
+		</copy>
+	</target>
+
+	<target name="compile" depends="preprocess">
 		<mkdir dir="build/classes" />
 		<javac destdir="build/classes"
 		       target="1.1"
@@ -141,7 +153,7 @@
 		       debug="${compile.debug}"
 		       verbose="no">
 			<!-- sources -->
-			<src path="src" />
+			<src path="build/sources" />
 			<include name="remuco/**/*.java" />
 			<exclude unless="build.test" name="remuco/test/**/*.java" />
 			<!-- classpath -->
@@ -193,9 +205,7 @@
 		      file="design/logos/logo_${logo.size}.png" />
 		<jar jarfile="build/jar/${midlet.jar}" manifest="build/MF">
 			<fileset dir="build/preverified" />
-			<fileset dir="res/">
-				<exclude unless="build.test" name="test/" />
-			</fileset>
+			<fileset dir="res" includes="${res.include}" />
 			<fileset dir="build">
 				<include name="logo.png" />
 			</fileset>
@@ -212,9 +222,6 @@
 	</target>
 
 	<target name="manifest">
-		<condition property="emulation-flag" value="true" else="false">
-			<isset property="emulation" />
-		</condition>
 		<condition property="midlet.class"
 		           value="remuco.test.Test"
 		           else="remuco.Remuco">
@@ -230,18 +237,15 @@
 			<attribute name="MIDlet-Version" value="${midlet.version}" />
 			<attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
 			<!--
+			These options cause trouble on certain devices and does not provide
+			a great benefit at all, thus they are commented.
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client,javax.microedition.io.Connector.socket" />
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client" />
 			 -->
-			<attribute name="Remuco-emulation" value="${emulation-flag}" />
 			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />
 		</manifest>
-	</target>
-
-	<target name="jar.sign" depends="jar">
-		<signjar alias="remuco" storepass="tester" jar="dist/${midlet.jar}" />
 	</target>
 
 	<!-- =================== Dist ========================================= -->

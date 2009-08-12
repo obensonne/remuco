@@ -43,9 +43,6 @@ public final class ClientInfo implements ISerializable {
 			SerialAtom.TYPE_S, SerialAtom.TYPE_I, SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AS };
 
-	private static final String SYS_PROPS_DEVICE[] = { "device.model",
-			"microedition.platform" };
-
 	private final SerialAtom[] atoms;
 
 	/**
@@ -97,25 +94,9 @@ public final class ClientInfo implements ISerializable {
 		info.put(key, value ? "yes" : "no");
 	}
 
-	// private void addDeviceInfo(Hashtable info, String key, int value) {
-	// info.put(key, String.valueOf(value));
-	// }
-
 	private void addDeviceInfo(Hashtable info, String key, String value) {
-		info.put(key, value);
-	}
-
-	private void addDeviceInfo(Hashtable info, String key, String sysProps[]) {
-
-		String value = "unknown";
-		for (int i = 0; i < sysProps.length; i++) {
-			try {
-				value = System.getProperty(sysProps[i]);
-				if (value != null) {
-					break;
-				}
-			} catch (Exception e) {
-			}
+		if (value == null) {
+			value = "unknown";
 		}
 		info.put(key, value);
 	}
@@ -124,10 +105,10 @@ public final class ClientInfo implements ISerializable {
 
 		final Hashtable info = new Hashtable();
 
-		addDeviceInfo(info, "name", SYS_PROPS_DEVICE);
+		addDeviceInfo(info, "name", Config.DEVICE_NAME);
 		addDeviceInfo(info, "touch", Config.TOUCHSCREEN);
 		addDeviceInfo(info, "utf8", Config.UTF8);
-		addDeviceInfo(info, "version", config.getAppProperty("MIDlet-Version"));
+		addDeviceInfo(info, "version", Remuco.VERSION);
 
 		return info;
 	}
