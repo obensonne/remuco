@@ -42,6 +42,18 @@ microemu.bluecove-gpl.jar=${basedir}/tools/bluecove/bluecove-gpl-2.1.0.jar
 proguard.jar=${basedir}/tools/proguard4.2/lib/proguard.jar
 
 # =============================================================================
+# Theme things
+# =============================================================================
+
+# Adjust if you want to add or exclude themes.
+theme.list=Vico,Emo,Frog,Frog-XL,Lilac,Lilac-XL
+
+# If you know the recommended list icon size for your device, you can reduce
+# the JAR file size by adjusting this list to only include the next smallest
+# icon size.
+theme.lics=12,16,22,24,32,48
+
+# =============================================================================
 # API libs
 # =============================================================================
 
