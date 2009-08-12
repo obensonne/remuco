@@ -39,11 +39,11 @@ public final class ItemList implements ISerializable {
 
 	public static final int TYPE_SEARCH = Message.REQ_SEARCH;
 
-	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_AS,
+	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
 			SerialAtom.TYPE_AS, SerialAtom.TYPE_AS, SerialAtom.TYPE_AS,
-			SerialAtom.TYPE_I, SerialAtom.TYPE_I, SerialAtom.TYPE_I,
-			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS, SerialAtom.TYPE_AB,
-			SerialAtom.TYPE_AI, SerialAtom.TYPE_AS };
+			SerialAtom.TYPE_AS, SerialAtom.TYPE_I, SerialAtom.TYPE_I,
+			SerialAtom.TYPE_I, SerialAtom.TYPE_AI, SerialAtom.TYPE_AS,
+			SerialAtom.TYPE_AB, SerialAtom.TYPE_AI, SerialAtom.TYPE_AS };
 
 	private static final int TYPE_FILES = Message.REQ_FILES;
 
@@ -80,6 +80,8 @@ public final class ItemList implements ISerializable {
 	private int page, pageMax, itemOffset;
 
 	private String path[], nested[], itemIDs[], itemNames[];
+
+	private int requestID = -1;
 
 	private final int type;
 
@@ -283,6 +285,11 @@ public final class ItemList implements ISerializable {
 
 	}
 
+	/** Get the ID of the item list's original request. */
+	public int getRequestID() {
+		return requestID;
+	}
+
 	public boolean hasItemActions() {
 		return haveItemActions && itemIDs.length > 0;
 	}
@@ -325,14 +332,15 @@ public final class ItemList implements ISerializable {
 
 	public void notifyAtomsUpdated() {
 
-		path = atoms[0].as;
-		nested = atoms[1].as;
-		itemIDs = atoms[2].as;
-		itemNames = atoms[3].as;
+		requestID = atoms[0].i;
+		path = atoms[1].as;
+		nested = atoms[2].as;
+		itemIDs = atoms[3].as;
+		itemNames = atoms[4].as;
 
-		itemOffset = atoms[4].i;
-		page = atoms[5].i;
-		pageMax = atoms[6].i;
+		itemOffset = atoms[5].i;
+		page = atoms[6].i;
+		pageMax = atoms[7].i;
 
 		if (type == TYPE_FILES) { // no dynamic actions
 			return;
@@ -342,14 +350,14 @@ public final class ItemList implements ISerializable {
 
 		actions.removeAllElements();
 
-		off = 10;
+		off = 11;
 		haveListActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			actions.addElement(new ListAction(atoms[off].ai[i],
 					atoms[off + 1].as[i]));
 		}
 
-		off = 7;
+		off = 8;
 		haveItemActions = atoms[off].ai.length > 0;
 		for (int i = 0; i < atoms[off].ai.length; i++) {
 			final ItemAction ia = new ItemAction(atoms[off].ai[i],

@@ -38,26 +38,6 @@ import remuco.util.Log;
  */
 public final class Player {
 
-	// TODO better attach a unique reqest ID to each request (requires some
-	// change to pa-api)
-	private static final String REQ_PARAM_ID_PLAYLIST = "==PLAYLIST==";
-
-	private static final String REQ_PARAM_ID_QUEUE = "==QUEUE==";
-
-	private static String pathToString(String sa[]) {
-
-		if (sa == null || sa.length == 0) {
-			return "";
-		}
-
-		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < sa.length; i++) {
-			sb.append('/').append(sa[i]);
-		}
-
-		return sb.toString();
-	}
-
 	/** Do not alter outside {@link Player}! */
 	public final PlayerInfo info;
 
@@ -79,7 +59,7 @@ public final class Player {
 	private IRequester reqCaller;
 
 	/** Used to detect if incoming request replies are still up to date. */
-	private String reqParamID = null;
+	private int reqID = -1;
 
 	private IStateListener stateListener;
 
@@ -250,39 +230,40 @@ public final class Player {
 			break;
 
 		case Message.REQ_ITEM:
-
-			final Item item = new Item();
-
-			Serial.in(item, m.data);
-
-			if (item.getId().equals(reqParamID)) {
-				reqCaller.handleItem(item);
-				reqCaller = null;
-				reqParamID = null;
-			}
+			
+			// maybe used later
+			// final Item item = new Item();
+			//
+			// Serial.in(item, m.data);
+			//
+			// if (item.getId().equals(reqID)) {
+			// reqCaller.handleItem(item);
+			// reqCaller = null;
+			// reqID = -1;
+			// }
 
 			break;
 
 		case Message.REQ_PLAYLIST:
 
-			if (reqParamID == REQ_PARAM_ID_PLAYLIST) {
-				final ItemList playlist = new ItemList(ItemList.TYPE_PLAYLIST);
-				Serial.in(playlist, m.data);
+			final ItemList playlist = new ItemList(ItemList.TYPE_PLAYLIST);
+			Serial.in(playlist, m.data);
+			if (reqID == playlist.getRequestID()) {
 				reqCaller.handlePlaylist(playlist);
 				reqCaller = null;
-				reqParamID = null;
+				reqID = -1;
 			}
 
 			break;
 
 		case Message.REQ_QUEUE:
 
-			if (reqParamID == REQ_PARAM_ID_QUEUE) {
-				final ItemList queue = new ItemList(ItemList.TYPE_QUEUE);
-				Serial.in(queue, m.data);
+			final ItemList queue = new ItemList(ItemList.TYPE_QUEUE);
+			Serial.in(queue, m.data);
+			if (reqID == queue.getRequestID()) {
 				reqCaller.handleQueue(queue);
 				reqCaller = null;
-				reqParamID = null;
+				reqID = -1;
 			}
 
 			break;
@@ -290,12 +271,11 @@ public final class Player {
 		case Message.REQ_MLIB:
 
 			final ItemList mlib = new ItemList(ItemList.TYPE_MLIB);
-
 			Serial.in(mlib, m.data);
-			if (pathToString(mlib.getPath()).equals(reqParamID)) {
+			if (reqID == mlib.getRequestID()) {
 				reqCaller.handleLibrary(mlib);
 				reqCaller = null;
-				reqParamID = null;
+				reqID = -1;
 			}
 
 			break;
@@ -303,12 +283,11 @@ public final class Player {
 		case Message.REQ_FILES:
 
 			final ItemList files = new ItemList(info.getFileActions());
-
 			Serial.in(files, m.data);
-			if (pathToString(files.getPath()).equals(reqParamID)) {
+			if (reqID == files.getRequestID()) {
 				reqCaller.handleFiles(files);
 				reqCaller = null;
-				reqParamID = null;
+				reqID = -1;
 			}
 
 			break;
@@ -316,12 +295,11 @@ public final class Player {
 		case Message.REQ_SEARCH:
 
 			final ItemList search = new ItemList(ItemList.TYPE_SEARCH);
-
 			Serial.in(search, m.data);
-			if (pathToString(search.getPath()).equals(reqParamID)) {
+			if (reqID == search.getRequestID()) {
 				reqCaller.handleSearch(search);
 				reqCaller = null;
-				reqParamID = null;
+				reqID = -1;
 			}
 
 			break;
@@ -333,42 +311,38 @@ public final class Player {
 	}
 
 	public void reqCancel() {
-		reqParamID = null;
+		reqID = -1;
 		reqCaller = null;
 	}
 
 	public void reqFiles(IRequester lr, String path[], int page) {
 
-		req(lr, Message.REQ_FILES, new RequestParam(path, page),
-			pathToString(path));
+		req(lr, Message.REQ_FILES, new RequestParam(path, page));
 	}
 
 	public void reqItem(IRequester ir, String id) {
 
-		req(ir, Message.REQ_ITEM, new RequestParam(id), id);
+		req(ir, Message.REQ_ITEM, new RequestParam(id));
 	}
 
 	public void reqMLib(IRequester lr, String path[], int page) {
 
-		req(lr, Message.REQ_MLIB, new RequestParam(path, page),
-			pathToString(path));
+		req(lr, Message.REQ_MLIB, new RequestParam(path, page));
 	}
 
 	public void reqPlaylist(IRequester lr, int page) {
 
-		req(lr, Message.REQ_PLAYLIST, new RequestParam(page),
-			REQ_PARAM_ID_PLAYLIST);
+		req(lr, Message.REQ_PLAYLIST, new RequestParam(page));
 	}
 
 	public void reqQueue(IRequester lr, int page) {
 
-		req(lr, Message.REQ_QUEUE, new RequestParam(page), REQ_PARAM_ID_QUEUE);
+		req(lr, Message.REQ_QUEUE, new RequestParam(page));
 	}
 
 	public void reqSearch(IRequester lr, String query[], int page) {
 
-		req(lr, Message.REQ_SEARCH, new RequestParam(query, page),
-			pathToString(query));
+		req(lr, Message.REQ_SEARCH, new RequestParam(query, page));
 	}
 
 	/**
@@ -433,10 +407,12 @@ public final class Player {
 		conn.send(m);
 	}
 
-	private void req(IRequester rc, int msgID, RequestParam req, String paramID) {
+	private void req(IRequester rc, int msgID, RequestParam req) {
 
 		reqCaller = rc;
-		reqParamID = paramID;
+		reqID = req.getRequestID();
+		
+		Log.debug("reqid: " + reqID);
 
 		final Message m = new Message();
 

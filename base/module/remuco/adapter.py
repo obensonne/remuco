@@ -62,13 +62,21 @@ class ListReply(object):
     'nested', 'list_actions') and to send the reply to clients (using send()).
     
     """
-    def __init__(self, client, reply_msg_id, page, path=None):
+    def __init__(self, client, request_id, reply_msg_id, page, path=None):
         """Create a new list reply.
         
         Used internally, not needed within player adapters.
         
+        @param client: the client to send the reply to
+        @param request_id: the request's ID
+        @param reply_msg_id: the message ID of the client's request
+        @param page: page of the requested list
+        
+        @keyword path: path of the requested list, if there is one
+        
         """
         self.__client = client
+        self.__request_id = request_id
         self.__reply_msg_id = reply_msg_id
         self.__page = page
         self.__path = path
@@ -78,7 +86,7 @@ class ListReply(object):
         self.__names = []
         self.__list_actions = []
         self.__item_actions = []
-    
+        
     def send(self):
         """Send the requested item list to the requesting client."""
         
@@ -117,7 +125,8 @@ class ListReply(object):
         
         ### sending ###
         
-        ilist = ItemList(self.__path, nested, ids, names, item_offset,
+        ilist = ItemList(self.__request_id,
+                         self.__path, nested, ids, names, item_offset,
                          self.__page, page_max,
                          self.__item_actions, self.__list_actions)
         
@@ -1358,7 +1367,8 @@ class PlayerAdapter(object):
         if request is None:
             return
         
-        reply = ListReply(client, id, request.page, path=request.path)
+        reply = ListReply(client, request.request_id, id, request.page,
+                          path=request.path)
         
         if id == message.REQ_PLAYLIST:
             

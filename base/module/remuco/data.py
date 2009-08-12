@@ -181,9 +181,10 @@ class Item(serial.Serializable):
 class ItemList(serial.Serializable):
     """ Parameter of a request reply message sent to clients."""
     
-    def __init__(self, path, nested, item_ids, item_names, item_offset,
-                 page, page_max, item_actions, list_actions):
+    def __init__(self, request_id, path, nested, item_ids, item_names,
+                 item_offset, page, page_max, item_actions, list_actions):
         
+        self.request_id = request_id
         self.path = path or []
         self.nested = nested or []
         self.item_ids = item_ids or []
@@ -208,7 +209,8 @@ class ItemList(serial.Serializable):
             
     def __str__(self):
         
-        return "(%s, %s, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s)" % (
+        return "(%d, %s, %s, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s)" % (
+                self.request_id,
                 self.path, self.nested, self.item_ids, self.item_names,
                 self.item_offset, self.page, self.page_max,
                 self.ia_ids, self.ia_labels, self.ia_multiples,
@@ -217,13 +219,15 @@ class ItemList(serial.Serializable):
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS,
+        return (serial.TYPE_I,
+                serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS, serial.TYPE_AS,
                 serial.TYPE_I, serial.TYPE_I, serial.TYPE_I,
                 serial.TYPE_AI, serial.TYPE_AS, serial.TYPE_AB,
                 serial.TYPE_AI, serial.TYPE_AS)
         
     def get_data(self):
-        return (self.path, self.nested, self.item_ids, self.item_names,
+        return (self.request_id,
+                self.path, self.nested, self.item_ids, self.item_names,
                 self.item_offset, self.page, self.page_max,
                 self.ia_ids, self.ia_labels, self.ia_multiples,
                 self.la_ids, self.la_labels)
@@ -308,15 +312,16 @@ class Request(serial.Serializable):
 
     def __init__(self):
         
-        self.id = None
-        self.path = None
-        self.page = 0
+        self.request_id = -2
+        self.id = None # item id
+        self.path = None # list path
+        self.page = 0 # list page
         
     # === serial interface ===
         
     def get_fmt(self):
-        return (serial.TYPE_S, serial.TYPE_AS, serial.TYPE_I)
+        return (serial.TYPE_I, serial.TYPE_S, serial.TYPE_AS, serial.TYPE_I)
         
     def set_data(self, data):
-        self.id, self.path, self.page = data
+        self.request_id, self.id, self.path, self.page = data
 

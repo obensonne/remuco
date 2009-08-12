@@ -20,6 +20,8 @@
  */
 package remuco.player;
 
+import java.util.Random;
+
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
@@ -33,31 +35,39 @@ import remuco.util.Log;
  */
 public class RequestParam implements ISerializable {
 
-	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
-			SerialAtom.TYPE_AS, SerialAtom.TYPE_I };
+	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
+			SerialAtom.TYPE_S, SerialAtom.TYPE_AS, SerialAtom.TYPE_I };
+
+	private static final Random random = new Random();
 
 	private final SerialAtom[] atoms;
+
+	/** Request for a playlist or queue. */
+	public RequestParam(int page) {
+		atoms = SerialAtom.build(ATOMS_FMT);
+		atoms[0].i = random.nextInt(Integer.MAX_VALUE);
+		atoms[3].i = page;
+	}
 
 	/** Request for an item. */
 	public RequestParam(String id) {
 		this(0);
-		atoms[0].s = id;
+		atoms[1].s = id;
 	}
 
 	/** Request for a file system or media lib level or search. */
 	public RequestParam(String path[], int page) {
 		this(page);
-		atoms[1].as = path;
-	}
-
-	/** Request for a playlist or queue. */
-	public RequestParam(int page) {
-		atoms = SerialAtom.build(ATOMS_FMT);
-		atoms[2].i = page;
+		atoms[2].as = path;
 	}
 
 	public SerialAtom[] getAtoms() {
 		return atoms;
+	}
+
+	/** Get this request's randomly generated ID. */
+	public int getRequestID() {
+		return atoms[0].i;
 	}
 
 	public void notifyAtomsUpdated() throws BinaryDataExecption {
