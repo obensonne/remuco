@@ -213,7 +213,7 @@ public final class Tools {
 			}
 			ret[i] = s.substring(first, last);
 			if (trim) {
-				ret[i].trim();
+				ret[i] = ret[i].trim();
 			}
 			first = last + 1;
 		}
