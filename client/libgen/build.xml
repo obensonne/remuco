@@ -20,17 +20,15 @@
 <project name="J2ME Library Generator" default="build">
 
 	<description>
-        This build script creates the libraries needed to build the Remuco client,
-        based solely on API signature files (midp-20.xml, cldc-11.xml and
-        jsr-82.xml).
+        This build script creates the libraries needed to build the Remuco
+		client, based solely on API signature files (midp-20.xml, cldc-11.xml
+		and jsr-82.xml).
     </description>
 
 	<property name="tools.dir" value="../tools" />
-
-	<!-- ================================= 
-          target: default              
-         ================================= -->
-
+	<property name="midp" value="midp-20" />
+	<property name="cldc" value="cldc-11" />
+	<property name="bt" value="jsr-82" />
 
 	<target name="source">
 		<mkdir dir="sources/${component}" />
@@ -40,7 +38,6 @@
 			<arg value="sources/${component}" />
 		</exec>
 	</target>
-
 
 	<target name="build.component">
 		<antcall target="source">
@@ -64,17 +61,17 @@
 
 	<target name="build" depends="clean" description="--> build libs">
 		<antcall target="build.component">
-			<param name="component" value="cldc-11" />
+			<param name="component" value="${cldc}" />
 			<param name="classpath" value="" />
 		</antcall>
 		<antcall target="build.component">
-			<param name="component" value="midp-20" />
-			<param name="classpath" value="jar/cldc-11.jar" />
+			<param name="component" value="${midp}" />
+			<param name="classpath" value="jar/${cldc}.jar" />
 		</antcall>
 		<antcall target="build.component">
-			<param name="component" value="jsr-82" />
+			<param name="component" value="${bt}" />
 			<param name="classpath"
-			       value="jar/cldc-11.jar${path.separator}jar/midp-20.jar" />
+			       value="jar/${cldc}.jar${path.separator}jar/${midp}.jar" />
 		</antcall>
 	</target>
 
@@ -94,15 +91,15 @@
 		<replaceregexp file="../build.properties"
 		               flags="m"
 		               match="^midp.jar=.*$"
-		               replace="midp.jar=libgen/jar/midp-20.jar" />
+		               replace="midp.jar=libgen/jar/${midp}.jar" />
 		<replaceregexp file="../build.properties"
 		               flags="m"
 		               match="^cldc.jar=.*$"
-		               replace="cldc.jar=libgen/jar/cldc-11.jar" />
+		               replace="cldc.jar=libgen/jar/${cldc}.jar" />
 		<replaceregexp file="../build.properties"
 		               flags="m"
 		               match="^jsr82.jar=.*$"
-		               replace="jsr82.jar=libgen/jar/jsr-82.jar" />
+		               replace="jsr82.jar=libgen/jar/${bt}.jar" />
 		<replaceregexp file="../build.properties"
 		               flags="m"
 		               match="^proguard.jar=.*$"
