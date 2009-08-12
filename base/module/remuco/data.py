@@ -30,8 +30,6 @@ import urllib
 from remuco import log
 from remuco import serial
 
-# TODO: remove help fields
-
 # =============================================================================
 # outgoing data (to clients)
 # =============================================================================
@@ -125,7 +123,7 @@ class Item(serial.Serializable):
         
     def __str__(self):
         
-        return "(%s, %s, %s)" % (self.id, self.__info, self.__img)
+        return "(%s, %s, %s)" % (self.__id, self.__info, self.__img)
 
     # === serial interface ===
     
