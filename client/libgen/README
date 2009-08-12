@@ -9,7 +9,7 @@ The signature files midp-20.xml, cldc-11.xml and jsr-82.xml originate in the
 MicroEmu project (http://www.microemu.org/). They have other licenses than
 the rest of the project Remuco.
 
-These following licenses apply to these files:
+The following licenses apply to these files:
 - midp-20.xml: GNU Lesser General Public License 2.1 (see COPYING-LGPL-2.1) 
 - cldc-11.xml: GNU Lesser General Public License 2.1 (see COPYING-LGPL-2.1)
 - jsr-82.xml: Apache License 2.0 (see COPYING-AL-2.0)
