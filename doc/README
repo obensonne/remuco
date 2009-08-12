@@ -42,7 +42,7 @@ Banshee:
  * Banshee >= 1.4
 
 Exaile:
- * Exaile >= 2.99.3 (3 alpha)
+ * Exaile >= 2.99.3 (aka 3 alpha)
 
 MPD:
  * MPD >= 0.13.2
@@ -72,7 +72,6 @@ Client:
  * CLDC >= 1.1
  * JSR-82 (not needed for WiFi mode)
 
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 2. Installation
@@ -92,8 +91,11 @@ Note: If you installed Remuco using packages for your distribution, the client
       files are either located in /usr/share/remuco/client/ or need to get
       downloaded manually:
       http://downloads.sourceforge.net/remuco/remuco-0.9.1.tar.gz
-      Make sure the installed server version and the version of the downloaded
-      tarball match! 
+      Make sure client and server versions match! 
+
+Note: The source only package (remuco-source-x.x.x.tar.gz) does not contain
+      the client binaries. Read sections "Client Development" and
+      "Packager Information" for how to build the client.
 
 Note: If the client fails to start on your mobile, have a look at
       http://remuco.sourceforge.net/index.php/Client_Customization
@@ -101,7 +103,6 @@ Note: If the client fails to start on your mobile, have a look at
 
 For more information visit:
 http://remuco.sourceforge.net/index.php/Getting_Started
-
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -124,6 +125,13 @@ Using the client is not too complicated, just start and use it ;) .
 
 Nevertheless, you'll find some usage information here:
 http://remuco.sourceforge.net/index.php/Getting_Started
+
+3.3 Report
+
+Remuco comes with a tool called remuco-report. This tool submits information
+of seen Remuco client devices to remuco.sf.net. Help setting up a Remuco
+compatible device list, by using remuco-report! See the tool's man page for
+more information.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -163,6 +171,12 @@ Additionally some more environment variables may be used to adjust the
 installation process. Just search for 'os.getenv' within setup.py to get more
 detailed information.
 
+If your distribution requires source only packages, use the package
+remuco-source-x.x.x.tar.gz. Building the client requires Ant (including
+optional tasks), ProGuard and JavaME libraries. You can use JavaME libraries
+from SUN's Wireless Toolkit, from the MicroEmu project or generate them from
+scratch as described in client/ligben/README.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 A. General Information
@@ -192,9 +206,9 @@ http://sourceforge.net/forum/forum.php?forum_id=568226
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-A.2. Source Code Access
+A.2. SVN
 
-You can get the source code via SVN. The SVN root is:
+Remuco's SVN root is:
 https://remuco.svn.sourceforge.net/svnroot/remuco
 
 To browse the SVN repository visit:
