@@ -226,10 +226,15 @@ public final class ItemList implements ISerializable {
 		return nested != null ? nested.length : 0;
 	}
 
+	/** Get current page (starting from 0). */
 	public int getPage() {
 		return page;
 	}
 
+	/**
+	 * Get maximum page number (starting from 0, so this is one less than the
+	 * number of pages).
+	 */
 	public int getPageMax() {
 		return pageMax;
 	}
