@@ -93,9 +93,9 @@ class ListReply(object):
         ### paging ###
         
         page_size = self.__client.info.page_size
-        # TODO: float() and int() may be removed in P3K
-        len_all = float(len(self.__ids or []) + len(self.__nested or []))
-        page_max = int(max(math.ceil(len_all / page_size) - 1, 0))
+        len_all = len(self.__ids or []) + len(self.__nested or [])
+        # P3K: remove float() and int()
+        page_max = int(max(math.ceil(float(len_all) / page_size) - 1, 0))
         
         # number of pages may have changed since client sent the request
         self.__page = min(self.__page, page_max)
