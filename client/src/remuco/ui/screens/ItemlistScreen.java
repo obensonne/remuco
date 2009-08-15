@@ -35,6 +35,7 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
+import javax.microedition.lcdui.TextField;
 
 import remuco.Remuco;
 import remuco.player.AbstractAction;
@@ -48,6 +49,53 @@ import remuco.ui.Theme;
 import remuco.util.Log;
 
 public final class ItemlistScreen extends List implements CommandListener {
+
+	private class ActionAlert extends Form implements CommandListener {
+
+		private static final int LAYOUT = Item.LAYOUT_CENTER
+				| Item.LAYOUT_NEWLINE_AFTER;
+
+		private final Display display;
+
+		private final ImageItem element;
+
+		private final StringItem issue, solution;
+
+		private final Displayable parent;
+
+		protected ActionAlert(Display display, Displayable parent) {
+			super("Action");
+			this.display = display;
+			this.parent = parent;
+			this.issue = new StringItem(null, "");
+			this.issue.setLayout(LAYOUT);
+			this.element = new ImageItem(null, theme.licItem, LAYOUT, null);
+			this.solution = new StringItem(null, "");
+			this.solution.setLayout(LAYOUT);
+			this.append(new ImageItem(null, theme.aicHmpf, LAYOUT, null));
+			this.append(issue);
+			this.append("\n");
+			this.append(element);
+			this.append("\n");
+			this.append(solution);
+			this.addCommand(CMD.OK);
+			this.setCommandListener(this);
+		}
+
+		public void commandAction(Command c, Displayable d) {
+			this.display.setCurrent(parent);
+		}
+
+		protected void show(AbstractAction a, String issue, String solution) {
+
+			this.issue.setLabel(a.label);
+			this.issue.setText(issue + "\n");
+			this.element.setImage(a.isListAction() ? theme.licList
+					: theme.licItemMarked);
+			this.solution.setText(solution);
+			this.display.setCurrent(this);
+		}
+	}
 
 	private class AutoMarker extends TimerTask {
 
@@ -73,61 +121,17 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 	}
 
-	private class ActionAlert extends Form implements CommandListener {
-
-		private final StringItem issue, solution;
-
-		private final ImageItem element;
-
-		private final Displayable parent;
-
-		private final Display display;
-
-		private static final int LAYOUT = Item.LAYOUT_CENTER
-				| Item.LAYOUT_NEWLINE_AFTER;
-
-		protected ActionAlert(Display display, Displayable parent) {
-			super("Action");
-			this.display = display;
-			this.parent = parent;
-			this.issue = new StringItem(null, "");
-			this.issue.setLayout(LAYOUT);
-			this.element = new ImageItem(null, theme.licItem, LAYOUT, null);
-			this.solution = new StringItem(null, "");
-			this.solution.setLayout(LAYOUT);
-			this.append(new ImageItem(null, theme.aicHmpf, LAYOUT, null));
-			this.append(issue);
-			this.append("\n");
-			this.append(element);
-			this.append("\n");
-			this.append(solution);
-			this.addCommand(CMD.OK);
-			this.setCommandListener(this);
-		}
-
-		protected void show(AbstractAction a, String issue, String solution) {
-
-			this.issue.setLabel(a.label);
-			this.issue.setText(issue + "\n");
-			this.element.setImage(a.isListAction() ? theme.licList
-					: theme.licItemMarked);
-			this.solution.setText(solution);
-			this.display.setCurrent(this);
-		}
-
-		public void commandAction(Command c, Displayable d) {
-			this.display.setCurrent(parent);
-		}
-	}
-
-	private static final Command CMD_PAGE_UP = new Command("Page up",
-		Command.SCREEN, 8);
-
-	private static final Command CMD_PAGE_DOWN = new Command("Page down",
-		Command.SCREEN, 9);
+	private static final Command CMD_GOTO_PAGE = new Command("Page #",
+			Command.SCREEN, 10);
 
 	private static final Command CMD_MARK_ALL = new Command("Mark all",
-			Command.SCREEN, 10);
+			Command.SCREEN, 11);
+
+	private static final Command CMD_PAGE_DOWN = new Command("Page down",
+			Command.SCREEN, 9);
+
+	private static final Command CMD_PAGE_UP = new Command("Page up",
+			Command.SCREEN, 8);
 
 	private static final Command CMD_ROOT = new Command("Root", Command.SCREEN,
 			99);
@@ -135,9 +139,13 @@ public final class ItemlistScreen extends List implements CommandListener {
 	/** Pseudo-index for marking all items. */
 	private static final int MARK_ALL = -1;
 
+	private final ActionAlert aa;
+
 	private final Hashtable actionCommands;
 
 	private AutoMarker autoMarker = null;
+
+	private final Display display;
 
 	/** Flags indicating for each item if it has been marked by the user. */
 	private boolean itemMarkedFlags[] = new boolean[0];
@@ -156,7 +164,11 @@ public final class ItemlistScreen extends List implements CommandListener {
 	/** Number of nested lists. */
 	private final int numNested;
 
-	private final ActionAlert aa;
+	/** Screen to select a specific page number. */
+	private final Form screenPageSelecetion;
+
+	/** Text field to enter a page number. */
+	private final TextField tfPageSelection;
 
 	private final Theme theme;
 
@@ -169,6 +181,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		// init some fields
 
+		this.display = display;
 		this.listener = listener;
 		this.list = list;
 
@@ -181,6 +194,27 @@ public final class ItemlistScreen extends List implements CommandListener {
 		numItems = list.getNumItems();
 
 		itemMarkedFlags = new boolean[list.getNumItems()];
+
+		// page selection screen
+
+		if (list.getPageMax() > 1) {
+			addCommand(CMD_GOTO_PAGE);
+			screenPageSelecetion = new Form("Go to page ..");
+			final StringItem si = new StringItem("Page number (1 .. "
+					+ (list.getPageMax() + 1) + ")", null);
+			si.setLayout(Item.LAYOUT_CENTER);
+			screenPageSelecetion.append(si);
+			tfPageSelection = new TextField(null,
+					String.valueOf(list.getPage() + 1), 6, TextField.NUMERIC);
+			tfPageSelection.setLayout(Item.LAYOUT_CENTER);
+			screenPageSelecetion.append(tfPageSelection);
+			screenPageSelecetion.addCommand(CMD.BACK);
+			screenPageSelecetion.addCommand(CMD.OK);
+			screenPageSelecetion.setCommandListener(this);
+		} else {
+			screenPageSelecetion = null;
+			tfPageSelection = null;
+		}
 
 		// set up content
 
@@ -206,7 +240,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 		if (numItems > 0) {
 			addCommand(CMD_MARK_ALL);
 		}
-		
+
 		if (list.getPage() > 0) {
 			addCommand(CMD_PAGE_UP);
 		}
@@ -268,13 +302,34 @@ public final class ItemlistScreen extends List implements CommandListener {
 			updateItemIcons();
 
 		} else if (c == CMD_PAGE_UP) {
-			
+
 			listener.ilcGotoPage(this, list.getPage() - 1);
-			
+
 		} else if (c == CMD_PAGE_DOWN) {
-			
+
 			listener.ilcGotoPage(this, list.getPage() + 1);
-			
+
+		} else if (c == CMD_GOTO_PAGE) {
+
+			display.setCurrent(screenPageSelecetion);
+
+		} else if (c == CMD.OK && d == screenPageSelecetion) {
+
+			int page = -1;
+			try {
+				page = Integer.parseInt(tfPageSelection.getString());
+			} catch (NumberFormatException e) {
+			}
+			if (page < 1 || page > list.getPageMax() + 1) {
+				tfPageSelection.setString(Integer.toString(list.getPage() + 1));
+			} else {
+				listener.ilcGotoPage(this, page - 1);
+			}
+
+		} else if (c == CMD.BACK && d == screenPageSelecetion) {
+
+			display.setCurrent(this);
+
 		} else if (c == CMD.SELECT && d == this) {
 
 			final int index = getSelectedIndex();
