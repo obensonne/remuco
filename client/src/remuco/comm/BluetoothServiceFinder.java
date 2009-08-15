@@ -38,7 +38,7 @@ import remuco.util.Log;
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {
 
-	private class BTD extends RemoteDevice {
+	private static class BTD extends RemoteDevice {
 
 		public BTD(String addr) {
 			super(addr);
@@ -47,7 +47,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	}
 
 	/** Container for service search related data. */
-	private class Search {
+	private static class Search {
 
 		public final int id;
 		public final IServiceListener listener;
