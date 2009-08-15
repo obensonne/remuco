@@ -6,6 +6,8 @@
 	* client: optionally show detailed item information
 	* client: size and type of cover art image are now configured on the client
 	* client: item list page size is now configured on the client
+	* client: pages in item lists can be selected by number (in addition to
+	  up/down navigation)
 	
 0.9.0	Oben Sonne <obensonne@googlemail.com>
 
