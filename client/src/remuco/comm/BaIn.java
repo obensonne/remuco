@@ -239,17 +239,17 @@ public final class BaIn extends ByteArrayInputStream {
 	 *             if the long could not be read because there is not enough
 	 *             data
 	 */
-	public int readX() throws BinaryDataExecption {
+	public long readX() throws BinaryDataExecption {
 
 		checkType(SerialAtom.TYPE_X);
 
 		if (pos + 8 > count)
 			throw new BinaryDataExecption("not enough data");
 
-		return (((read() & 0xff) << 56) | ((read() & 0xff) << 48)
-				| ((read() & 0xff) << 40) | ((read() & 0xff) << 32)
-				| ((read() & 0xff) << 24) | ((read() & 0xff) << 16)
-				| ((read() & 0xff) << 8) | (read() & 0xff));
+		return ((((long) read() & 0xff) << 56) | (((long) read() & 0xff) << 48)
+				| (((long) read() & 0xff) << 40)
+				| (((long) read() & 0xff) << 32) | ((read() & 0xff) << 24)
+				| ((read() & 0xff) << 16) | ((read() & 0xff) << 8) | (read() & 0xff));
 
 	}
 
