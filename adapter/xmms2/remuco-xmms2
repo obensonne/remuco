@@ -30,7 +30,7 @@ import gobject
 
 import xmmsclient
 import xmmsclient.glib
-import xmmsclient.collections
+import xmmsclient.collections as xc
 
 import remuco
 from remuco import log
@@ -53,6 +53,10 @@ PLAYLIST_ID_ACTIVE = "_active"
 
 SEARCH_MASK = ["Artist", "Title", "Album", "Genre"]
 
+VARIOUS_ARTISTS = "Various Artists"
+BLANK_ARTIST = "[unknown]"
+BLANK_TITLE = "[untitled]"
+
 # =============================================================================
 # actions
 # =============================================================================
@@ -72,150 +76,318 @@ MLIB_ITEM_ACTIONS = (IA_APPEND, IA_PLAY_NEXT)
 # helper classes
 # =============================================================================
 
-class SearchRequest():
-    """Class for handling a search request."""
-    
-    def __init__(self, reply, pa, query):
-        """Create a new search request.
-        
-        @param reply: the request's ListReply object
-        @param pa: XMMS2Adapter
-        @param query: search query
-        
-        """
-        coll = None
-        
-        for field, value in zip(SEARCH_MASK, query):
-            value = value.strip()
-            if not value:
-                continue
-            value = "*%s*" % value
-            field = field.lower()
-            coll = xmmsclient.collections.Match(coll, field=field, value=value)
-            
-        if coll is None:
-            reply.send()
-            return
-        
-        self.__reply = reply
-        self.__pa = pa
-        
-        self.__pa._x2.coll_query_infos(coll, ("artist", "title", "id"),
-                                       cb=self.__handle_result)
-        
-    def __handle_result(self, result):
-        
-        if not self.__pa._check_result(result):
-            return
-        
-        items = result.value()
-        
-        for item in items:
-            self.__reply.ids.append(str(item["id"]))
-            artist = item.get("artist", "???")
-            title = item.get("title", "???")
-            self.__reply.names.append("%s- %s" % (artist, title))
-        
-        self.__reply.item_actions = MLIB_ITEM_ACTIONS
-        
-        self.__reply.send()
-
 class ItemListRequest():
     
-    def __init__(self, reply, pa, path):
+    def __init__(self, reply, pa, path, search=False):
         """Create a new item list request.
         
         @param reply: the request's ListReply object
         @param pa: XMMS2Adapter
         @param path: path of the requested item list
         
+        @keyword search: if True then path is a search query
+        
         """
-        self.__pa = pa
-        self.__ids_iter = 0
-        self.__ids_int = []
-        
         self.__reply = reply
-        
+        self.__pa = pa
         self.__path = path
         
-        if not path:
-            # request mlib root
-            self.__pa._x2.playlist_list(cb=self.__handle_list_of_playlists)
-        elif len(path) == 1:
-            # request contents of specific list
-            self.__pa._x2.playlist_list_entries(playlist=path[0],
-                                                cb=self.__handle_ids)
-        else:
-            log.error("** BUG ** unexpected path: %s" % path)
-
-    def __handle_ids(self, result):
+        self.__pl_ids = []
+        self.__pl_tracks = []
         
-        if not self.__pa._check_result(result):
-            return
+        x2 = self.__pa._x2
         
-        self.__ids_int = result.value()
+        roots = [ 'Playlists', 'Collections', 'Albums', 'Artists', 'Tracks' ]
         
-        log.debug("playlist ids: %s" % self.__ids_int)
-        
-        self.__request_next_name()
-        
-    def __request_next_name(self):
-        """Iterates over item IDs of a list to get item names.
-        
-        If all item names have been collected, the original request is replied.
-         
-        """
-        if self.__ids_iter < len(self.__ids_int):
-            # proceed in getting item names
-            id = self.__ids_int[self.__ids_iter]
-            self.__pa._x2.medialib_get_info(id, cb=self.__handle_name)
-            
-        elif self.__path[0] == PLAYLIST_ID_ACTIVE:
-            # have all item names, reply playlist request
-            self.__reply.item_actions = PLAYLIST_ITEM_ACTIONS
-            self.__reply.send()
-            
-        else:
-            # have all item names, reply mlib list request
+        if search:
+                
             self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                
+            match = None
+            
+            for field, value in zip(SEARCH_MASK, path):
+                value = value.strip()
+                if not value:
+                    continue
+                value = "*%s*" % value
+                field = field.lower()
+                match = xc.Match(match, field=field, value=value)
+                
+            if match is None:
+                reply.send()
+            else:
+                x2.coll_query_infos(match, ['artist', 'title', 'id'],
+                                    cb=self.__bil_list_of_tracks)
+            
+        elif not path:
+            
+            self.__reply.nested = roots
             self.__reply.send()
-            
-            
-    def __handle_name(self, result):
-        """Callback to handle meta info of a specific list item."""
         
-        if not self.__pa._check_result(result):
-            return
+        elif path[0] not in roots:
+            
+            log.error("** BUG ** unexpected path: %s" % path)
+        
+        elif len(path) == 1:
+            
+            if path[0] == "Playlists":
+            
+                self.__reply.list_actions = MLIB_LIST_ACTIONS
+                
+                x2.coll_list(path[0], cb=self.__bil_list_of_colls)
+
+            if path[0] == "Collections":
+                
+                x2.coll_list(path[0], cb=self.__bil_list_of_colls)
+                                
+            elif path[0] == "Albums":
+                
+                match = xc.Has(xc.Universe(), 'album')
+                x2.coll_query_infos(match, ['album', 'artist', 'compilation'],
+                                    groupby=['album', 'artist'],
+                                    cb=self.__bil_list_of_albums)
+                
+            elif path[0] == 'Artists':
+                
+                artists = xc.Has(xc.Universe(), 'artist')
+                match = xc.Intersection(xc.Complement(xc.Has(xc.Universe(),
+                                        'compilation')), artists)
+                match = xc.Union(match, xc.Match(artists, field='compilation',
+                                                 value='0'))
+
+                x2.coll_query_infos(match, ['artist'], groupby=['artist'],
+                                    cb=self.__bil_list_of_artists)
+                
+            elif path[0] == 'Tracks':
+                
+                match = xc.Has(xc.Universe(), 'title')
+                x2.coll_query_infos(match, ['title', 'artist', 'id'],
+                                    groupby=['title', 'artist'],
+                                    cb=self.__bil_list_of_tracks)
+        
+        elif len(path) == 2:
+            
+            if path[0] == 'Playlists':
+                
+                if path[1] == PLAYLIST_ID_ACTIVE:
+                    self.__reply.item_actions = PLAYLIST_ITEM_ACTIONS
+                else:
+                    self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                    
+                x2.playlist_list_entries(playlist=path[1],
+                                         cb=self.__handle_pl_ids)
+                
+            elif path[0] == 'Collections':
+                
+                self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                
+                x2.coll_get(path[1], ns="Collections",
+                            cb=self.__handle_collection)
+                
+            elif path[0] == 'Albums':
+                
+                self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                
+                album, artist = path[1].split("\n")
+                
+                if artist == BLANK_ARTIST:
+                    artist = ""
+                elif artist == VARIOUS_ARTISTS:
+                    artist = None
+                
+                match = xc.Match(xc.Universe(), field='album', value=album)
+        
+                if artist is not None:
+                    match = xc.Match(match, field='artist', value=artist)
+        
+                x2.coll_query_infos(match, ['title', 'artist', 'id',
+                                    'compilation', 'tracknr'], order=['tracknr'],
+                                    cb=self.__bil_items_in_album)
+                
+            elif path[0] == 'Artists':
+                
+                self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                
+                match = xc.Match(xc.Universe(), field='artist', value=path[1])
+                x2.coll_query_infos(match, ['title', 'album', 'id',
+                                    'compilation'],
+                                    cb=self.__bil_items_and_albums_of_artist)
     
-        minfo = result.value()
+        elif len(path) == 3:
+            
+            if path[0] == 'Artists':
+                
+                self.__reply.item_actions = MLIB_ITEM_ACTIONS
+                
+                match = xc.Match(xc.Universe(), field='artist', value=path[1])
+                match = xc.Match(match, field='album', value=path[2])
+                x2.coll_query_infos(match, ['title', 'id', 'tracknr'],
+                                    order=['tracknr'],
+                                    cb=self.__bil_items_in_album)
+        
+        else:
+        
+            log.error("** BUG ** unexpected path: %s" % path)
+        
+    def __handle_pl_ids(self, result):
+        """Collects track infos about the tracks playlist ID list."""
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        self.__pl_ids = result.value()
+        
+        log.debug("playlist ids: %s" % self.__pl_ids)
+        
+        self.__request_next_pl_track()
+        
+    def __request_next_pl_track(self):
+        """Requests track info for the next track in the playlist ID list."""
+        
+        if len(self.__pl_tracks) < len(self.__pl_ids):
+            # proceed in getting item names
+            id = self.__pl_ids[len(self.__pl_tracks)]
+            self.__pa._x2.medialib_get_info(id, cb=self.__handle_pl_track)
+        else:
+            # have all item names
+            self.__bil_list_of_tracks(self.__pl_tracks)
+            
+    def __handle_pl_track(self, result):
+        """Adds a track to the playlist track list and requests the next."""
+        
+        if not self.__pa._check_result(result):
+            return
 
-        id = str(self.__ids_int[self.__ids_iter])
-        artist = minfo.get("artist", "???")
-        title = minfo.get("title", "???")
-        name = "%s - %s" % (artist, title)
+        self.__pl_tracks.append(result.value())
         
-        self.__reply.ids.append(id)
-        self.__reply.names.append(name)
+        self.__request_next_pl_track()
         
-        self.__ids_iter += 1
-        self.__request_next_name()
+    def __handle_collection(self, result):
+        """Requests a track info list for a collection."""
         
-    def __handle_list_of_playlists(self, result):
-        """Callback to handle list of playlists."""
+        if not self.__pa._check_result(result):
+            return
+
+        coll = result.value()
+    
+        self.__pa._x2.coll_query_infos(coll, ['title', 'artist', 'id'],
+                                       cb=self.__bil_list_of_tracks)
+        
+    def __bil_list_of_colls(self, result):
+        """Builds an item list with all collections of a specific namespace."""
 
         if not self.__pa._check_result(result):
             return
 
-        list = result.value()
+        colls = result.value()
         
-        self.__reply.nested = []
-        
-        for name in list:
-            if not name.startswith("_"):
-                self.__reply.nested.append(name)
-        
-        self.__reply.list_actions = MLIB_LIST_ACTIONS
+        self.__reply.nested = [ i for i in colls if not i.startswith("_") ]
         self.__reply.send()
+        
+    def __bil_list_of_tracks(self, result):
+        """Builds an item list of a non-specific list of tracks."""
+        
+        if isinstance(result, xmmsclient.XMMSResult):
+            if not self.__pa._check_result(result):
+                return
+            tracks = result.value()
+        else:
+            tracks = result
+    
+        for minfo in tracks:
+
+            self.__reply.ids.append(minfo['id'])
+            self.__reply.names.append(self.__get_item_name(minfo))
+        
+        self.__reply.send()
+            
+    def __bil_list_of_albums(self, result):
+        """Builds an item list of all albums."""
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        albums = set()
+        
+        for x in result.value():
+            if not x['album']:
+                continue
+            elif x['compilation']:
+                albums.add("%s\n%s" % (x['album'], VARIOUS_ARTISTS))
+            else:
+                albums.add("%s\n%s" % (x['album'], x['artist'] or BLANK_ARTIST))
+         
+        self.__reply.nested = sorted(albums)
+        self.__reply.send()
+        
+    def __bil_list_of_artists(self, result):
+        """Builds an item list of all artists."""
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        self.__reply.nested = map(lambda x: x['artist'], result.value())
+        self.__reply.send()
+        
+    def __bil_items_in_album(self, result):
+        """Builds an item list for a specific album."""
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        for minfo in result.value():
+            number = minfo.get('tracknr', 0) and "%s. " % minfo['tracknr'] or ""
+            track = "%s%s" % (number, minfo.get('title', BLANK_TITLE))
+        
+            if minfo.get('compilation', False):
+                track += " / %s" % minfo.get('artist', BLANK_ARTIST)
+        
+            self.__reply.names.append(track)
+            self.__reply.ids.append(minfo['id'])
+        
+        self.__reply.send()
+        
+    def __bil_items_and_albums_of_artist(self, result):
+        """Builds an item list for a specific artist."""
+        
+        if not self.__pa._check_result(result):
+            return
+        
+        albums = set()
+        
+        for minfo in result.value():
+            if not minfo.get('album') or minfo.get('compilation'):
+                name = minfo.get('title', BLANK_TITLE)
+                if minfo.get('album'):
+                    name += " / %s" % minfo['album']
+                self.__reply.names.append(name)
+                self.__reply.ids.append(minfo['id'])
+            else:
+                albums.add(minfo['album'])
+        
+        self.__reply.nested = sorted(albums)
+        self.__reply.send()
+        
+    def __get_item_name(self, minfo, need=None):
+        """Get a standard item name.
+        
+        @param minfo: track info dict
+        @keyword need: list of required tags (artist, title)
+        
+        @return: a name composed of artist and title or None if one the tags
+            in 'need' is None or the empty string
+            
+        """
+        if need and 'title' in need and not minfo.get('title'):
+            return None
+        
+        if need and 'artist' in need and not minfo.get('artist'):
+            return None
+
+        artist = minfo.get('artist', BLANK_ARTIST)
+        title = minfo.get('title', BLANK_TITLE)
+        return "%s / %s" % (title, artist)
+        
     
 # =============================================================================
 # player adapter
@@ -308,11 +480,11 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     
     def ctrl_toggle_playing(self):
         
-            if self.__state_playback == remuco.PLAYBACK_STOP or \
-               self.__state_playback == remuco.PLAYBACK_PAUSE:
-                self._x2.playback_start(cb=self.__ignore_result)
-            else:
-                self._x2.playback_pause(cb=self.__ignore_result)
+        if (self.__state_playback == remuco.PLAYBACK_STOP or
+            self.__state_playback == remuco.PLAYBACK_PAUSE):
+            self._x2.playback_start(cb=self.__ignore_result)
+        else:
+            self._x2.playback_pause(cb=self.__ignore_result)
                     
     def ctrl_toggle_shuffle(self):
         
@@ -413,8 +585,8 @@ class XMMS2Adapter(remuco.PlayerAdapter):
 
         if action_id == LA_LOAD.id:
             
-            if len(path) == 1:
-                self._x2.playlist_load(path[0], cb=self.__ignore_result)
+            if len(path) == 2 and path[0] == "Playlists":
+                self._x2.playlist_load(path[1], cb=self.__ignore_result)
                 self._x2.playlist_set_next(0, cb=self.__ignore_result)
                 self._x2.playback_tickle(cb=self.__ignore_result)
                 if self.__state_playback != remuco.PLAYBACK_PLAY:
@@ -435,7 +607,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     
     def request_playlist(self, reply):
         
-        ItemListRequest(reply, self, [PLAYLIST_ID_ACTIVE])
+        ItemListRequest(reply, self, ['Playlists', PLAYLIST_ID_ACTIVE])
 
     def request_mlib(self, reply, path):
         
@@ -443,7 +615,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         
     def request_search(self, reply, query):
         
-        SearchRequest(reply, self, query)
+        ItemListRequest(reply, self, query, search=True)
     
     # =========================================================================
     # internal methods
@@ -494,15 +666,16 @@ class XMMS2Adapter(remuco.PlayerAdapter):
         minfo = result.value()
 
         info = {}
-        info[remuco.INFO_ARTIST] = minfo.get("artist", "")
-        info[remuco.INFO_ALBUM] = minfo.get("album", "")
-        info[remuco.INFO_TITLE] = minfo.get("title", "")
-        info[remuco.INFO_GENRE] = minfo.get("genre", "")
-        info[remuco.INFO_YEAR] = minfo.get("year", "")
+        info[remuco.INFO_ARTIST] = minfo.get('artist', "")
+        info[remuco.INFO_ALBUM] = minfo.get('album', "")
+        info[remuco.INFO_TITLE] = minfo.get('title', "")
+        info[remuco.INFO_GENRE] = minfo.get('genre', "")
+        info[remuco.INFO_YEAR] = minfo.get('year', "")
+        info[remuco.INFO_BITRATE] = int(minfo.get('bitrate', 0) / 1000)
         info[remuco.INFO_RATING] = minfo.get(MINFO_KEY_RATING, 0)
         info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
     
-        self.__item_len = int(minfo.get("duration", 0) // 1000)
+        self.__item_len = int(minfo.get('duration', 0) // 1000)
         info[remuco.INFO_LENGTH] = self.__item_len
     
         img = None
@@ -513,7 +686,7 @@ class XMMS2Adapter(remuco.PlayerAdapter):
                 break
         
         if not img:
-            url = minfo.get("url").replace("+", "%20")
+            url = minfo.get('url').replace("+", "%20")
             img = self.find_image(url)
         
         self.update_item(self.__item_id, info, img)
