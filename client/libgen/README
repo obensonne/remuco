@@ -22,7 +22,7 @@ environment accordingly, run:
  
 $ ant -f client/libgen/build.xml setup -Dproguard.jar=PATH_TO_PROGUARD_JAR
 
-Note that PATH_TO_PROGUARD_JAR nees to refer to the ProGuard JAR file which
+Note that PATH_TO_PROGUARD_JAR needs to refer to the ProGuard JAR file which
 contains the ProGuard Ant task.
 
 Subsequent the client binaries can be built with:
