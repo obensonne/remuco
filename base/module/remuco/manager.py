@@ -58,10 +58,13 @@ def _start_pa(pa):
         pa.start()
     except StandardError, e:
         log.error("failed to start player adapter (%s)" % e)
-    except:
-        log.exception("** BUG **")
+        return False
+    except Exception, e:
+        log.exception("** BUG ** %s", e)
+        return False
     else:
         log.info("player adapter started")
+        return True
 
 def _stop_pa(pa):
     """Stop the given player adapter with error handling."""
@@ -69,8 +72,8 @@ def _stop_pa(pa):
     log.info("stop player adapter")
     try:
         pa.stop()
-    except Exception:
-        log.exception("** BUG **")
+    except Exception, e:
+        log.exception("** BUG ** %s", e)
     else:
         log.info("player adapter stopped")
 
@@ -214,16 +217,18 @@ class Manager(object):
         
         """
         if self.__dbus_observer is None: # start pa directly
-            _start_pa(self.__pa)
-        # else: dbus observer will start pa
+            ready = _start_pa(self.__pa)
+        else:
+            # dbus observer will start pa
+            ready = True
             
-        if not self.__stopped: # not stopped since creation 
+        if ready and not self.__stopped: # not stopped since creation 
             
             log.info("start main loop")
             try:
                 self.__ml.run()
-            except Exception:
-                log.exception("** BUG **")
+            except Exception, e:
+                log.exception("** BUG ** %s", e)
             log.info("main loop stopped")
             
         if self.__dbus_observer is not None: # disconnect dbus observer
