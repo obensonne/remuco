@@ -280,6 +280,9 @@ class Bin:
         
         if s is None:
             s = ""
+            
+        if not isinstance(s, basestring):
+            s = str(s)
         
         l = len(s)
         
