@@ -412,8 +412,6 @@ public final class Player {
 		reqCaller = rc;
 		reqID = req.getRequestID();
 		
-		Log.debug("reqid: " + reqID);
-
 		final Message m = new Message();
 
 		m.id = msgID;
