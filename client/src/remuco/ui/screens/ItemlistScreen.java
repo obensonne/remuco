@@ -121,7 +121,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 	}
 
-	private static final Command CMD_GOTO_PAGE = new Command("Page #",
+	private static final Command CMD_GOTO_PAGE = new Command("Page go to",
 			Command.SCREEN, 10);
 
 	private static final Command CMD_MARK_ALL = new Command("Mark all",
