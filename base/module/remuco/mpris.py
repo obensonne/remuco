@@ -390,14 +390,18 @@ class MPRISAdapter(PlayerAdapter):
             self._playing = PLAYBACK_STOP
         elif status[0] == STATUS_PAUSED:
             self._playing = PLAYBACK_PAUSE
-        else:
+        elif status[0] == STATUS_PLAYING:
             self._playing = PLAYBACK_PLAY
+        else:
+            log.warning("unknown play state (%s), assume playing)" % status[0])
+            self._playing = PLAYBACK_PLAY
+            
         self.update_playback(self._playing)
         
-        self._shuffle = bool(status[1]) # remember for toggle_shuffle()
+        self._shuffle = status[1] # remember for toggle_shuffle()
         self.update_shuffle(self._shuffle)
         
-        self._repeat = bool(status[2]) or bool(status[3]) # for toggle_repeat()
+        self._repeat = status[2] or status[3] # for toggle_repeat()
         self.update_repeat(self._repeat)
         
     def _notify_tracklist_change(self, new_len):
