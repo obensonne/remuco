@@ -230,7 +230,7 @@ class ItemListRequest():
             log.error("** BUG ** unexpected path: %s" % path)
         
     def __handle_pl_ids(self, result):
-        """Collects track infos about the tracks playlist ID list."""
+        """Collects track infos for the tracks in the playlist ID list."""
         
         if not self.__pa._check_result(result):
             return
@@ -388,7 +388,6 @@ class ItemListRequest():
         title = minfo.get('title', BLANK_TITLE)
         return "%s / %s" % (title, artist)
         
-    
 # =============================================================================
 # player adapter
 # =============================================================================
