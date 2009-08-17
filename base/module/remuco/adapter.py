@@ -1040,6 +1040,8 @@ class PlayerAdapter(object):
         @note: Call to synchronize player state with remote clients.
         
         """
+        repeat = bool(repeat)
+        
         change = self.__state.repeat != repeat
         
         if change:
@@ -1055,6 +1057,8 @@ class PlayerAdapter(object):
         @note: Call to synchronize player state with remote clients.
         
         """
+        shuffle = bool(shuffle)
+        
         change = self.__state.shuffle != shuffle
         
         if change:
@@ -1074,6 +1078,11 @@ class PlayerAdapter(object):
             return
         
         volume = int(volume)
+        
+        if volume < 0 or volume > 100:
+            log.warning("bad volume from player adapter: %d" % volume)
+            volume = 50
+            
         change = self.__state.volume != volume
         
         if change:
@@ -1090,6 +1099,10 @@ class PlayerAdapter(object):
             log.warning("output of custom volume command malformed: '%s'" % out)
             return
         
+        if volume < 0 or volume > 100:
+            log.warning("bad volume from custom volume command: %d" % volume)
+            volume = 50
+            
         change = self.__state.volume != volume
         
         if change:
