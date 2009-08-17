@@ -23,7 +23,6 @@
 import inspect
 import struct
 import array
-import types
 
 from remuco import log
 
@@ -161,7 +160,7 @@ class Bin:
         
         a = []
         
-        for i in range(0,num):
+        for i in range(num):
             
             a.append(fn_read_element())
             
