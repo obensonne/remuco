@@ -192,7 +192,7 @@ if client_from_path is not None:
 
 
 setup(name='remuco',
-      version='0.9.1',
+      version='0.9.2',
       description='Remuco is a remote control system for media players.',
       author='Oben Sonne',
       author_email='obensonne@googlemail.com',
