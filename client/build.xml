@@ -55,7 +55,7 @@
 
 	<property name="midlet.icon" value="logo.png" />
 	<property name="midlet.vendor" value="remuco.sf.net" />
-	<property name="midlet.version" value="0.9.1" />
+	<property name="midlet.version" value="0.9.2" />
 	<property name="midlet.data-size" value="2048" />
 
 	<property name="midlet.name" value="Remuco" />
@@ -155,7 +155,6 @@
 			<!-- sources -->
 			<src path="build/sources" />
 			<include name="remuco/**/*.java" />
-			<exclude unless="build.test" name="remuco/test/**/*.java" />
 			<!-- classpath -->
 			<classpath refid="cp.compile" />
 		</javac>
@@ -222,28 +221,23 @@
 	</target>
 
 	<target name="manifest">
-		<condition property="midlet.class"
-		           value="remuco.test.Test"
-		           else="remuco.Remuco">
-			<isset property="build.test" />
-		</condition>
 		<manifest file="build/MF">
 			<attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
 			<attribute name="MicroEdition-Profile" value="${midp.ver}" />
 			<attribute name="MIDlet-1"
-			           value="${midlet.name},${midlet.icon},${midlet.class}" />
+			           value="${midlet.name},${midlet.icon},remuco.Entry" />
 			<attribute name="MIDlet-Name" value="${midlet.name}" />
 			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
 			<attribute name="MIDlet-Version" value="${midlet.version}" />
 			<attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
 			<!--
-			These options cause trouble on certain devices and does not provide
+			These options cause trouble on certain devices and do not provide
 			a great benefit at all, thus they are commented.
 			<attribute name="MIDlet-Permissions"
-			           value="javax.microedition.io.Connector.bluetooth.client,javax.microedition.io.Connector.socket" />
+			           value="javax.microedition.io.Connector.socket" />
 			<attribute name="MIDlet-Permissions"
 			           value="javax.microedition.io.Connector.bluetooth.client" />
-			 -->
+			-->
 			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />
 		</manifest>
 	</target>
