@@ -24,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.microedition.io.ConnectionNotFoundException;
@@ -35,9 +34,10 @@ import javax.microedition.io.StreamConnection;
 import remuco.ClientInfo;
 import remuco.Config;
 import remuco.IOptionListener;
+import remuco.MainLoop;
 import remuco.OptionDescriptor;
-import remuco.Remuco;
 import remuco.UserException;
+import remuco.player.Player;
 import remuco.player.PlayerInfo;
 import remuco.util.Log;
 import remuco.util.Tools;
@@ -64,7 +64,7 @@ public final class Connection implements Runnable, IOptionListener {
 			(byte) 0xFE, (byte) 0xFE };
 
 	private static final int HELLO_LEN = PREFIX.length + PROTO_VERSION.length
-	+ SUFFIX.length;
+			+ SUFFIX.length;
 
 	private boolean closed = false;
 
@@ -76,22 +76,15 @@ public final class Connection implements Runnable, IOptionListener {
 
 	private final DataOutputStream dos;
 
-	private final IMessageListener messageListener;
-
 	private final StreamConnection sc;
-
-	private final Timer timer;
 
 	private String url = null;
 
-	public Connection(String url, IConnectionListener connectionListener,
-			IMessageListener messageListener) throws UserException {
+	public Connection(String url, IConnectionListener connectionListener)
+			throws UserException {
 
 		this.url = url;
 		this.connectionListener = connectionListener;
-		this.messageListener = messageListener;
-
-		timer = Remuco.getGlobalTimer();
 
 		Log.ln("[CN] url: " + url);
 
@@ -127,7 +120,7 @@ public final class Connection implements Runnable, IOptionListener {
 
 		// start the receiver thread delayed to give the UI some time to update
 		final Connection conn = this;
-		timer.schedule(new TimerTask() {
+		MainLoop.schedule(new TimerTask() {
 			public void run() {
 				new Thread(conn).start();
 			}
@@ -147,6 +140,10 @@ public final class Connection implements Runnable, IOptionListener {
 		connectionListenerNotifiedAboutError = true;
 
 		downPrivate();
+	}
+
+	public boolean isClosed() {
+		return closed;
 	}
 
 	public void optionChanged(OptionDescriptor od) {
@@ -173,7 +170,13 @@ public final class Connection implements Runnable, IOptionListener {
 			return;
 		}
 
-		notifyConnected(pinfo);
+		final Player player = new Player(this, pinfo);
+
+		MainLoop.schedule(new TimerTask() {
+			public void run() {
+				connectionListener.notifyConnected(player);
+			}
+		});
 
 		while (!closed) { // loop receiving messages
 
@@ -187,7 +190,23 @@ public final class Connection implements Runnable, IOptionListener {
 			}
 
 			if (m.id != Message.IGNORE) {
-				notifyMessage(m);
+
+				// notify new message in main loop
+
+				MainLoop.schedule(new TimerTask() {
+					public void run() {
+						try {
+							player.handleMessage(m);
+						} catch (BinaryDataExecption e) {
+							notifyDisconnected("Connection Error",
+								"Received malformed data.", e);
+						} catch (OutOfMemoryError e) {
+							m.data = null;
+							notifyDisconnected("Memory Error",
+								"Received data too big.", null);
+						}
+					}
+				});
 			}
 		}
 
@@ -211,8 +230,8 @@ public final class Connection implements Runnable, IOptionListener {
 			} catch (IOException e) {
 				Log.ln("[CN] connection broken", e);
 				downPrivate();
-				notifyDisconnected(new UserException("Connection broken",
-						"There was an IO error while sending data.", e));
+				notifyDisconnected("Connection broken",
+					"There was an IO error while sending data.", e);
 
 			}
 		}
@@ -261,15 +280,9 @@ public final class Connection implements Runnable, IOptionListener {
 		}
 	}
 
-	/** Notification is done via the global timer thread. */
-	private void notifyConnected(final PlayerInfo pinfo) {
-
-		final Connection conn = this;
-		timer.schedule(new TimerTask() {
-			public void run() {
-				connectionListener.notifyConnected(conn, pinfo);
-			}
-		}, 0);
+	/** See {@link #notifyDisconnected(UserException)}. */
+	private void notifyDisconnected(String error, String details, Exception e) {
+		notifyDisconnected(new UserException(error, details, e));
 	}
 
 	/**
@@ -288,23 +301,12 @@ public final class Connection implements Runnable, IOptionListener {
 
 			connectionListenerNotifiedAboutError = true;
 
-			timer.schedule(new TimerTask() {
+			MainLoop.schedule(new TimerTask() {
 				public void run() {
 					connectionListener.notifyDisconnected(url, ue);
 				}
-			}, 200);
+			});
 		}
-	}
-
-	/** Notification is done via the global timer thread. */
-	private void notifyMessage(final Message m) {
-
-		final Connection conn = this;
-		timer.schedule(new TimerTask() {
-			public void run() {
-				messageListener.notifyMessage(conn, m);
-			}
-		}, 0);
 	}
 
 	/**
@@ -548,7 +550,8 @@ public final class Connection implements Runnable, IOptionListener {
 
 		// now we are ready to handle changes in client info config
 		Config.getInstance().addOptionListener(this);
-		
+
 		return pinfo;
 	}
+
 }

@@ -21,10 +21,9 @@
 package remuco.comm;
 
 import java.util.Hashtable;
-import java.util.Timer;
 import java.util.TimerTask;
 
-import remuco.Remuco;
+import remuco.MainLoop;
 import remuco.UserException;
 
 public final class InetServiceFinder implements IServiceFinder {
@@ -35,13 +34,9 @@ public final class InetServiceFinder implements IServiceFinder {
 
 	private TimerTask notifier = null;
 
-	private final Timer timer;
-
 	public InetServiceFinder() {
 
 		lock = new Object();
-
-		timer = Remuco.getGlobalTimer();
 
 	}
 
@@ -68,13 +63,13 @@ public final class InetServiceFinder implements IServiceFinder {
 
 		final Hashtable services = new Hashtable(1);
 		services.put("Player", url);
-		
+
 		synchronized (lock) {
 
 			if (notifier != null) {
 				return;
 			}
-			
+
 			notifier = new TimerTask() {
 				public void run() {
 					listener.notifyServices(services, null);
@@ -83,7 +78,7 @@ public final class InetServiceFinder implements IServiceFinder {
 		}
 
 		// fake a service search:
-		timer.schedule(notifier, 1000);
+		MainLoop.schedule(notifier, 1000);
 
 	}
 

@@ -22,7 +22,6 @@ package remuco.ui.screens;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.microedition.lcdui.Command;
@@ -37,7 +36,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import remuco.Remuco;
+import remuco.MainLoop;
 import remuco.player.AbstractAction;
 import remuco.player.ActionParam;
 import remuco.player.ItemAction;
@@ -172,8 +171,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 	private final Theme theme;
 
-	private final Timer timer;
-
 	public ItemlistScreen(Display display, PlayerInfo pinfo,
 			IItemListController listener, ItemList list) {
 
@@ -185,7 +182,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 		this.listener = listener;
 		this.list = list;
 
-		timer = Remuco.getGlobalTimer();
 		theme = Theme.getInstance();
 
 		aa = new ActionAlert(display, this);
@@ -303,10 +299,12 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		} else if (c == CMD_PAGE_UP) {
 
+			disableAutoMarker();
 			listener.ilcGotoPage(this, list.getPage() - 1);
 
 		} else if (c == CMD_PAGE_DOWN) {
 
+			disableAutoMarker();
 			listener.ilcGotoPage(this, list.getPage() + 1);
 
 		} else if (c == CMD_GOTO_PAGE) {
@@ -323,6 +321,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 			if (page < 1 || page > list.getPageMax() + 1) {
 				tfPageSelection.setString(Integer.toString(list.getPage() + 1));
 			} else {
+				disableAutoMarker();
 				listener.ilcGotoPage(this, page - 1);
 			}
 
@@ -410,7 +409,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 		}
 
 		autoMarker = new AutoMarker();
-		timer.schedule(autoMarker, 100, 100);
+		MainLoop.schedule(autoMarker, 100, 100);
 
 	}
 

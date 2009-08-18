@@ -20,8 +20,6 @@
  */
 package remuco.ui.screens;
 
-import java.util.Timer;
-
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
@@ -33,10 +31,9 @@ import javax.microedition.lcdui.Graphics;
 
 import remuco.Config;
 import remuco.IOptionListener;
+import remuco.MainLoop;
 import remuco.OptionDescriptor;
-import remuco.Remuco;
 import remuco.comm.BinaryDataExecption;
-import remuco.comm.Connection;
 import remuco.comm.Message;
 import remuco.player.Feature;
 import remuco.player.IItemListener;
@@ -44,7 +41,6 @@ import remuco.player.IProgressListener;
 import remuco.player.IStateListener;
 import remuco.player.Item;
 import remuco.player.Player;
-import remuco.player.PlayerInfo;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.IActionListener;
@@ -93,11 +89,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	private final Config config;
 
-	private final Connection conn;
-
 	private final Display display;
 
-	private CommandListener externalCommandListener = null;
+	private CommandListener externalCommandListener;
 
 	/** Indicates if the item's image is currently shown in fullscreen mode. */
 	private boolean itemImageFullscreen;
@@ -135,8 +129,6 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	private final Theme theme;
 
-	private final Timer timer;
-
 	/**
 	 * Create a new player screen.
 	 * 
@@ -147,22 +139,19 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	 * @param pinfo
 	 *            information about the remote player
 	 */
-	public PlayerScreen(Display display, Connection conn, PlayerInfo pinfo) {
+	public PlayerScreen(Display display, Player player) {
 
 		this.display = display;
-		this.conn = conn;
-
-		timer = Remuco.getGlobalTimer();
 
 		theme = Theme.getInstance();
 
-		player = new Player(conn, pinfo);
+		this.player = player;
 
 		player.setStateListener(this);
 		player.setItemListener(this);
 		player.setProgressListener(this);
 
-		if (pinfo.supportsMediaBrowser()) {
+		if (player.info.supportsMediaBrowser()) {
 			super.addCommand(CMD_MEDIA);
 		}
 		super.addCommand(CMD_MENU);
@@ -170,7 +159,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		screenMenu = new CommandList("Options");
 		screenMenu.addCommand(CMD_KEYS, theme.licKeys);
-		if (pinfo.supports(Feature.SHUTDOWN)) {
+		if (player.info.supports(Feature.SHUTDOWN)) {
 			screenMenu.addCommand(CMD_SHUTDOWN_HOST, theme.licOff);
 		}
 		screenMenu.addCommand(CMD.BACK);
@@ -305,13 +294,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		}
 	}
 
-	/** Do some clean up before this player screen gets finally disposed. */
-	public void dispose() {
-
-		stopVolumeControl();
-		stopSeek();
-		conn.down();
-
+	public Player getPlayer() {
+		return player;
 	}
 
 	public void handleActionPressed(int action) {
@@ -522,6 +506,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	}
 
 	public void handleMessageForPlayer(Message msg) throws BinaryDataExecption {
+		// TODO: why not send this directly to player?
 		player.handleMessage(msg);
 	}
 
@@ -773,7 +758,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			recoSeek.cancel();
 		}
 		recoSeek = new RepeatedControl(RepeatedControl.SEEK, player, direction);
-		timer.schedule(recoSeek, SEEK_DELAY, 321);
+		MainLoop.schedule(recoSeek, SEEK_DELAY, 321);
 	}
 
 	private void startVolumeControl(int direction) {
@@ -783,7 +768,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		}
 		recoVolume = new RepeatedControl(RepeatedControl.VOLUME, player,
 				direction);
-		timer.schedule(recoVolume, 0, 253);
+		MainLoop.schedule(recoVolume, 0, 253);
 	}
 
 	/**

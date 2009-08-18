@@ -22,7 +22,6 @@ package remuco.player;
 
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.Connection;
-import remuco.comm.IMessageListener;
 import remuco.comm.ISerializable;
 import remuco.comm.Message;
 import remuco.comm.Serial;
@@ -230,7 +229,7 @@ public final class Player {
 			break;
 
 		case Message.REQ_ITEM:
-			
+
 			// maybe used later
 			// final Item item = new Item();
 			//
@@ -374,6 +373,16 @@ public final class Player {
 		stateListener = sl;
 	}
 
+	/** Disconnect from the remote player. */
+	public void disconnect() {
+		conn.down();
+	}
+
+	/** Check if there still is a connection to the remote player. */
+	public boolean isConnected() {
+		return !conn.isClosed();
+	}
+
 	private void action(int msgID, ActionParam action) {
 
 		final Message m = new Message();
@@ -411,7 +420,7 @@ public final class Player {
 
 		reqCaller = rc;
 		reqID = req.getRequestID();
-		
+
 		final Message m = new Message();
 
 		m.id = msgID;

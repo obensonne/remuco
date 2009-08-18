@@ -21,7 +21,7 @@
 package remuco.comm;
 
 import remuco.UserException;
-import remuco.player.PlayerInfo;
+import remuco.player.Player;
 
 /**
  * Interface for classes interested in the state of a {@link Connection}.
@@ -35,12 +35,10 @@ public interface IConnectionListener {
 	/**
 	 * Notifies a successful connection.
 	 * 
-	 * @param conn
-	 *            the connected connection
-	 * @param pinfo
-	 *            information about the connected player
+	 * @param player
+	 *            the connected player
 	 */
-	public void notifyConnected(Connection conn, PlayerInfo pinfo);
+	public void notifyConnected(Player player);
 
 	/**
 	 * Notifies a disconnection.

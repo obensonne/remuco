@@ -20,8 +20,7 @@
  */
 package remuco;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
@@ -30,12 +29,27 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
-import javax.microedition.midlet.MIDletStateChangeException;
 
+import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
+import remuco.comm.IConnectionListener;
+import remuco.comm.IDeviceSelectionListener;
+import remuco.comm.IServiceFinder;
+import remuco.comm.IServiceListener;
+import remuco.comm.InetServiceFinder;
+import remuco.player.Player;
 import remuco.ui.CMD;
-import remuco.ui.UI;
+import remuco.ui.Theme;
+import remuco.ui.screens.DeviceSelectorScreen;
+import remuco.ui.screens.LogScreen;
+import remuco.ui.screens.PlayerScreen;
+import remuco.ui.screens.ServiceSelectorScreen;
+import remuco.ui.screens.WaitingScreen;
 import remuco.util.FormLogger;
 import remuco.util.Log;
 
@@ -51,7 +65,45 @@ import remuco.util.Log;
  * @author Oben Sonne
  * 
  */
-public class Remuco extends MIDlet implements CommandListener {
+public class Remuco implements CommandListener, IConnectionListener,
+		IServiceListener, IDeviceSelectionListener {
+
+	private class ReconnectDialog extends Form implements CommandListener {
+
+		private final String url;
+
+		public ReconnectDialog(String url, String msg) {
+			super("Disconnected");
+			this.url = url;
+			final ImageItem img = new ImageItem(null,
+					Theme.getInstance().aicConnecting, Item.LAYOUT_CENTER
+							| Item.LAYOUT_NEWLINE_AFTER, "");
+			append(img);
+			final StringItem text = new StringItem(null, msg);
+			text.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+			append(text);
+			append("\n");
+			final StringItem question = new StringItem("Reconnect?", null);
+			question.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+			append(question);
+			addCommand(CMD.YES);
+			addCommand(CMD.NO);
+			setCommandListener(this);
+
+		}
+
+		public void commandAction(Command c, Displayable d) {
+
+			if (c == CMD.YES) {
+				connect(url);
+			} else if (c == CMD.NO) {
+				display.setCurrent(screenDeviceSelector);
+			} else {
+				Log.bug("Apr 9, 2009.9:53:36 PM");
+			}
+		}
+
+	}
 
 	/**
 	 * @emulator If <code>true</code>, the client runs inside the WTK emulator.
@@ -60,61 +112,12 @@ public class Remuco extends MIDlet implements CommandListener {
 
 	public static final String VERSION = "@VERSION@";
 
-	/** Command for the log form to run the garbage collector */
-	private static final Command CMD_RUNGC = new Command("Run GC",
-			Command.SCREEN, 2);
-
-	/** Command for the log form to show memory status */
-	private static final Command CMD_SYSINFO = new Command("System",
-			Command.SCREEN, 1);
-
-	private static Timer GLOBAL_TIMER = null;
-
 	static {
 		EMULATION = "@EMULATION@".equalsIgnoreCase("true") ? true : false;
 	}
 
-	/**
-	 * Get the global (main loop) timer.
-	 * <p>
-	 * The global timer is used for
-	 * <ul>
-	 * <li>handling events from a {@link Connection} (decoupled from the
-	 * {@link Connection}'s receiver thread and from the threads calling methods
-	 * on a {@link Connection}),
-	 * <li>scheduling repetitive tasks,
-	 * <li>scheduling delayed tasks and
-	 * <li>synchronizing access to objects where critical race conditions may
-	 * occur.
-	 * </ul>
-	 * Do not call {@link Timer#cancel()} on this timer - this is done once on
-	 * application shutdown.
-	 */
-	public static Timer getGlobalTimer() {
-		if (GLOBAL_TIMER == null) {
-			GLOBAL_TIMER = new Timer();
-			// periodically log if the global timer is still alive:
-			GLOBAL_TIMER.schedule(new TimerTask() {
-				private final long startTime = System.currentTimeMillis();
-
-				public void run() {
-					final long now = System.currentTimeMillis();
-					final long seconds = (now - startTime) / 1000;
-					Log.ln("main loop alive (" + seconds + ")");
-				}
-			}, 30000, 30000);
-		}
-		return GLOBAL_TIMER;
-	}
-
-	private static void cancelGlobalTimer() {
-
-		if (GLOBAL_TIMER != null) {
-			GLOBAL_TIMER.cancel();
-			GLOBAL_TIMER = null;
-		}
-
-	}
+	/** An alert to signal an alerting message :) */
+	private final Alert alert;
 
 	private final Alert alertLoadConfig;
 
@@ -126,51 +129,56 @@ public class Remuco extends MIDlet implements CommandListener {
 
 	private Displayable displayableAfterLog;
 
-	private final Form logForm;
-
-	/** Alert displaying current memory status */
-	private final Form logSysInfoForm;
+	private final MIDlet midlet;
 
 	/**
-	 * We need to know this since {@link #startApp()} might get called more than
-	 * once (e.g. after we have been paused).
-	 */
-	private boolean startAppFirstTime = true;
+	 * Screen to show progress while connecting.
+	 * <p>
+	 * This waiting screen's property is used for synchronizing connection state
+	 * handling between the UI event thread and the global timer thread.
+	 * */
+	private final WaitingScreen screenConnecting;
 
-	private final UI ui;
+	/** Screen to select a device to connect to */
+	private final DeviceSelectorScreen screenDeviceSelector;
 
-	public Remuco() {
+	private final Form screenLog;
 
-		display = Display.getDisplay(this);
+	/** Main player interaction screen */
+	private PlayerScreen screenPlayer = null;
+
+	/** Screen to select a service (media player) */
+	private final ServiceSelectorScreen screenServiceSelector;
+
+	private final IServiceFinder serviceFinderBluetooth, serviceFinderWifi;
+
+	public Remuco(MIDlet midlet) {
+
+		this.midlet = midlet;
+		display = Display.getDisplay(midlet);
 
 		// set up logging
 
-		logForm = new Form("Log");
-		logForm.addCommand(CMD.BACK);
-		logForm.addCommand(CMD_SYSINFO);
-		logForm.setCommandListener(this);
+		screenLog = new LogScreen(display);
+		screenLog.addCommand(CMD.BACK);
+		screenLog.setCommandListener(this);
 		if (EMULATION) {
 			Log.ln("RUNING IN EMULATION MODE ..");
-			logForm.append("Emulation -> logging goes to standard out!");
+			screenLog.append("Emulation -> logging goes to standard out!");
 		} else {
-			Log.setOut(new FormLogger(logForm));
+			Log.setOut(new FormLogger(screenLog));
 		}
 
 		// init configuration
 
-		Config.init(this);
+		Config.init(midlet);
 
 		config = Config.getInstance();
 
 		// set up some displayables
 
-		logSysInfoForm = new Form("System Info");
-		logSysInfoForm.addCommand(CMD_RUNGC);
-		logSysInfoForm.addCommand(CMD.BACK);
-		logSysInfoForm.setCommandListener(this);
-
 		alertLoadConfig = new Alert("Error");
-		alertLoadConfig.setString("Erros while loading configuration. "
+		alertLoadConfig.setString("Errors while loading configuration. "
 				+ "Please inspect the log for details! Configuration erros "
 				+ "are normal, if you installed a new version of the client.");
 		alertLoadConfig.setType(AlertType.ERROR);
@@ -178,7 +186,7 @@ public class Remuco extends MIDlet implements CommandListener {
 		alertLoadConfig.setCommandListener(this);
 
 		alertSaveConfig = new Alert("Error");
-		alertSaveConfig.setString("Erros while saving configuration."
+		alertSaveConfig.setString("Errors while saving configuration."
 				+ " Please inspect the log for details!");
 		alertSaveConfig.setType(AlertType.ERROR);
 		alertSaveConfig.setTimeout(Alert.FOREVER);
@@ -186,8 +194,37 @@ public class Remuco extends MIDlet implements CommandListener {
 
 		// set up the start screen
 
-		ui = new UI(this, display);
+		if (BluetoothFactory.BLUETOOTH) {
+			serviceFinderBluetooth = BluetoothFactory.createBluetoothServiceFinder();
+		} else {
+			serviceFinderBluetooth = null;
+		}
 
+		serviceFinderWifi = new InetServiceFinder();
+
+		alert = new Alert("");
+		alert.setTimeout(Alert.FOREVER);
+		alert.setType(AlertType.ERROR);
+
+		screenServiceSelector = new ServiceSelectorScreen();
+		screenServiceSelector.addCommand(CMD.BACK);
+		screenServiceSelector.setCommandListener(this);
+
+		screenConnecting = new WaitingScreen();
+		// screenConnecting = new WaitingAlert();
+		screenConnecting.setTitle("Connecting");
+		screenConnecting.setImage(Theme.getInstance().aicConnecting);
+		screenConnecting.setCommandListener(this);
+
+		screenDeviceSelector = new DeviceSelectorScreen(this, display, this);
+		screenDeviceSelector.addCommand(CMD.LOG);
+		screenDeviceSelector.addCommand(CMD.EXIT);
+
+		if (config.loadedSuccessfully()) {
+			screenDeviceSelector.show();
+		} else {
+			display.setCurrent(alertLoadConfig);
+		}
 	}
 
 	public void commandAction(Command c, Displayable d) {
@@ -196,58 +233,75 @@ public class Remuco extends MIDlet implements CommandListener {
 
 			displayableAfterLog = d;
 
-			display.setCurrent(logForm);
+			display.setCurrent(screenLog);
 
-		} else if (c == CMD.BACK && d == logSysInfoForm) {
-
-			display.setCurrent(logForm);
-
-		} else if (c == CMD_RUNGC && d == logSysInfoForm) {
-
-			// run garbage collector
-
-			System.gc();
-
-			updateSysInfoForm();
-
-		} else if (c == CMD_SYSINFO) {
-
-			// show memory usage
-
-			updateSysInfoForm();
-
-			display.setCurrent(logSysInfoForm);
-
-		} else if (c == CMD.BACK && d == logForm) {
+		} else if (c == CMD.BACK && d == screenLog) {
 
 			// display the displayable shown before the log
 
-			if (displayableAfterLog != null)
+			if (displayableAfterLog != null) {
 				display.setCurrent(displayableAfterLog);
-			else
-				Log.ln("A BUG !! Do not know what to show after Log !?");
+			} else {
+				Log.bug("Aug 18, 2009.16:38:28 AM");
+			}
+
+		} else if (c == List.SELECT_COMMAND && d == screenServiceSelector) {
+
+			connect(screenServiceSelector.getSelectedService());
+
+		} else if (c == CMD.BACK && d == screenServiceSelector) {
+
+			display.setCurrent(screenDeviceSelector);
+
+		} else if (c == WaitingScreen.CMD_CANCEL && d == screenConnecting) {
+
+			// user canceled connection setup
+
+			final Object property = screenConnecting.detachProperty();
+
+			if (property == null) {
+				return; // already connected
+			}
+
+			if (property instanceof IServiceFinder) {
+				// currently searching for services
+				((IServiceFinder) property).cancelServiceSearch();
+			} else if (property instanceof Connection) {
+				// currently waiting for player description
+				((Connection) property).down();
+			} else {
+				Log.bug("Mar 17, 2009.9:40:43 PM");
+			}
+
+			display.setCurrent(screenDeviceSelector);
 
 		} else if (c == CMD.EXIT) {
 
-			if (!config.save()) {
-				display.setCurrent(alertSaveConfig);
+			disconnectPlayer();
+
+			if (config.save()) {
+				midlet.notifyDestroyed();
 			} else {
-				cancelGlobalTimer();
-				notifyDestroyed();
+				display.setCurrent(alertSaveConfig);
 			}
+
+		} else if (c == CMD.BACK && d == screenPlayer) {
+
+			disconnectPlayer();
+
+			display.setCurrent(screenDeviceSelector);
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
 
 			// continue start up
 
-			ui.show();
+			screenDeviceSelector.show();
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
 
 			// continue shut down
 
-			cancelGlobalTimer();
-			notifyDestroyed();
+			midlet.notifyDestroyed();
 
 		} else {
 
@@ -257,75 +311,154 @@ public class Remuco extends MIDlet implements CommandListener {
 
 	}
 
-	protected void destroyApp(boolean unconditional)
-			throws MIDletStateChangeException {
+	public void notifyConnected(Player player) {
 
-		/*
-		 * This method only gets called by the application management (and not
-		 * when the MIDLet gets shut down by the user)!
-		 */
+		if (screenConnecting.detachProperty() == null) {
+			// connection set up already canceled by user
+			return;
+		}
 
-		config.save();
-		cancelGlobalTimer();
+		screenPlayer = new PlayerScreen(display, player);
+		screenPlayer.addCommand(CMD.BACK);
+		screenPlayer.addCommand(CMD.LOG);
+		screenPlayer.addCommand(CMD.EXIT);
+		screenPlayer.setCommandListener(this);
 
+		Log.ln("[UI] show player screen");
+
+		display.setCurrent(screenPlayer);
 	}
 
-	protected void pauseApp() {
+	public void notifyDisconnected(String url, UserException reason) {
 
-		Log.ln("[RM] paused");
+		disconnectPlayer();
 
+		if (url != null) {
+			display.setCurrent(new ReconnectDialog(url, reason.getDetails()));
+		} else {
+			alert(reason, screenDeviceSelector);
+		}
 	}
 
-	protected void startApp() throws MIDletStateChangeException {
+	public void notifySelectedDevice(String type, String addr) {
 
-		if (startAppFirstTime) {
+		final IServiceFinder sf;
 
-			startAppFirstTime = false;
+		if (type.equals(Config.DEVICE_TYPE_BLUETOOTH)) {
 
-			if (!config.loadedSuccessfully()) {
-				display.setCurrent(alertLoadConfig);
+			if (serviceFinderBluetooth == null) {
+				// this may happen in emulator, when switching on/off bluetooth
+				// support between two runs
+				Log.bug("Feb 3, 2009.12:54:53 AM");
 				return;
 			}
+			sf = serviceFinderBluetooth;
 
-			ui.show();
+		} else if (type.equals(Config.DEVICE_TYPE_INET)) {
 
-			Log.ln("[RM] started");
+			sf = serviceFinderWifi;
 
 		} else {
 
-			Log.ln("[RM] unpaused");
-
+			Log.bug("Jan 26, 2009.7:29:56 PM");
+			return;
 		}
 
-	}
+		try {
+			sf.findServices(addr, this);
+		} catch (UserException e) {
+			alert(e, screenDeviceSelector);
+			return;
+		}
 
-	private void updateSysInfoForm() {
-
-		final long memTotal = Runtime.getRuntime().totalMemory() / 1024;
-		final long memFree = Runtime.getRuntime().freeMemory() / 1024;
-		final long memUsed = memTotal - memFree;
-
-		final StringBuffer sb = new StringBuffer(200);
-
-		sb.append("--- Memory --- \n");
-		sb.append("Total ").append(memTotal).append(" KB\n");
-		sb.append("Used  ").append(memUsed).append(" KB\n");
-		sb.append("Free  ").append(memFree).append(" KB\n");
-		sb.append("--- Misc --- \n");
-		sb.append("Version: ").append(VERSION);
-		sb.append('\n');
-		sb.append("UTF-8: ").append(Config.UTF8 ? "yes" : "no");
-		sb.append('\n');
-		sb.append("Device: ").append(Config.DEVICE_NAME);
-		sb.append('\n');
-		sb.append("Best list icon size: ").append(config.SUGGESTED_LICS);
-		sb.append('\n');
-		sb.append("Time: ").append(System.currentTimeMillis());
-		sb.append('\n');
-
-		logSysInfoForm.deleteAll();
-		logSysInfoForm.append(sb.toString());
+		screenConnecting.attachProperty(sf);
+		screenConnecting.setMessage("Searching for players.");
+		display.setCurrent(screenConnecting);
 
 	}
 
+	public void notifyServices(Hashtable services, UserException ex) {
+
+		if (screenConnecting.detachProperty() == null) {
+			// connection set up already canceled by user
+			return;
+		}
+
+		if (ex != null) {
+			alert(ex, screenDeviceSelector);
+			return;
+		}
+
+		if (services.size() == 1) {
+
+			final String url = (String) services.elements().nextElement();
+
+			connect(url);
+
+		} else {
+
+			screenServiceSelector.setServices(services);
+
+			display.setCurrent(screenServiceSelector);
+		}
+	}
+
+	/**
+	 * Called when the application managed requests to shutdown.
+	 * <p>
+	 * In this method important and delay-free clean up stuff has to be
+	 * implemented.
+	 */
+	protected void destroy() {
+
+		disconnectPlayer();
+		config.save();
+
+	}
+
+	/**
+	 * Alert an error user to the user.
+	 * 
+	 * @param ue
+	 *            the user exception describing the error
+	 * @param next
+	 *            the displayable to show after the alert
+	 */
+	private void alert(UserException ue, Displayable next) {
+
+		alert.setTitle(ue.getError());
+		alert.setString(ue.getDetails());
+		display.setCurrent(alert, next);
+	}
+
+	/**
+	 * Connect to the given service and set up a waiting screen.
+	 * 
+	 * @param url
+	 *            the service url
+	 */
+	private void connect(String url) {
+
+		final Connection conn;
+
+		try {
+			conn = new Connection(url, this);
+		} catch (UserException e) {
+			alert(e, screenDeviceSelector);
+			return;
+		}
+
+		screenConnecting.attachProperty(conn);
+		screenConnecting.setMessage("Connecting to player.");
+		display.setCurrent(screenConnecting);
+	}
+
+	/** Disconnects from the currently connected player, if there is one. */
+	private void disconnectPlayer() {
+
+		if (screenPlayer != null) {
+			screenPlayer.getPlayer().disconnect();
+			screenPlayer = null;
+		}
+	}
 }

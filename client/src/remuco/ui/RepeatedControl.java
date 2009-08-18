@@ -28,6 +28,9 @@ import remuco.util.Log;
 /**
  * Timer task to periodically do a player control (intended for controls
  * triggered by holding down a key).
+ * <p>
+ * {@link RepeatedControl} tasks automatically stop if the player to control is
+ * disconnected.
  */
 public class RepeatedControl extends TimerTask {
 
@@ -49,7 +52,7 @@ public class RepeatedControl extends TimerTask {
 	 * @param type
 	 *            either {@link #SEEK} or {@link #VOLUME}
 	 * @param player
-	 *            the player to use to control
+	 *            the player to control
 	 * @param direction
 	 *            either <code>-1</code> or <code>1</code> for seeking
 	 *            backward/forward respectively adjusting volume down/up
@@ -76,6 +79,11 @@ public class RepeatedControl extends TimerTask {
 		// actually we have to synchronize here to be perfect, but we do not
 		// need to be perfect
 		neverRun = false;
+
+		if (!player.isConnected()) { // be nice and stop if disconnected
+			super.cancel();
+			return;
+		}
 
 		switch (type) {
 		case VOLUME:
