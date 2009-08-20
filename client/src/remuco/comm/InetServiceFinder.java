@@ -73,6 +73,9 @@ public final class InetServiceFinder implements IServiceFinder {
 			notifier = new TimerTask() {
 				public void run() {
 					listener.notifyServices(services, null);
+					synchronized (lock) {
+						notifier = null;
+					}
 				}
 			};
 		}
