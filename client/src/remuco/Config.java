@@ -719,10 +719,10 @@ public final class Config {
 				try {
 					int i = Integer.parseInt(stored);
 					if (i < od.min || i > od.max) {
-						options.put(od.id, null);
+						options.remove(od.id);
 					}
 				} catch (NumberFormatException e) {
-					options.put(od.id, null);
+					options.remove(od.id);
 				}
 			}
 		}
