@@ -712,7 +712,7 @@ public final class Config {
 			if (od.type == OptionDescriptor.TYPE_CHOICE) {
 				final String stored = getOption(od);
 				if (stored != null && Tools.getIndex(od.choices, stored) < 0) {
-					options.put(od.id, null);
+					options.remove(od.id);
 				}
 			} else if (od.type == OptionDescriptor.TYPE_INT) {
 				final String stored = getOption(od);
