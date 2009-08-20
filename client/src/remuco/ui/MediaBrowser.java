@@ -50,7 +50,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		private ItemlistScreen ils = null;
 
-		public PostActionDialog(MediaBrowser outer) {
+		public PostActionDialog() {
 
 			super("Action Done");
 
@@ -134,6 +134,8 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	private final Theme theme;
 
+	// TODO: make this a displayable (extending CommandList), this is more
+	// consistent to other screens
 	public MediaBrowser(Displayable parent, Display display, Player player) {
 
 		this.display = display;
@@ -147,7 +149,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 		screenWaiting.setImage(theme.aicRefresh);
 		screenWaiting.setCommandListener(this);
 
-		screenPostActionDialog = new PostActionDialog(this);
+		screenPostActionDialog = new PostActionDialog();
 
 		screenRoot = new CommandList("Media Browser");
 		if (player.info.supports(Feature.REQ_PL)) {
