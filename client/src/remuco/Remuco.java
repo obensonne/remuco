@@ -33,7 +33,6 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
-import javax.microedition.midlet.MIDlet;
 
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
@@ -129,7 +128,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 	private Displayable displayableAfterLog;
 
-	private final MIDlet midlet;
+	private final Entry midlet;
 
 	/**
 	 * Screen to show progress while connecting.
@@ -152,7 +151,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 	private final IServiceFinder serviceFinderBluetooth, serviceFinderWifi;
 
-	public Remuco(MIDlet midlet) {
+	public Remuco(Entry midlet) {
 
 		this.midlet = midlet;
 		display = Display.getDisplay(midlet);
@@ -220,7 +219,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenDeviceSelector.addCommand(CMD.LOG);
 		screenDeviceSelector.addCommand(CMD.EXIT);
 
-		if (config.loadedSuccessfully()) {
+		if (config.loadedSuccessfully) {
 			screenDeviceSelector.show();
 		} else {
 			display.setCurrent(alertLoadConfig);
@@ -277,17 +276,17 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 		} else if (c == CMD.EXIT) {
 
-			disconnectPlayer();
+			disconnect();
 
 			if (config.save()) {
-				midlet.notifyDestroyed();
+				midlet.notifyExit();
 			} else {
 				display.setCurrent(alertSaveConfig);
 			}
 
 		} else if (c == CMD.BACK && d == screenPlayer) {
 
-			disconnectPlayer();
+			disconnect();
 
 			display.setCurrent(screenDeviceSelector);
 
@@ -301,7 +300,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 			// continue shut down
 
-			midlet.notifyDestroyed();
+			midlet.notifyExit();
 
 		} else {
 
@@ -325,13 +324,13 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenPlayer.setCommandListener(this);
 
 		Log.ln("[UI] show player screen");
-
+		
 		display.setCurrent(screenPlayer);
 	}
 
 	public void notifyDisconnected(String url, UserException reason) {
 
-		disconnectPlayer();
+		disconnect();
 
 		if (url != null) {
 			display.setCurrent(new ReconnectDialog(url, reason.getDetails()));
@@ -411,7 +410,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 	 */
 	protected void destroy() {
 
-		disconnectPlayer();
+		disconnect();
 		config.save();
 
 	}
@@ -453,8 +452,13 @@ public class Remuco implements CommandListener, IConnectionListener,
 		display.setCurrent(screenConnecting);
 	}
 
-	/** Disconnects from the currently connected player, if there is one. */
-	private void disconnectPlayer() {
+	/**
+	 * Disconnects from the currently connected player (if there is one) and do
+	 * related clean up.
+	 */
+	private void disconnect() {
+
+		config.removeSessionOptionListener();
 
 		if (screenPlayer != null) {
 			screenPlayer.getPlayer().disconnect();

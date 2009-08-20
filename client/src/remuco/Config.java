@@ -42,6 +42,7 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import remuco.comm.Connection;
 import remuco.comm.Serial;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
@@ -66,6 +67,9 @@ public final class Config {
 	public static final String DEVICE_TYPE_INET = "I";
 
 	public static final int IMG_MAX_SIZE;
+
+	/** List of all option descriptors. */
+	public static final Vector OPTION_DESCRIPTORS;
 
 	/** Available screen size for a canvas screen. */
 	public static final int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -131,6 +135,17 @@ public final class Config {
 
 		DEVICE_NAME = dn;
 
+		// option descriptors
+
+		OPTION_DESCRIPTORS = new Vector();
+
+		OPTION_DESCRIPTORS.addElement(Theme.OD_THEME);
+		OPTION_DESCRIPTORS.addElement(TitleScreeny.OD_INFO_LEVEL);
+		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_PAGE_SIZE);
+		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_SIZE);
+		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_TYPE);
+		OPTION_DESCRIPTORS.addElement(Connection.OD_PING);
+
 	}
 
 	/**
@@ -193,16 +208,14 @@ public final class Config {
 		return null;
 	}
 
-	public final Vector optionDescriptors = new Vector();
-
 	/** Recommended list icon size. */
 	public final int SUGGESTED_LICS;
+
+	protected final boolean loadedSuccessfully;
 
 	private final Vector devices = new Vector();
 
 	private int[] keyBindings = new int[0];
-
-	private final boolean loadedSuccessfully;
 
 	private final Vector optionListener = new Vector();
 
@@ -222,8 +235,7 @@ public final class Config {
 
 		loadedSuccessfully = load();
 
-		initOptions();
-
+		validateOptionDescriptorOptions();
 	}
 
 	/**
@@ -475,8 +487,21 @@ public final class Config {
 		}
 	}
 
-	protected boolean loadedSuccessfully() {
-		return loadedSuccessfully;
+	/**
+	 * Remove all option listeners which only are alive during a session.
+	 */
+	protected void removeSessionOptionListener() {
+
+		final int len = optionListener.size();
+
+		IOptionListener ol;
+
+		for (int i = len - 1; i >= 0; i--) {
+			ol = (IOptionListener) optionListener.elementAt(i);
+			if (ol.isSessionOptionListener()) {
+				optionListener.removeElementAt(i);
+			}
+		}
 	}
 
 	/** @see #devicesIntoOptions() */
@@ -541,44 +566,6 @@ public final class Config {
 
 		options.put(OPTION_KEY_DEVS, val.toString());
 
-	}
-
-	/**
-	 * Collect all option descriptors and validate corresponding stored values.
-	 */
-	private void initOptions() {
-
-		optionDescriptors.addElement(Theme.OD_THEME);
-		optionDescriptors.addElement(TitleScreeny.OD_INFO_LEVEL);
-		optionDescriptors.addElement(ClientInfo.OD_PAGE_SIZE);
-		optionDescriptors.addElement(ClientInfo.OD_IMG_SIZE);
-		optionDescriptors.addElement(ClientInfo.OD_IMG_TYPE);
-
-		final Enumeration enu = optionDescriptors.elements();
-
-		while (enu.hasMoreElements()) {
-
-			final OptionDescriptor od = (OptionDescriptor) enu.nextElement();
-
-			// check if stored values are still valid
-			if (od.type == OptionDescriptor.TYPE_CHOICE) {
-				final String stored = getOption(od);
-				if (stored != null && Tools.getIndex(od.choices, stored) < 0) {
-					options.put(od.id, null);
-				}
-			} else if (od.type == OptionDescriptor.TYPE_INT) {
-				final String stored = getOption(od);
-				try {
-					int i = Integer.parseInt(stored);
-					if (i < od.min || i > od.max) {
-						options.put(od.id, null);
-					}
-				} catch (NumberFormatException e) {
-					options.put(od.id, null);
-				}
-			}
-
-		}
 	}
 
 	/**
@@ -705,6 +692,40 @@ public final class Config {
 
 		return ret;
 
+	}
+
+	/**
+	 * Check if all saved options still are valid according to the constrains of
+	 * their option descriptors.
+	 * 
+	 * @see #OPTION_DESCRIPTORS
+	 */
+	private void validateOptionDescriptorOptions() {
+
+		final Enumeration enu = OPTION_DESCRIPTORS.elements();
+
+		while (enu.hasMoreElements()) {
+
+			final OptionDescriptor od = (OptionDescriptor) enu.nextElement();
+
+			// check if stored values are still valid
+			if (od.type == OptionDescriptor.TYPE_CHOICE) {
+				final String stored = getOption(od);
+				if (stored != null && Tools.getIndex(od.choices, stored) < 0) {
+					options.put(od.id, null);
+				}
+			} else if (od.type == OptionDescriptor.TYPE_INT) {
+				final String stored = getOption(od);
+				try {
+					int i = Integer.parseInt(stored);
+					if (i < od.min || i > od.max) {
+						options.put(od.id, null);
+					}
+				} catch (NumberFormatException e) {
+					options.put(od.id, null);
+				}
+			}
+		}
 	}
 
 }

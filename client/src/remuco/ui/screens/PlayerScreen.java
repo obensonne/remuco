@@ -33,8 +33,6 @@ import remuco.Config;
 import remuco.IOptionListener;
 import remuco.MainLoop;
 import remuco.OptionDescriptor;
-import remuco.comm.BinaryDataExecption;
-import remuco.comm.Message;
 import remuco.player.Feature;
 import remuco.player.IItemListener;
 import remuco.player.IProgressListener;
@@ -505,9 +503,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	}
 
-	public void handleMessageForPlayer(Message msg) throws BinaryDataExecption {
-		// TODO: why not send this directly to player?
-		player.handleMessage(msg);
+	public boolean isSessionOptionListener() {
+		return true;
 	}
 
 	public void notifyItemChanged() {

@@ -34,7 +34,7 @@ import remuco.util.Log;
 import remuco.util.Tools;
 
 /**
- * Screen to adjust all options given by {@link Config#optionDescriptors}.
+ * Screen to adjust all options given by {@link Config#OPTION_DESCRIPTORS}.
  */
 public class OptionsScreen extends Form {
 
@@ -66,12 +66,12 @@ public class OptionsScreen extends Form {
 
 		setTicker(new Ticker("Changes get applied immediately."));
 
-		for (int i = 0; i < config.optionDescriptors.size(); i++) {
+		for (int i = 0; i < config.OPTION_DESCRIPTORS.size(); i++) {
 
 			final OptionDescriptor od;
 			final Item ow;
 
-			od = (OptionDescriptor) config.optionDescriptors.elementAt(i);
+			od = (OptionDescriptor) config.OPTION_DESCRIPTORS.elementAt(i);
 			ow = optionDescriptorToWidget(od);
 
 			append(ow);

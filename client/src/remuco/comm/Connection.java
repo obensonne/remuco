@@ -53,6 +53,29 @@ import remuco.util.Tools;
  */
 public final class Connection implements Runnable, IOptionListener {
 
+	private class PingTask extends TimerTask {
+
+		private final Message m;
+
+		private PingTask() {
+			m = new Message();
+			m.id = Message.IGNORE;
+		}
+
+		public void run() {
+			if (closed) {
+				cancel();
+			} else {
+				send(m);
+			}
+		}
+
+	}
+
+	/** Ping interval option. */
+	public static final OptionDescriptor OD_PING = new OptionDescriptor("ping",
+			"Ping interval", 20, 0, 300);
+
 	private static final int HELLO_TIMEOUT = 2000;
 
 	private static final byte[] PREFIX = { (byte) 0xFF, (byte) 0xFF,
@@ -75,6 +98,8 @@ public final class Connection implements Runnable, IOptionListener {
 	private final DataInputStream dis;
 
 	private final DataOutputStream dos;
+
+	private TimerTask ping;
 
 	private final StreamConnection sc;
 
@@ -118,13 +143,7 @@ public final class Connection implements Runnable, IOptionListener {
 
 		}
 
-		// start the receiver thread delayed to give the UI some time to update
-		final Connection conn = this;
-		MainLoop.schedule(new TimerTask() {
-			public void run() {
-				new Thread(conn).start();
-			}
-		}, 200);
+		new Thread(this).start();
 	}
 
 	/**
@@ -146,6 +165,10 @@ public final class Connection implements Runnable, IOptionListener {
 		return closed;
 	}
 
+	public boolean isSessionOptionListener() {
+		return true;
+	}
+
 	public void optionChanged(OptionDescriptor od) {
 
 		if (od == ClientInfo.OD_IMG_SIZE || od == ClientInfo.OD_PAGE_SIZE
@@ -155,11 +178,21 @@ public final class Connection implements Runnable, IOptionListener {
 			m.id = Message.CONN_CINFO;
 			m.data = Serial.out(new ClientInfo(false));
 			send(m);
+
+		} else if (od == OD_PING) {
+
+			ping(true);
 		}
 
 	}
 
 	public void run() {
+
+		// delay startup a little bit to give UI a chance to update
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+		}
 
 		final PlayerInfo pinfo;
 
@@ -169,6 +202,8 @@ public final class Connection implements Runnable, IOptionListener {
 			notifyDisconnected(e);
 			return;
 		}
+
+		ping(true);
 
 		final Player player = new Player(this, pinfo);
 
@@ -189,25 +224,27 @@ public final class Connection implements Runnable, IOptionListener {
 				return;
 			}
 
-			if (m.id != Message.IGNORE) {
-
-				// notify new message in main loop
-
-				MainLoop.schedule(new TimerTask() {
-					public void run() {
-						try {
-							player.handleMessage(m);
-						} catch (BinaryDataExecption e) {
-							notifyDisconnected("Connection Error",
-								"Received malformed data.", e);
-						} catch (OutOfMemoryError e) {
-							m.data = null;
-							notifyDisconnected("Memory Error",
-								"Received data too big.", null);
-						}
-					}
-				});
+			if (m.id == Message.IGNORE) {
+				continue;
 			}
+
+			// notify new message in main loop
+
+			MainLoop.schedule(new TimerTask() {
+				public void run() {
+					try {
+						player.handleMessage(m);
+					} catch (BinaryDataExecption e) {
+						notifyDisconnected("Connection Error",
+							"Received malformed data.", e);
+					} catch (OutOfMemoryError e) {
+						m.data = null;
+						notifyDisconnected("Memory Error",
+							"Received data too big.", null);
+					}
+				}
+			});
+
 		}
 
 	}
@@ -239,9 +276,11 @@ public final class Connection implements Runnable, IOptionListener {
 
 	private void downPrivate() {
 
+		closed = true;
+
 		Log.ln("[CN] going down");
 
-		closed = true;
+		ping(false);
 
 		try {
 			dis.close();
@@ -306,6 +345,37 @@ public final class Connection implements Runnable, IOptionListener {
 					connectionListener.notifyDisconnected(url, ue);
 				}
 			});
+		}
+	}
+
+	/**
+	 * Enable or disable pinging.
+	 * <p>
+	 * If pinging is already enabled, it is disabled first and then enabled
+	 * according to its current configuration (which may also be 0, i.e. no
+	 * pinging at all).
+	 * 
+	 * @param enable
+	 *            if <code>true</code> ping as defined by option
+	 *            {@link #OD_PING}, if <code>false</code>, stop pinging
+	 * 
+	 */
+	private void ping(boolean enable) {
+
+		if (ping != null) {
+			ping.cancel();
+			ping = null;
+		}
+
+		if (!enable) {
+			return;
+		}
+
+		final int v = Integer.parseInt(Config.getInstance().getOption(OD_PING));
+
+		if (v > 0) {
+			ping = new PingTask();
+			MainLoop.schedule(ping, v * 1000, v * 1000);
 		}
 	}
 

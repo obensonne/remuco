@@ -24,6 +24,16 @@ package remuco;
 public interface IOptionListener {
 
 	/**
+	 * Check if the option listener is a session listener, i.e. it is only alive
+	 * as long there is a player connection session.
+	 * 
+	 * @return <code>true</code> if this is a session only listener,
+	 *         <code>false</code> if this is a listener which is alive the whole
+	 *         application live time
+	 */
+	public boolean isSessionOptionListener();
+
+	/**
 	 * Notify the change of an option.
 	 * 
 	 * @param od

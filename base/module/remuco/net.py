@@ -82,15 +82,14 @@ class ClientConnection(object):
     IO_PROTO_VERSION = '\x0a'
     IO_HELLO = "%s%s%s" % (IO_PREFIX, IO_PROTO_VERSION, IO_SUFFIX) # hello msg
     
-    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, ping,
-                 conn_type):
+    def __init__(self, sock, addr, clients, pinfo_msg, msg_handler_fn, c_type):
         
         self.__sock = sock
         self.__addr = addr
         self.__clients = clients
         self.__pinfo_msg = pinfo_msg
         self.__msg_handler_fn = msg_handler_fn
-        self.__conn_type = conn_type
+        self.__conn_type = c_type
         
         # client info
         self.info = ClientInfo()
@@ -112,14 +111,6 @@ class ClientConnection(object):
             ]
         self.__sid_out = 0
         
-        # setup ping
-        self.__snd_ts = time.time()
-        self.__ping_ival = int(ping * 1000)
-        if self.__ping_ival > 0:
-            msg = build_message(message.IGNORE, None)
-            sid = gobject.timeout_add(self.__ping_ival, self.__ping, msg)
-            self.__sids.append(sid)
-
         log.debug("send 'hello' to %s" % self)
         
         self.send(ClientConnection.IO_HELLO)
@@ -219,9 +210,13 @@ class ClientConnection(object):
         msg_id = self.__rcv_msg_id
         msg_data = self.__rcv_buff_data.data
 
-        log.debug("received msg ")
+        log.debug("incoming msg ")
         
-        if msg_id == message.CONN_CINFO:
+        if msg_id == message.IGNORE:
+            
+            log.debug("received ignore msg (probably a ping)")
+            
+        elif msg_id == message.CONN_CINFO:
             
             log.debug("received client info from %s" % self)
             
@@ -290,13 +285,6 @@ class ClientConnection(object):
         else:
             return True
     
-    def __ping(self, msg):
-        
-        now = time.time()
-        if now - self.__snd_ts >= self.__ping_ival:
-            log.debug("ping client %s" % self)
-            self.send(msg)
-    
     def send(self, msg):
         """Send a message to the client.
         
@@ -316,8 +304,6 @@ class ClientConnection(object):
             log.debug("cannot send message to %s, already disconnected" % self)
             return
 
-        self.__snd_ts = time.time()
-        
         self.__snd_buff = "%s%s" % (self.__snd_buff, msg)
         
         # if not already trying to send data ..
@@ -400,7 +386,6 @@ class _Server(object):
         self.__clients = clients
         self.__msg_handler_fn = msg_handler_fn
         self.__pinfo_msg = build_message(message.CONN_PINFO, pinfo)
-        self.__ping_ival = config.ping
         self.__sid = None
         
         self._pinfo = pinfo
@@ -443,7 +428,7 @@ class _Server(object):
                 client_sock.setblocking(0)
                 ClientConnection(client_sock, addr, self.__clients,
                                  self.__pinfo_msg, self.__msg_handler_fn,
-                                 self.__ping_ival, self._get_type())
+                                 self._get_type())
             except IOError, e:
                 log.error("accepting %s client failed: %s" %
                           (self._get_type(), e))

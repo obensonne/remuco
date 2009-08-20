@@ -37,7 +37,7 @@ DEVICE_FILE = os.path.join(xdg_cache, "remuco", "devices")
 SEC = ConfigParser.DEFAULTSECT
 
 CONFIG_VERSION_MAJOR = "1"
-CONFIG_VERSION_MINOR = "3"
+CONFIG_VERSION_MINOR = "4"
 CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
@@ -46,7 +46,6 @@ KEY_WIFI = "wifi-enabled"
 KEY_WIFI_PORT = "wifi-port"
 KEY_ENDCODING = "player-encoding"
 KEY_LOGLEVEL = "log-level"
-KEY_PING = "ping-interval"
 KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
 KEY_FB_ROOT_DIRS = "file-browser-root-dirs"
@@ -58,7 +57,6 @@ DEFAULTS = { # values as saved in config file
     KEY_WIFI_PORT: "34271",
     KEY_ENDCODING: "UTF8",
     KEY_LOGLEVEL: "INFO",
-    KEY_PING: "15",
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
     KEY_FB_ROOT_DIRS: "",
@@ -365,31 +363,6 @@ class Config(object):
     
     log_level = property(__pget_log_level, __pset_log_level, None,
                          __pget_log_level.__doc__)
-
-    # === property: ping ===
-    
-    def __pget_ping(self):
-        """Interval in seconds for sending a ping to clients.
-        
-        An interval of 0 disables ping.
-        
-        Default: 15
-        
-        Option name: 'ping-interval'
-
-        """
-        try:
-            return self.__cp.getint(SEC, KEY_PING)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_PING, e))
-            return 15
-        
-    def __pset_ping(self, value):
-
-        self.__cp.set(SEC, KEY_PING, str(value))
-        self.__save()
-    
-    ping = property(__pget_ping, __pset_ping, None, __pget_ping.__doc__)
 
     # === property: fb ===
     
