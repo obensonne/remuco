@@ -75,7 +75,7 @@ public class MainLoop {
 
 		if (timer == null) {
 			timer = new Timer();
-			timer.schedule(new AliveLogger(), 30000, 30000);
+			timer.schedule(new AliveLogger(), 60000, 60000);
 		}
 	}
 
