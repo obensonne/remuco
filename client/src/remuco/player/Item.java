@@ -276,10 +276,6 @@ public final class Item implements ISerializable {
 		}
 	}
 
-	public void setImg(Image img) {
-		this.img = img;
-	}
-
 	public void setMeta(String name, String value) {
 		meta.put(name, value != null ? value : "");
 	}
