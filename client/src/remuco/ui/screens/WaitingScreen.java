@@ -85,7 +85,9 @@ public final class WaitingScreen extends Form {
 	 * @see #attachProperty(Object)
 	 */
 	public synchronized Object detachProperty() {
-		return property;
+		final Object p = property;
+		property = null;
+		return p;
 	}
 
 	/** Set an image centered above the gauge. */
