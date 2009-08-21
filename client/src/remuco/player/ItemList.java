@@ -325,7 +325,8 @@ public final class ItemList implements ISerializable {
 
 	/**
 	 * Check if the list is a root list, i.e. it has no parent list. This is
-	 * true for playlist, queue and the top level list of the media library.
+	 * true for playlist, queue and the top level list of the media library (but
+	 * for technical reasons not for a search result list).
 	 */
 	public boolean isRoot() {
 		return path == null || path.length == 0;
