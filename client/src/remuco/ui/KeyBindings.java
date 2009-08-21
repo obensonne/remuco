@@ -96,7 +96,9 @@ public final class KeyBindings {
 
 		if (!validate(kb)) {
 			kb = new int[defaultBindings.length];
-			System.arraycopy(defaultBindings, 0, kb, 0, kb.length);
+			for (int i = 0; i < defaultBindings.length; i++) {
+				kb[i] = defaultBindings[i];
+			}
 			config.setKeyBindings(kb);
 		}
 
@@ -213,7 +215,9 @@ public final class KeyBindings {
 	}
 
 	public void resetToDefaults() {
-		System.arraycopy(defaultBindings, 0, bindings, 0, bindings.length);
+		for (int i = 0; i < defaultBindings.length; i++) {
+			bindings[i] = defaultBindings[i];
+		}
 	}
 
 	/**
