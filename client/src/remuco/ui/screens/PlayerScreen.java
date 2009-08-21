@@ -170,8 +170,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		screenyButtons = new ButtonBarScreeny(player.info);
 		screenyProgress = new ProgressScreeny(player.info);
 
-		screenKeyConfig = new KeyBindingsScreen(this, display);
+		screenKeyConfig = new KeyBindingsScreen(display);
 		screenKeyConfig.addCommand(CMD.BACK);
+		screenKeyConfig.setCommandListener(this);
 
 		screenOptions = new OptionsScreen();
 		screenOptions.addCommand(CMD.BACK);

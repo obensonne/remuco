@@ -31,6 +31,7 @@ import javax.microedition.lcdui.List;
 import remuco.ui.CMD;
 import remuco.ui.IKeyListener;
 import remuco.ui.KeyBindings;
+import remuco.util.Log;
 
 /** Screen to configure key bindings. */
 public final class KeyBindingsScreen extends List implements CommandListener,
@@ -46,13 +47,13 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 
 	private final Display display;
 
-	private final StringBuffer msgKeyConflict = new StringBuffer(60);
-
-	private final CommandListener parent;
-
-	private final KeyBinderScreen screenKeyBinder;
+	private CommandListener externalCommandListener;
 
 	private final KeyBindings keyBindings;
+
+	private final StringBuffer msgKeyConflict = new StringBuffer(60);
+
+	private final KeyBinderScreen screenKeyBinder;
 
 	/**
 	 * The key selected to set for {@link #actionToBind}. This field has only a
@@ -61,17 +62,11 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	 */
 	private int selectedKey;
 
-	/**
-	 * @param display
-	 * @param parent
-	 * @param player
-	 */
-	public KeyBindingsScreen(final CommandListener parent, final Display display) {
+	public KeyBindingsScreen(final Display display) {
 
 		super("Key Bindings", IMPLICIT);
 
 		this.display = display;
-		this.parent = parent;
 
 		keyBindings = KeyBindings.getInstance();
 
@@ -143,9 +138,13 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 
 			display.setCurrent(this);
 
+		} else if (externalCommandListener != null) {
+
+			externalCommandListener.commandAction(c, d);
+
 		} else {
 
-			parent.commandAction(c, d);
+			Log.bug("Aug 21, 2009.8:06:24 PM");
 		}
 
 	}
@@ -170,12 +169,12 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 			msgKeyConflict.append("Key ").append(keyName);
 			msgKeyConflict.append(" is already in use for '");
 			msgKeyConflict.append(KeyBindings.actionNames[actionOld]).append(
-					"'.");
+				"'.");
 			msgKeyConflict.append("\nDo you want to unset it from '");
 			msgKeyConflict.append(KeyBindings.actionNames[actionOld]);
 			msgKeyConflict.append("' and use it for '");
-			msgKeyConflict.append(KeyBindings.actionNames[actionToBind]).append(
-					"' ?");
+			msgKeyConflict.append(KeyBindings.actionNames[actionToBind])
+					.append("' ?");
 			alertKeyConflict.setString(msgKeyConflict.toString());
 
 			display.setCurrent(alertKeyConflict);
@@ -193,6 +192,14 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 	public void keyReleased(int key) {
 		// ignore
 
+	}
+
+	public void setCommandListener(CommandListener l) {
+		if (l == this) {
+			super.setCommandListener(l);
+		} else {
+			externalCommandListener = l;
+		}
 	}
 
 	/**
@@ -229,6 +236,5 @@ public final class KeyBindingsScreen extends List implements CommandListener,
 			keyName = "";
 		}
 		set(action, KeyBindings.actionNames[action] + ": " + keyName, null);
-
 	}
 }
