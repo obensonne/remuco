@@ -43,7 +43,6 @@ import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
-import remuco.ui.MediaBrowser;
 import remuco.ui.RepeatedControl;
 import remuco.ui.Theme;
 import remuco.ui.screenies.ButtonBarScreeny;
@@ -95,7 +94,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private boolean itemImageFullscreen;
 
 	/** Screen for browsing the remote player's media */
-	private final MediaBrowser screenMediaBrowser;
+	private final MediaBrowserScreen screenMediaBrowser;
 
 	private final Player player;
 
@@ -185,7 +184,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		alertFeature = new Alert("", "", null, AlertType.INFO);
 
-		screenMediaBrowser = new MediaBrowser(display, player);
+		screenMediaBrowser = new MediaBrowserScreen(display, player);
 		screenMediaBrowser.addCommand(CMD.BACK);
 		screenMediaBrowser.setCommandListener(this);
 

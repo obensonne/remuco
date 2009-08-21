@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.ui;
+package remuco.ui.screens;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -35,12 +35,12 @@ import remuco.player.IRequester;
 import remuco.player.Item;
 import remuco.player.ItemList;
 import remuco.player.Player;
-import remuco.ui.screens.ItemlistScreen;
-import remuco.ui.screens.SearchScreen;
-import remuco.ui.screens.WaitingScreen;
+import remuco.ui.CMD;
+import remuco.ui.IItemListController;
+import remuco.ui.Theme;
 import remuco.util.Log;
 
-public final class MediaBrowser extends List implements CommandListener,
+public final class MediaBrowserScreen extends List implements CommandListener,
 		IRequester, IItemListController {
 
 	/** Nice dialog to ask what to do next after an action has been executed. */
@@ -84,7 +84,7 @@ public final class MediaBrowser extends List implements CommandListener,
 			} else {
 				// in theory we do not know that the external command listener
 				// handles the back command, however, in practice we do ..
-				MediaBrowser.this.commandAction(CMD.BACK, MediaBrowser.this);
+				MediaBrowserScreen.this.commandAction(CMD.BACK, MediaBrowserScreen.this);
 			}
 			ils = null;
 		}
@@ -117,7 +117,7 @@ public final class MediaBrowser extends List implements CommandListener,
 
 	private final Theme theme;
 
-	public MediaBrowser(Display display, Player player) {
+	public MediaBrowserScreen(Display display, Player player) {
 
 		super("Media Browser", List.IMPLICIT);
 
