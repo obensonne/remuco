@@ -240,6 +240,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 			if (displayableAfterLog != null) {
 				display.setCurrent(displayableAfterLog);
+				displayableAfterLog = null;
 			} else {
 				Log.bug("Aug 18, 2009.16:38:28 AM");
 			}
@@ -288,7 +289,11 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 			disconnect();
 
-			display.setCurrent(screenDeviceSelector);
+			final Alert confirm = new Alert("Disconnected",
+					"Disconnected from remote player.",
+					Theme.getInstance().aicConnecting, AlertType.CONFIRMATION);
+			confirm.setTimeout(1500);
+			display.setCurrent(confirm, screenDeviceSelector);
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
 
@@ -324,7 +329,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenPlayer.setCommandListener(this);
 
 		Log.ln("[UI] show player screen");
-		
+
 		display.setCurrent(screenPlayer);
 	}
 
