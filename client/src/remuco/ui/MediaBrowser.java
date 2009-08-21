@@ -26,6 +26,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
 import remuco.player.ActionParam;
@@ -39,8 +40,8 @@ import remuco.ui.screens.SearchScreen;
 import remuco.ui.screens.WaitingScreen;
 import remuco.util.Log;
 
-public final class MediaBrowser implements CommandListener, IRequester,
-		IItemListController {
+public final class MediaBrowser extends List implements CommandListener,
+		IRequester, IItemListController {
 
 	/** Nice dialog to ask what to do next after an action has been executed. */
 	private class PostActionDialog extends Form implements CommandListener {
@@ -73,17 +74,17 @@ public final class MediaBrowser implements CommandListener, IRequester,
 			addCommand(CMD_MAIN);
 			addCommand(CMD_LIST);
 
-			setCommandListener(this);
-
+			this.setCommandListener(this);
 		}
 
 		public void commandAction(Command c, Displayable d) {
 
 			if (c == CMD_LIST && ils != null) {
 				ilcGotoPage(ils, ils.getItemList().getPage());
-				// display.setCurrent(ils); // do not reloads
 			} else {
-				display.setCurrent(parent);
+				// in theory we do not know that the external command listener
+				// handles the back command, however, in practice we do ..
+				MediaBrowser.this.commandAction(CMD.BACK, MediaBrowser.this);
 			}
 			ils = null;
 		}
@@ -92,37 +93,19 @@ public final class MediaBrowser implements CommandListener, IRequester,
 			this.ils = ils;
 			display.setCurrent(this);
 		}
-
 	}
 
-	private static final Command CMD_FILES = new Command("File Browser",
-			Command.ITEM, 40);
-
-	private static final Command CMD_MLIB = new Command("Library",
-			Command.ITEM, 30);
-
-	private static final Command CMD_PLAYLIST = new Command("Playlist",
-			Command.ITEM, 10);
-
-	private static final Command CMD_QUEUE = new Command("Queue", Command.ITEM,
-			20);
-
-	private static final Command CMD_SEARCH = new Command("Search",
-			Command.ITEM, 50);
+	private final int cmdIndexPlaylist, cmdIndexQeue, cmdIndexMLib,
+			cmdIndexFiles, cmdIndexSearch;
 
 	private final Display display;
 
-	private Displayable displayableBeforeRequest = null;
-
-	/** Displayable to show when library screen has done its job. */
-	private final Displayable parent;
+	private CommandListener externalCommandListener;
 
 	private final Player player;
 
 	/** Dialog asking what to do next after executing an action. */
 	private final PostActionDialog screenPostActionDialog;
-
-	private final CommandList screenRoot;
 
 	private final SearchScreen screenSearch;
 
@@ -134,15 +117,42 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	private final Theme theme;
 
-	// TODO: make this a displayable (extending CommandList), this is more
-	// consistent to other screens
-	public MediaBrowser(Displayable parent, Display display, Player player) {
+	public MediaBrowser(Display display, Player player) {
+
+		super("Media Browser", List.IMPLICIT);
 
 		this.display = display;
-		this.parent = parent;
 		this.player = player;
 
 		theme = Theme.getInstance();
+
+		if (player.info.supports(Feature.REQ_PL)) {
+			cmdIndexPlaylist = append("Playlist", theme.licList);
+		} else {
+			cmdIndexPlaylist = -2;
+		}
+		if (player.info.supports(Feature.REQ_QU)) {
+			cmdIndexQeue = append("Queue", theme.licQueue);
+		} else {
+			cmdIndexQeue = -2;
+		}
+		if (player.info.supports(Feature.REQ_MLIB)) {
+			cmdIndexMLib = append("Library", theme.licMLib);
+		} else {
+			cmdIndexMLib = -2;
+		}
+		if (player.info.getFileActions().size() > 0) {
+			cmdIndexFiles = append("Files", theme.licFiles);
+		} else {
+			cmdIndexFiles = -2;
+		}
+		if (player.info.getSearchMask().length > 0) {
+			cmdIndexSearch = append("Search", theme.licSearch);
+		} else {
+			cmdIndexSearch = -2;
+		}
+		setSelectCommand(CMD.SELECT);
+		setCommandListener(this);
 
 		screenWaiting = new WaitingScreen();
 		screenWaiting.setTitle("Updating");
@@ -151,83 +161,76 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		screenPostActionDialog = new PostActionDialog();
 
-		screenRoot = new CommandList("Media Browser");
-		if (player.info.supports(Feature.REQ_PL)) {
-			screenRoot.addCommand(CMD_PLAYLIST, theme.licList);
-		}
-		if (player.info.supports(Feature.REQ_QU)) {
-			screenRoot.addCommand(CMD_QUEUE, theme.licQueue);
-		}
-		if (player.info.supports(Feature.REQ_MLIB)) {
-			screenRoot.addCommand(CMD_MLIB, theme.licMLib);
-		}
-		if (player.info.getFileActions().size() > 0) {
-			screenRoot.addCommand(CMD_FILES, theme.licFiles);
-		}
-		if (player.info.getSearchMask().length > 0) {
-			screenRoot.addCommand(CMD_SEARCH, theme.licSearch);
-		}
-		screenRoot.addCommand(CMD.BACK);
-		screenRoot.setCommandListener(this);
-
 		screenSearch = new SearchScreen(player.info.getSearchMask());
 		screenSearch.addCommand(CMD.OK);
 		screenSearch.addCommand(CMD.BACK);
 		screenSearch.setCommandListener(this);
-
-		displayableBeforeRequest = screenRoot;
 	}
 
 	public void commandAction(Command c, Displayable d) {
 
-		if (c == CMD_PLAYLIST) {
+		if (c == CMD.SELECT && d == this) {
 
-			displayableBeforeRequest = d;
-			display.setCurrent(screenWaiting);
-			player.reqPlaylist(this, 0);
+			final int index = getSelectedIndex();
 
-		} else if (c == CMD_QUEUE) {
+			if (index == -1) {
+				// ignore
 
-			displayableBeforeRequest = d;
-			display.setCurrent(screenWaiting);
-			player.reqQueue(this, 0);
+			} else if (index == cmdIndexPlaylist) {
 
-		} else if (c == CMD_MLIB) {
+				screenWaiting.attachProperty(d);
+				display.setCurrent(screenWaiting);
+				player.reqPlaylist(this, 0);
 
-			displayableBeforeRequest = d;
-			display.setCurrent(screenWaiting);
-			player.reqMLib(this, null, 0);
+			} else if (index == cmdIndexQeue) {
 
-		} else if (c == CMD_FILES) {
+				screenWaiting.attachProperty(d);
+				display.setCurrent(screenWaiting);
+				player.reqQueue(this, 0);
 
-			displayableBeforeRequest = d;
-			display.setCurrent(screenWaiting);
-			player.reqFiles(this, null, 0);
+			} else if (index == cmdIndexMLib) {
 
-		} else if (c == CMD_SEARCH) {
+				screenWaiting.attachProperty(d);
+				display.setCurrent(screenWaiting);
+				player.reqMLib(this, null, 0);
 
-			display.setCurrent(screenSearch);
+			} else if (index == cmdIndexFiles) {
+
+				screenWaiting.attachProperty(d);
+				display.setCurrent(screenWaiting);
+				player.reqFiles(this, null, 0);
+
+			} else if (index == cmdIndexSearch) {
+
+				display.setCurrent(screenSearch);
+
+			} else {
+
+				Log.bug("Aug 21, 2009.9:59:30 PM");
+			}
 
 		} else if (c == CMD.BACK && d == screenSearch) {
 
-			display.setCurrent(screenRoot);
+			display.setCurrent(this);
 
 		} else if (c == CMD.OK && d == screenSearch) {
 
-			displayableBeforeRequest = d;
+			screenWaiting.attachProperty(d);
 			display.setCurrent(screenWaiting);
 			player.reqSearch(this, screenSearch.getQuery(), 0);
-
-		} else if (c == CMD.BACK && d == screenRoot) {
-
-			displayableBeforeRequest = screenRoot; // release item list screen
-			display.setCurrent(parent);
 
 		} else if (c == WaitingScreen.CMD_CANCEL) {
 
 			player.reqCancel();
 
-			display.setCurrent(displayableBeforeRequest);
+			final Displayable next = (Displayable) screenWaiting.detachProperty();
+			if (next != null) {
+				display.setCurrent(next);
+			} // else: too late for cancel
+
+		} else if (externalCommandListener != null) {
+
+			externalCommandListener.commandAction(c, d);
 
 		} else {
 
@@ -237,6 +240,9 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void handleFiles(ItemList files) {
 
+		if (screenWaiting.detachProperty() == null) {
+			return; // already canceled
+		}
 		display.setCurrent(new ItemlistScreen(display, player.info, this, files));
 
 	}
@@ -246,12 +252,19 @@ public final class MediaBrowser implements CommandListener, IRequester,
 	}
 
 	public void handleLibrary(ItemList library) {
+
+		if (screenWaiting.detachProperty() == null) {
+			return; // already canceled
+		}
 		display.setCurrent(new ItemlistScreen(display, player.info, this,
 				library));
 	}
 
 	public void handlePlaylist(ItemList playlist) {
 
+		if (screenWaiting.detachProperty() == null) {
+			return; // already canceled
+		}
 		final ItemlistScreen ils = new ItemlistScreen(display, player.info,
 				this, playlist);
 
@@ -264,6 +277,9 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void handleQueue(ItemList queue) {
 
+		if (screenWaiting.detachProperty() == null) {
+			return; // already canceled
+		}
 		final ItemlistScreen ils = new ItemlistScreen(display, player.info,
 				this, queue);
 
@@ -276,6 +292,9 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void handleSearch(ItemList search) {
 
+		if (screenWaiting.detachProperty() == null) {
+			return; // already canceled
+		}
 		display.setCurrent(new ItemlistScreen(display, player.info, this,
 				search));
 	}
@@ -305,20 +324,20 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		final ItemList list = ils.getItemList();
 
-		if (list.isRoot()) {
-			display.setCurrent(screenRoot);
+		if (list.isSearch()) {
+			display.setCurrent(screenSearch);
+		} else if (list.isRoot()) {
+			display.setCurrent(this);
 		} else {
 			final String path[] = ils.getItemList().getPathForParent();
 			if (list.isMediaLib()) {
-				displayableBeforeRequest = ils;
+				screenWaiting.attachProperty(ils);
 				display.setCurrent(screenWaiting);
 				player.reqMLib(this, path, 0);
 			} else if (list.isFiles()) {
-				displayableBeforeRequest = ils;
+				screenWaiting.attachProperty(ils);
 				display.setCurrent(screenWaiting);
 				player.reqFiles(this, path, 0);
-			} else if (list.isSearch()) {
-				display.setCurrent(screenSearch);
 			} else {
 				Log.bug("Mar 13, 2009.10:58:36 PM");
 			}
@@ -329,7 +348,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		final ItemList list = ils.getItemList();
 
-		displayableBeforeRequest = ils;
+		screenWaiting.attachProperty(ils);
 		display.setCurrent(screenWaiting);
 
 		if (list.isPlaylist()) {
@@ -350,7 +369,7 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	public void ilcRoot(ItemlistScreen ils) {
 
-		display.setCurrent(screenRoot);
+		display.setCurrent(this);
 
 	}
 
@@ -358,13 +377,12 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 		final ItemList list = ils.getItemList();
 
+		screenWaiting.attachProperty(ils);
+		display.setCurrent(screenWaiting);
+
 		if (list.isMediaLib()) {
-			displayableBeforeRequest = ils;
-			display.setCurrent(screenWaiting);
 			player.reqMLib(this, path, 0);
 		} else if (list.isFiles()) {
-			displayableBeforeRequest = ils;
-			display.setCurrent(screenWaiting);
 			player.reqFiles(this, path, 0);
 		} else {
 			Log.bug("Mar 13, 2009.10:58:36 PM");
@@ -372,9 +390,11 @@ public final class MediaBrowser implements CommandListener, IRequester,
 
 	}
 
-	public void showYourself() {
-
-		display.setCurrent(screenRoot);
+	public void setCommandListener(CommandListener l) {
+		if (l == this) {
+			super.setCommandListener(l);
+		} else {
+			externalCommandListener = l;
+		}
 	}
-
 }

@@ -95,7 +95,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private boolean itemImageFullscreen;
 
 	/** Screen for browsing the remote player's media */
-	private final MediaBrowser mediaBrowser;
+	private final MediaBrowser screenMediaBrowser;
 
 	private final Player player;
 
@@ -155,7 +155,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		super.addCommand(CMD_MENU);
 		setCommandListener(this);
 
-		screenMenu = new CommandList("Options");
+		screenMenu = new CommandList("Menu");
 		screenMenu.addCommand(CMD_KEYS, theme.licKeys);
 		if (player.info.supports(Feature.SHUTDOWN)) {
 			screenMenu.addCommand(CMD_SHUTDOWN_HOST, theme.licOff);
@@ -185,7 +185,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		alertFeature = new Alert("", "", null, AlertType.INFO);
 
-		mediaBrowser = new MediaBrowser(this, display, player);
+		screenMediaBrowser = new MediaBrowser(display, player);
+		screenMediaBrowser.addCommand(CMD.BACK);
+		screenMediaBrowser.setCommandListener(this);
 
 		config = Config.getInstance();
 		config.addOptionListener(this);
@@ -225,15 +227,19 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	public void commandAction(Command c, Displayable d) {
 
-		if (c == CMD_MEDIA) {
+		if (c == CMD_MEDIA) { // MEDIA //
 
-			mediaBrowser.showYourself();
+			display.setCurrent(screenMediaBrowser);
 
-		} else if (c == CMD_MENU) {
+		} else if (c == CMD.BACK && d == screenMediaBrowser) {
+
+			display.setCurrent(this);
+
+		} else if (c == CMD_MENU) { // OPTIONS //
 
 			display.setCurrent(screenMenu);
 
-		} else if (c == CMD.BACK && d == screenMenu) { // OPTIONS //
+		} else if (c == CMD.BACK && d == screenMenu) {
 
 			display.setCurrent(this);
 
