@@ -28,6 +28,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
+import remuco.util.Log;
+
 /**
  * A screen to organize commands as a list.
  * <p>
@@ -151,11 +153,16 @@ public class CommandList extends List implements CommandListener {
 
 			if (externalCommandListener != null) {
 				externalCommandListener.commandAction(cmdSelected, this);
+			} else {
+				Log.bug("Aug 21, 2009.9:23:04 PM");
 			}
-
-		} else {
-
+			
+		} else if (externalCommandListener != null) {
+			
 			externalCommandListener.commandAction(c, d);
+			
+		} else {
+			Log.bug("Aug 21, 2009.9:23:19 PM");
 		}
 
 	}
