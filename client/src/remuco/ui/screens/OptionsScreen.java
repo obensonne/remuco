@@ -26,7 +26,6 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
-import javax.microedition.lcdui.Ticker;
 
 import remuco.Config;
 import remuco.OptionDescriptor;
@@ -64,14 +63,12 @@ public class OptionsScreen extends Form {
 
 		config = Config.getInstance();
 
-		setTicker(new Ticker("Changes get applied immediately."));
-
-		for (int i = 0; i < config.OPTION_DESCRIPTORS.size(); i++) {
+		for (int i = 0; i < Config.OPTION_DESCRIPTORS.size(); i++) {
 
 			final OptionDescriptor od;
 			final Item ow;
 
-			od = (OptionDescriptor) config.OPTION_DESCRIPTORS.elementAt(i);
+			od = (OptionDescriptor) Config.OPTION_DESCRIPTORS.elementAt(i);
 			ow = optionDescriptorToWidget(od);
 
 			append(ow);
@@ -114,12 +111,12 @@ public class OptionsScreen extends Form {
 		final OptionDescriptor od = (OptionDescriptor) ow2od.get(ow);
 
 		if (ow instanceof ChoiceGroup) {
-			
+
 			final int index = ((ChoiceGroup) ow).getSelectedIndex();
 			config.setOption(od, od.choices[index]);
-			
+
 		} else if (ow instanceof TextField) {
-			
+
 			String val = ((TextField) ow).getString();
 			if (od.type == OptionDescriptor.TYPE_INT) {
 				try {
@@ -137,7 +134,7 @@ public class OptionsScreen extends Form {
 				}
 			}
 			config.setOption(od, val);
-			
+
 		} else {
 			Log.bug("Jul 30, 2009.8:26:44 PM");
 		}
