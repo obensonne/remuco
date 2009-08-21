@@ -33,6 +33,7 @@ import remuco.ui.CMD;
 import remuco.ui.Theme;
 import remuco.util.Log;
 
+// TODO: maybe this can be used instead of PostActionDialog and ActionAlert
 public class NotificationScreen extends Form implements CommandListener {
 
 	private final Display display;
