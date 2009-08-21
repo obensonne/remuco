@@ -67,7 +67,7 @@ public class LogScreen extends Form implements CommandListener {
 		sysInfoForm.setCommandListener(this);
 
 		addCommand(CMD_SYSINFO);
-		super.setCommandListener(this);
+		setCommandListener(this);
 	}
 
 	public void commandAction(Command c, Displayable d) {
@@ -99,7 +99,11 @@ public class LogScreen extends Form implements CommandListener {
 	}
 
 	public void setCommandListener(CommandListener l) {
-		externalCommandListener = l;
+		if (l == this) {
+			super.setCommandListener(l);
+		} else {
+			externalCommandListener = l;
+		}
 	}
 
 	private void updateSysInfoForm() {

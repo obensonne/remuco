@@ -81,8 +81,7 @@ public class CommandList extends List implements CommandListener {
 
 		setSelectCommand(this.select);
 
-		super.setCommandListener(this);
-
+		setCommandListener(this);
 	}
 
 	/**
@@ -121,8 +120,7 @@ public class CommandList extends List implements CommandListener {
 		int position;
 		for (position = 0; position < itemCount; position++) {
 
-			final Command cmdExistent = (Command) itemCommands
-					.elementAt(position);
+			final Command cmdExistent = (Command) itemCommands.elementAt(position);
 
 			if (cmd.getPriority() < cmdExistent.getPriority()) {
 				break;
@@ -182,7 +180,11 @@ public class CommandList extends List implements CommandListener {
 	}
 
 	public void setCommandListener(CommandListener l) {
-		externalCommandListener = l;
+		if (l == this) {
+			super.setCommandListener(l);
+		} else {
+			externalCommandListener = l;
+		}
 	}
 
 	/**

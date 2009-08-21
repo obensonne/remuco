@@ -153,7 +153,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			super.addCommand(CMD_MEDIA);
 		}
 		super.addCommand(CMD_MENU);
-		super.setCommandListener(this);
+		setCommandListener(this);
 
 		screenMenu = new CommandList("Options");
 		screenMenu.addCommand(CMD_KEYS, theme.licKeys);
@@ -543,9 +543,12 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	}
 
-	/** Set an <em>external</em> command listener. */
 	public void setCommandListener(CommandListener l) {
-		externalCommandListener = l;
+		if (l == this) {
+			super.setCommandListener(l);
+		} else {
+			externalCommandListener = l;
+		}
 	}
 
 	protected void keyPressed(int key) {
