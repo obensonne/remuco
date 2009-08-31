@@ -243,7 +243,7 @@ public final class Config {
 	 * on top of the list.
 	 * 
 	 * @param addr
-	 *            the device address
+	 *            the device address (optionally with port and options)
 	 * @param name
 	 *            the device name or <code>null</code> for an unknown name -
 	 *            note that the empty string will also be treated as an unknown
@@ -344,13 +344,7 @@ public final class Config {
 	 */
 	public boolean save() {
 
-		ByteArrayOutputStream baos;
-		DataOutputStream dos;
-		byte[] ba;
-		String key, val;
-		Enumeration keys;
 		boolean ret = true;
-		int rid;
 
 		// delete old config
 
@@ -373,8 +367,8 @@ public final class Config {
 
 		devicesIntoOptions();
 
-		baos = new ByteArrayOutputStream();
-		dos = new DataOutputStream(baos);
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final DataOutputStream dos = new DataOutputStream(baos);
 
 		// save key config
 
@@ -387,11 +381,13 @@ public final class Config {
 			Log.ln("[CF] save: unknown IO error", e);
 		}
 
+		byte ba[];
+		
 		ba = baos.toByteArray();
 		baos.reset();
 
 		try {
-			rid = rs.addRecord(ba, 0, ba.length);
+			final int rid = rs.addRecord(ba, 0, ba.length);
 			if (rid != FIRST_RECORD_ID) {
 				Log.ln("[CF] save: WARNING, keys not in record 1 !!!");
 				closeRecord(rs);
@@ -412,12 +408,12 @@ public final class Config {
 
 		// save options
 
-		keys = options.keys();
+		final Enumeration keys = options.keys();
 
 		while (keys.hasMoreElements()) {
 
-			key = (String) keys.nextElement();
-			val = (String) options.get(key);
+			final String key = (String) keys.nextElement();
+			final String val = (String) options.get(key);
 
 			try {
 				dos.writeUTF(key);
@@ -578,11 +574,6 @@ public final class Config {
 	 */
 	private boolean load() {
 
-		ByteArrayInputStream bais;
-		DataInputStream dis;
-		byte[] ba;
-		int nextId;
-		String key, val;
 		boolean ret = true;
 
 		// open record
@@ -592,6 +583,8 @@ public final class Config {
 		if (rs == null)
 			return false;
 
+		int nextId;
+		
 		try {
 			nextId = rs.getNextRecordID();
 		} catch (RecordStoreNotOpenException e) {
@@ -602,6 +595,10 @@ public final class Config {
 			closeRecord(rs);
 			return false;
 		}
+
+		ByteArrayInputStream bais;
+		DataInputStream dis;
+		byte[] ba;
 
 		// first record contains key bindings:
 
@@ -666,6 +663,8 @@ public final class Config {
 				return false;
 			}
 
+			final String key, val;
+			
 			try {
 				key = dis.readUTF();
 				val = dis.readUTF();
