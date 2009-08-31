@@ -20,6 +20,7 @@
  */
 package remuco.util;
 
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -29,6 +30,9 @@ import java.util.Vector;
  * 
  */
 public final class Tools {
+
+	/** A global random number generator instance. */
+	public static final Random RANDOM = new Random();
 
 	/**
 	 * Compare two byte arrays.
