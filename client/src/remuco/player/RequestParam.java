@@ -20,12 +20,11 @@
  */
 package remuco.player;
 
-import java.util.Random;
-
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
+import remuco.util.Tools;
 
 /**
  * Parameters of a request to send to the server.
@@ -38,14 +37,12 @@ public class RequestParam implements ISerializable {
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
 			SerialAtom.TYPE_S, SerialAtom.TYPE_AS, SerialAtom.TYPE_I };
 
-	private static final Random random = new Random();
-
 	private final SerialAtom[] atoms;
 
 	/** Request for a playlist or queue. */
 	public RequestParam(int page) {
 		atoms = SerialAtom.build(ATOMS_FMT);
-		atoms[0].i = random.nextInt(Integer.MAX_VALUE);
+		atoms[0].i = Tools.RANDOM.nextInt(Integer.MAX_VALUE);
 		atoms[3].i = page;
 	}
 
