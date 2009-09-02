@@ -220,6 +220,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenDeviceSelector.addCommand(CMD.LOG);
 		screenDeviceSelector.addCommand(CMD.EXIT);
 
+		// TODO: handle no device situation
 		if (config.loadedSuccessfully) {
 			display.setCurrent(screenDeviceSelector);
 		} else {

@@ -95,6 +95,7 @@ public final class DeviceSelectorScreen extends List implements
 		config = Config.getInstance();
 		theme = Theme.getInstance();
 
+		// TODO: could be created on the fly and attached to waiting screen
 		if (BluetoothFactory.BLUETOOTH) {
 			bluetoothScanner = BluetoothFactory.createBluetoothScanner();
 		} else {
@@ -106,6 +107,7 @@ public final class DeviceSelectorScreen extends List implements
 		alertScanProblem.setTimeout(Alert.FOREVER);
 		alertScanProblem.setCommandListener(this);
 
+		// TODO what about an Alert factory? get rid of forever living alerts 
 		alertConfirmRemove = new Alert("Confirmation");
 		alertConfirmRemove.setString("Please confirm ..");
 		alertConfirmRemove.setType(AlertType.WARNING);
@@ -114,6 +116,7 @@ public final class DeviceSelectorScreen extends List implements
 		alertConfirmRemove.addCommand(CMD.YES);
 		alertConfirmRemove.setCommandListener(this);
 
+		// TODO: could be created on the fly
 		screenScanning = new WaitingScreen();
 		screenScanning.setTitle("Scanning");
 		screenScanning.setImage(theme.aicBluetooth);
