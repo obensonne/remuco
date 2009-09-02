@@ -47,13 +47,16 @@ import remuco.util.Log;
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanListener {
 
-	private static final Command CMD_ADD_BLUETOOTH = new Command("Bluetooth",
+	private static final Command CMD_ADD = new Command("Add", Command.SCREEN,
+			10);
+
+	private static final Command CMD_DT_BLUETOOTH = new Command("Bluetooth",
 			Command.SCREEN, 10);
 
-	private static final Command CMD_ADD_INET = new Command("WiFi",
+	private static final Command CMD_DT_WIFI = new Command("WiFi",
 			Command.SCREEN, 20);
 
-	private static final Command CMD_REMOVE_DEVICE = new Command("Remove",
+	private static final Command CMD_REMOVE = new Command("Remove",
 			Command.SCREEN, 30);
 
 	private final Alert alertScanProblem, alertConfirmRemove;
@@ -112,10 +115,10 @@ public final class DeviceSelectorScreen extends List implements
 		screenDeviceTypeSelection = new CommandList("Add Connection", CMD.OK);
 		screenDeviceTypeSelection.addCommand(CMD.BACK);
 		if (bluetoothScanner != null) {
-			screenDeviceTypeSelection.addCommand(CMD_ADD_BLUETOOTH,
+			screenDeviceTypeSelection.addCommand(CMD_DT_BLUETOOTH,
 				theme.licBluetooth);
 		}
-		screenDeviceTypeSelection.addCommand(CMD_ADD_INET, theme.licWifi);
+		screenDeviceTypeSelection.addCommand(CMD_DT_WIFI, theme.licWifi);
 		screenDeviceTypeSelection.setCommandListener(this);
 
 		screenScanning = new WaitingScreen();
@@ -129,6 +132,7 @@ public final class DeviceSelectorScreen extends List implements
 		screenScanResults.addCommand(CMD.BACK);
 		screenScanResults.setCommandListener(this);
 
+		addCommand(CMD_ADD);
 		setSelectCommand(CMD.SELECT);
 		setCommandListener(this);
 	}
@@ -139,12 +143,6 @@ public final class DeviceSelectorScreen extends List implements
 
 			final int index = getSelectedIndex();
 			if (index < 0) {
-				return;
-			}
-
-			if (index == size() - 1) { // add connection
-
-				display.setCurrent(screenDeviceTypeSelection);
 				return;
 			}
 
@@ -167,7 +165,7 @@ public final class DeviceSelectorScreen extends List implements
 
 			display.setCurrent(this);
 
-		} else if (c == CMD_ADD_BLUETOOTH) {
+		} else if (c == CMD_DT_BLUETOOTH) {
 
 			try {
 				bluetoothScanner.startScan(this);
@@ -179,7 +177,7 @@ public final class DeviceSelectorScreen extends List implements
 				display.setCurrent(alertScanProblem, this);
 			}
 
-		} else if (c == CMD_ADD_INET) {
+		} else if (c == CMD_DT_WIFI) {
 
 			final Device device = new Device(Device.WIFI, ":"
 					+ InetServiceFinder.PORT, "");
@@ -239,12 +237,16 @@ public final class DeviceSelectorScreen extends List implements
 			update();
 
 			listener.notifySelectedDevice(device);
-			// display.setCurrent(this);
 
-		} else if (c == CMD_REMOVE_DEVICE) {
+		} else if (c == CMD_ADD) {
+
+			display.setCurrent(screenDeviceTypeSelection);
+
+		} else if (c == CMD_REMOVE) {
 
 			final int index = getSelectedIndex();
-			if (index == -1 || index == size() - 1) {
+
+			if (index < 0) {
 				return;
 			}
 
@@ -335,9 +337,9 @@ public final class DeviceSelectorScreen extends List implements
 	private void update() {
 
 		if (config.devices.isEmpty()) {
-			removeCommand(CMD_REMOVE_DEVICE);
+			removeCommand(CMD_REMOVE);
 		} else {
-			addCommand(CMD_REMOVE_DEVICE);
+			addCommand(CMD_REMOVE);
 		}
 
 		deleteAll();
@@ -369,8 +371,6 @@ public final class DeviceSelectorScreen extends List implements
 
 			append(label, icon);
 		}
-
-		append("Add", theme.licAdd);
 
 		setSelectedIndex(0, true);
 	}
