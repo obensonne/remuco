@@ -559,15 +559,13 @@ public final class Config {
 
 		if (val != null) {
 
-			final String flatDevices[] = Tools.splitString(val,
-				Device.LIST_SEP, false);
+			final String flad[] = Tools.splitString(val, Device.LIST_SEP, false);
 
-			for (int i = 0; i < flatDevices.length; i++) {
+			for (int i = 0; i < flad.length; i++) {
 				try {
-					devices.addElement(new Device(flatDevices[i]));
+					devices.addElement(new Device(flad[i]));
 				} catch (IllegalArgumentException e) {
-					Log.ln("[CF] load: discard malformed stored device: "
-							+ flatDevices[i]);
+					ret = false;
 				}
 			}
 		}
