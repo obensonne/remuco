@@ -221,9 +221,9 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenDeviceSelector.addCommand(CMD.EXIT);
 
 		if (config.loadedSuccessfully) {
-			screenDeviceSelector.show();
+			display.setCurrent(screenDeviceSelector);
 		} else {
-			display.setCurrent(alertLoadConfig);
+			display.setCurrent(alertLoadConfig, screenDeviceSelector);
 		}
 	}
 
@@ -295,12 +295,6 @@ public class Remuco implements CommandListener, IConnectionListener,
 					Theme.getInstance().aicConnecting, AlertType.CONFIRMATION);
 			confirm.setTimeout(1500);
 			display.setCurrent(confirm, screenDeviceSelector);
-
-		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
-
-			// continue start up
-
-			screenDeviceSelector.show();
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
 

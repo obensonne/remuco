@@ -50,6 +50,10 @@ public final class DeviceSelectorScreen extends List implements
 	private static final Command CMD_ADD = new Command("Add", Command.SCREEN,
 			10);
 
+	/** Back command for sub screens to get back to this screen. */
+	private static final Command CMD_BACK_TO_ME = new Command("Back",
+			Command.BACK, 1);
+
 	private static final Command CMD_DT_BLUETOOTH = new Command("Bluetooth",
 			Command.SCREEN, 10);
 
@@ -72,8 +76,6 @@ public final class DeviceSelectorScreen extends List implements
 	private final CommandListener parent;
 
 	private Device scanResults[] = new Device[0];
-
-	private final CommandList screenDeviceTypeSelection;
 
 	private final WaitingScreen screenScanning;
 
@@ -112,15 +114,6 @@ public final class DeviceSelectorScreen extends List implements
 		alertConfirmRemove.addCommand(CMD.YES);
 		alertConfirmRemove.setCommandListener(this);
 
-		screenDeviceTypeSelection = new CommandList("Add Connection", CMD.OK);
-		screenDeviceTypeSelection.addCommand(CMD.BACK);
-		if (bluetoothScanner != null) {
-			screenDeviceTypeSelection.addCommand(CMD_DT_BLUETOOTH,
-				theme.licBluetooth);
-		}
-		screenDeviceTypeSelection.addCommand(CMD_DT_WIFI, theme.licWifi);
-		screenDeviceTypeSelection.setCommandListener(this);
-
 		screenScanning = new WaitingScreen();
 		screenScanning.setTitle("Scanning");
 		screenScanning.setImage(theme.aicBluetooth);
@@ -129,7 +122,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		screenScanResults = new List("Scan Results", List.IMPLICIT);
 		screenScanResults.setSelectCommand(CMD.SELECT);
-		screenScanResults.addCommand(CMD.BACK);
+		screenScanResults.addCommand(CMD_BACK_TO_ME);
 		screenScanResults.setCommandListener(this);
 
 		addCommand(CMD_ADD);
@@ -161,11 +154,19 @@ public final class DeviceSelectorScreen extends List implements
 
 			display.setCurrent(this);
 
-		} else if (c == CMD.BACK && d == screenDeviceTypeSelection) {
+		} else if (c == CMD_BACK_TO_ME) {
 
 			display.setCurrent(this);
 
 		} else if (c == CMD_DT_BLUETOOTH) {
+
+			if (!BluetoothFactory.BLUETOOTH) {
+				display.setCurrent(new Alert("No Bluetooth",
+						"Sorry, it looks like Bluetooth is not supported "
+								+ "on this device. Please use WiFi instead.",
+						null, AlertType.INFO), d);
+				return;
+			}
 
 			try {
 				bluetoothScanner.startScan(this);
@@ -182,7 +183,7 @@ public final class DeviceSelectorScreen extends List implements
 			final Device device = new Device(Device.WIFI, ":"
 					+ InetServiceFinder.PORT, "");
 			final DeviceEditorScreen des = new DeviceEditorScreen(device);
-			des.addCommand(CMD.BACK);
+			des.addCommand(CMD_BACK_TO_ME);
 			des.addCommand(CMD.OK);
 			des.setCommandListener(this);
 			display.setCurrent(des);
@@ -211,14 +212,6 @@ public final class DeviceSelectorScreen extends List implements
 
 			}
 
-		} else if (c == CMD.BACK && d instanceof DeviceEditorScreen) {
-
-			display.setCurrent(this);
-
-		} else if (c == CMD.BACK && d == screenScanResults) {
-
-			display.setCurrent(this);
-
 		} else if (c == CMD.SELECT && d == screenScanResults) {
 
 			final int index = screenScanResults.getSelectedIndex();
@@ -240,7 +233,13 @@ public final class DeviceSelectorScreen extends List implements
 
 		} else if (c == CMD_ADD) {
 
-			display.setCurrent(screenDeviceTypeSelection);
+			final CommandList dts = new CommandList("Add Connection", CMD.OK);
+			dts.addCommand(CMD_BACK_TO_ME);
+			dts.addCommand(CMD_DT_BLUETOOTH, theme.licBluetooth);
+			dts.addCommand(CMD_DT_WIFI, theme.licWifi);
+			dts.setCommandListener(this);
+
+			display.setCurrent(dts);
 
 		} else if (c == CMD_REMOVE) {
 
@@ -305,30 +304,32 @@ public final class DeviceSelectorScreen extends List implements
 		display.setCurrent(screenScanResults);
 	}
 
-	/**
-	 * On first time display, use this method instead of
-	 * {@link Display#setCurrent(Displayable)}.
-	 */
-	public void show() {
-
-		update();
-
-		if (config.devices.isEmpty()) {
-			if (BluetoothFactory.BLUETOOTH) {
-				display.setCurrent(screenDeviceTypeSelection);
-			} else {
-				final Alert alert = new Alert("No Bluetooth",
-						"Bluetooth is not available. "
-								+ "Only Wifi connections are possible.",
-						theme.aicWifi, AlertType.INFO);
-				final Device device = new Device(Device.WIFI, ":"
-						+ InetServiceFinder.PORT, "");
-				display.setCurrent(alert, new DeviceEditorScreen(device));
-			}
-		} else
-			display.setCurrent(this);
-
-	}
+	// /**
+	// * On first time display, use this method instead of
+	// * {@link Display#setCurrent(Displayable)}.
+	// */
+	// public void show() {
+	//
+	// update();
+	//
+	// if (config.devices.isEmpty()) {
+	// if (!BluetoothFactory.BLUETOOTH) {
+	// commandAction(CMD_ADD, this);
+	// } else {
+	// final Alert alert = new Alert("No Bluetooth",
+	// "Bluetooth is not available. "
+	// + "Only Wifi connections are possible.",
+	// theme.aicWifi, AlertType.INFO);
+	// final Device device = new Device(Device.WIFI, ":"
+	// + InetServiceFinder.PORT, "");
+	// commandAction(CMD_DT_WIFI, this);
+	// display.setCurrent(alert, new DeviceEditorScreen(device));
+	// }
+	// commandAction(CMD_ADD, this);
+	// } else
+	// display.setCurrent(this);
+	//
+	// }
 
 	/**
 	 * Update list to show all known devices. As a side effect, {@link #devices}
