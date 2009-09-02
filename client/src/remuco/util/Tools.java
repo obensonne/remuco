@@ -194,8 +194,14 @@ public final class Tools {
 	 * Splits a string into a string array.
 	 * 
 	 * @param s
+	 *            the string to split (must not be <code>null</code>)
 	 * @param splitter
-	 * @return
+	 *            the char to split the string at
+	 * @param trim
+	 *            if <code>true</code>, each split string will be trimmed
+	 * @return a string array, if <em>s</em> does not contain <em>splitter</em>
+	 *         then the array contains only one element which is <em>s</em>
+	 *         itself (also if <em>s</em> is an empty string)
 	 */
 	public static String[] splitString(String s, char splitter, boolean trim) {
 
