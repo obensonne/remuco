@@ -31,7 +31,6 @@ import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 
-import remuco.Config;
 import remuco.UserException;
 import remuco.util.Log;
 
@@ -47,11 +46,11 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 	 */
 	private boolean canceled = false;
 
+	private IScanListener listener;
+
 	private final LocalDevice localDevice;
 
 	private Vector remoteDevices = new Vector();
-
-	private IScanListener listener;
 
 	private final UserException startScanException;
 
@@ -100,31 +99,26 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 
 		Log.ln("search finished");
 
-		RemoteDevice dev;
-		int n, i;
-
 		if (canceled)
 			return;
 
 		// iterate over devices and get address and name
 
-		n = remoteDevices.size();
+		final Device devices[] = new Device[remoteDevices.size()];
 
-		final String devices[] = new String[3 * n];
+		for (int i = 0; i < devices.length; i++) {
 
-		for (i = 0; i < n; i++) {
+			final RemoteDevice dev = (RemoteDevice) remoteDevices.elementAt(i);
 
-			dev = (RemoteDevice) remoteDevices.elementAt(i);
-
-			devices[3 * i] = dev.getBluetoothAddress();
-
+			String address = dev.getBluetoothAddress();
+			String name;
 			try {
-				devices[3 * i + 1] = dev.getFriendlyName(false);
+				name = dev.getFriendlyName(false);
 			} catch (IOException e) {
-				devices[3 * i + 1] = null;
+				name = "";
 			}
 
-			devices[3 * i + 2] = Config.DEVICE_TYPE_BLUETOOTH;
+			devices[i] = new Device(Device.BLUETOOTH, address, name);
 		}
 
 		remoteDevices.removeAllElements();

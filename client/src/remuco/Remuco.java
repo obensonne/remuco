@@ -36,6 +36,7 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
+import remuco.comm.Device;
 import remuco.comm.IConnectionListener;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IServiceFinder;
@@ -344,11 +345,11 @@ public class Remuco implements CommandListener, IConnectionListener,
 		}
 	}
 
-	public void notifySelectedDevice(String type, String addr) {
+	public void notifySelectedDevice(Device device) {
 
 		final IServiceFinder sf;
 
-		if (type.equals(Config.DEVICE_TYPE_BLUETOOTH)) {
+		if (device.type == Device.BLUETOOTH && device.address.indexOf(':') < 0) {
 
 			if (serviceFinderBluetooth == null) {
 				// this may happen in emulator, when switching on/off bluetooth
@@ -358,7 +359,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 			}
 			sf = serviceFinderBluetooth;
 
-		} else if (type.equals(Config.DEVICE_TYPE_INET)) {
+		} else if (device.type == Device.WIFI) {
 
 			sf = serviceFinderWifi;
 
@@ -369,7 +370,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		}
 
 		try {
-			sf.findServices(addr, this);
+			sf.findServices(device.address, this);
 		} catch (UserException e) {
 			alert(e, screenDeviceSelector);
 			return;

@@ -43,6 +43,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.comm.Connection;
+import remuco.comm.Device;
 import remuco.comm.Serial;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
@@ -60,12 +61,6 @@ public final class Config {
 
 	public static final String DEVICE_NAME;
 
-	/** Device type marker. */
-	public static final String DEVICE_TYPE_BLUETOOTH = "B";
-
-	/** Device type marker. */
-	public static final String DEVICE_TYPE_INET = "I";
-
 	public static final int IMG_MAX_SIZE;
 
 	/** List of all option descriptors. */
@@ -79,8 +74,6 @@ public final class Config {
 
 	/** Indicates if UTF-8 is supported. */
 	public static final boolean UTF8;
-
-	private static final char DEVICE_SPLITTER = ',';
 
 	private static final int FIRST_RECORD_ID = 1;
 
@@ -208,12 +201,12 @@ public final class Config {
 		return null;
 	}
 
+	public final Vector devices = new Vector();
+
 	/** Recommended list icon size. */
 	public final int SUGGESTED_LICS;
 
 	protected final boolean loadedSuccessfully;
-
-	private final Vector devices = new Vector();
 
 	private int[] keyBindings = new int[0];
 
@@ -238,86 +231,12 @@ public final class Config {
 		validateOptionDescriptorOptions();
 	}
 
-	/**
-	 * Add a device to the list of known devices. The new device will be placed
-	 * on top of the list.
-	 * 
-	 * @param addr
-	 *            the device address (optionally with port and options)
-	 * @param name
-	 *            the device name or <code>null</code> for an unknown name -
-	 *            note that the empty string will also be treated as an unknown
-	 *            name
-	 * @param type
-	 *            the device type (either {@link #DEVICE_TYPE_BLUETOOTH} or
-	 *            {@link #DEVICE_TYPE_INET})
-	 * 
-	 */
-	public void addKnownDevice(String addr, String name, String type) {
-
-		int pos;
-
-		pos = devices.indexOf(addr);
-		while (pos != -1 && pos % 3 != 0) {
-			pos = devices.indexOf(addr, pos);
-		}
-
-		if (pos == -1) {
-			devices.insertElementAt(addr, 0);
-			devices.insertElementAt(name, 1);
-			devices.insertElementAt(type, 2);
-		} else {
-			devices.removeElementAt(pos);
-			devices.removeElementAt(pos);
-			devices.removeElementAt(pos);
-			devices.insertElementAt(addr, 0);
-			devices.insertElementAt(name, 1);
-			devices.insertElementAt(type, 2);
-		}
-
-	}
-
 	public void addOptionListener(IOptionListener ol) {
 		optionListener.addElement(ol);
 	}
 
-	/**
-	 * Delete a device from the list of known devices.
-	 * 
-	 * @param addr
-	 *            the address of the device to delete
-	 */
-	public void deleteKnownDevice(String addr) {
-
-		int pos;
-
-		pos = devices.indexOf(addr);
-		while (pos != -1 && pos % 3 != 0) {
-			pos = devices.indexOf(addr, pos);
-		}
-
-		if (pos != -1) {
-			devices.removeElementAt(pos);
-			devices.removeElementAt(pos);
-			devices.removeElementAt(pos);
-		}
-	}
-
 	public int[] getKeyBindings() {
 		return keyBindings;
-	}
-
-	/**
-	 * Get all known devices.
-	 * 
-	 * @return the devices as a vector containing 3 strings for each device -
-	 *         its address (element <code>3*i</code> for device <code>i</code>),
-	 *         its name (element <code>3*i+1</code>, may be <code>null</code>)
-	 *         and its type (element <code>3*i+2</code>, one of
-	 *         {@link #DEVICE_TYPE_BLUETOOTH} or {@link #DEVICE_TYPE_INET})
-	 */
-	public Vector getKnownDevices() {
-		return devices;
 	}
 
 	/**
@@ -365,8 +284,6 @@ public final class Config {
 		if (rs == null)
 			return false;
 
-		devicesIntoOptions();
-
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final DataOutputStream dos = new DataOutputStream(baos);
 
@@ -382,7 +299,7 @@ public final class Config {
 		}
 
 		byte ba[];
-		
+
 		ba = baos.toByteArray();
 		baos.reset();
 
@@ -405,6 +322,22 @@ public final class Config {
 			closeRecord(rs);
 			return false;
 		}
+
+		// flatten devices
+
+		final StringBuffer sb = new StringBuffer();
+
+		final Enumeration devs = devices.elements();
+
+		while (devs.hasMoreElements()) {
+			sb.append(devs.nextElement());
+			sb.append(Device.LIST_SEP);
+		}
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+
+		options.put(OPTION_KEY_DEVS, sb.toString());
 
 		// save options
 
@@ -441,7 +374,6 @@ public final class Config {
 				closeRecord(rs);
 				return false;
 			}
-
 		}
 
 		// ok, done
@@ -500,70 +432,6 @@ public final class Config {
 		}
 	}
 
-	/** @see #devicesIntoOptions() */
-	private void devicesFromOptions() {
-
-		String val;
-		String[] devs;
-
-		devices.removeAllElements();
-
-		val = (String) options.get(OPTION_KEY_DEVS);
-
-		if (val == null)
-			return;
-
-		devs = Tools.splitString(val, DEVICE_SPLITTER, true);
-
-		if (devs.length == 0)
-			return;
-
-		if (devs.length % 3 != 0) {
-			Log.ln("[CF] option 'devs' malformed");
-			return;
-		}
-
-		for (int i = 0; i < devs.length; i++) {
-			devices.addElement(devs[i].length() > 0 ? devs[i] : null);
-		}
-
-	}
-
-	/**
-	 * Transform the device vector {@link #devices} into an option string.
-	 * Device names that are <code>null</code> are stored as empty strings but
-	 * will be re-transformed to <code>null</code> when read by
-	 * {@link #devicesFromOptions()}. This means a non-<code>null</code> device
-	 * name of length zero will be interpreted later by
-	 * {@link #devicesFromOptions()} as a <code>null</code> device name (which
-	 * is just o.k.).
-	 */
-	private void devicesIntoOptions() {
-
-		StringBuffer val = new StringBuffer(100);
-		String s;
-
-		int len;
-
-		len = devices.size();
-
-		if (len == 0) {
-			options.remove(OPTION_KEY_DEVS);
-			return;
-		}
-
-		for (int i = 0; i < len; i++) {
-			s = (String) devices.elementAt(i);
-			val.append(s != null ? s : "").append(DEVICE_SPLITTER);
-		}
-
-		if (len > 0)
-			val.deleteCharAt(val.length() - 1);
-
-		options.put(OPTION_KEY_DEVS, val.toString());
-
-	}
-
 	/**
 	 * Load the configuration.
 	 * 
@@ -584,7 +452,7 @@ public final class Config {
 			return false;
 
 		int nextId;
-		
+
 		try {
 			nextId = rs.getNextRecordID();
 		} catch (RecordStoreNotOpenException e) {
@@ -664,7 +532,7 @@ public final class Config {
 			}
 
 			final String key, val;
-			
+
 			try {
 				key = dis.readUTF();
 				val = dis.readUTF();
@@ -683,9 +551,26 @@ public final class Config {
 
 		closeRecord(rs);
 
-		// update device list
+		// unflatten devices
 
-		devicesFromOptions();
+		devices.removeAllElements();
+
+		final String val = (String) options.get(OPTION_KEY_DEVS);
+
+		if (val != null) {
+
+			final String flatDevices[] = Tools.splitString(val,
+				Device.LIST_SEP, false);
+
+			for (int i = 0; i < flatDevices.length; i++) {
+				try {
+					devices.addElement(new Device(flatDevices[i]));
+				} catch (IllegalArgumentException e) {
+					Log.ln("[CF] load: discard malformed stored device: "
+							+ flatDevices[i]);
+				}
+			}
+		}
 
 		Log.ln("[CF] load: " + (ret ? "success" : "erros"));
 

@@ -20,7 +20,7 @@
  */
 package remuco.ui.screens;
 
-import java.util.Vector;
+import java.util.Enumeration;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
@@ -34,9 +34,11 @@ import javax.microedition.lcdui.List;
 import remuco.Config;
 import remuco.UserException;
 import remuco.comm.BluetoothFactory;
+import remuco.comm.Device;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IScanListener;
 import remuco.comm.IScanner;
+import remuco.comm.InetServiceFinder;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.Theme;
@@ -60,24 +62,13 @@ public final class DeviceSelectorScreen extends List implements
 
 	private final Config config;
 
-	/**
-	 * Contains the devices currently selectable by the user. Element
-	 * <code>3 * i</code> is the address of device <code>i</code>, element
-	 * <code>3 * i + 1</code> its name and element <code>3 * i + 2</code> its
-	 * type (one of {@link Config#DEVICE_TYPE_BLUETOOTH} or
-	 * {@link Config#DEVICE_TYPE_INET}).
-	 */
-	private String[] devices = new String[0];
-
 	private final Display display;
 
 	private final IDeviceSelectionListener listener;
 
 	private final CommandListener parent;
 
-	private String scanResults[] = new String[0];
-
-	private final AddInetDeviceScreen screenAddInetDevice;
+	private Device scanResults[] = new Device[0];
 
 	private final CommandList screenDeviceTypeSelection;
 
@@ -118,11 +109,6 @@ public final class DeviceSelectorScreen extends List implements
 		alertConfirmRemove.addCommand(CMD.YES);
 		alertConfirmRemove.setCommandListener(this);
 
-		screenAddInetDevice = new AddInetDeviceScreen();
-		screenAddInetDevice.addCommand(CMD.BACK);
-		screenAddInetDevice.addCommand(CMD.OK);
-		screenAddInetDevice.setCommandListener(this);
-
 		screenDeviceTypeSelection = new CommandList("Add Connection", CMD.OK);
 		screenDeviceTypeSelection.addCommand(CMD.BACK);
 		if (bluetoothScanner != null) {
@@ -162,14 +148,14 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final String addr = devices[3 * index];
-			final String name = devices[3 * index + 1];
-			final String type = devices[3 * index + 2];
+			// move selected device to top of device list
+			final Device device = (Device) config.devices.elementAt(index);
+			config.devices.removeElementAt(index);
+			config.devices.insertElementAt(device, 0);
 
-			config.addKnownDevice(addr, name, type);
 			update();
 
-			listener.notifySelectedDevice(type, addr);
+			listener.notifySelectedDevice(device);
 
 		} else if (c == WaitingScreen.CMD_CANCEL) { // cancel scan
 
@@ -195,25 +181,39 @@ public final class DeviceSelectorScreen extends List implements
 
 		} else if (c == CMD_ADD_INET) {
 
-			display.setCurrent(screenAddInetDevice);
+			final Device device = new Device(Device.WIFI, ":"
+					+ InetServiceFinder.PORT, "");
+			final DeviceEditorScreen des = new DeviceEditorScreen(device);
+			des.addCommand(CMD.BACK);
+			des.addCommand(CMD.OK);
+			des.setCommandListener(this);
+			display.setCurrent(des);
 
-		} else if (c == CMD.OK && d == screenAddInetDevice) {
+		} else if (c == CMD.OK && d instanceof DeviceEditorScreen) {
 
-			final String address = screenAddInetDevice.getAddress();
+			final DeviceEditorScreen des = (DeviceEditorScreen) d;
 
-			if (address == null) {
-				final Alert alert = new Alert("Error", "Invalid host!", null,
-						AlertType.ERROR);
-				display.setCurrent(alert, screenAddInetDevice);
-				return;
+			final String problem = des.validate();
+
+			if (problem != null) {
+
+				display.setCurrent(new Alert("Oops..", problem, null,
+						AlertType.ERROR), des);
+
+			} else {
+
+				final Device device = des.getDevice();
+
+				config.devices.removeElement(device);
+				config.devices.insertElementAt(device, 0);
+
+				update();
+
+				display.setCurrent(this);
+
 			}
 
-			config.addKnownDevice(address, null, Config.DEVICE_TYPE_INET);
-			update();
-
-			display.setCurrent(this);
-
-		} else if (c == CMD.BACK && d == screenAddInetDevice) {
+		} else if (c == CMD.BACK && d instanceof DeviceEditorScreen) {
 
 			display.setCurrent(this);
 
@@ -228,14 +228,17 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final String addr = scanResults[3 * index];
-			final String name = scanResults[3 * index + 1];
-			final String type = scanResults[3 * index + 2];
+			final Device device = scanResults[index];
 
-			config.addKnownDevice(addr, name, type);
+			if (config.devices.contains(device)) {
+				Log.debug("dev exists");
+			}
+			config.devices.removeElement(device);
+			config.devices.insertElementAt(device, 0);
+
 			update();
 
-			listener.notifySelectedDevice(type, addr);
+			listener.notifySelectedDevice(device);
 			// display.setCurrent(this);
 
 		} else if (c == CMD_REMOVE_DEVICE) {
@@ -262,7 +265,7 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			config.deleteKnownDevice(devices[3 * index]);
+			config.devices.removeElementAt(index);
 			update();
 
 			display.setCurrent(this);
@@ -277,7 +280,7 @@ public final class DeviceSelectorScreen extends List implements
 		}
 	}
 
-	public void notifyScannedDevices(String[] devs) {
+	public void notifyScannedDevices(Device devs[]) {
 
 		if (devs.length == 0) {
 			alertScanProblem.setTitle("No Devices");
@@ -294,20 +297,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		for (int i = 0; i < devs.length; i += 3) {
 
-			final String name = devs[i + 1] != null ? devs[i + 1] : devs[i];
-
-			final Image icon;
-
-			if (devs[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
-				icon = theme.licBluetooth;
-			} else if (devs[i + 2].equals(Config.DEVICE_TYPE_INET)) {
-				icon = theme.licWifi;
-			} else {
-				Log.bug("Jan 28, 2009.10:57:37 PM");
-				icon = null;
-			}
-
-			screenScanResults.append(name, icon);
+			screenScanResults.append(scanResults[i].name, theme.licBluetooth);
 		}
 
 		display.setCurrent(screenScanResults);
@@ -321,7 +311,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		update();
 
-		if (devices.length == 0) {
+		if (config.devices.isEmpty()) {
 			if (BluetoothFactory.BLUETOOTH) {
 				display.setCurrent(screenDeviceTypeSelection);
 			} else {
@@ -329,7 +319,9 @@ public final class DeviceSelectorScreen extends List implements
 						"Bluetooth is not available. "
 								+ "Only Wifi connections are possible.",
 						theme.aicWifi, AlertType.INFO);
-				display.setCurrent(alert, screenAddInetDevice);
+				final Device device = new Device(Device.WIFI, ":"
+						+ InetServiceFinder.PORT, "");
+				display.setCurrent(alert, new DeviceEditorScreen(device));
 			}
 		} else
 			display.setCurrent(this);
@@ -342,37 +334,40 @@ public final class DeviceSelectorScreen extends List implements
 	 */
 	private void update() {
 
-		final Vector knownDevs = config.getKnownDevices();
-
-		devices = new String[knownDevs.size()];
-
-		knownDevs.copyInto(devices);
-
-		if (devices.length > 0) {
-			addCommand(CMD_REMOVE_DEVICE);
-		} else {
+		if (config.devices.isEmpty()) {
 			removeCommand(CMD_REMOVE_DEVICE);
+		} else {
+			addCommand(CMD_REMOVE_DEVICE);
 		}
 
 		deleteAll();
 
-		for (int i = 0; i < devices.length; i += 3) {
+		final Enumeration enu = config.devices.elements();
 
-			final String name = devices[i + 1] != null ? devices[i + 1]
-					: devices[i];
+		while (enu.hasMoreElements()) {
+
+			Device device = (Device) enu.nextElement();
 
 			final Image icon;
 
-			if (devices[i + 2].equals(Config.DEVICE_TYPE_BLUETOOTH)) {
+			if (device.type == Device.BLUETOOTH) {
 				icon = theme.licBluetooth;
-			} else if (devices[i + 2].equals(Config.DEVICE_TYPE_INET)) {
+			} else if (device.type == Device.WIFI) {
 				icon = theme.licWifi;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
 			}
 
-			append(name, icon);
+			final String label;
+
+			if (device.name.length() == 0) {
+				label = device.address;
+			} else {
+				label = device.name;
+			}
+
+			append(label, icon);
 		}
 
 		append("Add", theme.licAdd);
