@@ -1,0 +1,26 @@
+syntax: glob
+
+# Garbage, temporary and backup files:
+**~
+install-*.log
+tarballs
+sandbox
+
+# Build files:
+client/bin
+**.pyc
+build
+dist
+deployed
+client/build.properties
+client/wtk-emulator.properties
+client/tools
+
+# IDE files:
+.settings
+.project
+.pydevproject
+.classpath
+.eclipseme.tmp
+.eclipseme
+
