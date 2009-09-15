@@ -180,16 +180,31 @@ public class DeviceEditorScreen extends Form {
 			}
 		}
 
-		if (port.length() > 0) {
-			try {
-				Integer.valueOf(port);
-			} catch (NumberFormatException e) {
-				return "Port must be empty or a number!";
+		if (type == Device.BLUETOOTH) {
+			if (port.length() > 0) {
+				final int portInt;
+				try {
+					portInt = Integer.parseInt(port);
+				} catch (NumberFormatException e) {
+					return "Port must be empty or a number!";
+				}
+				if (portInt < 1 || portInt > 30) {
+					return "Port number out of range (1-30)!";
+				}
 			}
-		}
-
-		if (type == Device.WIFI && port.length() == 0) {
-			return "Need a port number!";
+		} else if (type == Device.WIFI) {
+			if (port.length() == 0) {
+				return "Need a port number!";
+			}
+			final int portInt;
+			try {
+				portInt = Integer.parseInt(port);
+			} catch (NumberFormatException e) {
+				return "Port must be a number!";
+			}
+			if (portInt < 1 || portInt > 65536) {
+				return "Port number out of range (1-65536)!";
+			}
 		}
 
 		return null;
