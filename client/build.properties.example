@@ -92,8 +92,8 @@ dist.proguard.optimize=yes
 # =============================================================================
 
 # Default emulator to use for the 'run' target.
-#run.emulator=wtk
-run.emulator=microemu
+#run.emulator=wtk.default
+run.emulator=microemu.default
 
 # The preverifier to use.
 #run.preverifier=wtk
