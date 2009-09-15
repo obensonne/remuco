@@ -297,6 +297,12 @@ public class Remuco implements CommandListener, IConnectionListener,
 			confirm.setTimeout(1500);
 			display.setCurrent(confirm, screenDeviceSelector);
 
+		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
+
+			// continue startup
+			
+			display.setCurrent(screenDeviceSelector);
+
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
 
 			// continue shut down
