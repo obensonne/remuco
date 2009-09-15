@@ -131,6 +131,8 @@ public final class DeviceSelectorScreen extends List implements
 		addCommand(CMD_ADD);
 		setSelectCommand(CMD.SELECT);
 		setCommandListener(this);
+		
+		update();
 	}
 
 	public void commandAction(Command c, Displayable d) {
