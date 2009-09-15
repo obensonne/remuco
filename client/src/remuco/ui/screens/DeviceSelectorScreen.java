@@ -378,7 +378,9 @@ public final class DeviceSelectorScreen extends List implements
 			append(label, icon);
 		}
 
-		setSelectedIndex(0, true);
+		if (!config.devices.isEmpty()) {
+			setSelectedIndex(0, true);
+		}
 	}
 
 }
