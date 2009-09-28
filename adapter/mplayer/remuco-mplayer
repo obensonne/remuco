@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+#
+# mplayer adapter by Ronald Oquendo Munoz
+
+
+import remuco
+import os
+from remuco import log
+
+
+class MplayerAdapter(remuco.PlayerAdapter):
+
+    def __init__(self):
+
+        self.rdfifo = '/tmp/rdfifo'
+        self.fd = 0
+        remuco.PlayerAdapter.__init__(self, "Mplayer",
+                                      playback_known=True,
+                                      volume_known=True)
+
+    def start(self):
+        remuco.PlayerAdapter.start(self)
+
+        if not(os.path.exists(self.rdfifo)):
+           os.mkfifo(self.rdfifo)
+
+        self.fd=os.open(self.rdfifo, os.O_WRONLY)
+
+        log.debug("starting mplayer-adapter")
+
+    def stop(self):
+
+        remuco.PlayerAdapter.stop(self)
+        os.close(self.fd)
+        log.debug("stopping mplayer-adapter")
+
+
+
+#    def poll(self):
+
+        #import random
+
+        #volume = random.randint(0,100)
+        #self.update_volume(volume)
+
+        #playing = random.randint(0,1)
+        #if playing:
+        #    self.update_playback(remuco.PLAYBACK_PLAY)
+        #else:
+        #    self.update_playback(remuco.PLAYBACK_PAUSE)
+
+    # =========================================================================
+    # control interface
+    # =========================================================================
+
+    def ctrl_toggle_playing(self):
+        os.write(self.fd, 'pause\n')
+
+    def ctrl_next(self):
+        os.write(self.fd, 'pt_step 1\n')
+
+    def ctrl_previous(self):
+        os.write(self.fd, 'pt_step -1\n')
+
+    def ctrl_volume(self, direction):
+        os.write(self.fd, 'volume %s\n' % direction)
+
+    def ctrl_seek(self, direction):
+        os.write(self.fd, 'seek %s0\n' % direction)
+    # ...
+
+    # =========================================================================
+    # request interface
+    # =========================================================================
+
+    #def request_playlist(self, client):
+
+    #    self.reply_playlist_request(client, ["1", "2"],
+    #            ["Joe - Joe's Song", "Sue - Sue's Song"])
+
+    # ...
+
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+
+    pa = MplayerAdapter() # create the player adapter
+    mg = remuco.Manager(pa)# # pass it to a manager
+    mg.run() # run the manager (blocks until interrupt signal)
+
