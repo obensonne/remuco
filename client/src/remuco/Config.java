@@ -48,6 +48,7 @@ import remuco.comm.Serial;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.ui.screenies.TitleScreeny;
+import remuco.ui.screens.PlayerScreen;
 import remuco.util.Log;
 import remuco.util.Tools;
 
@@ -137,6 +138,7 @@ public final class Config {
 		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_PAGE_SIZE);
 		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_SIZE);
 		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_TYPE);
+		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_KEEPFS);
 		OPTION_DESCRIPTORS.addElement(Connection.OD_PING);
 
 	}

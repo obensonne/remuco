@@ -28,6 +28,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import remuco.Config;
 import remuco.IOptionListener;
@@ -58,6 +59,10 @@ import remuco.util.Log;
 public final class PlayerScreen extends Canvas implements IItemListener,
 		IStateListener, IProgressListener, CommandListener, IActionListener,
 		IOptionListener {
+
+	public static final OptionDescriptor OD_IMG_KEEPFS = new OptionDescriptor(
+			"keep-img-fs", "Keep image in fullscreen on item change", "No",
+			"Yes,No");
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
@@ -91,10 +96,13 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private CommandListener externalCommandListener;
 
 	/** Indicates if the item's image is currently shown in fullscreen mode. */
-	private boolean itemImageFullscreen;
+	private boolean itemImageFullscreenActive;
 
-	/** Screen for browsing the remote player's media */
-	private final MediaBrowserScreen screenMediaBrowser;
+	/**
+	 * Indicates if the item's image (if there is one) is <em>supposed</em> to
+	 * be shown in fullscreen mode.
+	 */
+	private boolean itemImageFullscreenEnabled;
 
 	private final Player player;
 
@@ -104,6 +112,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	/** Screen to configure key setup */
 	private final KeyBindingsScreen screenKeyConfig;
+
+	/** Screen for browsing the remote player's media */
+	private final MediaBrowserScreen screenMediaBrowser;
 
 	private final CommandList screenMenu;
 
@@ -400,16 +411,13 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		case KeyBindings.ACTION_IMAGE:
 
-			if (itemImageFullscreen) {
-				itemImageFullscreen = false;
-				repaint(); // repaint all on fullscreen change
-			} else {
-				if (player.item.getImg() != null) {
-					itemImageFullscreen = true;
-					screenyItemImageFullscreen.updateData(player.item.getImg());
-					repaint(); // repaint all on fullscreen change
-				}
+			final Image itemImage = player.item.getImg();
+			if (itemImage == null) {
+				break; // ignore fullscreen toggles when there is no image
 			}
+			itemImageFullscreenEnabled = !itemImageFullscreenEnabled;
+			itemImageFullscreenActive = itemImageFullscreenEnabled;
+			repaint(); // repaint all on fullscreen change
 
 			break;
 
@@ -516,11 +524,16 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	public void notifyItemChanged() {
 
 		screenyItem.updateData(player.item);
-		if (itemImageFullscreen) {
-			itemImageFullscreen = false;
-			repaint(screenyItemImageFullscreen);
-		} else {
+		screenyItemImageFullscreen.updateData(player.item.getImg());
+
+		if (!itemImageFullscreenEnabled) {
 			repaint(screenyItem);
+		} else {
+			itemImageFullscreenEnabled = config.getOption(OD_IMG_KEEPFS)
+					.equalsIgnoreCase("yes");
+			itemImageFullscreenActive = itemImageFullscreenEnabled
+					&& player.item.getImg() != null;
+			repaint(screenyItemImageFullscreen);
 		}
 	}
 
@@ -579,7 +592,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		if (screenTooSmall) {
 			drawScreenTooSmallMessage(g);
-		} else if (itemImageFullscreen) {
+		} else if (itemImageFullscreenActive) {
 			screenyItemImageFullscreen.draw(g);
 		} else {
 			screenyState.draw(g);
@@ -593,7 +606,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		if (screenTooSmall) { // ignore pointer events
 			commandAction(CMD_OPTIONS, this);
-		} else if (itemImageFullscreen) {
+		} else if (itemImageFullscreenActive) {
 			handleActionPressed(KeyBindings.ACTION_IMAGE);
 		} else {
 			screenyState.pointerPressed(x, y, this);
@@ -603,7 +616,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	}
 
 	protected void pointerReleased(int x, int y) {
-		if (!itemImageFullscreen && !screenTooSmall) {
+		if (!itemImageFullscreenActive && !screenTooSmall) {
 			screenyState.pointerReleased(x, y, this);
 			screenyItem.pointerReleased(x, y, this);
 			screenyButtons.pointerReleased(x, y, this);
