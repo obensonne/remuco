@@ -23,6 +23,7 @@
 # =============================================================================
 #
 # mplayer adapter by Ronald Oquendo Munoz
+# some documentation for mplayer is available in http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
 
 import remuco
@@ -44,17 +45,17 @@ class MplayerAdapter(remuco.PlayerAdapter):
         remuco.PlayerAdapter.start(self)
 
         if not(os.path.exists(self.rdfifo)):
-           os.mkfifo(self.rdfifo)
+            os.mkfifo(self.rdfifo)
 
         self.fd=os.open(self.rdfifo, os.O_WRONLY)
 
-        log.debug("starting mplayer-adapter")
+        log.debug("starting mplayer adapter")
 
     def stop(self):
 
         remuco.PlayerAdapter.stop(self)
         os.close(self.fd)
-        log.debug("stopping mplayer-adapter")
+        log.debug("stopping mplayer adapter")
 
 
 
@@ -77,6 +78,9 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def ctrl_toggle_playing(self):
         os.write(self.fd, 'pause\n')
+
+    def ctrl_toggle_fullscreen(self):
+        os.write(self.fd, 'vo_fullscreen\n')
 
     def ctrl_next(self):
         os.write(self.fd, 'pt_step 1\n')
