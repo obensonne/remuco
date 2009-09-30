@@ -86,14 +86,18 @@ class MPDAdapter(remuco.PlayerAdapter):
             log.error("option mpd-port malformed (%s) -> use default" % port)
             self.__mpd_port = 6600
             
+        self.__mpd_pwd = self.config.get_custom("mpd-password", "")
+        
         self.__mpd_music_dir = self.config.get_custom("mpd-music-dir",
                                                       "/var/lib/mpd/music")
+        
         
         log.debug("MPD is at %s:%d" % (self.__mpd_host, self.__mpd_port))
         
         # ensure options are saved:
         self.config.set_custom("mpd-host", self.__mpd_host)
         self.config.set_custom("mpd-port", self.__mpd_port)
+        self.config.set_custom("mpd-password", self.__mpd_pwd)
         self.config.set_custom("mpd-music-dir", self.__mpd_music_dir)
         
         self.__playing = False
@@ -558,6 +562,8 @@ class MPDAdapter(remuco.PlayerAdapter):
             try:
                 self.__mpd.connect(self.__mpd_host, self.__mpd_port)
                 self.__mpd.ping()
+                if self.__mpd_pwd:
+                    self.__mpd.password(self.__mpd_pwd)
                 log.debug("connected to MPD")
             except (mpd.ConnectionError, socket.error), e:
                 log.error("failed to connect to MPD: %s" % e)
