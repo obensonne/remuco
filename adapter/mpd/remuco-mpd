@@ -595,7 +595,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             self.__mpd.command_list_ok_begin()
         except mpd.MPDError, e:
             log.warning("failed to start command list: %s" % e)
-            return None
+            return
         
         for param in params:
             try:
@@ -608,7 +608,10 @@ class MPDAdapter(remuco.PlayerAdapter):
             return self.__mpd.command_list_end()
         except mpd.MPDError, e:
             log.warning("failed to end command list: %s" % e)
-            return None
+            try:
+                self.__mpd.disconnect()
+            except mpd.ConnectionError:
+                pass
     
 # =============================================================================
 # main
