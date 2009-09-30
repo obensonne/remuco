@@ -27,18 +27,17 @@
 
 """Okular adapter for Remuco, implemented as an executable script."""
 
+import commands
+import os.path
+import re
+
 import dbus
 from dbus.exceptions import DBusException
-
-from os import path
-import commands
-import re
 
 import remuco
 from remuco import log
 
 IA_GOTO = remuco.ItemAction("Go to page", multiple=False)
-
 
 class OkularAdapter(remuco.PlayerAdapter):
     
@@ -75,7 +74,7 @@ class OkularAdapter(remuco.PlayerAdapter):
         
     def poll(self):
         info = {}
-        info[remuco.INFO_TITLE] = path.basename(self.__am.currentDocument())
+        info[remuco.INFO_TITLE] = os.path.basename(self.__am.currentDocument())
         info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
         commands.getoutput('convert "' + self.__am.currentDocument()+'"['+(self.__am.currentPage() - 1).__str__()+'] -thumbnail 150 /tmp/remuco-okular.png')
         self.update_item(None, info, "/tmp/remuco-okular.png")
@@ -83,7 +82,7 @@ class OkularAdapter(remuco.PlayerAdapter):
         
     def refreshdata(self):
         info = {}
-        info[remuco.INFO_TITLE] = path.basename(self.__am.currentDocument())
+        info[remuco.INFO_TITLE] = os.path.basename(self.__am.currentDocument())
         info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
         self.update_item(None, info, None)
         self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
