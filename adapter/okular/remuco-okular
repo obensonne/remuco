@@ -47,6 +47,8 @@ class OkularAdapter(remuco.PlayerAdapter):
                                       playback_known=True,
                                       volume_known=True, search_mask=["Page"])
         self.__am = None
+        
+        self.__image = os.path.join(self.config.cache_dir, "img.png")
 
     def start(self):
         
@@ -76,8 +78,8 @@ class OkularAdapter(remuco.PlayerAdapter):
         info = {}
         info[remuco.INFO_TITLE] = os.path.basename(self.__am.currentDocument())
         info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
-        commands.getoutput('convert "' + self.__am.currentDocument()+'"['+(self.__am.currentPage() - 1).__str__()+'] -thumbnail 150 /tmp/remuco-okular.png')
-        self.update_item(None, info, "/tmp/remuco-okular.png")
+        commands.getoutput('convert "' + self.__am.currentDocument()+'"['+(self.__am.currentPage() - 1).__str__()+'] -thumbnail 150 %s' % self.__image)
+        self.update_item(None, info, self.__image)
         self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
         
     def refreshdata(self):
