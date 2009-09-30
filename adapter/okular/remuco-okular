@@ -1,0 +1,156 @@
+#!/usr/bin/env python
+
+# =============================================================================
+#
+#    Okular adapter for Remuco
+#    Copyright (C) 2009 Pawel Szubert <pawel.pbm@gmail.com>
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""Okular adapter for Remuco, implemented as an executable script."""
+
+import dbus
+from dbus.exceptions import DBusException
+
+from os import path
+import commands
+import re
+
+import remuco
+from remuco import log
+
+IA_GOTO = remuco.ItemAction("Go to page", multiple=False)
+
+
+class OkularAdapter(remuco.PlayerAdapter):
+    
+    def __init__(self):
+        
+        remuco.PlayerAdapter.__init__(self, "Okular",
+                                      playback_known=True,
+                                      volume_known=True, search_mask=["Page"])
+        self.__am = None
+
+    def start(self):
+        
+        remuco.PlayerAdapter.start(self)
+
+        try:
+            bus = dbus.SessionBus()
+            proxy = bus.get_object("org.freedesktop.DBus",  "/")
+            dbusiface = dbus.Interface(proxy, "org.freedesktop.DBus")
+            okulariface = None
+            for iface in dbusiface.ListNames():
+                if "okular" in iface:
+                    okulariface = iface
+            proxy = bus.get_object(okulariface, "/okular")
+            self.__am = dbus.Interface(proxy, "org.kde.okular")
+        except DBusException, e:
+            raise StandardError("dbus error: %s" % e)
+        
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+
+        log.debug("bye, turning off the light")
+        
+    def poll(self):
+        info = {}
+        info[remuco.INFO_TITLE] = path.basename(self.__am.currentDocument())
+        info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
+        commands.getoutput('convert "' + self.__am.currentDocument()+'"['+(self.__am.currentPage() - 1).__str__()+'] -thumbnail 150 /tmp/remuco-okular.png')
+        self.update_item(None, info, "/tmp/remuco-okular.png")
+        self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
+        
+    def refreshdata(self):
+        info = {}
+        info[remuco.INFO_TITLE] = path.basename(self.__am.currentDocument())
+        info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
+        self.update_item(None, info, None)
+        self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
+        
+         
+        
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
+    def ctrl_next(self):
+        self.__am.slotNextPage()
+        self.refreshdata()
+ 
+    def ctrl_previous(self):
+        self.__am.slotPreviousPage()
+        self.refreshdata()
+
+    def ctrl_volume(self, direction):
+        if direction == 0:
+            self.__am.goToPage(1)
+        elif direction == -1:
+            if self.__am.currentPage() - 10 < 1:
+                self.__am.slotGotoFirst()
+            else:
+                self.__am.goToPage(self.__am.currentPage() - 10)
+        elif direction == 1:
+            if self.__am.currentPage() + 10 > self.__am.pages():
+                self.__am.slotGotoLast()
+            else:
+                self.__am.goToPage(self.__am.currentPage() + 10)
+        self.refreshdata()
+        
+    def ctrl_toggle_fullscreen(self):
+        self.__am.slotTogglePresentation()
+
+    def action_playlist_item(self, action_id, positions, ids):
+        if action_id == IA_GOTO.id:
+            self.__am.goToPage(ids[0])
+
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    def request_playlist(self, reply):
+        reply.ids = range(1, self.__am.pages()+1)
+        reply.names = range(1, self.__am.pages()+1)
+        reply.item_actions = [IA_GOTO]
+        reply.send()
+
+    def request_search(self, reply, query):
+        if re.match("^[0-9]+$", query[0]) and int(query[0]) < self.__am.pages() and int(query[0]) > 0:
+            reply.ids = [query[0]]
+            reply.names = ["Page " + query[0] + " opened"]
+            self.__am.goToPage(int(query[0]))
+        else:
+            reply.ids = ["0"]
+            reply.names = ["No such page"]
+        reply.send()
+
+
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+    
+    pa = OkularAdapter() # create the player adapter
+    mg = remuco.Manager(pa)# # pass it to a manager
+    mg.run() # run the manager (blocks until interrupt signal)
