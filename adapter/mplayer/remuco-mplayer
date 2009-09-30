@@ -30,8 +30,10 @@
 
 """MPlayer adapter for Remuco, implemented as an executable script."""
 
-import remuco
 import os
+import os.path
+
+import remuco
 from remuco import log
 
 
@@ -39,13 +41,20 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __init__(self):
 
-        self.rdfifo = '/tmp/rdfifo'
-        self.fd = 0
         remuco.PlayerAdapter.__init__(self, "Mplayer",
                                       playback_known=True,
                                       volume_known=True)
+        
+        self.rdfifo = os.path.join(self.config.cache_dir, "fifo")
+        self.rdfifo = self.config.get_custom("mplayer-fifo", self.rdfifo)
+        
+        # ensure config is written:
+        self.config.set_custom("mplayer-fifo", self.rdfifo)
+        
+        self.fd = 0
 
     def start(self):
+        
         remuco.PlayerAdapter.start(self)
 
         if not(os.path.exists(self.rdfifo)):
@@ -60,8 +69,6 @@ class MplayerAdapter(remuco.PlayerAdapter):
         remuco.PlayerAdapter.stop(self)
         os.close(self.fd)
         log.debug("stopping mplayer adapter")
-
-
 
 #    def poll(self):
 
