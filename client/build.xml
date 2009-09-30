@@ -4,7 +4,7 @@
      Remuco Client
      A J2ME client for the Remuco system.
      
-     http://remuco.sourceforge.net
+     http://remuco.googlecode.com
      
      This build script requires Ant >= 1.7 !
                    
@@ -54,7 +54,7 @@
 	<property name="cldc.ver" value="CLDC-1.1" />
 
 	<property name="midlet.icon" value="logo.png" />
-	<property name="midlet.vendor" value="remuco.sf.net" />
+	<property name="midlet.vendor" value="remuco.googlecode.com" />
 	<property name="midlet.version" value="0.9.2" />
 	<property name="midlet.data-size" value="2048" />
 
