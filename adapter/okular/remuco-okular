@@ -38,6 +38,7 @@ import remuco
 from remuco import log
 
 IA_GOTO = remuco.ItemAction("Go to page", multiple=False)
+IA_OPEN = remuco.ItemAction("Open file", multiple=False)
 
 class OkularAdapter(remuco.PlayerAdapter):
     
@@ -45,7 +46,10 @@ class OkularAdapter(remuco.PlayerAdapter):
         
         remuco.PlayerAdapter.__init__(self, "Okular",
                                       playback_known=True,
-                                      volume_known=True, search_mask=["Page"])
+                                      volume_known=True,
+                                      search_mask=["Page"],
+                                      file_actions=[IA_OPEN],
+                                      mime_types=["application/pdf"])
         self.__am = None
         
         self.__image = os.path.join(self.config.cache_dir, "img.png")
@@ -84,7 +88,6 @@ class OkularAdapter(remuco.PlayerAdapter):
         page = self.__am.currentPage()
         page_max = self.__am.pages()
         
-        info = {}
         info = {}
         info[remuco.INFO_TITLE] = os.path.basename(doc)
         info[remuco.INFO_ARTIST] = "%d/%d" % (page, page_max)
@@ -130,9 +133,18 @@ class OkularAdapter(remuco.PlayerAdapter):
     def ctrl_toggle_fullscreen(self):
         self.__am.slotTogglePresentation()
 
+    # =========================================================================
+    # actions interface
+    # =========================================================================
+
     def action_playlist_item(self, action_id, positions, ids):
         if action_id == IA_GOTO.id:
             self.__am.goToPage(ids[0])
+
+    def action_files(self, action_id, files, uris):
+        if action_id == IA_OPEN.id:
+            self.__am.openDocument(uris[0])
+            self.refreshdata(True)            
 
     # =========================================================================
     # request interface
