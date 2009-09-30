@@ -60,6 +60,12 @@ pa_files["mpd"] = [
     ["remuco-mpd"]
 ]
 
+# --- Okular ------------------------------------------------------------------
+
+pa_files["okular"] = [
+    ["remuco-okular"]
+]
+
 # --- Rhythmbox ---------------------------------------------------------------
 
 # set prefix may not be valid for Rhythmbox -> use a Rhythmbox specific prefix:
@@ -98,12 +104,6 @@ pa_files["vlc"] = [
 
 pa_files["xmms2"] = [
     ["remuco-xmms2"]
-]
-
-# --- Okular ------------------------------------------------------------------
-
-pa_files["okular"] = [
-    ["remuco-okular"]
 ]
 
 # =============================================================================
