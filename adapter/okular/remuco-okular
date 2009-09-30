@@ -75,21 +75,30 @@ class OkularAdapter(remuco.PlayerAdapter):
         log.debug("bye, turning off the light")
         
     def poll(self):
-        info = {}
-        info[remuco.INFO_TITLE] = os.path.basename(self.__am.currentDocument())
-        info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
-        commands.getoutput('convert "' + self.__am.currentDocument()+'"['+(self.__am.currentPage() - 1).__str__()+'] -thumbnail 150 %s' % self.__image)
-        self.update_item(None, info, self.__image)
-        self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
         
-    def refreshdata(self):
-        info = {}
-        info[remuco.INFO_TITLE] = os.path.basename(self.__am.currentDocument())
-        info[remuco.INFO_ARTIST] = self.__am.currentPage().__str__() + "/" + self.__am.pages().__str__()
-        self.update_item(None, info, None)
-        self.update_volume((self.__am.currentPage().__float__() / self.__am.pages().__float__() * 100).__int__())
+        self.refreshdata(refresh_image=True)
         
-         
+    def refreshdata(self, refresh_image=False):
+        
+        doc = self.__am.currentDocument()
+        page = self.__am.currentPage()
+        page_max = self.__am.pages()
+        
+        info = {}
+        info = {}
+        info[remuco.INFO_TITLE] = os.path.basename(doc)
+        info[remuco.INFO_ARTIST] = "%d/%d" % (page, page_max)
+
+        if refresh_image:
+            commands.getoutput('convert "%s"[%s] -thumbnail 150 %s' %
+                               (doc, page, self.__image))
+            image = self.__image
+        else:
+            image = None
+
+        self.update_item(None, info, image)
+        
+        self.update_volume((float(page) / page_max * 100))
         
     # =========================================================================
     # control interface
@@ -136,9 +145,10 @@ class OkularAdapter(remuco.PlayerAdapter):
         reply.send()
 
     def request_search(self, reply, query):
-        if re.match("^[0-9]+$", query[0]) and int(query[0]) < self.__am.pages() and int(query[0]) > 0:
+        if (re.match("^[0-9]+$", query[0]) and
+                int(query[0]) < self.__am.pages() and int(query[0]) > 0):
             reply.ids = [query[0]]
-            reply.names = ["Page " + query[0] + " opened"]
+            reply.names = ["Page %s opened" % query[0]]
             self.__am.goToPage(int(query[0]))
         else:
             reply.ids = ["0"]
