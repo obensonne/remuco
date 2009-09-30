@@ -2,6 +2,9 @@
 
 # =============================================================================
 #
+#    MPlayer adapter for Remuco
+#    Copyright (C) 2009 Ronald Oquendo Munoz
+#
 #    Remuco - A remote control system for media players.
 #    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
 #
@@ -21,10 +24,11 @@
 #    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
 #
 # =============================================================================
-#
-# mplayer adapter by Ronald Oquendo Munoz
-# some documentation for mplayer is available in http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
+# Some remote control related documentation for MPlayer is available at
+# http://www.mplayerhq.hu/DOCS/tech/slave.txt
+
+"""MPlayer adapter for Remuco, implemented as an executable script."""
 
 import remuco
 import os
