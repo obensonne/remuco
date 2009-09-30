@@ -41,9 +41,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __init__(self):
 
-        remuco.PlayerAdapter.__init__(self, "Mplayer",
-                                      playback_known=True,
-                                      volume_known=True)
+        remuco.PlayerAdapter.__init__(self, "MPlayer")
         
         self.rdfifo = os.path.join(self.config.cache_dir, "fifo")
         self.rdfifo = self.config.get_custom("mplayer-fifo", self.rdfifo)
@@ -60,7 +58,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
         if not(os.path.exists(self.rdfifo)):
             os.mkfifo(self.rdfifo)
 
-        self.fd=os.open(self.rdfifo, os.O_WRONLY)
+        self.fd = os.open(self.rdfifo, os.O_WRONLY)
 
         log.debug("starting mplayer adapter")
 
