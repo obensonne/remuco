@@ -86,23 +86,22 @@ class MplayerAdapter(remuco.PlayerAdapter):
     # =========================================================================
 
     def ctrl_toggle_playing(self):
-        os.write(self.fd, 'pause\n')
+        self.__command('pause\n')
 
     def ctrl_toggle_fullscreen(self):
-        os.write(self.fd, 'vo_fullscreen\n')
+        self.__command('vo_fullscreen\n')
 
     def ctrl_next(self):
-        os.write(self.fd, 'pt_step 1\n')
+        self.__command('pt_step 1\n')
 
     def ctrl_previous(self):
-        os.write(self.fd, 'pt_step -1\n')
+        self.__command('pt_step -1\n')
 
     def ctrl_volume(self, direction):
-        os.write(self.fd, 'volume %s\n' % direction)
+        self.__command('volume %s\n' % direction)
 
     def ctrl_seek(self, direction):
-        os.write(self.fd, 'seek %s0\n' % direction)
-    # ...
+        self.__command('seek %s0\n' % direction)
 
     # =========================================================================
     # request interface
@@ -114,6 +113,19 @@ class MplayerAdapter(remuco.PlayerAdapter):
     #            ["Joe - Joe's Song", "Sue - Sue's Song"])
 
     # ...
+
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+
+    def __command(self, cmd):
+        """Write a command to the MPlayer FIFO and handle errors."""
+        
+        try:
+            os.write(self.fd, cmd)
+        except OSError, e:
+            log.warning("FIFO to MPlayer broken (%s)", e)
+            self.manager.stop()
 
 # =============================================================================
 # main (example startup using remuco.Manager)
