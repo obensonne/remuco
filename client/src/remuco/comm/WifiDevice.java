@@ -18,7 +18,6 @@ public class WifiDevice extends Device {
 		address = "";
 		port = PORT;
 		options = "";
-		port = "";
 		name = "";
 	}
 
