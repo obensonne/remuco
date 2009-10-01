@@ -33,6 +33,7 @@ import javax.microedition.lcdui.List;
 
 import remuco.Config;
 import remuco.UserException;
+import remuco.comm.BluetoothDevice;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Device;
 import remuco.comm.IDeviceSelectionListener;
@@ -107,7 +108,7 @@ public final class DeviceSelectorScreen extends List implements
 		alertScanProblem.setTimeout(Alert.FOREVER);
 		alertScanProblem.setCommandListener(this);
 
-		// TODO what about an Alert factory? get rid of forever living alerts 
+		// TODO what about an Alert factory? get rid of forever living alerts
 		alertConfirmRemove = new Alert("Confirmation");
 		alertConfirmRemove.setString("Please confirm ..");
 		alertConfirmRemove.setType(AlertType.WARNING);
@@ -131,7 +132,7 @@ public final class DeviceSelectorScreen extends List implements
 		addCommand(CMD_ADD);
 		setSelectCommand(CMD.SELECT);
 		setCommandListener(this);
-		
+
 		update();
 	}
 
@@ -173,15 +174,22 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			try {
-				bluetoothScanner.startScan(this);
-				display.setCurrent(screenScanning);
-			} catch (UserException e) {
-				alertScanProblem.setTitle("Scan Error");
-				alertScanProblem.setString(e.getError() + ": " + e.getDetails());
-				alertScanProblem.setType(AlertType.ERROR);
-				display.setCurrent(alertScanProblem, this);
-			}
+			final BluetoothScreen bs = new BluetoothScreen();
+			bs.addCommand(CMD_BACK_TO_ME);
+			bs.addCommand(CMD.OK);
+			bs.setCommandListener(this);
+			display.setCurrent(bs);
+
+			//
+			// try {
+			// bluetoothScanner.startScan(this);
+			// display.setCurrent(screenScanning);
+			// } catch (UserException e) {
+			// alertScanProblem.setTitle("Scan Error");
+			// alertScanProblem.setString(e.getError() + ": " + e.getDetails());
+			// alertScanProblem.setType(AlertType.ERROR);
+			// display.setCurrent(alertScanProblem, this);
+			// }
 
 		} else if (c == CMD_DT_WIFI) {
 
@@ -192,6 +200,47 @@ public final class DeviceSelectorScreen extends List implements
 			des.addCommand(CMD.OK);
 			des.setCommandListener(this);
 			display.setCurrent(des);
+
+		} else if (c == CMD.OK && d instanceof BluetoothScreen) {
+
+			final BluetoothScreen des = (BluetoothScreen) d;
+
+			final String problem = des.validate();
+
+			if (problem != null) {
+
+				display.setCurrent(new Alert("Oops..", problem, null,
+						AlertType.ERROR), des);
+				return;
+
+			}
+
+			final BluetoothDevice device = des.getDevice();
+
+			if (device.getAddress().length() == 0) {
+
+				try {
+					bluetoothScanner.startScan(this);
+					display.setCurrent(screenScanning);
+				} catch (UserException e) {
+					alertScanProblem.setTitle("Scan Error");
+					alertScanProblem.setString(e.getError() + ": "
+							+ e.getDetails());
+					alertScanProblem.setType(AlertType.ERROR);
+					display.setCurrent(alertScanProblem, this);
+				}
+
+			} else {
+
+				config.devices.removeElement(device);
+				config.devices.insertElementAt(device, 0);
+
+				update();
+				
+				listener.notifySelectedDevice(device);
+			}
+
+			display.setCurrent(this);
 
 		} else if (c == CMD.OK && d instanceof DeviceEditorScreen) {
 
