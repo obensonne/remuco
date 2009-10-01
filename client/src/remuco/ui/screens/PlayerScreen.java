@@ -61,8 +61,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 		IOptionListener {
 
 	public static final OptionDescriptor OD_IMG_KEEPFS = new OptionDescriptor(
-			"keep-img-fs", "Keep image in fullscreen on item change", "No",
-			"Yes,No");
+			"keep-img-fs", "Image fullscreen persistent", "No", "Yes,No");
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
