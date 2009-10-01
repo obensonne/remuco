@@ -4,12 +4,6 @@ import remuco.util.Tools;
 
 public class WifiDevice extends Device {
 
-	/**
-	 * Char indicating the device type in a flattened representation of this
-	 * device. This char is the first character in a flattened representation.
-	 */
-	public static final char TYPE_CHAR = 'W';
-
 	private String address;
 
 	private String name;
@@ -39,7 +33,7 @@ public class WifiDevice extends Device {
 
 		sa = Tools.splitString(flat, FIELD_SEP, false);
 
-		if (sa.length != 5 || sa[0].charAt(0) != TYPE_CHAR) {
+		if (sa.length != 5 || sa[0].charAt(0) != TYPE_WIFI) {
 			throw new IllegalArgumentException();
 		}
 
@@ -82,7 +76,11 @@ public class WifiDevice extends Device {
 	}
 
 	public String getName() {
-		return name;
+		if (name.length() > 0) {
+			return name;
+		} else {
+			return address + ":" + port;
+		}
 	}
 
 	public String getOptions() {
@@ -91,6 +89,10 @@ public class WifiDevice extends Device {
 
 	public String getPort() {
 		return port;
+	}
+
+	public char getType() {
+		return TYPE_WIFI;
 	}
 
 	public void setAddress(String address) {
@@ -114,7 +116,7 @@ public class WifiDevice extends Device {
 
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(TYPE_CHAR);
+		sb.append(TYPE_WIFI);
 		sb.append(FIELD_SEP);
 		sb.append(address);
 		sb.append(FIELD_SEP);

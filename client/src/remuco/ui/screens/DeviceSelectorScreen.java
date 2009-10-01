@@ -39,7 +39,6 @@ import remuco.comm.Device;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IScanListener;
 import remuco.comm.IScanner;
-import remuco.comm.InetServiceFinder;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.Theme;
@@ -180,47 +179,35 @@ public final class DeviceSelectorScreen extends List implements
 			bs.setCommandListener(this);
 			display.setCurrent(bs);
 
-			//
-			// try {
-			// bluetoothScanner.startScan(this);
-			// display.setCurrent(screenScanning);
-			// } catch (UserException e) {
-			// alertScanProblem.setTitle("Scan Error");
-			// alertScanProblem.setString(e.getError() + ": " + e.getDetails());
-			// alertScanProblem.setType(AlertType.ERROR);
-			// display.setCurrent(alertScanProblem, this);
-			// }
-
 		} else if (c == CMD_DT_WIFI) {
 
-			final Device device = new Device(Device.WIFI, ":"
-					+ InetServiceFinder.PORT, "");
-			final DeviceEditorScreen des = new DeviceEditorScreen(device);
-			des.addCommand(CMD_BACK_TO_ME);
-			des.addCommand(CMD.OK);
-			des.setCommandListener(this);
-			display.setCurrent(des);
+			final WifiScreen ws = new WifiScreen();
+			ws.addCommand(CMD_BACK_TO_ME);
+			ws.addCommand(CMD.OK);
+			ws.setCommandListener(this);
+			display.setCurrent(ws);
 
-		} else if (c == CMD.OK && d instanceof BluetoothScreen) {
+		} else if (c == CMD.OK && d instanceof IDeviceScreen) {
 
-			final BluetoothScreen des = (BluetoothScreen) d;
+			final IDeviceScreen des = (IDeviceScreen) d;
 
 			final String problem = des.validate();
 
 			if (problem != null) {
 
 				display.setCurrent(new Alert("Oops..", problem, null,
-						AlertType.ERROR), des);
+						AlertType.ERROR), d);
 				return;
-
 			}
 
-			final BluetoothDevice device = des.getDevice();
+			final Device device = des.getDevice();
 
-			if (device.getAddress().length() == 0) {
+			if (device instanceof BluetoothDevice
+					&& ((BluetoothDevice) device).getAddress().length() == 0) {
 
 				try {
 					bluetoothScanner.startScan(this);
+					screenScanning.attachProperty(device);
 					display.setCurrent(screenScanning);
 				} catch (UserException e) {
 					alertScanProblem.setTitle("Scan Error");
@@ -236,34 +223,8 @@ public final class DeviceSelectorScreen extends List implements
 				config.devices.insertElementAt(device, 0);
 
 				update();
-				
-				listener.notifySelectedDevice(device);
-			}
-
-			display.setCurrent(this);
-
-		} else if (c == CMD.OK && d instanceof DeviceEditorScreen) {
-
-			final DeviceEditorScreen des = (DeviceEditorScreen) d;
-
-			final String problem = des.validate();
-
-			if (problem != null) {
-
-				display.setCurrent(new Alert("Oops..", problem, null,
-						AlertType.ERROR), des);
-
-			} else {
-
-				final Device device = des.getDevice();
-
-				config.devices.removeElement(device);
-				config.devices.insertElementAt(device, 0);
-
-				update();
 
 				display.setCurrent(this);
-
 			}
 
 		} else if (c == CMD.SELECT && d == screenScanResults) {
@@ -335,7 +296,7 @@ public final class DeviceSelectorScreen extends List implements
 		}
 	}
 
-	public void notifyScannedDevices(Device devs[]) {
+	public void notifyScannedDevices(BluetoothDevice devs[]) {
 
 		if (devs.length == 0) {
 			alertScanProblem.setTitle("No Devices");
@@ -352,7 +313,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		for (int i = 0; i < devs.length; i += 3) {
 
-			screenScanResults.append(scanResults[i].name, theme.licBluetooth);
+			screenScanResults.append(scanResults[i].getName(), theme.licBluetooth);
 		}
 
 		display.setCurrent(screenScanResults);
@@ -407,24 +368,16 @@ public final class DeviceSelectorScreen extends List implements
 
 			final Image icon;
 
-			if (device.type == Device.BLUETOOTH) {
+			if (device.getType() == Device.TYPE_BLUETOOTH) {
 				icon = theme.licBluetooth;
-			} else if (device.type == Device.WIFI) {
+			} else if (device.getType() == Device.TYPE_WIFI) {
 				icon = theme.licWifi;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
 			}
 
-			final String label;
-
-			if (device.name.length() == 0) {
-				label = device.address;
-			} else {
-				label = device.name;
-			}
-
-			append(label, icon);
+			append(device.getName(), icon);
 		}
 
 		if (!config.devices.isEmpty()) {

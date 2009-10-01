@@ -9,9 +9,10 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import remuco.comm.BluetoothDevice;
+import remuco.comm.Device;
 
 /** Screen to configure a Bluetooth connection. */
-public class BluetoothScreen extends Form {
+public class BluetoothScreen extends Form implements IDeviceScreen {
 
 	/**
 	 * Implement item state listener in this class because it is already
@@ -93,12 +94,7 @@ public class BluetoothScreen extends Form {
 
 	}
 
-	/**
-	 * Apply user entered values to device and return that device. If a device
-	 * has been passed to the constructor of this screen, then the same device
-	 * will be returned here. Otherwise a new device will be returned.
-	 */
-	public BluetoothDevice getDevice() {
+	public Device getDevice() {
 
 		device.setAddress(tfAddr.getString());
 		device.setSearch(cgSearch.getSelectedIndex());
@@ -108,12 +104,6 @@ public class BluetoothScreen extends Form {
 		return device;
 	}
 
-	/**
-	 * Validate the user input.
-	 * 
-	 * @return <code>null</code> if user input is ok, otherwise a string message
-	 *         describing what's wrong
-	 */
 	public String validate() {
 
 		final String address = tfAddr.getString();

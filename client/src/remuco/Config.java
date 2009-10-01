@@ -568,9 +568,9 @@ public final class Config {
 			for (int i = 0; i < flad.length; i++) {
 				final Device device;
 				try {
-					if (flad[i].charAt(0) == WifiDevice.TYPE_CHAR) {
+					if (flad[i].charAt(0) == Device.TYPE_WIFI) {
 						device = new WifiDevice(flad[i]);
-					} else if (flad[i].charAt(0) == BluetoothDevice.TYPE_CHAR) {
+					} else if (flad[i].charAt(0) == Device.TYPE_BLUETOOTH) {
 						device = new BluetoothDevice(flad[i]);
 					} else {
 						ret = false;

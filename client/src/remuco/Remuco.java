@@ -290,7 +290,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
 
 			// continue startup
-			
+
 			display.setCurrent(screenDeviceSelector);
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
@@ -340,22 +340,17 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 		final IServiceFinder sf;
 
-		if (device.type == Device.BLUETOOTH && device.address.indexOf(':') < 0) {
-
+		if (device.getType() == Device.TYPE_BLUETOOTH) {
 			sf = BluetoothFactory.createBluetoothServiceFinder();
-
-		} else if (device.type == Device.WIFI) {
-
+		} else if (device.getType() == Device.TYPE_WIFI) {
 			sf = new InetServiceFinder();
-
 		} else {
-
 			Log.bug("Jan 26, 2009.7:29:56 PM");
 			return;
 		}
 
 		try {
-			sf.findServices(device.address, this);
+			sf.findServices(device, this);
 		} catch (UserException e) {
 			alert(e, screenDeviceSelector);
 			return;

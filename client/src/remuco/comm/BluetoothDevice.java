@@ -8,12 +8,6 @@ public class BluetoothDevice extends Device {
 	public static final int SEARCH_STANDARD = 0, SEARCH_FAILSAFE = 1,
 			SEARCH_MANUAL = 2;
 
-	/**
-	 * Char indicating the device type in a flattened representation of this
-	 * device. This char is the first character in a flattened representation.
-	 */
-	public static final char TYPE_CHAR = 'B';
-
 	private static final int SEARCH_TYPE_LAST = SEARCH_MANUAL;
 
 	private String address;
@@ -45,7 +39,7 @@ public class BluetoothDevice extends Device {
 
 		sa = Tools.splitString(flat, FIELD_SEP, false);
 
-		if (sa.length != 5 || sa[0].charAt(0) != TYPE_CHAR) {
+		if (sa.length != 5 || sa[0].charAt(0) != TYPE_BLUETOOTH) {
 			throw new IllegalArgumentException();
 		}
 
@@ -95,7 +89,11 @@ public class BluetoothDevice extends Device {
 	}
 
 	public String getName() {
-		return name;
+		if (name.length() > 0) {
+			return name;
+		} else {
+			return address;
+		}
 	}
 
 	public String getPort() {
@@ -104,6 +102,10 @@ public class BluetoothDevice extends Device {
 
 	public int getSearch() {
 		return search;
+	}
+
+	public char getType() {
+		return TYPE_BLUETOOTH;
 	}
 
 	public void setAddress(String address) {
@@ -127,7 +129,7 @@ public class BluetoothDevice extends Device {
 
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(TYPE_CHAR);
+		sb.append(TYPE_BLUETOOTH);
 		sb.append(FIELD_SEP);
 		sb.append(address);
 		sb.append(FIELD_SEP);

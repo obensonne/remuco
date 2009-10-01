@@ -51,15 +51,16 @@ public final class InetServiceFinder implements IServiceFinder {
 
 	}
 
-	public void findServices(String addr, final IServiceListener listener)
+	public void findServices(Device device, final IServiceListener listener)
 			throws UserException {
 
 		final String url;
+		
+		final WifiDevice wd = (WifiDevice) device;
 
-		if (addr.indexOf(':') >= 0)
-			url = "socket://" + addr;
-		else
-			url = "socket://" + addr + ":" + PORT;
+		url = "socket://" + wd.getAddress() + ":" + wd.getPort();
+		
+		
 
 		final Hashtable services = new Hashtable(1);
 		services.put("Player", url);

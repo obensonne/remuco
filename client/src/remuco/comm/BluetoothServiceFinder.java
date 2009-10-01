@@ -134,7 +134,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 		Log.bug("Mar 18, 2009.0:16:23 AM");
 	}
 
-	public void findServices(String addr, IServiceListener listener)
+	public void findServices(Device device, IServiceListener listener)
 			throws UserException {
 
 		synchronized (lock) {
@@ -144,7 +144,9 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			initBluetooth();
 
-			final BTD btd = new BTD(addr);
+			final BluetoothDevice bd = (BluetoothDevice) device;
+
+			final BTD btd = new BTD(bd.getAddress());
 
 			final int sid;
 			try {

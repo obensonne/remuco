@@ -3,14 +3,21 @@ package remuco.ui.screens;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
+import remuco.comm.Device;
 import remuco.comm.WifiDevice;
 
 /** Screen to configure a Bluetooth connection. */
-public class WifiScreen extends Form {
+public class WifiScreen extends Form implements IDeviceScreen {
 
 	private final WifiDevice device;
 
-	private final TextField tfAddr, tfPort, tfOptions, tfName;
+	private final TextField tfAddr;
+
+	private final TextField tfName;
+
+	private final TextField tfOptions;
+
+	private final TextField tfPort;
 
 	public WifiScreen() {
 		this(new WifiDevice());
@@ -41,12 +48,7 @@ public class WifiScreen extends Form {
 		append(tfName);
 	}
 
-	/**
-	 * Apply user entered values to device and return that device. If a device
-	 * has been passed to the constructor of this screen, then the same device
-	 * will be returned here. Otherwise a new device will be returned.
-	 */
-	public WifiDevice getDevice() {
+	public Device getDevice() {
 
 		device.setAddress(tfAddr.getString());
 		device.setPort(tfPort.getString());
@@ -56,12 +58,6 @@ public class WifiScreen extends Form {
 		return device;
 	}
 
-	/**
-	 * Validate the user input.
-	 * 
-	 * @return <code>null</code> if user input is ok, otherwise a string message
-	 *         describing what's wrong
-	 */
 	public String validate() {
 
 		final String address = tfAddr.getString();
