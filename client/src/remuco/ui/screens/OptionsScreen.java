@@ -86,7 +86,7 @@ public class OptionsScreen extends Form {
 		switch (od.type) {
 
 		case OptionDescriptor.TYPE_CHOICE:
-			final ChoiceGroup cg = new ChoiceGroup(od.label, Choice.EXCLUSIVE,
+			final ChoiceGroup cg = new ChoiceGroup(od.label, Choice.POPUP,
 					od.choices, null);
 			val = config.getOption(od);
 			int index = Tools.getIndex(od.choices, val);
