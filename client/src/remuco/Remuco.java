@@ -150,8 +150,6 @@ public class Remuco implements CommandListener, IConnectionListener,
 	/** Screen to select a service (media player) */
 	private final ServiceSelectorScreen screenServiceSelector;
 
-	private final IServiceFinder serviceFinderBluetooth, serviceFinderWifi;
-
 	public Remuco(Entry midlet) {
 
 		this.midlet = midlet;
@@ -193,14 +191,6 @@ public class Remuco implements CommandListener, IConnectionListener,
 		alertSaveConfig.setCommandListener(this);
 
 		// set up the start screen
-
-		if (BluetoothFactory.BLUETOOTH) {
-			serviceFinderBluetooth = BluetoothFactory.createBluetoothServiceFinder();
-		} else {
-			serviceFinderBluetooth = null;
-		}
-
-		serviceFinderWifi = new InetServiceFinder();
 
 		alert = new Alert("");
 		alert.setTimeout(Alert.FOREVER);
@@ -352,17 +342,11 @@ public class Remuco implements CommandListener, IConnectionListener,
 
 		if (device.type == Device.BLUETOOTH && device.address.indexOf(':') < 0) {
 
-			if (serviceFinderBluetooth == null) {
-				// this may happen in emulator, when switching on/off bluetooth
-				// support between two runs
-				Log.bug("Feb 3, 2009.12:54:53 AM");
-				return;
-			}
-			sf = serviceFinderBluetooth;
+			sf = BluetoothFactory.createBluetoothServiceFinder();
 
 		} else if (device.type == Device.WIFI) {
 
-			sf = serviceFinderWifi;
+			sf = new InetServiceFinder();
 
 		} else {
 
