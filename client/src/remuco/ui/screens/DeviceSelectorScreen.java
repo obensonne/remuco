@@ -39,6 +39,7 @@ import remuco.comm.Device;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IScanListener;
 import remuco.comm.IScanner;
+import remuco.comm.WifiDevice;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.Theme;
@@ -59,6 +60,9 @@ public final class DeviceSelectorScreen extends List implements
 
 	private static final Command CMD_DT_WIFI = new Command("WiFi",
 			Command.SCREEN, 20);
+
+	private static final Command CMD_EDIT = new Command("Edit", Command.SCREEN,
+			20);
 
 	private static final Command CMD_REMOVE = new Command("Remove",
 			Command.SCREEN, 30);
@@ -173,19 +177,11 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final BluetoothScreen bs = new BluetoothScreen();
-			bs.addCommand(CMD_BACK_TO_ME);
-			bs.addCommand(CMD.OK);
-			bs.setCommandListener(this);
-			display.setCurrent(bs);
+			showDeviceEditorScreen(new BluetoothDevice());
 
 		} else if (c == CMD_DT_WIFI) {
 
-			final WifiScreen ws = new WifiScreen();
-			ws.addCommand(CMD_BACK_TO_ME);
-			ws.addCommand(CMD.OK);
-			ws.setCommandListener(this);
-			display.setCurrent(ws);
+			showDeviceEditorScreen(new WifiDevice());
 
 		} else if (c == CMD.OK && d instanceof IDeviceScreen) {
 
@@ -256,10 +252,20 @@ public final class DeviceSelectorScreen extends List implements
 
 			display.setCurrent(dts);
 
+		} else if (c == CMD_EDIT) {
+
+			final int index = getSelectedIndex();
+			if (index < 0) {
+				return;
+			}
+
+			final Device device = (Device) config.devices.elementAt(index);
+
+			showDeviceEditorScreen(device);
+
 		} else if (c == CMD_REMOVE) {
 
 			final int index = getSelectedIndex();
-
 			if (index < 0) {
 				return;
 			}
@@ -347,15 +353,34 @@ public final class DeviceSelectorScreen extends List implements
 	//
 	// }
 
-	/**
-	 * Update list to show all known devices. As a side effect, {@link #devices}
-	 * gets updated to the devices returned by {@link Config#getKnownDevices()}.
-	 */
+	/** Create and show a device editor screen for the given device. */
+	private void showDeviceEditorScreen(Device device) {
+
+		final Displayable d;
+
+		if (device instanceof WifiDevice) {
+			d = new WifiScreen((WifiDevice) device);
+		} else if (device instanceof BluetoothDevice) {
+			d = new BluetoothScreen((BluetoothDevice) device);
+		} else {
+			Log.bug("Oct 1, 2009.10:55:54 PM");
+			return;
+		}
+
+		d.addCommand(CMD_BACK_TO_ME);
+		d.addCommand(CMD.OK);
+		d.setCommandListener(this);
+		display.setCurrent(d);
+	}
+
+	/** Update list to show all known devices. */
 	private void update() {
 
 		if (config.devices.isEmpty()) {
+			removeCommand(CMD_EDIT);
 			removeCommand(CMD_REMOVE);
 		} else {
+			addCommand(CMD_EDIT);
 			addCommand(CMD_REMOVE);
 		}
 

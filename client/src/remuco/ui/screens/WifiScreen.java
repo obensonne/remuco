@@ -19,13 +19,9 @@ public class WifiScreen extends Form implements IDeviceScreen {
 
 	private final TextField tfPort;
 
-	public WifiScreen() {
-		this(new WifiDevice());
-	}
-
 	public WifiScreen(WifiDevice device) {
 
-		super("Bluetooth");
+		super("WiFi");
 
 		this.device = device;
 
@@ -35,7 +31,7 @@ public class WifiScreen extends Form implements IDeviceScreen {
 		tfAddr = new TextField(label, device.getAddress(), 256, TextField.URL);
 		append(tfAddr);
 
-		label = "Port (for manual service search)";
+		label = "Port (if unsure, do not change)";
 		tfPort = new TextField(label, device.getPort(), 256, TextField.NUMERIC);
 		append(tfPort);
 

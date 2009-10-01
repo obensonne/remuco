@@ -48,10 +48,6 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 	private final TextField tfAddr, tfPort, tfName;
 
-	public BluetoothScreen() {
-		this(new BluetoothDevice(), true);
-	}
-
 	public BluetoothScreen(BluetoothDevice device) {
 		this(new BluetoothDevice(), false);
 	}
