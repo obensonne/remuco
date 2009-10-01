@@ -4,6 +4,8 @@ import remuco.util.Tools;
 
 public class WifiDevice extends Device {
 
+	private static final String PORT = "34271";
+
 	private String address;
 
 	private String name;
@@ -14,7 +16,7 @@ public class WifiDevice extends Device {
 
 	public WifiDevice() {
 		address = "";
-		port = InetServiceFinder.PORT;
+		port = PORT;
 		options = "";
 		port = "";
 	}

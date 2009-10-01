@@ -28,8 +28,6 @@ import remuco.UserException;
 
 public final class InetServiceFinder implements IServiceFinder {
 
-	public static final String PORT = "34271";
-
 	private final Object lock;
 
 	private TimerTask notifier = null;
