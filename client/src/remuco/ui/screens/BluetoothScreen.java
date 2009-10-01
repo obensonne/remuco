@@ -143,7 +143,7 @@ public class BluetoothScreen extends Form {
 			try {
 				portInt = Integer.parseInt(port);
 			} catch (NumberFormatException e) {
-				return "Port must be empty or a number!";
+				return "Port must be a number!";
 			}
 			if (portInt < 1 || portInt > 30) {
 				return "Port number out of range (1-30)!";
