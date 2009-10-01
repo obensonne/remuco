@@ -42,9 +42,11 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import remuco.comm.BluetoothDevice;
 import remuco.comm.Connection;
 import remuco.comm.Device;
 import remuco.comm.Serial;
+import remuco.comm.WifiDevice;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.ui.screenies.TitleScreeny;
@@ -564,11 +566,21 @@ public final class Config {
 			final String flad[] = Tools.splitString(val, Device.LIST_SEP, false);
 
 			for (int i = 0; i < flad.length; i++) {
+				final Device device;
 				try {
-					devices.addElement(new Device(flad[i]));
+					if (flad[i].charAt(0) == WifiDevice.TYPE_CHAR) {
+						device = new WifiDevice(flad[i]);
+					} else if (flad[i].charAt(0) == BluetoothDevice.TYPE_CHAR) {
+						device = new BluetoothDevice(flad[i]);
+					} else {
+						ret = false;
+						continue;
+					}
 				} catch (IllegalArgumentException e) {
 					ret = false;
+					continue;
 				}
+				devices.addElement(device);
 			}
 		}
 
