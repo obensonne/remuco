@@ -72,7 +72,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			Command.SCREEN, 92);
 
 	private static final Command CMD_KEYS = new Command("Key Bindings",
-			Command.SCREEN, 2);
+			Command.SCREEN, 3);
 
 	private static final Command CMD_MEDIA = new Command("Media",
 			Command.SCREEN, 1);
@@ -80,7 +80,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	private static final Command CMD_MENU = new Command("Menu", Command.BACK, 2);
 
 	private static final Command CMD_OPTIONS = new Command("Options",
-			Command.SCREEN, 3);
+			Command.SCREEN, 2);
 
 	private static final Command CMD_SHUTDOWN_HOST = new Command(
 			"Shutdown Host", Command.SCREEN, 95);
