@@ -2,33 +2,27 @@ package remuco.comm;
 
 import remuco.util.Tools;
 
-public class BluetoothDevice extends Device {
-
-	/** Service search strategy. */
-	public static final int SEARCH_STANDARD = 0, SEARCH_FAILSAFE = 1,
-			SEARCH_MANUAL = 2;
+public class WifiDevice extends Device {
 
 	/**
 	 * Char indicating the device type in a flattened representation of this
 	 * device. This char is the first character in a flattened representation.
 	 */
-	public static final char TYPE_CHAR = 'B';
-
-	private static final int SEARCH_TYPE_LAST = SEARCH_MANUAL;
+	public static final char TYPE_CHAR = 'W';
 
 	private String address;
 
 	private String name;
 
+	private String options;
+
 	private String port;
 
-	private int search;
-
-	public BluetoothDevice() {
+	public WifiDevice() {
 		address = "";
-		search = SEARCH_STANDARD;
-		port = "1";
-		name = "";
+		port = "";
+		options = "";
+		port = "";
 	}
 
 	/**
@@ -39,7 +33,7 @@ public class BluetoothDevice extends Device {
 	 * @throws IllegalArgumentException
 	 *             if <em>flat</em> is malformed
 	 */
-	public BluetoothDevice(String flat) throws IllegalArgumentException {
+	public WifiDevice(String flat) throws IllegalArgumentException {
 
 		String sa[];
 
@@ -51,26 +45,18 @@ public class BluetoothDevice extends Device {
 
 		address = sa[1];
 
-		try {
-			search = Integer.parseInt(sa[2]);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException();
-		}
-		if (search < 0 && search > SEARCH_TYPE_LAST) {
-			throw new IllegalArgumentException();
-		}
-
-		port = sa[3];
+		port = sa[2];
 		try {
 			Integer.parseInt(port);
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException();
 		}
 
+		options = sa[3];
 		name = sa[4];
 	}
 
-	/** Compares 2 device based solely on its address. */
+	/** Compares 2 device based on address and port. */
 	public boolean equals(Object obj) {
 
 		if (obj == this) {
@@ -81,13 +67,14 @@ public class BluetoothDevice extends Device {
 			return false;
 		}
 
-		if (!(obj instanceof BluetoothDevice)) {
+		if (!(obj instanceof WifiDevice)) {
 			return false;
 		}
 
-		final BluetoothDevice other = (BluetoothDevice) obj;
+		final WifiDevice other = (WifiDevice) obj;
 
-		return other.address.equals(address);
+		return other.address.equals(address) && other.port.equals(port);
+
 	}
 
 	public String getAddress() {
@@ -98,12 +85,12 @@ public class BluetoothDevice extends Device {
 		return name;
 	}
 
-	public String getPort() {
-		return port;
+	public String getOptions() {
+		return options;
 	}
 
-	public int getSearch() {
-		return search;
+	public String getPort() {
+		return port;
 	}
 
 	public void setAddress(String address) {
@@ -114,12 +101,12 @@ public class BluetoothDevice extends Device {
 		this.name = name;
 	}
 
-	public void setPort(String port) {
-		this.port = port;
+	public void setOptions(String options) {
+		this.options = options;
 	}
 
-	public void setSearch(int search) {
-		this.search = search;
+	public void setPort(String port) {
+		this.port = port;
 	}
 
 	/** Create flat representation of this device. */
@@ -131,9 +118,9 @@ public class BluetoothDevice extends Device {
 		sb.append(FIELD_SEP);
 		sb.append(address);
 		sb.append(FIELD_SEP);
-		sb.append(search);
-		sb.append(FIELD_SEP);
 		sb.append(port);
+		sb.append(FIELD_SEP);
+		sb.append(options);
 		sb.append(FIELD_SEP);
 		sb.append(name);
 
