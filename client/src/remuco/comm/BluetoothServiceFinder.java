@@ -50,11 +50,13 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	private static class Search {
 
 		public final int id;
+		public final boolean failsafe;
 		public final IServiceListener listener;
 		public final Hashtable services;
 
-		public Search(int id, IServiceListener listener) {
+		public Search(int id, boolean failsafe, IServiceListener listener) {
 			this.id = id;
+			this.failsafe = failsafe;
 			this.listener = listener;
 			this.services = new Hashtable();
 		}
@@ -74,6 +76,9 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	private final static String UUID = "025fe2ae07624bed90f2d8d778f020fe";
 
 	private static final UUID[] UUID_LIST = new UUID[] { new UUID(UUID, false) };
+
+	/** UUID list with a short UUID for SPP services. */
+	private static final UUID[] UUID_LIST_SHORT = new UUID[] { new UUID(0x1101) };
 
 	/**
 	 * Get the name of a service (the player behind the remuco service).
@@ -146,25 +151,36 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			final BluetoothDevice bd = (BluetoothDevice) device;
 
-			final BTD btd = new BTD(bd.getAddress());
+			final UUID uuidList[];
+			final int attrList[];
+			final boolean failsafe;
+			
+			failsafe = bd.getSearch() == BluetoothDevice.SEARCH_FAILSAFE;
 
+			if (failsafe) {
+				uuidList = UUID_LIST_SHORT;
+				attrList = null;
+			} else {
+				uuidList = UUID_LIST;
+				attrList = ATTRIBUTE_LIST;
+			}
+
+			final BTD btd = new BTD(bd.getAddress());
+			
 			final int sid;
 			try {
-				sid = agent.searchServices(ATTRIBUTE_LIST, UUID_LIST, btd, this);
-
+				sid = agent.searchServices(attrList, uuidList, btd, this);
 			} catch (BluetoothStateException e) {
-
 				Log.ln("[BT] BluetoothStateException", e);
 				throw new UserException("Bluetooth Error",
 						"Bluetooth seems to be busy. Cannot search for Remuco "
 								+ "services right now.");
-
 			} catch (NullPointerException e) {
 				// WTK emulator throws this if there are no services
 				return;
 			}
 
-			search = new Search(sid, listener);
+			search = new Search(sid, failsafe, listener);
 		}
 	}
 
@@ -182,9 +198,14 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			for (int i = 0; i < srs.length; i++) {
 
-				String url = srs[i].getConnectionURL(SECURITY, false);
+				final String url = srs[i].getConnectionURL(SECURITY, false);
 
-				String name = getServiceName(srs[i]);
+				final String name;
+				if (search.failsafe) {
+					name = "Player " + i;
+				} else {
+					name = getServiceName(srs[i]);
+				}
 
 				search.services.put(name, url); // assuming names are unique
 			}
