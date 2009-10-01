@@ -172,7 +172,7 @@ public class DeviceEditorScreen extends Form {
 			for (i = 0; i < digits.length; i++) {
 				boolean good = false;
 				good |= digits[i] >= '0' && digits[i] <= '9';
-				good |= digits[i] >= 'a' && digits[i] <= 'A';
+				good |= digits[i] >= 'a' && digits[i] <= 'f';
 				good |= digits[i] >= 'A' && digits[i] <= 'F';
 				if (!good) {
 					return "Bluetooth address contains invalid characters!";
