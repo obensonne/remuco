@@ -19,6 +19,7 @@ public class WifiDevice extends Device {
 		port = PORT;
 		options = "";
 		port = "";
+		name = "";
 	}
 
 	/**
@@ -77,12 +78,16 @@ public class WifiDevice extends Device {
 		return address;
 	}
 
-	public String getName() {
+	public String getLabel() {
 		if (name.length() > 0) {
 			return name;
 		} else {
 			return address + ":" + port;
 		}
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getOptions() {

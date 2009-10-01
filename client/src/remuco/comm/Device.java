@@ -13,7 +13,7 @@ public abstract class Device {
 	protected static final char FIELD_SEP = '|';
 
 	/** Get a descriptive name of the device. */
-	public abstract String getName();
+	public abstract String getLabel();
 
 	/**
 	 * Get the device type, one of {@link #TYPE_WIFI} or {@link #TYPE_BLUETOOTH}

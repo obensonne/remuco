@@ -313,7 +313,8 @@ public final class DeviceSelectorScreen extends List implements
 
 		for (int i = 0; i < devs.length; i += 3) {
 
-			screenScanResults.append(scanResults[i].getName(), theme.licBluetooth);
+			screenScanResults.append(scanResults[i].getLabel(),
+				theme.licBluetooth);
 		}
 
 		display.setCurrent(screenScanResults);
@@ -377,7 +378,7 @@ public final class DeviceSelectorScreen extends List implements
 				icon = null;
 			}
 
-			append(device.getName(), icon);
+			append(device.getLabel(), icon);
 		}
 
 		if (!config.devices.isEmpty()) {

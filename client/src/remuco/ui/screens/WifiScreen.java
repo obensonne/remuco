@@ -31,7 +31,7 @@ public class WifiScreen extends Form implements IDeviceScreen {
 
 		String label;
 
-		label = "Host or IP address:";
+		label = "Host or IP address";
 		tfAddr = new TextField(label, device.getAddress(), 256, TextField.URL);
 		append(tfAddr);
 
@@ -40,7 +40,7 @@ public class WifiScreen extends Form implements IDeviceScreen {
 		append(tfPort);
 
 		label = "Options (if unsure, leave empty)";
-		tfOptions = new TextField(label, device.getName(), 256, TextField.URL);
+		tfOptions = new TextField(label, device.getOptions(), 256, TextField.URL);
 		append(tfOptions);
 
 		label = "Name (optional)";

@@ -88,12 +88,16 @@ public class BluetoothDevice extends Device {
 		return address;
 	}
 
-	public String getName() {
+	public String getLabel() {
 		if (name.length() > 0) {
 			return name;
 		} else {
 			return address;
 		}
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getPort() {
