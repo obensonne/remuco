@@ -59,9 +59,9 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	private static final int PORT_ON = TextField.NUMERIC;
 
 	/** Welcome message to show on new devices. */
-	private static final String WELCOME_1 = "In most cases just pressing OK "
-			+ "here is fine.", WELCOME_2 = "Tweak the fields below if "
-			+ "automatic address and port search fails.";
+	private static final String WELCOME = "In most cases just pressing OK "
+			+ "here is fine. Tweak the fields below if automatic address and "
+			+ "port search fails.";
 
 	private final ChoiceGroup cgScan, cgSearch;
 
@@ -81,7 +81,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		virgin = device.getAddress().length() == 0;
 
 		if (virgin) {
-			final StringItem si = new StringItem(WELCOME_1, WELCOME_2);
+			final StringItem si = new StringItem(null, WELCOME);
 			si.setLayout(Item.LAYOUT_CENTER);
 			append(si);
 		}
@@ -119,7 +119,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 		label = "Port";
 		cgSearch = new ChoiceGroup(label, Choice.EXCLUSIVE, PORT_CHOICES, null);
-		cgSearch.setSelectedIndex(BluetoothDevice.SEARCH_STANDARD, true);
+		cgSearch.setSelectedIndex(device.getSearch(), true);
 		append(cgSearch);
 
 		// port //
