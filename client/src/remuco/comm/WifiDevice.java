@@ -20,7 +20,7 @@ public class WifiDevice extends Device {
 
 	public WifiDevice() {
 		address = "";
-		port = "";
+		port = InetServiceFinder.PORT;
 		options = "";
 		port = "";
 	}
