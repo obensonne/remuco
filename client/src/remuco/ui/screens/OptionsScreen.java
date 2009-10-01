@@ -79,7 +79,7 @@ public class OptionsScreen extends Form {
 		setItemStateListener(new OptionWidgetChangeListener());
 	}
 
-	public Item optionDescriptorToWidget(OptionDescriptor od) {
+	private Item optionDescriptorToWidget(OptionDescriptor od) {
 
 		final String val;
 
