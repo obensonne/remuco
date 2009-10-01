@@ -49,16 +49,12 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	private final TextField tfAddr, tfPort, tfName;
 
 	public BluetoothScreen(BluetoothDevice device) {
-		this(new BluetoothDevice(), false);
-	}
-
-	private BluetoothScreen(BluetoothDevice device, boolean welcome) {
 
 		super("Bluetooth");
 
 		this.device = device;
 
-		if (welcome) {
+		if (device.getAddress().length() == 0) {
 			final StringItem si = new StringItem(WELCOME_1, WELCOME_2);
 			si.setLayout(Item.LAYOUT_CENTER);
 			append(si);
@@ -106,7 +102,8 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		final String port = tfPort.getString();
 		final int search = cgSearch.getSelectedIndex();
 
-		if (address.length() > 0 && address.length() != 12) {
+		if ((device.getAddress().length() > 0 || address.length() > 0)
+				&& address.length() != 12) {
 			return "A Bluetooth address has exactly 12 characters!";
 		}
 		final char[] digits = address.toCharArray();
