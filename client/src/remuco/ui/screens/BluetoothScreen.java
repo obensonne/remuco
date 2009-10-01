@@ -5,6 +5,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
+import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import remuco.comm.BluetoothDevice;
@@ -35,6 +36,9 @@ public class BluetoothScreen extends Form {
 	/** Text field constraints for port (uneditable). */
 	private static final int PORT_OFF = PORT_ON | TextField.UNEDITABLE;
 
+	private static final String WELCOME_1 = "In most cases just pressing OK here is fine.",
+			WELCOME_2 = "The fields below are only relevant if automatic connection setup fails.";
+
 	private final ChoiceGroup cgSearch;
 
 	private final BluetoothDevice device;
@@ -44,18 +48,26 @@ public class BluetoothScreen extends Form {
 	private final TextField tfAddr, tfPort, tfName;
 
 	public BluetoothScreen() {
-		this(new BluetoothDevice());
+		this(new BluetoothDevice(), true);
 	}
 
 	public BluetoothScreen(BluetoothDevice device) {
+		this(new BluetoothDevice(), false);
+	}
+
+	private BluetoothScreen(BluetoothDevice device, boolean welcome) {
 
 		super("Bluetooth");
 
 		this.device = device;
 
-		String label;
+		if (welcome) {
+			final StringItem si = new StringItem(WELCOME_1, WELCOME_2);
+			si.setLayout(Item.LAYOUT_CENTER);
+			append(si);
+		}
 
-		// append(label);
+		String label;
 
 		label = "Address (withput colons, leave empty to scan for)";
 		tfAddr = new TextField(label, device.getAddress(), 256, TextField.URL);
@@ -78,6 +90,7 @@ public class BluetoothScreen extends Form {
 		append(tfName);
 
 		setItemStateListener(new SearchSelectionChangeListener());
+
 	}
 
 	/**
