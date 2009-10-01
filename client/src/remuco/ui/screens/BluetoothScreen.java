@@ -62,7 +62,11 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 		String label;
 
-		label = "Address (withput colons, leave empty to scan for)";
+		if (device.getAddress().length() == 0) {
+			label = "Address (without colons, leave empty to scan for)";
+		} else {
+			label = "Address (without colons)";
+		}
 		tfAddr = new TextField(label, device.getAddress(), 256, TextField.URL);
 		append(tfAddr);
 
