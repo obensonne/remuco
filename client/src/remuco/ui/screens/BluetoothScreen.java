@@ -21,13 +21,19 @@ public class BluetoothScreen extends Form {
 		public void itemStateChanged(Item item) {
 			if (item == cgSearch) {
 				if (cgSearch.getSelectedIndex() == BluetoothDevice.SEARCH_MANUAL) {
-					tfPort.setConstraints(TextField.ANY);
+					tfPort.setConstraints(PORT_ON);
 				} else {
-					tfPort.setConstraints(TextField.UNEDITABLE);
+					tfPort.setConstraints(PORT_OFF);
 				}
 			}
 		}
 	}
+
+	/** Text field constraints for port (editable). */
+	private static final int PORT_ON = TextField.NUMERIC;
+
+	/** Text field constraints for port (uneditable). */
+	private static final int PORT_OFF = PORT_ON | TextField.UNEDITABLE;
 
 	private final ChoiceGroup cgSearch;
 
@@ -60,8 +66,11 @@ public class BluetoothScreen extends Form {
 				null);
 		append(cgSearch);
 
-		label = "Port (only relevant on manual service search)";
-		tfPort = new TextField(label, device.getPort(), 256, TextField.URL);
+		label = "Port (for manual service search)";
+		tfPort = new TextField(label, device.getPort(), 256, PORT_OFF);
+		if (device.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
+			tfPort.setConstraints(PORT_ON);
+		}
 		append(tfPort);
 
 		label = "Name (optional)";
