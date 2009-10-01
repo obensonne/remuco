@@ -561,12 +561,16 @@ public final class Config {
 
 		final String val = (String) options.get(OPTION_KEY_DEVS);
 
-		if (val != null) {
+		if (val != null && val.length() > 0) {
 
 			final String flad[] = Tools.splitString(val, Device.LIST_SEP, false);
 
 			for (int i = 0; i < flad.length; i++) {
 				final Device device;
+				if (flad[i].length() == 0) {
+					ret = false;
+					continue;
+				}
 				try {
 					if (flad[i].charAt(0) == Device.TYPE_WIFI) {
 						device = new WifiDevice(flad[i]);
