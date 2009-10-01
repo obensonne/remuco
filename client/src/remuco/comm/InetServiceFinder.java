@@ -67,7 +67,7 @@ public final class InetServiceFinder implements IServiceFinder {
 		}
 
 		final Hashtable services = new Hashtable(1);
-		services.put("Player", url);
+		services.put("Player", url.toString());
 
 		synchronized (lock) {
 
