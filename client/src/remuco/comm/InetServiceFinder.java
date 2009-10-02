@@ -25,6 +25,7 @@ import java.util.TimerTask;
 
 import remuco.MainLoop;
 import remuco.UserException;
+import remuco.util.Tools;
 
 public final class InetServiceFinder implements IServiceFinder {
 
@@ -33,7 +34,7 @@ public final class InetServiceFinder implements IServiceFinder {
 	private TimerTask notifier = null;
 
 	public InetServiceFinder() {
-		
+
 		lock = new Object();
 	}
 
@@ -52,22 +53,8 @@ public final class InetServiceFinder implements IServiceFinder {
 
 		final WifiDevice wd = (WifiDevice) device;
 
-		final StringBuffer url = new StringBuffer("socket://");
-
-		url.append(wd.getAddress());
-		url.append(':');
-		url.append(wd.getPort());
-
-		final String options = wd.getOptions();
-		if (options.length() > 0) {
-			if (options.charAt(0) != ';') {
-				url.append(';');
-			}
-			url.append(options);
-		}
-
-		final Hashtable services = new Hashtable(1);
-		services.put("Player", url.toString());
+		final Hashtable services = Tools.buildManualServiceList("socket",
+			wd.getAddress(), wd.getPort(), wd.getOptions());
 
 		synchronized (lock) {
 
