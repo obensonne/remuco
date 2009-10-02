@@ -20,6 +20,7 @@
  */
 package remuco.util;
 
+import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
 
@@ -33,6 +34,46 @@ public final class Tools {
 
 	/** A global random number generator instance. */
 	public static final Random RANDOM = new Random();
+
+	/**
+	 * Build a one element service list containing the connection URL for a
+	 * service where all required URL parameters are known.
+	 * 
+	 * @param proto
+	 *            URL parameter
+	 * @param addr
+	 *            URL parameter
+	 * @param port
+	 *            URL parameter
+	 * @param options
+	 *            URL parameter (may be <code>null</code> or empty string)
+	 * 
+	 * @return a hash table mapping the generic service name <em>Player</em> to
+	 *         an URL build from the given parameters
+	 */
+	public static Hashtable buildManualServiceList(String proto, String addr,
+			String port, String options) {
+
+		final StringBuffer url = new StringBuffer(proto);
+
+		url.append("://");
+		url.append(addr);
+		url.append(':');
+		url.append(port);
+
+		if (options != null && options.length() > 0) {
+			if (options.charAt(0) != ';') {
+				url.append(';');
+			}
+			url.append(options);
+		}
+
+		final Hashtable services = new Hashtable(1);
+
+		services.put("Player", url.toString());
+
+		return services;
+	}
 
 	/**
 	 * Compare two byte arrays.
