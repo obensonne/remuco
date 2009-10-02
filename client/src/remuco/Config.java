@@ -42,9 +42,11 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import remuco.comm.BluetoothDevice;
 import remuco.comm.Connection;
-import remuco.comm.Device;
+import remuco.comm.IDevice;
 import remuco.comm.Serial;
+import remuco.comm.WifiDevice;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.ui.screenies.TitleScreeny;
@@ -333,7 +335,7 @@ public final class Config {
 
 		while (devs.hasMoreElements()) {
 			sb.append(devs.nextElement());
-			sb.append(Device.LIST_SEP);
+			sb.append(IDevice.LIST_SEP);
 		}
 		if (sb.length() > 0) {
 			sb.deleteCharAt(sb.length() - 1);
@@ -559,16 +561,30 @@ public final class Config {
 
 		final String val = (String) options.get(OPTION_KEY_DEVS);
 
-		if (val != null) {
+		if (val != null && val.length() > 0) {
 
-			final String flad[] = Tools.splitString(val, Device.LIST_SEP, false);
+			final String flad[] = Tools.splitString(val, IDevice.LIST_SEP, false);
 
 			for (int i = 0; i < flad.length; i++) {
+				final IDevice iDevice;
+				if (flad[i].length() == 0) {
+					ret = false;
+					continue;
+				}
 				try {
-					devices.addElement(new Device(flad[i]));
+					if (flad[i].charAt(0) == IDevice.TYPE_WIFI) {
+						iDevice = new WifiDevice(flad[i]);
+					} else if (flad[i].charAt(0) == IDevice.TYPE_BLUETOOTH) {
+						iDevice = new BluetoothDevice(flad[i]);
+					} else {
+						ret = false;
+						continue;
+					}
 				} catch (IllegalArgumentException e) {
 					ret = false;
+					continue;
 				}
+				devices.addElement(iDevice);
 			}
 		}
 

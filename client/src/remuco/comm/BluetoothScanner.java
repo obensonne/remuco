@@ -104,7 +104,7 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 
 		// iterate over devices and get address and name
 
-		final Device devices[] = new Device[remoteDevices.size()];
+		final BluetoothDevice devices[] = new BluetoothDevice[remoteDevices.size()];
 
 		for (int i = 0; i < devices.length; i++) {
 
@@ -118,7 +118,9 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 				name = "";
 			}
 
-			devices[i] = new Device(Device.BLUETOOTH, address, name);
+			devices[i] = new BluetoothDevice();
+			devices[i].setAddress(address);
+			devices[i].setName(name);
 		}
 
 		remoteDevices.removeAllElements();

@@ -36,6 +36,6 @@ public interface IScanListener {
 	 * @param devices
 	 *            the found devices
 	 */
-	public void notifyScannedDevices(Device devices[]);
+	public void notifyScannedDevices(BluetoothDevice devices[]);
 
 }

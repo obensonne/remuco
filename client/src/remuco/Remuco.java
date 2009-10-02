@@ -36,7 +36,7 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
-import remuco.comm.Device;
+import remuco.comm.IDevice;
 import remuco.comm.IConnectionListener;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IServiceFinder;
@@ -290,7 +290,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		} else if (c == Alert.DISMISS_COMMAND && d == alertLoadConfig) {
 
 			// continue startup
-			
+
 			display.setCurrent(screenDeviceSelector);
 
 		} else if (c == Alert.DISMISS_COMMAND && d == alertSaveConfig) {
@@ -336,26 +336,21 @@ public class Remuco implements CommandListener, IConnectionListener,
 		}
 	}
 
-	public void notifySelectedDevice(Device device) {
+	public void notifySelectedDevice(IDevice iDevice) {
 
 		final IServiceFinder sf;
 
-		if (device.type == Device.BLUETOOTH && device.address.indexOf(':') < 0) {
-
+		if (iDevice.getType() == IDevice.TYPE_BLUETOOTH) {
 			sf = BluetoothFactory.createBluetoothServiceFinder();
-
-		} else if (device.type == Device.WIFI) {
-
+		} else if (iDevice.getType() == IDevice.TYPE_WIFI) {
 			sf = new InetServiceFinder();
-
 		} else {
-
 			Log.bug("Jan 26, 2009.7:29:56 PM");
 			return;
 		}
 
 		try {
-			sf.findServices(device.address, this);
+			sf.findServices(iDevice, this);
 		} catch (UserException e) {
 			alert(e, screenDeviceSelector);
 			return;

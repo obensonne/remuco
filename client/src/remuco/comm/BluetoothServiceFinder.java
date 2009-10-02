@@ -21,6 +21,7 @@
 package remuco.comm;
 
 import java.util.Hashtable;
+import java.util.TimerTask;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DataElement;
@@ -32,8 +33,13 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 
+import remuco.MainLoop;
 import remuco.UserException;
 import remuco.util.Log;
+import remuco.util.Tools;
+
+// TODO: Service finder classes can make use of final instance variables 
+// because they are used only once per instances now
 
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {
@@ -49,31 +55,63 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	/** Container for service search related data. */
 	private static class Search {
 
+		public final boolean failsafe;
 		public final int id;
 		public final IServiceListener listener;
+		public final TimerTask manual;
 		public final Hashtable services;
 
-		public Search(int id, IServiceListener listener) {
+		/** For default and failsafe service search. */
+		public Search(int id, boolean failsafe, IServiceListener listener) {
 			this.id = id;
+			this.failsafe = failsafe;
 			this.listener = listener;
 			this.services = new Hashtable();
+			this.manual = null;
 		}
 
+		/** For manual/faked service search. */
+		public Search(TimerTask manual) {
+			this.id = -1;
+			this.failsafe = false;
+			this.listener = null;
+			this.services = null;
+			this.manual = manual;
+		}
 	}
 
-	/** Service name in default language. */
+	/** Service descriptor attribute ID: service name in default language. */
 	private static final int ATTRIBUTE_NAME = 0x0100;
 
+	/** List of attributes to retrieve within a service descriptor. */
 	private static final int ATTRIBUTE_LIST[] = new int[] { ATTRIBUTE_NAME };
 
+	/**
+	 * List of attributes to retrieve within a service descriptor on a
+	 * <em>failsafe</em> service search. When using this, the names of services
+	 * (respectively players) in search results are not known.
+	 */
+	private static final int ATTRIBUTE_LIST_FS[] = null;
+
 	private static final String DEFAULT_SERVICE_NAME = "NoName";
+
+	private static final String OPTIONS = ";master=false;encrypt=false;authenticate=false";
 
 	private static final int SECURITY = ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
 
 	/** Remuco service UUID */
 	private final static String UUID = "025fe2ae07624bed90f2d8d778f020fe";
 
+	/** List of service UUIDs to search for. */
 	private static final UUID[] UUID_LIST = new UUID[] { new UUID(UUID, false) };
+
+	/**
+	 * List of service UUIDs to search for on a <em>failsafe</em> service
+	 * search. This list uses the generic UUID for SPP services. When using
+	 * this, the search result may list services which are an SPP service but
+	 * not a Remuco player adapter service.
+	 */
+	private static final UUID[] UUID_LIST_FS = new UUID[] { new UUID(0x1101) };
 
 	/**
 	 * Get the name of a service (the player behind the remuco service).
@@ -98,6 +136,8 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			Log.ln("failed to get service name", e);
 			return DEFAULT_SERVICE_NAME;
 		}
+
+		// TODO: return null on error and then assign name as in failsafe mode
 
 	}
 
@@ -124,7 +164,11 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 		synchronized (lock) {
 			if (search != null) {
-				agent.cancelServiceSearch(search.id);
+				if (search.manual != null) {
+					search.manual.cancel();
+				} else {
+					agent.cancelServiceSearch(search.id);
+				}
 				search = null;
 			}
 		}
@@ -134,7 +178,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 		Log.bug("Mar 18, 2009.0:16:23 AM");
 	}
 
-	public void findServices(String addr, IServiceListener listener)
+	public void findServices(IDevice iDevice, final IServiceListener listener)
 			throws UserException {
 
 		synchronized (lock) {
@@ -142,27 +186,65 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			if (search != null)
 				return;
 
+			final BluetoothDevice bd = (BluetoothDevice) iDevice;
+
+			// faked search for manual service search
+
+			if (bd.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
+
+				final Hashtable services = Tools.buildManualServiceList(
+					"btspp", bd.getAddress(), bd.getPort(), OPTIONS);
+
+				final TimerTask notifer = new TimerTask() {
+					public void run() {
+						listener.notifyServices(services, null);
+						synchronized (lock) {
+							search = null;
+						}
+					}
+				};
+				search = new Search(notifer);
+
+				// fake a service search
+				MainLoop.schedule(notifer, 1000);
+
+				return;
+			}
+
+			// real service search
+
 			initBluetooth();
 
-			final BTD btd = new BTD(addr);
+			final UUID uuidList[];
+			final int attrList[];
+			final boolean failsafe;
+
+			failsafe = bd.getSearch() == BluetoothDevice.SEARCH_FAILSAFE;
+
+			if (failsafe) {
+				uuidList = UUID_LIST_FS;
+				attrList = ATTRIBUTE_LIST_FS;
+			} else {
+				uuidList = UUID_LIST;
+				attrList = ATTRIBUTE_LIST;
+			}
+
+			final BTD btd = new BTD(bd.getAddress());
 
 			final int sid;
 			try {
-				sid = agent.searchServices(ATTRIBUTE_LIST, UUID_LIST, btd, this);
-
+				sid = agent.searchServices(attrList, uuidList, btd, this);
 			} catch (BluetoothStateException e) {
-
 				Log.ln("[BT] BluetoothStateException", e);
 				throw new UserException("Bluetooth Error",
 						"Bluetooth seems to be busy. Cannot search for Remuco "
 								+ "services right now.");
-
 			} catch (NullPointerException e) {
 				// WTK emulator throws this if there are no services
 				return;
 			}
 
-			search = new Search(sid, listener);
+			search = new Search(sid, failsafe, listener);
 		}
 	}
 
@@ -180,9 +262,14 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			for (int i = 0; i < srs.length; i++) {
 
-				String url = srs[i].getConnectionURL(SECURITY, false);
+				final String url = srs[i].getConnectionURL(SECURITY, false);
 
-				String name = getServiceName(srs[i]);
+				final String name;
+				if (search.failsafe) {
+					name = "Player " + i;
+				} else {
+					name = getServiceName(srs[i]);
+				}
 
 				search.services.put(name, url); // assuming names are unique
 			}

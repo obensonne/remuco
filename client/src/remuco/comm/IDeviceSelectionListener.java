@@ -25,9 +25,9 @@ public interface IDeviceSelectionListener {
 	/**
 	 * Notify a device selection.
 	 * 
-	 * @param device
+	 * @param iDevice
 	 *            the selected device
 	 */
-	public void notifySelectedDevice(Device device);
+	public void notifySelectedDevice(IDevice iDevice);
 
 }
