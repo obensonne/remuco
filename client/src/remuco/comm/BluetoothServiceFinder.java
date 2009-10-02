@@ -35,6 +35,9 @@ import javax.bluetooth.UUID;
 import remuco.UserException;
 import remuco.util.Log;
 
+// TODO: Service finder classes can make use of final instance variables 
+// because they are used only once per instances now
+
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {
 
@@ -104,6 +107,8 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			return DEFAULT_SERVICE_NAME;
 		}
 
+		// TODO: return null on error and then assign name as in failsafe mode
+
 	}
 
 	private DiscoveryAgent agent = null;
@@ -147,6 +152,8 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			if (search != null)
 				return;
 
+			// TODO: handle manual port setting (fake service search)
+
 			initBluetooth();
 
 			final BluetoothDevice bd = (BluetoothDevice) device;
@@ -154,7 +161,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			final UUID uuidList[];
 			final int attrList[];
 			final boolean failsafe;
-			
+
 			failsafe = bd.getSearch() == BluetoothDevice.SEARCH_FAILSAFE;
 
 			if (failsafe) {
@@ -166,7 +173,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			}
 
 			final BTD btd = new BTD(bd.getAddress());
-			
+
 			final int sid;
 			try {
 				sid = agent.searchServices(attrList, uuidList, btd, this);
