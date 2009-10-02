@@ -191,6 +191,9 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 			if (portInt < 1 || portInt > 30) {
 				return "Port number out of range (1-30)!";
 			}
+		} else if (port.length() == 0) {
+			// not a problem now, but may be later, let's fix it silently:
+			tfPort.setString("1");
 		}
 
 		return null;
