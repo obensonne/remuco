@@ -2,7 +2,7 @@ package remuco.comm;
 
 import remuco.util.Tools;
 
-public class BluetoothDevice extends Device {
+public class BluetoothDevice implements IDevice {
 
 	/** Service search strategy. */
 	public static final int SEARCH_STANDARD = 0, SEARCH_FAILSAFE = 1,

@@ -9,7 +9,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import remuco.comm.BluetoothDevice;
-import remuco.comm.Device;
+import remuco.comm.IDevice;
 
 /** Screen to configure a Bluetooth connection. */
 public class BluetoothScreen extends Form implements IDeviceScreen {
@@ -143,7 +143,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 	}
 
-	public Device getDevice() {
+	public IDevice getDevice() {
 
 		if (!virgin || cgScan.getSelectedIndex() == ADDR_TYPE_MANUAL) {
 			device.setAddress(tfAddr.getString());

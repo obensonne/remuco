@@ -178,7 +178,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 		Log.bug("Mar 18, 2009.0:16:23 AM");
 	}
 
-	public void findServices(Device device, final IServiceListener listener)
+	public void findServices(IDevice iDevice, final IServiceListener listener)
 			throws UserException {
 
 		synchronized (lock) {
@@ -186,7 +186,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			if (search != null)
 				return;
 
-			final BluetoothDevice bd = (BluetoothDevice) device;
+			final BluetoothDevice bd = (BluetoothDevice) iDevice;
 
 			// faked search for manual service search
 

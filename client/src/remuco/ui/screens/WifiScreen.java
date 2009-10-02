@@ -3,7 +3,7 @@ package remuco.ui.screens;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
-import remuco.comm.Device;
+import remuco.comm.IDevice;
 import remuco.comm.WifiDevice;
 
 /** Screen to configure a Bluetooth connection. */
@@ -44,7 +44,7 @@ public class WifiScreen extends Form implements IDeviceScreen {
 		append(tfName);
 	}
 
-	public Device getDevice() {
+	public IDevice getDevice() {
 
 		device.setAddress(tfAddr.getString());
 		device.setPort(tfPort.getString());

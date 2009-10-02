@@ -1,8 +1,8 @@
 package remuco.ui.screens;
 
-import remuco.comm.Device;
+import remuco.comm.IDevice;
 
-/** Device screens are forms to configure a connection to a remote device. */
+/** IDevice screens are forms to configure a connection to a remote device. */
 public interface IDeviceScreen {
 
 	/**
@@ -10,7 +10,7 @@ public interface IDeviceScreen {
 	 * has been passed to the constructor of this screen, then the same device
 	 * will be returned here. Otherwise a new device will be returned.
 	 */
-	public Device getDevice();
+	public IDevice getDevice();
 
 	/**
 	 * Validate the user input.

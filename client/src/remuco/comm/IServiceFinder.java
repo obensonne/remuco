@@ -38,7 +38,7 @@ public interface IServiceFinder {
 	/**
 	 * Find all available Remuco services on a device.
 	 * 
-	 * @param device
+	 * @param iDevice
 	 *            device to search for services
 	 * @param listener
 	 *            the {@link IServiceListener} to notify if service search is
@@ -46,7 +46,7 @@ public interface IServiceFinder {
 	 * @throws UserException
 	 *             if there was an error in starting the search
 	 */
-	public void findServices(Device device, IServiceListener listener)
+	public void findServices(IDevice iDevice, IServiceListener listener)
 			throws UserException;
 
 }

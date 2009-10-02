@@ -48,10 +48,10 @@ public final class InetServiceFinder implements IServiceFinder {
 		}
 	}
 
-	public void findServices(Device device, final IServiceListener listener)
+	public void findServices(IDevice iDevice, final IServiceListener listener)
 			throws UserException {
 
-		final WifiDevice wd = (WifiDevice) device;
+		final WifiDevice wd = (WifiDevice) iDevice;
 
 		final Hashtable services = Tools.buildManualServiceList("socket",
 			wd.getAddress(), wd.getPort(), wd.getOptions());

@@ -2,7 +2,7 @@ package remuco.comm;
 
 import remuco.util.Tools;
 
-public class WifiDevice extends Device {
+public class WifiDevice implements IDevice {
 
 	private static final String PORT = "34271";
 
