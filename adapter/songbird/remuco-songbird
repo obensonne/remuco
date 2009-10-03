@@ -46,34 +46,6 @@ class SongbirdAdapter(remuco.MPRISAdapter):
         remuco.MPRISAdapter.__init__(self, "songbird", "Songbird", 
                                      mime_types=("audio",))
         
-        self.__am = None
-        
-    def start(self):
-        
-        remuco.MPRISAdapter.start(self)
-        
-        try:
-            bus = dbus.SessionBus()
-            self.__am = bus.get_object("org.mpris.songbird", "/Player")
-        except DBusException, e:
-            raise StandardError("dbus error: %s" % e)
-
-    def stop(self):
-        
-        remuco.MPRISAdapter.stop(self)
-        
-        self.__am = None
-        
-    def poll(self):
-        remuco.MPRISAdapter.poll(self)
-        
-    # =========================================================================
-    # control interface 
-    # =========================================================================
-    
-    def ctrl_toggle_shuffle(self):
-        remuco.MPRISAdapter.ctrl_toggle_shuffle(self)
-            
     # =========================================================================
     # internal methods (overridden to fix MPRIS issues) 
     # =========================================================================
