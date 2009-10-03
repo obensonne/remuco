@@ -381,15 +381,6 @@ class PlayerAdapter(object):
         corresponding media player.
     
     ===========================================================================
-    Methods to call to respond to the requests above:
-    ===========================================================================
-
-        * reply_playlist_request()
-        * reply_queue_request()
-        * reply_mlib_request()
-        * reply_search_request()
-        
-    ===========================================================================
     Methods to call to synchronize media player state information with clients:
     ===========================================================================
     
