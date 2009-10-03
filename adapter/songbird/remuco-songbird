@@ -30,6 +30,7 @@
 import dbus
 from dbus.exceptions import DBusException
 import gobject
+import urllib
 
 import remuco
 from remuco import log
@@ -73,6 +74,30 @@ class SongbirdAdapter(remuco.MPRISAdapter):
     def ctrl_toggle_shuffle(self):
         remuco.MPRISAdapter.ctrl_toggle_shuffle(self)
             
+    # =========================================================================
+    # internal methods (overridden to fix MPRIS issues) 
+    # =========================================================================
+    
+    def _notify_track(self, track):
+        
+        # The Songbird MPRIS extension does not provide real URLs in the
+        # meta data's location entry. Until this is fixed, quote the location
+        # here.
+        
+        if track and "location" in track:
+            
+            loc = track["location"]
+            try:
+                loc = loc.encode("UTF8")
+            except UnicodeDecodeError:
+                pass # not a unicode string
+            
+            loc = urllib.quote(loc, ":/%") # '%' prevents double quoting
+            
+            track["location"] = loc
+        
+        remuco.MPRISAdapter._notify_track(self, track)
+        
 # =============================================================================
 # main
 # =============================================================================
