@@ -1122,10 +1122,7 @@ class PlayerAdapter(object):
         if length > 0:
             progress = min(length, progress)
         
-        #diff = abs(self.__progress.progress - progress)
-        
         change = self.__progress.length != length
-        #change |= diff >= 5
         change |= self.__progress.progress != progress
         
         if change:
