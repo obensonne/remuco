@@ -47,6 +47,19 @@ class SongbirdAdapter(remuco.MPRISAdapter):
                                      mime_types=("audio",))
         
     # =========================================================================
+    # request interface 
+    # =========================================================================
+    
+    def request_playlist(self, reply):
+        
+        # Getting the playlist from Songbird is very slow. Further there are no
+        # playlist actions possible right now -> don't send the playlist.
+        
+        reply.ids = ["X"]
+        reply.names = ["Not yet available, maybe in a later version of the Songbird adapter"]
+        reply.send() # no playlist actions right now, 
+        
+    # =========================================================================
     # internal methods (overridden to fix MPRIS issues) 
     # =========================================================================
     
