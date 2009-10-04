@@ -96,11 +96,8 @@ public class ProgressScreeny extends Screeny {
 			sb.append(p.getProgressFormatted());
 		}
 
-		sb.append("    -    ");
-
-		if (p.getLength() < 0) {
-			sb.append("???");
-		} else {
+		if (p.getLength() > 0) {
+			sb.append("    -    ");
 			sb.append(p.getLengthFormatted());
 		}
 
