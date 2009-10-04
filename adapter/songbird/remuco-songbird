@@ -43,8 +43,7 @@ class SongbirdAdapter(remuco.MPRISAdapter):
     
     def __init__(self):
         
-        remuco.MPRISAdapter.__init__(self, "songbird", "Songbird", 
-                                     mime_types=("audio",))
+        remuco.MPRISAdapter.__init__(self, "songbird", "Songbird")
         
     # =========================================================================
     # request interface 
