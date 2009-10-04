@@ -83,6 +83,12 @@ pa_files["rhythmbox"] = [
      ["remuco.rb-plugin", "remythm.py"])
 ]
 
+# --- Songbird ------------------------------------------------------------------
+
+pa_files["songbird"] = [
+    ["remuco-songbird"]
+]
+
 # --- Totem -------------------------------------------------------------------
 
 # set prefix may not be valid for Totem -> use a Totem specific prefix:
