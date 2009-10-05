@@ -185,7 +185,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
         else:
             log.error("statusfifo read error")
             self.watch_id = None
-            self.stop()
+            self.manager.stop()
             return False
 
 
