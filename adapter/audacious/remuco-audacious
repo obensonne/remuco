@@ -110,12 +110,10 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     
     def ctrl_toggle_repeat(self):
         
-        # audacious uses wrong method name for setting repeat mode
-        
+        # this works in more Audacious versions than the related MPRIS control 
         try:
-            self._mp_t.Loop(not self._repeat,
-                            reply_handler=self._dbus_ignore,
-                            error_handler=self._dbus_error)
+            self.__ad.ToggleRepeat(reply_handler=self._dbus_ignore,
+                                   error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
             
@@ -124,12 +122,10 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     
     def ctrl_toggle_shuffle(self):
         
-        # audacious uses wrong method name for setting shuffle mode
-        
+        # this works in more Audacious versions than the related MPRIS control 
         try:
-            self._mp_t.Random(not self._shuffle,
-                              reply_handler=self._dbus_ignore,
-                              error_handler=self._dbus_error)
+            self.__ad.ToggleShuffle(reply_handler=self._dbus_ignore,
+                                    error_handler=self._dbus_error)
         except DBusException, e:
             log.warning("dbus error: %s" % e)
         
@@ -163,7 +159,7 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     def _notify_status(self, status):
 
         if isinstance(status, int):
-            # audacious only provides playback status here
+            # audacious only provides playback status here (Audacious 1.5)
             self.__poll_for_repeat_and_shuffle = True
             status = (status, self._shuffle, self._repeat, self._repeat)
         else:
@@ -175,10 +171,11 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     def _notify_track(self, track):
         
         # audacious provides length in 'length', not in 'time' or 'mtime'
+        # (fixed by http://hg.atheme.org/audacious/rev/e6caff433c68)
         if "length" in track and not "mtime" in track:
             track["mtime"] = track["length"]
             
-        # audacious provides length in 'URI', not in 'location'
+        # audacious 1.5 provides length in 'URI', not in 'location'
         if "URI" in track:
             track["location"] = track["URI"]
             
