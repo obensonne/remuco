@@ -51,11 +51,7 @@ class QuodLibetAdapter(remuco.PlayerAdapter):
         info[remuco.INFO_ALBUM] = self.quodlibet("--print-playing '<album>'")
         info[remuco.INFO_ARTIST] = self.quodlibet("--print-playing '<artist>'")
         info[remuco.INFO_GENRE] = self.quodlibet("--print-playing '<genere>'")
-#        info[remuco.INFO_LENGHT] = self.quodlibet("--print-playing '<lenght>'")
-#        info[remuco.INFO_RATING] = self.quodlibet("--print-playing '<rating>'")
-#        info[remuco.INFO_TAGS] = self.quodlibet("--print-playing '<tags>'")
         info[remuco.INFO_TITLE] = self.quodlibet("--print-playing '<title>'")
-#        info[remuco.INFO_YEAR] = self.quodlibet("--print-playing '<year>'")
         self.update_item(None, info, None)
 
     def quodlibet(self, action):
