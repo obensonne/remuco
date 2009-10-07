@@ -42,20 +42,6 @@ public class ProgressScreeny extends Screeny {
 
 	}
 
-	// private Progress progress = new Progress();
-	//	
-	// private int rating = 0;
-	//	
-	// protected void dataUpdated() {
-	// if (data instanceof Progress) {
-	// progress = (Progress) data;
-	// } else if (data instanceof Item) {
-	// rating = ((Item) data).getRating();
-	// } else {
-	// Log.bug("Jun 17, 2009.11:19:06 PM");
-	// }
-	// }
-
 	protected void initRepresentation() throws ScreenyException {
 
 		if (!player.supports(Feature.KNOWN_PROGRESS)) {
@@ -74,7 +60,6 @@ public class ProgressScreeny extends Screeny {
 
 		colorBG = theme.getColor(Theme.RTC_BG);
 		colorFG = theme.getColor(Theme.RTC_TEXT_OTHER);
-
 	}
 
 	protected void updateRepresentation() {
@@ -96,18 +81,14 @@ public class ProgressScreeny extends Screeny {
 			sb.append(p.getProgressFormatted());
 		}
 
-		sb.append("    -    ");
-
-		if (p.getLength() < 0) {
-			sb.append("???");
-		} else {
+		if (p.getLength() > 0) {
+			sb.append("    -    ");
 			sb.append(p.getLengthFormatted());
 		}
 
 		g.setColor(colorFG);
 
 		g.drawString(sb.toString(), xOff, yOff, BOTTOM_CENTER);
-
 	}
 
 }

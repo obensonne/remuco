@@ -22,21 +22,19 @@ package remuco.ui.screens;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.TimerTask;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import remuco.MainLoop;
 import remuco.player.AbstractAction;
 import remuco.player.ActionParam;
 import remuco.player.ItemAction;
@@ -49,79 +47,11 @@ import remuco.util.Log;
 
 public final class ItemlistScreen extends List implements CommandListener {
 
-	private class ActionAlert extends Form implements CommandListener {
-
-		private static final int LAYOUT = Item.LAYOUT_CENTER
-				| Item.LAYOUT_NEWLINE_AFTER;
-
-		private final Display display;
-
-		private final ImageItem element;
-
-		private final StringItem issue, solution;
-
-		private final Displayable parent;
-
-		protected ActionAlert(Display display, Displayable parent) {
-			super("Action");
-			this.display = display;
-			this.parent = parent;
-			this.issue = new StringItem(null, "");
-			this.issue.setLayout(LAYOUT);
-			this.element = new ImageItem(null, theme.licItem, LAYOUT, null);
-			this.solution = new StringItem(null, "");
-			this.solution.setLayout(LAYOUT);
-			this.append(new ImageItem(null, theme.aicHmpf, LAYOUT, null));
-			this.append(issue);
-			this.append("\n");
-			this.append(element);
-			this.append("\n");
-			this.append(solution);
-			this.addCommand(CMD.OK);
-			this.setCommandListener(this);
-		}
-
-		public void commandAction(Command c, Displayable d) {
-			this.display.setCurrent(parent);
-		}
-
-		protected void show(AbstractAction a, String issue, String solution) {
-
-			this.issue.setLabel(a.label);
-			this.issue.setText(issue + "\n");
-			this.element.setImage(a.isListAction() ? theme.licList
-					: theme.licItemMarked);
-			this.solution.setText(solution);
-			this.display.setCurrent(this);
-		}
-	}
-
-	private class AutoMarker extends TimerTask {
-
-		private int lastIndex = -1;
-
-		public void run() {
-
-			final int index = getSelectedIndex();
-			if (index == lastIndex || index < 0) { // nothing or same selected
-				return;
-			}
-			if (lastIndex >= numNested) { // unmark last item
-				set(lastIndex, getString(lastIndex), theme.licItem);
-				lastIndex = -1;
-			}
-			if (index < numNested) { // no item selected
-				return;
-			}
-			// new item selected
-			lastIndex = index;
-			set(index, getString(index), theme.licItemMarked);
-		}
-
-	}
-
 	private static final Command CMD_GOTO_PAGE = new Command("Page go to",
 			Command.SCREEN, 10);
+
+	private static final Command CMD_MARK = new Command("Mark", Command.SCREEN,
+			1);
 
 	private static final Command CMD_MARK_ALL = new Command("Mark all",
 			Command.SCREEN, 11);
@@ -138,11 +68,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 	/** Pseudo-index for marking all items. */
 	private static final int MARK_ALL = -1;
 
-	private final ActionAlert aa;
-
 	private final Hashtable actionCommands;
-
-	private AutoMarker autoMarker = null;
 
 	private final Display display;
 
@@ -183,8 +109,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 		this.list = list;
 
 		theme = Theme.getInstance();
-
-		aa = new ActionAlert(display, this);
 
 		numNested = list.getNumNested();
 		numItems = list.getNumItems();
@@ -229,7 +153,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		// commands
 
-		setSelectCommand(CMD.SELECT);
+		setSelectCommand(CMD_MARK);
 		addCommand(CMD.BACK);
 		addCommand(CMD_ROOT);
 
@@ -260,9 +184,9 @@ public final class ItemlistScreen extends List implements CommandListener {
 					continue;
 				}
 				if (((ItemAction) a).multiple) {
-					label = a.label + " (items)";
+					label = a.label + " (marked)";
 				} else {
-					label = a.label + " (item)";
+					label = a.label + " (focussed)";
 				}
 			}
 			final Command c = new Command(label, Command.SCREEN, 10);
@@ -272,10 +196,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		// misc
 
-		if (numItems > 0) {
-			enableAutoMarker();
-		}
-
 		super.setCommandListener(this);
 
 	}
@@ -284,12 +204,10 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		if (c == CMD_ROOT) {
 
-			disableAutoMarker();
 			listener.ilcRoot(this);
 
 		} else if (c == CMD.BACK && d == this) {
 
-			disableAutoMarker();
 			listener.ilcBack(this);
 
 		} else if (c == CMD_MARK_ALL) {
@@ -299,12 +217,10 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		} else if (c == CMD_PAGE_UP) {
 
-			disableAutoMarker();
 			listener.ilcGotoPage(this, list.getPage() - 1);
 
 		} else if (c == CMD_PAGE_DOWN) {
 
-			disableAutoMarker();
 			listener.ilcGotoPage(this, list.getPage() + 1);
 
 		} else if (c == CMD_GOTO_PAGE) {
@@ -321,7 +237,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 			if (page < 1 || page > list.getPageMax() + 1) {
 				tfPageSelection.setString(Integer.toString(list.getPage() + 1));
 			} else {
-				disableAutoMarker();
 				listener.ilcGotoPage(this, page - 1);
 			}
 
@@ -329,7 +244,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			display.setCurrent(this);
 
-		} else if (c == CMD.SELECT && d == this) {
+		} else if (c == CMD_MARK && d == this) {
 
 			final int index = getSelectedIndex();
 			if (index < 0) {
@@ -338,7 +253,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			if (index < numNested) { // nested list selected
 
-				disableAutoMarker();
 				listener.ilcShowNested(this, list.getPathForNested(index));
 
 			} else { // item selected
@@ -391,26 +305,13 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 	}
 
-	private void disableAutoMarker() {
+	private void actionAlert(String msg) {
 
-		if (autoMarker == null) {
-			return;
-		}
-
-		autoMarker.cancel();
-		autoMarker = null;
-
-	}
-
-	private void enableAutoMarker() {
-
-		if (autoMarker != null) {
-			return;
-		}
-
-		autoMarker = new AutoMarker();
-		MainLoop.schedule(autoMarker, 100, 100);
-
+		final Alert alert = new Alert("Oops..");
+		alert.setImage(theme.aicHmpf);
+		alert.setString(msg);
+		alert.setTimeout(2000);
+		display.setCurrent(alert, this);
 	}
 
 	private void handleAction(AbstractAction a) {
@@ -424,37 +325,27 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			final ItemAction ia = (ItemAction) a;
 
-			if (!ia.multiple && numberOfMarkedItems > 1) {
+			if (ia.multiple && numberOfMarkedItems == 0) {
 
-				aa.show(a, "is only applicable to a single item.",
-					"Currently multiple items are marked.");
+				actionAlert("This action requires one or more marked items.");
 
-			} else if (index < numNested && numberOfMarkedItems == 0) {
+			} else if (index < numNested) {
 
-				if (ia.multiple) {
-
-					aa.show(a, "is only applicable to items.",
-						"Mark one or more items to perform this action.");
-
-				} else {
-
-					aa.show(a, "is only applicable to an item.",
-						"Mark an item to perform this action.");
-				}
+				actionAlert("This is an item action, not applicable to lists.");
 
 			} else {
 
 				final int positions[];
 				final String ids[];
 
-				if (numberOfMarkedItems == 0) { // use single auto marked item
+				if (!ia.multiple) { // use focussed item
 
 					final int itemNo = index - numNested;
 
 					positions = new int[] { list.getItemPosAbsolute(itemNo) };
 					ids = new String[] { list.getItemID(itemNo) };
 
-				} else { // use all user marked items
+				} else { // use marked items
 
 					positions = new int[numberOfMarkedItems];
 					ids = new String[numberOfMarkedItems];
@@ -476,7 +367,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 				} else {
 					ap = new ActionParam(a.id, list.getPath(), positions, ids);
 				}
-				disableAutoMarker();
 				listener.ilcAction(this, ap);
 			}
 
@@ -484,13 +374,11 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			if (index >= numNested) {
 
-				aa.show(a, "is only applicable to a list.",
-					"Focus a list to perform this action.");
+				actionAlert("This is a list action, not applicable to items");
 
 			} else {
 
 				final int listNo = index;
-				disableAutoMarker();
 				listener.ilcAction(this, new ActionParam(a.id,
 						list.getPathForNested(listNo), null, null));
 			}
@@ -531,12 +419,6 @@ public final class ItemlistScreen extends List implements CommandListener {
 	}
 
 	private void updateItemIcons() {
-
-		if (numberOfMarkedItems > 0) {
-			disableAutoMarker();
-		} else {
-			enableAutoMarker();
-		}
 
 		for (int i = 0; i < itemMarkedFlags.length; i++) {
 			final int index = numNested + i;

@@ -315,6 +315,7 @@ class MPRISAdapter(PlayerAdapter):
             reply.send()
             return
         
+        # TODO: very slow for SongBird, should be async
         tracks = self.__get_tracklist()
 
         for track in tracks:

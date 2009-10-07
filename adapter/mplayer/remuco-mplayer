@@ -27,11 +27,15 @@
 
 # Some remote control related documentation for MPlayer is available at
 # http://www.mplayerhq.hu/DOCS/tech/slave.txt
+# To parse the status line, read
+# http://www.mplayerhq.hu/DOCS/HTML/en/faq.html#id2734829
 
 """MPlayer adapter for Remuco, implemented as an executable script."""
 
 import os
 import os.path
+import gobject
+from time import sleep
 
 import remuco
 from remuco import log
@@ -42,33 +46,66 @@ class MplayerAdapter(remuco.PlayerAdapter):
     def __init__(self):
 
         remuco.PlayerAdapter.__init__(self, "MPlayer")
-        
-        self.rdfifo = os.path.join(self.config.cache_dir, "fifo")
-        self.rdfifo = self.config.get_custom("mplayer-fifo", self.rdfifo)
-        
+
+        self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
+        self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
+
+        self.statusfifo = os.path.join(self.config.cache_dir, "statusfifo")
+        self.statusfifo = self.config.get_custom("mplayer-statusfifo", self.statusfifo)
+
         # ensure config is written:
-        self.config.set_custom("mplayer-fifo", self.rdfifo)
-        
-        self.fd = 0
+        self.config.set_custom("mplayer-cmdfifo", self.cmdfifo)
+        self.config.set_custom("mplayer-statusfifo", self.statusfifo)
+
+        self.fd_cmdfifo = 0
+        self.fd_statusfifo = 0
 
     def start(self):
-        
+
         remuco.PlayerAdapter.start(self)
 
-        if not(os.path.exists(self.rdfifo)):
-            os.mkfifo(self.rdfifo)
+        if not(os.path.exists(self.cmdfifo)):
+            os.mkfifo(self.cmdfifo)
 
-        self.fd = os.open(self.rdfifo, os.O_WRONLY)
+        log.debug("creating cmdfifo and waiting for mplayer to read it")
+        self.fd_cmdfifo = os.open(self.cmdfifo, os.O_WRONLY)
+
+        i = 0
+        while not(os.path.exists(self.statusfifo)):
+            i = i + 1
+
+            if i == 10:
+                log.error("tried enough. Make sure mplayer's output streams " +
+                    "include " + self.statusfifo)
+                raise StandardError()
+
+            log.warning("status fifo from MPlayer not found. sleeping 1 second...")
+            sleep(1)
+
+        self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY)
+
+        self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
+            gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
+            self.__inputevent)
 
         log.debug("starting mplayer adapter")
 
     def stop(self):
 
         remuco.PlayerAdapter.stop(self)
-        os.close(self.fd)
+
+        #maybe this would look prettier in a try/catch block?
+        if self.fd_cmdfifo != 0:
+            os.close(self.fd_cmdfifo)
+        if self.fd_statusfifo != 0:
+            os.close(self.fd_statusfifo)
+
+        if self.watch_id is not None:
+            gobject.source_remove(self.watch_id)
+
         log.debug("stopping mplayer adapter")
 
-#    def poll(self):
+    #def poll(self):
 
         #import random
 
@@ -120,12 +157,38 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __command(self, cmd):
         """Write a command to the MPlayer FIFO and handle errors."""
-        
+
         try:
-            os.write(self.fd, cmd)
+            os.write(self.fd_cmdfifo, cmd)
         except OSError, e:
             log.warning("FIFO to MPlayer broken (%s)", e)
             self.manager.stop()
+
+    def __read_fifo(self, fd):
+        """Read from a FIFO and handle errors."""
+        try:
+            str = os.read(fd, 100) #magic buflength number
+            return str
+        except OSError, e:
+            log.warning("FIFO from MPlayer broken (%s)", e)
+            self.manager.stop()
+
+    def __inputevent(self, fd, condition):
+        if condition == gobject.IO_IN:
+            # read from fd (fd is self.fifo_fd)
+            status_str = self.__read_fifo(fd)
+
+            #parse the string
+
+            #set global string to be read on poll()
+            return True
+        else:
+            log.error("statusfifo read error")
+            self.watch_id = None
+            self.manager.stop()
+            return False
+
+
 
 # =============================================================================
 # main (example startup using remuco.Manager)

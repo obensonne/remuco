@@ -381,15 +381,6 @@ class PlayerAdapter(object):
         corresponding media player.
     
     ===========================================================================
-    Methods to call to respond to the requests above:
-    ===========================================================================
-
-        * reply_playlist_request()
-        * reply_queue_request()
-        * reply_mlib_request()
-        * reply_search_request()
-        
-    ===========================================================================
     Methods to call to synchronize media player state information with clients:
     ===========================================================================
     
@@ -1128,12 +1119,10 @@ class PlayerAdapter(object):
             progress -= off
         else:
             progress += (5 - off)
-        progress = min(length, progress)
-        
-        #diff = abs(self.__progress.progress - progress)
+        if length > 0:
+            progress = min(length, progress)
         
         change = self.__progress.length != length
-        #change |= diff >= 5
         change |= self.__progress.progress != progress
         
         if change:

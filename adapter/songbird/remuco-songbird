@@ -30,6 +30,7 @@
 import dbus
 from dbus.exceptions import DBusException
 import gobject
+import urllib
 
 import remuco
 from remuco import log
@@ -42,37 +43,45 @@ class SongbirdAdapter(remuco.MPRISAdapter):
     
     def __init__(self):
         
-        remuco.MPRISAdapter.__init__(self, "songbird", "Songbird", 
-                                     mime_types=("audio",))
-        
-        self.__am = None
-        
-    def start(self):
-        
-        remuco.MPRISAdapter.start(self)
-        
-        try:
-            bus = dbus.SessionBus()
-            self.__am = bus.get_object("org.mpris.songbird", "/Player")
-        except DBusException, e:
-            raise StandardError("dbus error: %s" % e)
-
-    def stop(self):
-        
-        remuco.MPRISAdapter.stop(self)
-        
-        self.__am = None
-        
-    def poll(self):
-        remuco.MPRISAdapter.poll(self)
+        remuco.MPRISAdapter.__init__(self, "songbird", "Songbird")
         
     # =========================================================================
-    # control interface 
+    # request interface 
     # =========================================================================
     
-    def ctrl_toggle_shuffle(self):
-        remuco.MPRISAdapter.ctrl_toggle_shuffle(self)
+    def request_playlist(self, reply):
+        
+        # Getting the playlist from Songbird is very slow. Further there are no
+        # playlist actions possible right now -> don't send the playlist.
+        
+        reply.ids = ["X"]
+        reply.names = ["Not yet available, maybe in a later version of the Songbird adapter"]
+        reply.send() # no playlist actions right now, 
+        
+    # =========================================================================
+    # internal methods (overridden to fix MPRIS issues) 
+    # =========================================================================
+    
+    def _notify_track(self, track):
+        
+        # The Songbird MPRIS extension does not provide real URLs in the
+        # meta data's location entry. Until this is fixed, quote the location
+        # here.
+        
+        if track and "location" in track:
             
+            loc = track["location"]
+            try:
+                loc = loc.encode("UTF8")
+            except UnicodeDecodeError:
+                pass # not a unicode string
+            
+            loc = urllib.quote(loc, ":/%") # '%' prevents double quoting
+            
+            track["location"] = loc
+        
+        remuco.MPRISAdapter._notify_track(self, track)
+        
 # =============================================================================
 # main
 # =============================================================================
