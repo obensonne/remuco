@@ -55,16 +55,19 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	/** Container for service search related data. */
 	private static class Search {
 
-		public final boolean failsafe;
+		public final boolean failsafe, authenticate, encrypt;
 		public final int id;
 		public final IServiceListener listener;
 		public final TimerTask manual;
 		public final Hashtable services;
 
 		/** For default and failsafe service search. */
-		public Search(int id, boolean failsafe, IServiceListener listener) {
+		public Search(int id, boolean failsafe, boolean authenticate,
+				boolean encrypt, IServiceListener listener) {
 			this.id = id;
 			this.failsafe = failsafe;
+			this.authenticate = authenticate;
+			this.encrypt = encrypt;
 			this.listener = listener;
 			this.services = new Hashtable();
 			this.manual = null;
@@ -72,10 +75,12 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 		/** For manual/faked service search. */
 		public Search(TimerTask manual) {
-			this.id = -1;
-			this.failsafe = false;
-			this.listener = null;
-			this.services = null;
+			this.id = -1; // not used
+			this.failsafe = false; // not used
+			this.authenticate = false; // not used
+			this.encrypt = false; // not used
+			this.listener = null; // not used
+			this.services = null; // not used
 			this.manual = manual;
 		}
 	}
@@ -95,10 +100,6 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 	private static final String DEFAULT_SERVICE_NAME = "NoName";
 
-	private static final String OPTIONS = ";master=false;encrypt=false;authenticate=false";
-
-	private static final int SECURITY = ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
-
 	/** Remuco service UUID */
 	private final static String UUID = "025fe2ae07624bed90f2d8d778f020fe";
 
@@ -112,6 +113,27 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	 * not a Remuco player adapter service.
 	 */
 	private static final UUID[] UUID_LIST_FS = new UUID[] { new UUID(0x1101) };
+
+	/**
+	 * Get a Bluetooth connection option string for the given security
+	 * parameters.
+	 * 
+	 * @param authenticate
+	 *            authentication required
+	 * @param encrypt
+	 *            encryption required (if <code>true</code>,
+	 *            <em>authentication</em> is also set to <code>true</code>)
+	 * @return an option string to append to a connection URL
+	 */
+	private static String getOptions(boolean authenticate, boolean encrypt) {
+
+		final StringBuffer sb = new StringBuffer(";master=false");
+		sb.append(";encrypt=");
+		sb.append(encrypt);
+		sb.append(";authenticate=");
+		sb.append(authenticate || encrypt);
+		return sb.toString();
+	}
 
 	/**
 	 * Get the name of a service (the player behind the remuco service).
@@ -193,7 +215,8 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			if (bd.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
 
 				final Hashtable services = Tools.buildManualServiceList(
-					"btspp", bd.getAddress(), bd.getPort(), OPTIONS);
+					"btspp", bd.getAddress(), bd.getPort(), getOptions(
+						bd.isAuthenticate(), bd.isEncrypt()));
 
 				final TimerTask notifer = new TimerTask() {
 					public void run() {
@@ -244,7 +267,8 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 				return;
 			}
 
-			search = new Search(sid, failsafe, listener);
+			search = new Search(sid, failsafe, bd.isAuthenticate(),
+					bd.isEncrypt(), listener);
 		}
 	}
 
@@ -262,7 +286,15 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			for (int i = 0; i < srs.length; i++) {
 
-				final String url = srs[i].getConnectionURL(SECURITY, false);
+				final int security;
+				if (search.encrypt) {
+					security = ServiceRecord.AUTHENTICATE_ENCRYPT;
+				} else if (search.authenticate) {
+					security = ServiceRecord.AUTHENTICATE_NOENCRYPT;
+				} else {
+					security = ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
+				}
+				final String url = srs[i].getConnectionURL(security, false);
 
 				final String name;
 				if (search.failsafe) {

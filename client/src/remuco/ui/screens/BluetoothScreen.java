@@ -33,12 +33,15 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 				} else {
 					tfAddr.setConstraints(ADDR_OFF);
 				}
+			} else if (item == cgSecurity) {
+				if (cgSecurity.isSelected(SEC_ENCRYPT_INDEX)) {
+					cgSecurity.setSelectedIndex(SEC_AUTHENTICATE_INDEX, true);
+				}
 			}
 		}
 	}
 
 	private static final String ADDR_CHOICES[] = { "Scan for", "Set manually" };
-
 	/** Text field constraints for address (uneditable). */
 	private static final int ADDR_OFF = TextField.URL | TextField.UNEDITABLE;
 
@@ -58,12 +61,18 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	/** Text field constraints for port (editable). */
 	private static final int PORT_ON = TextField.NUMERIC;
 
+	private static final int SEC_AUTHENTICATE_INDEX = 0;
+
+	private final static String SEC_CHOICES[] = { "Authenticate", "Encrypt" };
+
+	private static final int SEC_ENCRYPT_INDEX = 1;
+
 	/** Welcome message to show on new devices. */
 	private static final String WELCOME = "In most cases just pressing OK "
 			+ "here is fine. Tweak the fields below if automatic address and "
 			+ "port search fails.";
 
-	private final ChoiceGroup cgScan, cgSearch;
+	private final ChoiceGroup cgScan, cgSearch, cgSecurity;
 
 	private final BluetoothDevice device;
 
@@ -133,6 +142,15 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		tfPort = new TextField(label, device.getPort(), 256, constraints);
 		append(tfPort);
 
+		// security //
+
+		label = "Security";
+		cgSecurity = new ChoiceGroup(label, Choice.MULTIPLE, SEC_CHOICES, null);
+		cgSecurity.setSelectedIndex(SEC_AUTHENTICATE_INDEX,
+			device.isAuthenticate());
+		cgSecurity.setSelectedIndex(SEC_ENCRYPT_INDEX, device.isEncrypt());
+		append(cgSecurity);
+
 		// name //
 
 		label = "Name (optional):";
@@ -151,6 +169,8 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		device.setSearch(cgSearch.getSelectedIndex());
 		device.setPort(tfPort.getString());
 		device.setName(tfName.getString());
+		device.setAuthenticate(cgSecurity.isSelected(SEC_AUTHENTICATE_INDEX));
+		device.setEncrypt(cgSecurity.isSelected(SEC_ENCRYPT_INDEX));
 
 		return device;
 	}

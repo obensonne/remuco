@@ -12,6 +12,8 @@ public class BluetoothDevice implements IDevice {
 
 	private String address;
 
+	private boolean authenticate, encrypt;
+
 	private String name;
 
 	private String port;
@@ -23,6 +25,8 @@ public class BluetoothDevice implements IDevice {
 		search = SEARCH_STANDARD;
 		port = "1";
 		name = "";
+		authenticate = false;
+		encrypt = false;
 	}
 
 	/**
@@ -39,7 +43,7 @@ public class BluetoothDevice implements IDevice {
 
 		sa = Tools.splitString(flat, FIELD_SEP, false);
 
-		if (sa.length != 5 || sa[0].charAt(0) != TYPE_BLUETOOTH) {
+		if (sa.length != 7 || sa[0].charAt(0) != TYPE_BLUETOOTH) {
 			throw new IllegalArgumentException();
 		}
 
@@ -61,7 +65,10 @@ public class BluetoothDevice implements IDevice {
 			throw new IllegalArgumentException();
 		}
 
-		name = sa[4];
+		authenticate = sa[4].equals("true");
+		encrypt = sa[5].equals("true");
+
+		name = sa[6];
 	}
 
 	/** Compares 2 device based solely on its address. */
@@ -112,8 +119,24 @@ public class BluetoothDevice implements IDevice {
 		return TYPE_BLUETOOTH;
 	}
 
+	public boolean isAuthenticate() {
+		return authenticate;
+	}
+
+	public boolean isEncrypt() {
+		return encrypt;
+	}
+
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public void setAuthenticate(boolean authenticate) {
+		this.authenticate = authenticate;
+	}
+
+	public void setEncrypt(boolean encrypt) {
+		this.encrypt = encrypt;
 	}
 
 	public void setName(String name) {
@@ -140,6 +163,10 @@ public class BluetoothDevice implements IDevice {
 		sb.append(search);
 		sb.append(FIELD_SEP);
 		sb.append(port);
+		sb.append(FIELD_SEP);
+		sb.append(authenticate);
+		sb.append(FIELD_SEP);
+		sb.append(encrypt);
 		sb.append(FIELD_SEP);
 		sb.append(name);
 
