@@ -1,0 +1,101 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    QuodLibet adapter for Remuco
+#    Copyright (C) 2009 Pawel 'pbm' Szubert <pawel.pbm@gmail.com>
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""QuodLibet adapter for Remuco, implemented as an executable script."""
+
+import commands
+
+import dbus
+from dbus.exceptions import DBusException
+
+import remuco
+from remuco import log
+
+class QuodLibetAdapter(remuco.PlayerAdapter):
+    
+    def __init__(self):
+        remuco.PlayerAdapter.__init__(self, "QuodLibet")
+                    
+    def start(self):
+        remuco.PlayerAdapter.start(self)
+          
+    def stop(self):
+        remuco.PlayerAdapter.stop(self)
+        
+    def poll(self):
+        info = {}
+        info[remuco.INFO_ALBUM] = self.quodlibet("--print-playing '<album>'")
+        info[remuco.INFO_ARTIST] = self.quodlibet("--print-playing '<artist>'")
+        info[remuco.INFO_GENRE] = self.quodlibet("--print-playing '<genre>'")
+        info[remuco.INFO_TITLE] = self.quodlibet("--print-playing '<title>'")
+        self.update_item(None, info, None)
+
+    def quodlibet(self, action):
+        return commands.getoutput("quodlibet " + action)
+
+
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    def ctrl_toggle_playing(self):
+        self.quodlibet("--play-pause")
+
+    def ctrl_next(self):
+        self.quodlibet("--next")
+
+    def ctrl_previous(self):
+        self.quodlibet("--previous")
+
+    def ctrl_toggle_shuffle(self):
+        self.quodlibet("--order=toggle")
+
+    def ctrl_toggle_repeat(self):
+        self.quodlibet("--repeat=t")
+
+    def ctrl_volume(self, direction):
+        if direction == 0:
+            self.quodlibet("--volume=0")
+        elif direction == -1:
+            self.quodlibet("--volume-down")
+        else:
+            self.quodlibet("--volume-up")
+    
+
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+    
+    pa = QuodLibetAdapter() # create the player adapter
+    mg = remuco.Manager(pa)# # pass it to a manager
+    mg.run() # run the manager (blocks until interrupt signal)
