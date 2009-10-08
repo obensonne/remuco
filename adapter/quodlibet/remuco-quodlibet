@@ -97,5 +97,5 @@ class QuodLibetAdapter(remuco.PlayerAdapter):
 if __name__ == '__main__':
     
     pa = QuodLibetAdapter() # create the player adapter
-    mg = remuco.Manager(pa)# # pass it to a manager
+    mg = remuco.Manager(pa, player_dbus_name="net.sacredchao.QuodLibet")
     mg.run() # run the manager (blocks until interrupt signal)
