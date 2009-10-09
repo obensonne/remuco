@@ -35,6 +35,7 @@
 import os
 import os.path
 import gobject
+import re
 from time import sleep
 
 import remuco
@@ -80,6 +81,26 @@ class MplayerAdapter(remuco.PlayerAdapter):
             self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
                 gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
                 self.__inputevent)
+
+            # compile two regexes to be used when parsing the status string
+            # in __inputevent()
+            # TODO use a generic self.current_regex pointing to one of these
+            # and update it whenever the current file in the playlist changes
+            # NOTE there is a space char after every information
+            # NOTE audio_regex contains a "pretty position" which looks like:
+            #   ([[HH:]MM:]SS.d)
+            #   i wonder how far does it go...
+            self.video_regex = re.compile(
+                r"""^A:\s*(?P<audiopos>\d+\.\d)\ + # audio position (seconds)
+                V:\s*(?P<videopos>\d+\.\d)\ + # video position (seconds)
+                """, re.VERBOSE)
+            self.audio_regex = re.compile(
+                r"""^A:\s*(?P<rawaudiopos>\d+\.\d)\ + # raw position (seconds)
+                \((?P<praudiopos>(\d\d:)*\d\d\.\d)\)\ + # pretty position
+                of (?P<rawtotal>\d+\.\d)\ + # total length in seconds
+                \((?P<prtotal>(\d\d:)*\d\d\.\d)\)\ + # pretty total
+                """, re.VERBOSE)
+
         else:
             log.warning("could not find statusfifo. Remuco's client "
                 " will not be able to retrieve information from the player.\n"
@@ -176,8 +197,10 @@ class MplayerAdapter(remuco.PlayerAdapter):
             status_str = self.__read_fifo(fd)
 
             # TODO parse the string
+            #matchobj = self.video_regex.match(status_str)
 
-            # set global string to be read on poll()
+            # TODO set global string to be read on poll()
+
             return True
         else:
             log.error("statusfifo read error")
