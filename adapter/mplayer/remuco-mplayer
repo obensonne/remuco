@@ -57,8 +57,12 @@ class MplayerAdapter(remuco.PlayerAdapter):
         self.config.set_custom("mplayer-cmdfifo", self.cmdfifo)
         self.config.set_custom("mplayer-statusfifo", self.statusfifo)
 
+        # file descriptors
         self.fd_cmdfifo = 0
         self.fd_statusfifo = 0
+
+        # gobject's watch: read from mplayer using statusfifo
+        self.watch_id = None
 
     def start(self):
 
@@ -70,23 +74,16 @@ class MplayerAdapter(remuco.PlayerAdapter):
         log.debug("creating cmdfifo and waiting for mplayer to read it")
         self.fd_cmdfifo = os.open(self.cmdfifo, os.O_WRONLY)
 
-        i = 0
-        while not(os.path.exists(self.statusfifo)):
-            i = i + 1
+        if os.path.exists(self.statusfifo):
+            self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY)
 
-            if i == 10:
-                log.error("tried enough. Make sure mplayer's output streams " +
-                    "include " + self.statusfifo)
-                raise StandardError()
-
-            log.warning("status fifo from MPlayer not found. sleeping 1 second...")
-            sleep(1)
-
-        self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY)
-
-        self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
-            gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
-            self.__inputevent)
+            self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
+                gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
+                self.__inputevent)
+        else:
+            log.warning("could not find statusfifo. Remuco's client "
+                " will not be able to retrieve information from the player.\n"
+                "Make sure mplayer's output streams include " + self.statusfifo)
 
         log.debug("starting mplayer adapter")
 
