@@ -91,7 +91,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
         remuco.PlayerAdapter.stop(self)
 
-        #maybe this would look prettier in a try/catch block?
+        # maybe this would look prettier in a try/catch block?
         if self.fd_cmdfifo != 0:
             os.close(self.fd_cmdfifo)
         if self.fd_statusfifo != 0:
@@ -172,12 +172,12 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __inputevent(self, fd, condition):
         if condition == gobject.IO_IN:
-            # read from fd (fd is self.fifo_fd)
+            # read from fd (fd is self.fd_statusfifo)
             status_str = self.__read_fifo(fd)
 
-            #parse the string
+            # TODO parse the string
 
-            #set global string to be read on poll()
+            # set global string to be read on poll()
             return True
         else:
             log.error("statusfifo read error")
@@ -194,6 +194,6 @@ class MplayerAdapter(remuco.PlayerAdapter):
 if __name__ == '__main__':
 
     pa = MplayerAdapter() # create the player adapter
-    mg = remuco.Manager(pa)# # pass it to a manager
+    mg = remuco.Manager(pa) # pass it to a manager
     mg.run() # run the manager (blocks until interrupt signal)
 
