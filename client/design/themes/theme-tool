@@ -33,13 +33,14 @@ Usage:
    theme-tool [--dpi=DPI] --svg=SVG_FILE --name=NAME
 
 Examples:
-   $ ./theme-tool --all
+   $ ./theme-tool --all # all themes listed in themes.conf
    $ ./theme-tool --svg=Purple.svg --name=Purple
    $ ./theme-tool --dpi=135 --svg=Purple.svg --name=Purple-XXL
    
 Default DPI is 90. Bigger/smaller DPI values produce bigger/smaller images.
 """
 
+from ConfigParser import SafeConfigParser
 import Image
 import os
 import os.path
@@ -291,13 +292,12 @@ def build_one(svg, dpi, name):
 def build_all():
     """Build all default themes."""
     
-    all = [("Purple.svg", 90, "Lilac"), ("Purple.svg", 117, "Lilac-XL"),
-           ("Frog.svg", 90, "Frog"), ("Frog.svg", 117, "Frog-XL"),
-           ("Vilanco.svg", 90, "Vico"), ("Emong.svg", 90, "Emo")]
-
-    for svg, dpi, name in all:
-        build_one(svg, dpi, name)
-
+    cp = SafeConfigParser()
+    cp.read("themes.conf")
+    
+    for theme in cp.sections():
+        build_one(cp.get(theme, "svg"), cp.get(theme, "dpi"), theme)
+    
 def main():
 
     svg = None
