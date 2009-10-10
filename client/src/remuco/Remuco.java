@@ -345,7 +345,11 @@ public class Remuco implements CommandListener, IConnectionListener,
 		} else if (iDevice.getType() == IDevice.TYPE_WIFI) {
 			sf = new InetServiceFinder();
 		} else {
+			sf = null;
 			Log.bug("Jan 26, 2009.7:29:56 PM");
+		}
+		
+		if (sf == null) {
 			return;
 		}
 

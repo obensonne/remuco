@@ -395,9 +395,6 @@ public final class DeviceSelectorScreen extends List implements
 			final Image icon;
 
 			if (iDevice.getType() == IDevice.TYPE_BLUETOOTH) {
-				if (!BluetoothFactory.BLUETOOTH) {
-					continue;
-				}
 				icon = theme.licBluetooth;
 			} else if (iDevice.getType() == IDevice.TYPE_WIFI) {
 				icon = theme.licWifi;
