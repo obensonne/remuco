@@ -91,9 +91,12 @@ PLAYERORDER_TOGGLE_MAP_SHUFFLE = {
     PLAYORDER_REPEAT: PLAYORDER_SHUFFLE_ALT
 }
 
-SEARCH_MASK = ("Artist", "Title", "Album", "Genre")
-SEARCH_PROPS = (rhythmdb.PROP_ARTIST, rhythmdb.PROP_TITLE, rhythmdb.PROP_ALBUM,
-                rhythmdb.PROP_GENRE)
+SEARCH_MASK = ("Any", "Artist", "Title", "Album", "Genre")
+SEARCH_PROPS = ("Any", rhythmdb.PROP_ARTIST, rhythmdb.PROP_TITLE,
+                rhythmdb.PROP_ALBUM, rhythmdb.PROP_GENRE)
+SEARCH_PROPS_ANY = (rhythmdb.PROP_ARTIST, rhythmdb.PROP_TITLE,
+                    rhythmdb.PROP_ALBUM, rhythmdb.PROP_GENRE,
+                    rhythmdb.PROP_LOCATION)
 
 # =============================================================================
 # actions
@@ -499,8 +502,15 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
         def eval_entry(entry):
             match = True
             for key in query_stripped:
-                val = db.entry_get(entry, key).lower()
-                if val.find(query_stripped[key]) < 0:
+                if key == "Any":
+                    props = SEARCH_PROPS_ANY
+                else:
+                    props = [key]
+                for prop in props:
+                    val = db.entry_get(entry, prop).lower()
+                    if val.find(query_stripped[key]) >= 0:
+                        break
+                else:
                     match = False
                     break
             if match:
