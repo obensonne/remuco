@@ -123,7 +123,7 @@ public class LogScreen extends Form implements CommandListener {
 		sb.append('\n');
 		sb.append("UTF-8: ").append(Config.UTF8 ? "yes" : "no");
 		sb.append('\n');
-		sb.append("IDevice: ").append(Config.DEVICE_NAME);
+		sb.append("Device: ").append(Config.DEVICE_NAME);
 		sb.append('\n');
 		sb.append("Best list icon size: ");
 		sb.append(display.getBestImageHeight(Display.LIST_ELEMENT));
