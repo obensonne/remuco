@@ -153,7 +153,12 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 		// commands
 
-		setSelectCommand(CMD_MARK);
+		if (numItems > 0) {
+			// FIXME: ambiguous when there are items _and_ nested lists
+			setSelectCommand(CMD_MARK);
+		} else {
+			setSelectCommand(CMD.SELECT);
+		}
 		addCommand(CMD.BACK);
 		addCommand(CMD_ROOT);
 
@@ -244,7 +249,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			display.setCurrent(this);
 
-		} else if (c == CMD_MARK && d == this) {
+		} else if ((c == CMD_MARK || c == CMD.SELECT) && d == this) {
 
 			final int index = getSelectedIndex();
 			if (index < 0) {
