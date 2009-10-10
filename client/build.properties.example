@@ -71,6 +71,8 @@ midp.jar=${microemu.home}/lib/midpapi20.jar
 cldc.jar=${microemu.home}/lib/cldcapi11.jar
 jsr82.jar=${microemu.home}/lib/microemu-jsr-82.jar
 
+# Note: comment jsr82.jar to disable Bluetooth (needed for devices using JBed)
+
 # =============================================================================
 # Configurations for targets 'dist'
 # =============================================================================

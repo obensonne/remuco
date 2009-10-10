@@ -43,6 +43,8 @@ public class BluetoothFactory {
 
 		try {
 			Class.forName("javax.bluetooth.LocalDevice");
+			Class.forName("remuco.comm.BluetoothScanner");
+			Class.forName("remuco.comm.BluetoothServiceFinder");
 			Log.ln("[BF] bluetooth: yes");
 		} catch (Exception e) {
 			Log.ln("[BF] bluetooth: no");

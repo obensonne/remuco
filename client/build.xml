@@ -89,6 +89,10 @@
 		<echo message="compile with debug symbols : ${compile.debug}" />
 		<echo message="preverifier                : ${preverifier}" />
 		<echo message="proguard optimizes         : ${proguard.optimize}" />
+		<condition property="bluetooth" value="yes" else="no">
+			<isset property="jsr82.jar"/>
+		</condition>
+		<echo message="bluetooth                  : ${bluetooth}" />
 	</target>
 
 	<!-- =================== Libraries and Classpath ====================== -->
@@ -152,8 +156,15 @@
 		       bootclasspath="${midp.jar}"
 		       debug="${compile.debug}"
 		       verbose="no">
-			<!-- sources -->
+			<!-- source paths -->
 			<src path="build/sources" />
+			<!-- exclude classes based on conditions -->
+			<not>
+				<selector unless="jsr82.jar">
+					<containsregexp expression="^import javax.bluetooth" />
+				</selector>
+			</not>
+			<!-- default classes to include -->
 			<include name="remuco/**/*.java" />
 			<!-- classpath -->
 			<classpath refid="cp.compile" />
