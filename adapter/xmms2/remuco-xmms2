@@ -29,6 +29,10 @@ import os
 import gobject
 
 import xmmsclient
+try:
+    from xmmsclient import XMMSValue as X2RV # XMMS2 >= 0.6
+except ImportError: 
+    from xmmsclient import XMMSResult as X2RV # XMMS2 < 0.6 
 import xmmsclient.glib
 import xmmsclient.collections as xc
 
@@ -287,7 +291,7 @@ class ItemListRequest():
     def __bil_list_of_tracks(self, result):
         """Builds an item list of a non-specific list of tracks."""
         
-        if isinstance(result, xmmsclient.XMMSResult):
+        if isinstance(result, X2RV):
             if not self.__pa._check_result(result):
                 return
             tracks = result.value()
@@ -623,7 +627,12 @@ class XMMS2Adapter(remuco.PlayerAdapter):
     def _check_result(self, result):
         """ Check the result of a request sent to XMMS2. """
         
-        if not result.iserror():
+        try:
+            ie = result.is_error() # XMMS2 >= 0.6
+        except AttributeError:
+            ie = result.iserror() # XMMS2 < 0.6
+        
+        if not ie:
             return True
         
         err = result.get_error()
