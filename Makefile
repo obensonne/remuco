@@ -43,12 +43,13 @@ install-%: install-base
 	@IC=adapter/$(subst install-,,$@)/install-check.py ; \
 		[ ! -e $$IC ] || python $$IC
 	REMUCO_COMPONENTS=$(subst install-,,$@) $(SETUP) --record install-tmp.log
-	diff --suppress-common-lines -n \
-		install-base.log install-tmp.log \
+	diff --suppress-common-lines -n install-base.log install-tmp.log \
 		| grep "^/" > install-$(subst install-,,$@).log
 	rm install-tmp.log
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Installed player adapter '$(subst install-,,$@)'."
+	@[ ! -e adapter/$(subst install-,,$@)/.wip ] || \
+		echo "| WARNING: This adapter is still work in progress!"
 	@echo "+-----------------------------------------------------------------+"
 
 uninstall-all: $(addprefix uninstall-,$(ADAPTERS)) uninstall-base
