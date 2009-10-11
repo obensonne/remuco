@@ -1,13 +1,9 @@
-Many thanks to:
+Various people have contributed to Remuco. Hopefully most of them are mentioned
+here. If you think your name should be listed here, just drop us a note.
 
 Chow Jong Lin
-  for packaging Remuco for Debian systems
-
-Tim Froidcoeur
-  for contributions on touch screen support
-
+Igor Almeida <igor.contato@gmail.com>
 James Le Cuirot
-  for improvements to the XMMS2 adapter
-
-The unknown user
-  for testing and providing feedback
+Oben Sonne <obensonne@googlemail.com>
+Pawel Szubert <pawel.pbm@gmail.com>
+Tim Froidcoeur
