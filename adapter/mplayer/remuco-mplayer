@@ -36,10 +36,10 @@ import os
 import os.path
 import gobject
 import re
-from time import sleep
 
 import remuco
 from remuco import log
+from remuco.defs import *
 
 
 class MplayerAdapter(remuco.PlayerAdapter):
@@ -65,6 +65,36 @@ class MplayerAdapter(remuco.PlayerAdapter):
         # gobject's watch: read from mplayer using statusfifo
         self.watch_id = None
 
+        # compile regexes to be used when parsing the status string
+        # in __inputevent()
+        # TODO use a generic self.current_regex pointing to either one
+        # of video_regex or audio_regex and update it whenever the current
+        # file in the playlist changes.
+        # NOTE there is a space char after every information
+        # NOTE audio_regex contains a "pretty position" which looks like:
+        #   ([[HH:]MM:]SS.d)
+        #   i wonder how far does it go...
+        self.video_regex = re.compile(
+            r"""^A:\s*(?P<rawaudiopos>\d+\.\d)\s # audio position (seconds)
+            V:\s*(?P<rawvideopos>\d+\.\d)\s # video position (seconds)
+            A-V:\s*(?P<delay>-?\d+\.\d+)\s # video position (seconds)
+            (?P<videoregex>) # identify this regex uniquely
+            """, re.VERBOSE)
+        self.audio_regex = re.compile(
+            r"""^A:\s*(?P<rawaudiopos>\d+\.\d)\s # raw position (seconds)
+            \((?P<praudiopos>(\d\d:)*\d\d\.\d)\)\s # pretty position
+            of (?P<rawtotal>\d+\.\d)\s # total length in seconds
+            \((?P<prtotal>(\d\d:)*\d\d\.\d)\)\s # pretty total
+            (?P<audioregex>) # identifier
+            """, re.VERBOSE)
+        self.info_regex = re.compile(
+            r"""^ANS_(?P<infovar>[A-Z_]+)=  # capitalized information name
+            (?P<infovalue>('.*'|\d+\.\d+)) # if quoted, str. else, number
+            (?P<inforegex>) # identifier
+            """, re.VERBOSE)
+
+        self.__set_default_info()
+
     def start(self):
 
         remuco.PlayerAdapter.start(self)
@@ -72,39 +102,22 @@ class MplayerAdapter(remuco.PlayerAdapter):
         if not(os.path.exists(self.cmdfifo)):
             os.mkfifo(self.cmdfifo)
 
-        log.debug("creating cmdfifo and waiting for mplayer to read it")
+        if not(os.path.exists(self.statusfifo)):
+            os.mkfifo(self.statusfifo)
+        else:
+            log.warning('statusfifo file already exists. this is not a ' +
+            'problem, but you might end up with a big file if ' +
+            self.statusfifo + ' is not a FIFO.')
+
+        log.debug("opening cmdfifo and waiting for mplayer to read it")
         self.fd_cmdfifo = os.open(self.cmdfifo, os.O_WRONLY)
 
-        if os.path.exists(self.statusfifo):
-            self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY)
+        log.debug("opening statusfifo")
+        self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY | os.O_NONBLOCK)
 
-            self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
-                gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
-                self.__inputevent)
-
-            # compile two regexes to be used when parsing the status string
-            # in __inputevent()
-            # TODO use a generic self.current_regex pointing to one of these
-            # and update it whenever the current file in the playlist changes
-            # NOTE there is a space char after every information
-            # NOTE audio_regex contains a "pretty position" which looks like:
-            #   ([[HH:]MM:]SS.d)
-            #   i wonder how far does it go...
-            self.video_regex = re.compile(
-                r"""^A:\s*(?P<audiopos>\d+\.\d)\ + # audio position (seconds)
-                V:\s*(?P<videopos>\d+\.\d)\ + # video position (seconds)
-                """, re.VERBOSE)
-            self.audio_regex = re.compile(
-                r"""^A:\s*(?P<rawaudiopos>\d+\.\d)\ + # raw position (seconds)
-                \((?P<praudiopos>(\d\d:)*\d\d\.\d)\)\ + # pretty position
-                of (?P<rawtotal>\d+\.\d)\ + # total length in seconds
-                \((?P<prtotal>(\d\d:)*\d\d\.\d)\)\ + # pretty total
-                """, re.VERBOSE)
-
-        else:
-            log.warning("could not find statusfifo. Remuco's client "
-                " will not be able to retrieve information from the player.\n"
-                "Make sure mplayer's output streams include " + self.statusfifo)
+        self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
+            gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
+            self.__inputevent)
 
         log.debug("starting mplayer adapter")
 
@@ -112,29 +125,30 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
         remuco.PlayerAdapter.stop(self)
 
-        # maybe this would look prettier in a try/catch block?
         if self.fd_cmdfifo != 0:
             os.close(self.fd_cmdfifo)
+            self.fd_cmdfifo = 0
+
         if self.fd_statusfifo != 0:
             os.close(self.fd_statusfifo)
+            self.fd_statusfifo = 0
 
         if self.watch_id is not None:
             gobject.source_remove(self.watch_id)
+            self.watch_id = None
 
         log.debug("stopping mplayer adapter")
 
-    #def poll(self):
+    def poll(self):
 
-        #import random
+        # fetch important information from player
+        # NOTE while this fixes most of our problems, it will always
+        # clutter mplayer's output
+        if self.__playback == PLAYBACK_PLAY:
+            self.__command('get_time_length\n')
+            self.__command('get_file_name\n')
 
-        #volume = random.randint(0,100)
-        #self.update_volume(volume)
-
-        #playing = random.randint(0,1)
-        #if playing:
-        #    self.update_playback(remuco.PLAYBACK_PLAY)
-        #else:
-        #    self.update_playback(remuco.PLAYBACK_PAUSE)
+        self.update_item(self.info[INFO_TITLE], self.info, None)
 
     # =========================================================================
     # control interface
@@ -184,29 +198,88 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __read_fifo(self, fd):
         """Read from a FIFO and handle errors."""
+
         try:
-            str = os.read(fd, 100) #magic buflength number
+            str = os.read(fd, 200) #magic buflength number
             return str
         except OSError, e:
             log.warning("FIFO from MPlayer broken (%s)", e)
             self.manager.stop()
 
     def __inputevent(self, fd, condition):
+        """Parse incoming line from the player"""
+
         if condition == gobject.IO_IN:
             # read from fd (fd is self.fd_statusfifo)
             status_str = self.__read_fifo(fd)
 
-            # TODO parse the string
-            #matchobj = self.video_regex.match(status_str)
+            if '================= ' in status_str: # note the space at the end
+                self.__playback = PLAYBACK_PAUSE
+                self.update_playback(PLAYBACK_PAUSE)
+                return True
 
-            # TODO set global string to be read on poll()
+            matchobj = None or self.video_regex.match(status_str) or \
+                self.audio_regex.match(status_str) or \
+                self.info_regex.match(status_str)
+
+            if matchobj is not None:
+                self.__playback = PLAYBACK_PLAY
+                self.update_playback(self.__playback)
+
+                current_progress = self.__progress
+                current_length = self.info[INFO_LENGTH]
+
+                identifier = matchobj.lastgroup
+                if identifier == 'videoregex': # we have a video regex
+                    current_progress = float(matchobj.group('rawvideopos'))
+
+                elif identifier == 'inforegex': # info regex
+                    self.__set_info(matchobj.group('infovar'),
+                        matchobj.group('infovalue'))
+                    current_length = self.info[INFO_LENGTH] #avoid a race condition
+
+                elif identifier == 'audioregex': # audio regex
+                    current_progress = float(matchobj.group('rawaudiopos'))
+                    current_length = float(matchobj.group('rawtotal'))
+
+                self.update_progress(current_progress, current_length)
+                self.__progress = current_progress
+                self.info[INFO_LENGTH] = current_length
 
             return True
-        else:
+
+        else: # error
+            if condition == gobject.IO_HUP: # mplayer has probably quit
+                log.info("statusfifo hangup. is mplayer still running?")
+
             log.error("statusfifo read error")
             self.watch_id = None
             self.manager.stop()
             return False
+
+    def __set_info(self, name, value):
+        """ Set global information of current item
+
+        @param name:
+            The name of the variable in mplayer. (str)
+        @param value:
+            The value mplayer assigns. (str)
+
+        @see self.__inputevent() and self.info_regex for more information
+
+        """
+        if name == 'LENGTH':
+            self.info[INFO_LENGTH] = float(value)
+        elif name == 'FILENAME':
+            self.info[INFO_TITLE] = value.strip("'")
+
+    def __set_default_info(self):
+        """ Set default playback information """
+
+        self.__progress = 0
+        self.__playback = PLAYBACK_STOP
+        self.info = { INFO_LENGTH: 100,
+            INFO_TITLE: '' }
 
 
 
