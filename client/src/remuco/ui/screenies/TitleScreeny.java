@@ -46,8 +46,8 @@ public final class TitleScreeny extends Screeny {
 	private static final String INFO_LEVEL_DETAILED = "Detailed";
 
 	public static final OptionDescriptor OD_INFO_LEVEL = new OptionDescriptor(
-			"item-info", "Item information level", INFO_LEVEL_NORMAL,
-			new String[] { INFO_LEVEL_NORMAL, INFO_LEVEL_DETAILED });
+			"item-info", "Item information", INFO_LEVEL_NORMAL, new String[] {
+					INFO_LEVEL_NORMAL, INFO_LEVEL_DETAILED });
 
 	private boolean showDetails;
 
