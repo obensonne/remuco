@@ -65,8 +65,9 @@ og.add_option("-a", "--tarball", action="store_true", dest="tarball",
 
 op.add_option("-r", "--release", dest="version",
               help="release version")
-op.add_option("-d", "--dry-run", action="store_false", dest="commit",
-              default=True, help="do not commit anything")
+op.add_option("-s", "--test-run", action="store_true", dest="test",
+              default=False,
+              help="ignore uncommitted changes and do not commit anything")
 
 options, args = op.parse_args()
 
@@ -77,13 +78,30 @@ options, args = op.parse_args()
 class CommandError(StandardError):
     pass
 
-def command(cmd):
+def command(cmd, rout=False):
+    """Execute a command.
+    
+    @param cmd:
+        the command to execute, either as a string which will be split into
+        arguments on ' ', or already a list of arguments
+    @keyword rout:
+        see below
+    @return:
+        command output if keyword 'rout' is set True, empty string otherwise
+    @raise CommandError:
+        if command returns with error 
+    
+    """
     if not isinstance(cmd, list):
         cmd = cmd.split()
-    sp = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    print("  CMD: %s" % ' '.join(cmd))
+    if rout:
+        sp = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    else:
+        sp = subprocess.Popen(cmd)
     out, err = sp.communicate()
-    if err:
-        raise CommandError(err)
+    if sp.returncode != os.EX_OK:
+        raise CommandError("Command failed, return code: %d" % sp.returncode)
     return out
 
 def grep(lines, rex, invert=False):
@@ -135,13 +153,12 @@ def refresh_thanks():
     names = set(names)
     names.remove('')
 
-    names_hg = command("hg log --template={author},").split(',')
+    names_hg = command("hg log --template={author},", rout=True).split(',')
     names_hg = set(names_hg)
     names_hg.remove('')
     
     names = names.union(names_hg)
-    names_ex = zip(*cp.items("authormap"))[0]
-    names = [name for name in names if name not in names_ex]
+    names = [name for name in names if name not in cp.options("authormap")]
     names.sort()
     
     with open(cp.get("paths", "thanks"), 'w') as thanks:
@@ -157,6 +174,41 @@ def refresh_thanks():
 def tarball():
     """Build release tarballs."""
     print("TODO")
+    
+    build_dir = "release.build"
+    dist_dir = "release.dist"
+    pkg_src = "remuco-source-%s" % options.version
+    pkg_all = "remuco-%s" % options.version
+    pkg_src_dir = "%s/%s" % (build_dir, pkg_src)
+    pkg_all_dir = "%s/%s" % (build_dir, pkg_all)
+    pkg_src_tb = "%s/%s.tar.gz" % (dist_dir, pkg_src)
+    pkg_all_tb = "%s/%s.tar.gz" % (dist_dir, pkg_all)
+    
+    for dir in (build_dir, dist_dir):
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
+        os.mkdir(dir)
+    
+    excludes = ""
+    for exc in zip(*cp.items("tarball-exclude"))[1]:
+        excludes += "--exclude %s " % exc 
+    
+    
+    command("hg archive --rev %s --type tgz %s %s" %
+            (options.version, excludes, pkg_src_tb))
+    command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
+    
+    command("%s/%s/client/setup.sh" % (build_dir, pkg_src))
+    command("ant -f %s/client/build.xml dist" % pkg_src_dir)
+    
+    shutil.move("%s/client/app" % pkg_src_dir, build_dir)
+    shutil.rmtree(pkg_src_dir)
+    command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
+    shutil.move("%s/app" % build_dir, "%s/client" % pkg_src_dir )
+    shutil.move(pkg_src_dir, pkg_all_dir)
+    command("tar zcf %s -C %s %s" % (pkg_all_tb, build_dir, pkg_all))
+    
+    #shutil.rmtree(build_dir)
 
 # -----------------------------------------------------------------------------
 # Main
@@ -167,7 +219,8 @@ def main():
     if not options.version:
         raise op.error("need a version")
     
-    if grep(command("hg st"), "(^\?)|(^$)", invert=True):
+    if not options.test and grep(command("hg st", rout=True),
+                                 "(^\?)|(^$)", invert=True):
         print("-> uncommitted changes, abort")
         sys.exit(1)
     
@@ -175,12 +228,12 @@ def main():
         print("-> prepare release")
         refresh_api_doc()
         refresh_thanks()
-        if options.commit:
+        if not options.test:
             command(["hg", "ci", "-m",
                      "Final changes for release %s" %options.version])
     if options.tag:
         print("-> tag release")
-        if options.commit:
+        if not options.test:
             command("hg tag %s" % options.version)
 
     if options.tarball:
