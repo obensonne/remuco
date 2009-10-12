@@ -173,7 +173,6 @@ def refresh_thanks():
    
 def tarball():
     """Build release tarballs."""
-    print("TODO")
     
     build_dir = "release.build"
     dist_dir = "release.dist"

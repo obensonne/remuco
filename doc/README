@@ -50,6 +50,10 @@ Rhythmbox:
  * Rhythmbox >= 0.11.5
  * Python modules: gconf
  
+Songbird:
+ * Songbird >= 1.2
+ * Songbird MPRIS Add-on must be installed
+ 
 Totem:
  * Totem >= 2.22
 
@@ -58,9 +62,7 @@ TVtime:
 
 VLC:
  * VLC >= 0.9
- * VLC needs to be started with DBus control:
-   $ vlc --control dbus
-   Alternatively enable it permanently in VLC's preferences.
+ * DBus control must be enabled in VLC
 
 XMMS2:
  * Python modules: xmmsclient (>= 0.5)
@@ -87,9 +89,7 @@ How to install is device dependent - please consult the documentation of your
 mobile device.
 
 Note: If you installed Remuco using packages for your distribution, the client
-      files are either located in /usr/share/remuco/client/ or need to get
-      downloaded manually: http://code.google.com/p/remuco/downloads
-      Make sure client and server versions match! 
+      files usually are located in /usr/share/remuco/client/. 
 
 Note: The source only package (remuco-source-x.x.x.tar.gz) does not contain
       the client binaries. Read sections "Client Development" and
