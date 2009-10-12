@@ -258,8 +258,8 @@
 	<target name="dist"
 	        depends="clean,configure.dist,jad"
 	        description="--> create distributable jar and jad file">
-		<mkdir dir="dist" />
-		<copy todir="dist">
+		<mkdir dir="app" />
+		<copy todir="app">
 			<fileset dir="build/jar">
 				<include name="${midlet.jar}" />
 				<include name="${midlet.jad}" />
@@ -402,7 +402,7 @@
 	<target name="clean" description="--> clean project">
 		<delete dir="build" />
 		<delete dir="design/themes/build" />
-		<delete dir="dist" />
+		<delete dir="app" />
 	</target>
 
 </project>
