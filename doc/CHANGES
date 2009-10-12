@@ -1,0 +1,183 @@
+Release 0.9.2 (in development)
+==============================
+
+General
+-------
+  * Progress of streams is now shown correctly (see [issue 36][i36]).
+
+Base
+----
+
+Player adapters
+---------------
+  * Songbird: Added Songbird adapter.
+  * XMMS2: Made adapter work with XMMS2 0.6.
+  * MPD: Added password configuration option (see [issue 29][i29]).
+  * Audacious: Made adapter work with Audacious 2.2 (see [issue 17][i17]).
+  * Rhythmbox: Added *Any* field to search mask.
+
+Client
+------
+  * Service search is now configurable to work around service search issues
+    seen on some devices (see [issue 5][i5]).
+  * Added a client customization option which makes Remuco usable on Windows
+    Mobile devices using JBed (only WiFi supported, see [issue 39][i39]).
+  * Cover art full screen mode now optionally stays enabled.
+  * Made action handling more portable (see UI [issue 33][i33]).
+  * Added editor screen for existing connections.
+  * Added optional authentication and encryption for Bluetooth connections.
+  * Fixed minor memory leak bugs.
+  
+
+[i5]: http://code.google.com/p/remuco/issues/detail?id=5
+[i17]: http://code.google.com/p/remuco/issues/detail?id=17
+[i29]: http://code.google.com/p/remuco/issues/detail?id=29
+[i30]: http://code.google.com/p/remuco/issues/detail?id=30
+[i33]: http://code.google.com/p/remuco/issues/detail?id=33
+[i36]: http://code.google.com/p/remuco/issues/detail?id=36
+[i39]: http://code.google.com/p/remuco/issues/detail?id=39
+
+Release 0.9.1.1
+===============
+
+Client
+------
+  * Fixed a memory leak bug on the client (which may have occurred when
+    browsing item lists a lot).
+
+Release 0.9.1
+=============
+
+Base
+----
+  * Added client device info report tool `remuco-report`.
+ 
+Player adapters
+---------------
+  * Exaile: Added Exaile 3 adapter.
+  * XMMS2: Enhanced media library browser.
+ 
+Client
+------
+  * Added options screen.
+  * Optionally show detailed item information.
+  * Size and type of cover art image are now configured on the client.
+  * Item list page size is now configured on the client.
+  * Pages in item lists can be selected by number (in addition to up/down
+    navigation).
+	
+Release 0.9.0
+=============
+
+General
+-------
+  * Added paging mechanism to item lists to enable clients to browse very long
+    item lists.
+  * Added search feature.
+  
+Base
+----
+  * Volume control optionally controls master volume.
+  
+Client
+------
+  * Added touch-screen support.
+  * Fullscreen cover art is now real fullscreen.
+  * Dropped themes Korama and Chocolate, added 4 new themes for touchscreen
+    devices.
+  * Added several new icons.
+  * Added script to automatically set up build environment.
+  * Changed default key bindings.
+
+Player adapters
+---------------
+  * XMMS2: Implemented search feature.
+  * MPD: Implemented search feature.
+  * Rhythmbox: Implemented search feature.
+  * Rhythmbox: Added repeat and shuffle control.
+
+Release 0.8.2.1
+===============
+
+General
+-------
+  * Fixed obsolete client installation in `setup.py`.
+  
+Player adapters
+---------------
+  * Totem: Adapted to Totem 2.26.
+	
+Release 0.8.2
+=============
+
+Base
+----
+  * Fixed Python path issue in Ubuntu Jaunty.
+  
+Player adapters
+---------------
+  * VLC: Added player adapter for VLC.
+  * TVtime: Added player adapter for TVtime.
+  * Banshee: Added seek support.
+  * Rhythmbox: Added action to directly jump to items somewhere in the library.
+  
+Client
+------
+  * Quick reconnect when connection is broken.
+  * Removed some unused icons (smaller JAR size).
+  * Logo size configurable in build process.
+	
+Release 0.8.1
+=============
+
+General
+-------
+  * Various minor technical improvements (as always :).
+
+Base
+----
+  * base: Added option for WiFi port.
+  * base: Added options for size and type of images sent to clients.
+  * base: Fixed a bug concerning the system shutdown command.
+
+Player adapters
+---------------
+  * MPD: Added player adapter for MPD.
+  
+Client
+------
+  * Full screen control enabled.
+  * Fixed a color bug in theme Karoma.
+  * Fixed some drawing issues on Nokia 5310.
+  * More accurate list icon size detection.
+  * Action execution improved.
+  * Build process now works completely without WTK.
+  * Emulation with MicroEmu now possible with other skins.
+
+Release 0.8.0.1
+===============
+
+General
+-------
+  * No additional features, just internal adjustments.
+  * Added GPL header to source files.
+  * Replaced nested make files and setup.py by global setup.py.
+  * Include client source in tarball.
+  
+Base
+----
+  * Replace Python module 'md5' by 'hashlib'.
+
+Client
+------
+  * Set 'Vilanco' as default theme ('Chocolate' is too big for some devices).
+
+Release 0.8.0
+=============
+
+General
+-------
+  * Merged client and server side components into one package.
+  * For that reason this change log is a fresh one.
+  * The changes from 0.7 to 0.8 are just to many to list them here.
+
