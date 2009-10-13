@@ -43,7 +43,8 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def __init__(self):
 
-        remuco.PlayerAdapter.__init__(self, "MPlayer")
+        remuco.PlayerAdapter.__init__(self, "MPlayer",
+                                      progress_known=True)
 
         self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
         self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
