@@ -148,9 +148,6 @@ class MplayerAdapter(remuco.PlayerAdapter):
             self.__command('get_file_name\n')
             self.__command('get_property volume\n')
 
-        self.update_item(self.info[INFO_TITLE], self.info, None)
-        self.update_volume(self.__volume)
-
     # =========================================================================
     # control interface
     # =========================================================================
@@ -163,12 +160,15 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
     def ctrl_next(self):
         self.__command('pt_step 1\n')
+        gobject.idle_add(self.poll)
 
     def ctrl_previous(self):
         self.__command('pt_step -1\n')
+        gobject.idle_add(self.poll)
 
     def ctrl_volume(self, direction):
         self.__command('volume %s\n' % direction)
+        gobject.idle_add(self.poll)
 
     def ctrl_seek(self, direction):
         self.__command('seek %s0\n' % direction)
@@ -273,23 +273,19 @@ class MplayerAdapter(remuco.PlayerAdapter):
             self.info[INFO_LENGTH] = float(value)
         elif name == 'FILENAME':
             self.info[INFO_TITLE] = value.strip("'")
+            self.update_item(self.info[INFO_TITLE], self.info, None)
         elif name == 'volume': # lower case because we use the get_property command
-            self.__volume = float(value)
             self.update_volume(float(value))
-
+            
     def __set_default_info(self):
         """ Set default playback information """
 
-        self.__volume = 80 # another magic default number to display in client
         self.__progress = 0
         self.__playback = PLAYBACK_STOP
-        self.info = { INFO_LENGTH: 100,
-            INFO_TITLE: '' }
-
-
+        self.info = { INFO_LENGTH: 100, INFO_TITLE: '' }
 
 # =============================================================================
-# main (example startup using remuco.Manager)
+# main
 # =============================================================================
 
 if __name__ == '__main__':
