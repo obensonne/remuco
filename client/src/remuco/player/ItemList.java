@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
+ *   Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
