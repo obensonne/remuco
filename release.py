@@ -78,6 +78,9 @@ options, args = op.parse_args()
 class CommandError(StandardError):
     pass
 
+class NotReadyError(StandardError):
+    pass
+
 def command(cmd, rout=False):
     """Execute a command.
     
@@ -101,7 +104,7 @@ def command(cmd, rout=False):
         sp = subprocess.Popen(cmd)
     out, err = sp.communicate()
     if sp.returncode != os.EX_OK:
-        raise CommandError("Command failed, return code: %d" % sp.returncode)
+        raise CommandError("Command failed, return code: %s" % sp.returncode)
     return out
 
 def grep(lines, rex, invert=False):
@@ -113,6 +116,20 @@ def grep(lines, rex, invert=False):
         return [e for e in lines if not re.match(rex, e)]
     else:
         return [e for e in lines if re.match(rex, e)]
+
+# -----------------------------------------------------------------------------
+# Some checks if we are ready for a release
+# -----------------------------------------------------------------------------
+
+def check_ready():
+    """Do various tests to check if we are ready for a release."""
+    
+    with open("doc/CHANGES", 'r') as fp:
+        if fp.read().find("(in development)"):
+            raise NotReadyError("CHANGES seems to be not ready")
+
+    if grep(command("hg st", rout=True), "(^\?)|(^$)", invert=True):
+        raise NotReadyError("uncommitted changes, abort")
 
 # -----------------------------------------------------------------------------
 # API doc generation
@@ -139,34 +156,6 @@ def refresh_api_doc():
     with open(cp.get("paths", "api"), 'w') as api:
         api.write(content)
         
-# -----------------------------------------------------------------------------
-# THANKS file
-# -----------------------------------------------------------------------------
-
-def refresh_thanks():
-    """Update the THANKS file."""
-    
-    with open(cp.get("paths", "thanks"), 'r') as thanks:
-        preamble, names = thanks.read().split("\n\n")
-        
-    names = names.split("\n")
-    names = set(names)
-    names.remove('')
-
-    names_hg = command("hg log --template={author},", rout=True).split(',')
-    names_hg = set(names_hg)
-    names_hg.remove('')
-    
-    names = names.union(names_hg)
-    names = [name for name in names if name not in cp.options("authormap")]
-    names.sort()
-    
-    with open(cp.get("paths", "thanks"), 'w') as thanks:
-        thanks.write(preamble)
-        thanks.write("\n\n")
-        for name in names:
-            thanks.write("%s\n" % name)
-
 # -----------------------------------------------------------------------------
 # Tarballs
 # -----------------------------------------------------------------------------
@@ -218,15 +207,13 @@ def main():
     if not options.version:
         raise op.error("need a version")
     
-    if not options.test and grep(command("hg st", rout=True),
-                                 "(^\?)|(^$)", invert=True):
-        print("-> uncommitted changes, abort")
-        sys.exit(1)
+    if not options.test:
+        print("-> check ready")
+        check_ready()
     
     if options.prepare:
         print("-> prepare release")
         refresh_api_doc()
-        refresh_thanks()
         if not options.test:
             command(["hg", "ci", "-m",
                      "Final changes for release %s" %options.version])
