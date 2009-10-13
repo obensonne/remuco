@@ -219,9 +219,9 @@ class MplayerAdapter(remuco.PlayerAdapter):
                 self.update_playback(PLAYBACK_PAUSE)
                 return True
 
-            matchobj = None or self.video_regex.match(status_str) or \
-                self.audio_regex.match(status_str) or \
-                self.info_regex.match(status_str)
+            matchobj = (self.video_regex.match(status_str) or
+                        self.audio_regex.match(status_str) or
+                        self.info_regex.match(status_str))
 
             if matchobj is not None:
                 self.__playback = PLAYBACK_PLAY
