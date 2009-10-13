@@ -90,6 +90,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
             (?P<infovalue>('.*'|\d+\.\d+)) # if quoted, str. else, number
             (?P<inforegex>) # identifier
             """, re.VERBOSE)
+        self.pause_regex = re.compile(r" *===+ +\w+ +===+")
 
         self.__set_default_info()
 
@@ -212,8 +213,8 @@ class MplayerAdapter(remuco.PlayerAdapter):
         if condition == gobject.IO_IN:
             # read from fd (fd is self.fd_statusfifo)
             status_str = self.__read_fifo(fd)
-
-            if '================= ' in status_str: # note the space at the end
+            
+            if self.pause_regex.search(status_str):
                 self.__playback = PLAYBACK_PAUSE
                 self.update_playback(PLAYBACK_PAUSE)
                 return True
