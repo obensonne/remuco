@@ -125,7 +125,7 @@ def check_ready():
     """Do various tests to check if we are ready for a release."""
     
     with open("doc/CHANGES", 'r') as fp:
-        if fp.read().find("(in development)"):
+        if fp.read().find("(in development)") >= 0:
             raise NotReadyError("CHANGES seems to be not ready")
 
     if grep(command("hg st", rout=True), "(^\?)|(^$)", invert=True):
