@@ -6,9 +6,9 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.1)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.2)</font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py">/home/mondai/data/Projects/Remuco/svn/remuco/trunk/base/module/remuco/__init__.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
 &nbsp;<br>
 The&nbsp;module&nbsp;'remuco'&nbsp;provides&nbsp;classes&nbsp;and&nbsp;constants&nbsp;for&nbsp;Remuco&nbsp;player&nbsp;adapters.<br>
@@ -152,6 +152,13 @@ Default:&nbsp;True&nbsp;(enabled)<br>
 &nbsp;<br>
 Option&nbsp;name:&nbsp;'bluetooth-enabled'</tt></dd>
 </dl>
+<dl><dt><strong>bluetooth_channel</strong></dt>
+<dd><tt>Channel&nbsp;to&nbsp;use&nbsp;for&nbsp;Bluetooth&nbsp;connections.<br>
+&nbsp;<br>
+Default:&nbsp;0&nbsp;(select&nbsp;channel&nbsp;automatically)<br>
+&nbsp;<br>
+Option&nbsp;name:&nbsp;'bluetooth-channel'</tt></dd>
+</dl>
 <dl><dt><strong>cache_dir</strong></dt>
 <dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;directory.<br>
 &nbsp;<br>
@@ -230,15 +237,6 @@ Default:&nbsp;log.INFO<br>
 Possible&nbsp;values:&nbsp;log.DEBUG,&nbsp;log.INFO,&nbsp;log.WARNING,&nbsp;log.ERROR<br>
 &nbsp;<br>
 Option&nbsp;name:&nbsp;'log-level'</tt></dd>
-</dl>
-<dl><dt><strong>ping</strong></dt>
-<dd><tt>Interval&nbsp;in&nbsp;seconds&nbsp;for&nbsp;sending&nbsp;a&nbsp;ping&nbsp;to&nbsp;clients.<br>
-&nbsp;<br>
-An&nbsp;interval&nbsp;of&nbsp;0&nbsp;disables&nbsp;ping.<br>
-&nbsp;<br>
-Default:&nbsp;15<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'ping-interval'</tt></dd>
 </dl>
 <dl><dt><strong>wifi</strong></dt>
 <dd><tt>Flag&nbsp;if&nbsp;WiFi/Inet&nbsp;is&nbsp;enabled.<br>
@@ -832,15 +830,6 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;provide&nbsp;information&nbsp;from&nb
 &nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;media&nbsp;player.<br>
 &nbsp;<br>
 ===========================================================================<br>
-Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;respond&nbsp;to&nbsp;the&nbsp;requests&nbsp;above:<br>
-===========================================================================<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_playlist_request()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_queue_request()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_mlib_request()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;reply_search_request()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
-===========================================================================<br>
 Methods&nbsp;to&nbsp;call&nbsp;to&nbsp;synchronize&nbsp;media&nbsp;player&nbsp;state&nbsp;information&nbsp;with&nbsp;clients:<br>
 ===========================================================================<br>
 &nbsp;<br>
@@ -1294,5 +1283,5 @@ to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
 <strong>PLAYBACK_STOP</strong> = 0<br>
 <strong>__all__</strong> = ('PlayerAdapter', 'MPRISAdapter', 'ListReply', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP')<br>
-<strong>__version__</strong> = '0.9.1'</td></tr></table>
+<strong>__version__</strong> = '0.9.2'</td></tr></table>
 </body></html>
