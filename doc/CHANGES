@@ -1,5 +1,5 @@
-Release 0.9.2 (in development)
-==============================
+Release 0.9.2
+=============
 
 General
 -------
@@ -7,10 +7,13 @@ General
 
 Base
 ----
+  * Added option to player adapter config to set a fixed Bluetooth channel (see
+    [issue 5][i5] and [issue 31][i31]).
 
 Player adapters
 ---------------
   * Songbird: Added Songbird adapter.
+  * MPlayer: Added (roughly working) MPlayer adapter.
   * XMMS2: Made adapter work with XMMS2 0.6.
   * MPD: Added password configuration option (see [issue 29][i29]).
   * Audacious: Made adapter work with Audacious 2.2 (see [issue 17][i17]).
@@ -27,12 +30,14 @@ Client
   * Added editor screen for existing connections.
   * Added optional authentication and encryption for Bluetooth connections.
   * Fixed minor memory leak bugs.
+  * Ping interval is now configured on the client.
   
 
 [i5]: http://code.google.com/p/remuco/issues/detail?id=5
 [i17]: http://code.google.com/p/remuco/issues/detail?id=17
 [i29]: http://code.google.com/p/remuco/issues/detail?id=29
 [i30]: http://code.google.com/p/remuco/issues/detail?id=30
+[i31]: http://code.google.com/p/remuco/issues/detail?id=31
 [i33]: http://code.google.com/p/remuco/issues/detail?id=33
 [i36]: http://code.google.com/p/remuco/issues/detail?id=36
 [i39]: http://code.google.com/p/remuco/issues/detail?id=39
