@@ -30,10 +30,6 @@ import remuco.util.Log;
  * <p>
  * Note: Synchronizing the methods in this class is not needed since they only
  * get called by the MIDlet thread.
- * 
- * 
- * @author Oben Sonne
- * 
  */
 public final class KeyBindings {
 

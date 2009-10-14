@@ -27,8 +27,6 @@ import remuco.player.Player;
  * Interface for classes interested in the state of a {@link Connection}.
  * 
  * @see Connection#Connection(String, IConnectionListener, IMessageListener)
- * 
- * @author Oben Sonne
  */
 public interface IConnectionListener {
 

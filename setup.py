@@ -207,18 +207,14 @@ if client_from_path is not None:
 # setup
 # =============================================================================
 
-
-
 setup(name='remuco',
       version='0.9.2',
       description='Remuco is a remote control system for media players.',
-      author='Oben Sonne',
-      author_email='obensonne@googlemail.com',
-      url='http://remuco.sourcefourge.net',
+      author='Remuco team',
+      url='http://remuco.googlecode.com',
       license='GPLv3',
       packages=['remuco'],
       package_dir={'remuco': 'base/module/remuco'},
       scripts=scripts,
       data_files=data_files,
 )
-

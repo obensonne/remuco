@@ -22,12 +22,7 @@ package remuco.ui;
 
 import javax.microedition.lcdui.Command;
 
-/**
- * Generic commands.
- * 
- * @author Oben Sonne
- * 
- */
+/** Generic commands. */
 public class CMD {
 
 	/**
@@ -48,8 +43,7 @@ public class CMD {
 	 * "http://sourceforge.net/forum/forum.php?thread_id=1953173&forum_id=568227"
 	 * >in this forum post</a>.
 	 */
-	public static final Command SELECT = new Command("Select",
-			Command.ITEM, 1);
+	public static final Command SELECT = new Command("Select", Command.ITEM, 1);
 	/**
 	 * A generic exit command. Every screen which wants to offer the user to
 	 * Immediately exit the application should add this command to itself.

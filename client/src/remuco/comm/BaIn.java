@@ -33,9 +33,6 @@ import java.io.UnsupportedEncodingException;
  * 
  * @see Serial
  * @see BaOut
- * 
- * @author Oben Sonne
- * 
  */
 public final class BaIn extends ByteArrayInputStream {
 

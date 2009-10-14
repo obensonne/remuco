@@ -20,12 +20,7 @@
  */
 package remuco.player;
 
-/**
- * Descriptor for a list related action.
- * 
- * @author Oben Sonne
- * 
- */
+/** Descriptor for a list related action. */
 public class ListAction extends AbstractAction {
 
 	public ListAction(int id, String label) {

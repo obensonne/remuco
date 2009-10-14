@@ -25,9 +25,6 @@ import javax.microedition.lcdui.Canvas;
 /**
  * Interface for classens listening for key events raised by a {@link Canvas}
  * based screen.
- * 
- * @author Oben Sonne
- * 
  */
 public interface IKeyListener {
 

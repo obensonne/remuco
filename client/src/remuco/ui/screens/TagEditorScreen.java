@@ -23,12 +23,7 @@ package remuco.ui.screens;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
-/**
- * A Form to edit the tags of a {@link Item}.
- * 
- * @author Oben Sonne
- * 
- */
+/** A Form to edit the tags of an {@link Item}. */
 public final class TagEditorScreen extends Form {
 
 	private String pid;

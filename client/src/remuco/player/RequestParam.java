@@ -26,12 +26,7 @@ import remuco.comm.SerialAtom;
 import remuco.util.Log;
 import remuco.util.Tools;
 
-/**
- * Parameters of a request to send to the server.
- * 
- * @author Oben Sonne
- * 
- */
+/** Parameters of a request to send to the server. */
 public class RequestParam implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,

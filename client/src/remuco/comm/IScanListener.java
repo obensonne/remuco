@@ -24,9 +24,6 @@ package remuco.comm;
  * Interface for classes interested in device scan results.
  * 
  * @see IScanner#startScan(IScanListener)
- * 
- * @author Oben Sonne
- * 
  */
 public interface IScanListener {
 

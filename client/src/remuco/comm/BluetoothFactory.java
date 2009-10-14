@@ -26,9 +26,6 @@ import remuco.util.Log;
  * On devices which have no JSR-82 support, references to bluetooth classes
  * could make the application fail. For this purpose this factory provides the
  * creation of bluetooth classes without references in the byte code.
- * 
- * @author Oben Sonne
- * 
  */
 public class BluetoothFactory {
 

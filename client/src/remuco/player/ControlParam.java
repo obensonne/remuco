@@ -25,12 +25,7 @@ import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
 
-/**
- * Parameters of a control to send to the server.
- * 
- * @author Oben Sonne
- * 
- */
+/** Parameters of a control to send to the server. */
 public class ControlParam implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I };

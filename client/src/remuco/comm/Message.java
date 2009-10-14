@@ -25,8 +25,6 @@ import remuco.util.Log;
 /**
  * A message received from or to send to the Remuco server.
  * 
- * @author Oben Sonne
- * 
  * @see Connection
  * @see Serial
  */

@@ -31,9 +31,6 @@ import remuco.util.Log;
  * A player mirrors the state of a remote player and provides methods to control
  * the remote player, to request data from the remote player and to register
  * listener for changes in player state.
- * 
- * @author Oben Sonne
- * 
  */
 public final class Player {
 

@@ -26,9 +26,6 @@ import java.util.Vector;
 
 /**
  * Miscellaneous J2ME specific utility constants and methods.
- * 
- * @author Oben Sonne
- * 
  */
 public final class Tools {
 

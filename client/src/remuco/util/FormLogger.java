@@ -27,9 +27,6 @@ import javax.microedition.lcdui.StringItem;
  * A {@link remuco.util.ILogPrinter} implementation which prints out log
  * messages to a {@link Form}. This is useful for inspecting what happens on a
  * mobile device where STDOUT cannot be inspected.
- * 
- * @author Oben Sonne
- * 
  */
 public final class FormLogger implements ILogPrinter {
 

@@ -20,12 +20,7 @@
  */
 package remuco.player;
 
-/**
- * Descriptor for an item related action.
- * 
- * @author Oben Sonne
- * 
- */
+/** Descriptor for an item related action. */
 public class ItemAction extends AbstractAction {
 
 	public final boolean multiple;

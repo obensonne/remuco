@@ -55,10 +55,7 @@ import remuco.util.Log;
 import remuco.util.Tools;
 
 /**
- * {@link Config} provides global access to various configuration options.
- * 
- * @author Oben Sonne
- * 
+ * Config provides global access to various configuration options.
  */
 public final class Config {
 

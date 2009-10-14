@@ -37,9 +37,6 @@ import remuco.util.Log;
  * {@link #addCommand(Command, String, Image)}. To add commands traditionally,
  * use {@link #addCommand(Command)}. Both command types can be removed as usual
  * with {@link #removeCommand(Command)}.
- * 
- * @author Oben Sonne
- * 
  */
 public class CommandList extends List implements CommandListener {
 

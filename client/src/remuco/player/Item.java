@@ -38,8 +38,6 @@ import remuco.util.Log;
  * Information you like. However, when adding standard information (artist,
  * genre, ..) use constants <code>META_...</code> as meta data keys, e.g.
  * {@link #META_ARTIST}.
- * 
- * @author Oben Sonne
  */
 
 public final class Item implements ISerializable {

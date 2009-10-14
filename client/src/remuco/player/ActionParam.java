@@ -25,12 +25,7 @@ import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
 
-/**
- * Parameters of an action (list or item) to send to the server.
- * 
- * @author Oben Sonne
- * 
- */
+/** Parameters of an action (list or item) to send to the server. */
 public class ActionParam implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,

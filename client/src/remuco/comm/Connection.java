@@ -47,9 +47,6 @@ import remuco.util.Tools;
  * <p>
  * All connection related events (state change and incoming data) are passed to
  * the global timer thread for delivering to event listener.
- * 
- * @author Oben Sonne
- * 
  */
 public final class Connection implements Runnable, IOptionListener {
 

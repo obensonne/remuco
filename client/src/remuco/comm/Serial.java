@@ -22,12 +22,7 @@ package remuco.comm;
 
 import remuco.util.Log;
 
-/**
- * {@link Serial} (de)serializes {@link ISerializable}s.
- * 
- * @author Oben Sonne
- * 
- */
+/** Serial (de)serializes {@link ISerializable}s. */
 public final class Serial {
 
 	public static final String ENCODING = "UTF-8";

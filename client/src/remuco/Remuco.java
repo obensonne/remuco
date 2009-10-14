@@ -61,9 +61,6 @@ import remuco.util.Log;
  * corresponding code is either tagged with <code>emulator</code> in its JavaDoc
  * or is located inside an if-statement block using the condition
  * {@link #EMULATION}.
- * 
- * @author Oben Sonne
- * 
  */
 public class Remuco implements CommandListener, IConnectionListener,
 		IServiceListener, IDeviceSelectionListener {

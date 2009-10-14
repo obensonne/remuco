@@ -36,10 +36,6 @@
      
      Run target 'run.wtk' to run the client in the WTK emulator.
      
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Author(s): Oben Sonne
-
      ====================================================================== -->
 
 <project name="Remuco Client" default="clean">

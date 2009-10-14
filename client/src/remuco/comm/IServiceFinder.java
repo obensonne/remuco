@@ -22,12 +22,7 @@ package remuco.comm;
 
 import remuco.UserException;
 
-/**
- * A finder searching for Remuco services.
- * 
- * @author Oben Sonne
- * 
- */
+/** A finder searching for Remuco services. */
 public interface IServiceFinder {
 
 	/**

@@ -26,9 +26,6 @@ package remuco;
  * <p>
  * <em>Note:</em> The precompiled exceptions do not provide valid stack traces.
  * They only provide some textual information.
- * 
- * @author Oben Sonne
- * 
  */
 public final class UserException extends Exception {
 

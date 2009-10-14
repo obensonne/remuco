@@ -27,10 +27,7 @@ import remuco.UserException;
 /**
  * Interface for service listener.
  * 
- * @author Oben Sonne
- * 
  * @see IServiceFinder
- *
  */
 public interface IServiceListener {
 
