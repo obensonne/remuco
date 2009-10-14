@@ -14,16 +14,16 @@ public class BluetoothDevice implements IDevice {
 
 	private boolean authenticate, encrypt;
 
-	private String name;
+	private String chan;
 
-	private String port;
+	private String name;
 
 	private int search;
 
 	public BluetoothDevice() {
 		address = "";
 		search = SEARCH_STANDARD;
-		port = "1";
+		chan = "1";
 		name = "";
 		authenticate = false;
 		encrypt = false;
@@ -58,9 +58,9 @@ public class BluetoothDevice implements IDevice {
 			throw new IllegalArgumentException();
 		}
 
-		port = sa[3];
+		chan = sa[3];
 		try {
-			Integer.parseInt(port);
+			Integer.parseInt(chan);
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException();
 		}
@@ -95,6 +95,10 @@ public class BluetoothDevice implements IDevice {
 		return address;
 	}
 
+	public String getChan() {
+		return chan;
+	}
+
 	public String getLabel() {
 		if (name.length() > 0) {
 			return name;
@@ -105,10 +109,6 @@ public class BluetoothDevice implements IDevice {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getPort() {
-		return port;
 	}
 
 	public int getSearch() {
@@ -144,7 +144,7 @@ public class BluetoothDevice implements IDevice {
 	}
 
 	public void setPort(String port) {
-		this.port = port;
+		this.chan = port;
 	}
 
 	public void setSearch(int search) {
@@ -162,7 +162,7 @@ public class BluetoothDevice implements IDevice {
 		sb.append(FIELD_SEP);
 		sb.append(search);
 		sb.append(FIELD_SEP);
-		sb.append(port);
+		sb.append(chan);
 		sb.append(FIELD_SEP);
 		sb.append(authenticate);
 		sb.append(FIELD_SEP);

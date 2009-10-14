@@ -215,7 +215,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 			if (bd.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
 
 				final Hashtable services = Tools.buildManualServiceList(
-					"btspp", bd.getAddress(), bd.getPort(), getOptions(
+					"btspp", bd.getAddress(), bd.getChan(), getOptions(
 						bd.isAuthenticate(), bd.isEncrypt()));
 
 				final TimerTask notifer = new TimerTask() {

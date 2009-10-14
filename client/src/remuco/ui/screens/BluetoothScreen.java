@@ -23,9 +23,9 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		public void itemStateChanged(Item item) {
 			if (item == cgSearch) {
 				if (cgSearch.getSelectedIndex() == BluetoothDevice.SEARCH_MANUAL) {
-					tfPort.setConstraints(PORT_ON);
+					tfChan.setConstraints(CHAN_ON);
 				} else {
-					tfPort.setConstraints(PORT_OFF);
+					tfChan.setConstraints(CHAN_OFF);
 				}
 			} else if (item == cgScan) {
 				if (cgScan.getSelectedIndex() == ADDR_TYPE_MANUAL) {
@@ -42,6 +42,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	}
 
 	private static final String ADDR_CHOICES[] = { "Scan for", "Set manually" };
+	
 	/** Text field constraints for address (uneditable). */
 	private static final int ADDR_OFF = TextField.URL | TextField.UNEDITABLE;
 
@@ -51,15 +52,15 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	/** Scan strategy. */
 	private static final int ADDR_TYPE_SCAN = 0, ADDR_TYPE_MANUAL = 1;
 
-	private final static String PORT_CHOICES[] = { "Search for",
+	private final static String CHAN_CHOICES[] = { "Search for",
 			"Search for (failsafe)", "Set manually" };
 
-	/** Text field constraints for port (uneditable). */
-	private static final int PORT_OFF = TextField.NUMERIC
+	/** Text field constraints for channel (uneditable). */
+	private static final int CHAN_OFF = TextField.NUMERIC
 			| TextField.UNEDITABLE;
 
-	/** Text field constraints for port (editable). */
-	private static final int PORT_ON = TextField.NUMERIC;
+	/** Text field constraints for channel (editable). */
+	private static final int CHAN_ON = TextField.NUMERIC;
 
 	private static final int SEC_AUTHENTICATE_INDEX = 0;
 
@@ -70,13 +71,13 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	/** Welcome message to show on new devices. */
 	private static final String WELCOME = "In most cases just pressing OK "
 			+ "here is fine. Tweak the fields below if automatic address and "
-			+ "port search fails.";
+			+ "channel search fails.";
 
 	private final ChoiceGroup cgScan, cgSearch, cgSecurity;
 
 	private final BluetoothDevice device;
 
-	private final TextField tfAddr, tfPort, tfName;
+	private final TextField tfAddr, tfChan, tfName;
 
 	/** Indicator if this screen configures a new or existing device. */
 	private final boolean virgin;
@@ -126,21 +127,21 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 		// search type //
 
-		label = "Port";
-		cgSearch = new ChoiceGroup(label, Choice.EXCLUSIVE, PORT_CHOICES, null);
+		label = "Channel";
+		cgSearch = new ChoiceGroup(label, Choice.EXCLUSIVE, CHAN_CHOICES, null);
 		cgSearch.setSelectedIndex(device.getSearch(), true);
 		append(cgSearch);
 
-		// port //
+		// channel //
 
-		label = "Manual port:";
+		label = "Manual channel:";
 		if (device.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
-			constraints = PORT_ON;
+			constraints = CHAN_ON;
 		} else {
-			constraints = PORT_OFF;
+			constraints = CHAN_OFF;
 		}
-		tfPort = new TextField(label, device.getPort(), 256, constraints);
-		append(tfPort);
+		tfChan = new TextField(label, device.getChan(), 256, constraints);
+		append(tfChan);
 
 		// security //
 
@@ -167,7 +168,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 			device.setAddress(tfAddr.getString());
 		}
 		device.setSearch(cgSearch.getSelectedIndex());
-		device.setPort(tfPort.getString());
+		device.setPort(tfChan.getString());
 		device.setName(tfName.getString());
 		device.setAuthenticate(cgSecurity.isSelected(SEC_AUTHENTICATE_INDEX));
 		device.setEncrypt(cgSecurity.isSelected(SEC_ENCRYPT_INDEX));
@@ -178,7 +179,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	public String validate() {
 
 		final String address = tfAddr.getString();
-		final String port = tfPort.getString();
+		final String chan = tfChan.getString();
 		final int search = cgSearch.getSelectedIndex();
 
 		if (!virgin || cgScan.getSelectedIndex() == ADDR_TYPE_MANUAL) {
@@ -202,18 +203,18 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		}
 
 		if (search == BluetoothDevice.SEARCH_MANUAL) {
-			final int portInt;
+			final int chanInt;
 			try {
-				portInt = Integer.parseInt(port);
+				chanInt = Integer.parseInt(chan);
 			} catch (NumberFormatException e) {
-				return "Port must be a number!";
+				return "Channel must be a number!";
 			}
-			if (portInt < 1 || portInt > 30) {
-				return "Port number out of range (1-30)!";
+			if (chanInt < 1 || chanInt > 30) {
+				return "Channel number out of range (1-30)!";
 			}
-		} else if (port.length() == 0) {
+		} else if (chan.length() == 0) {
 			// not a problem now, but may be later, let's fix it silently:
-			tfPort.setString("1");
+			tfChan.setString("1");
 		}
 
 		return null;
