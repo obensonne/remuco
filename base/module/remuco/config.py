@@ -42,6 +42,7 @@ CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
 KEY_BLUETOOTH = "bluetooth-enabled"
+KEY_BLUETOOTH_CHAN = "bluetooth-channel"
 KEY_WIFI = "wifi-enabled"
 KEY_WIFI_PORT = "wifi-port"
 KEY_ENDCODING = "player-encoding"
@@ -53,6 +54,7 @@ KEY_FB_XDG_UD = "file-browser-use-xdg-user-dirs"
 
 DEFAULTS = { # values as saved in config file
     KEY_BLUETOOTH: "1",
+    KEY_BLUETOOTH_CHAN: "0",
     KEY_WIFI: "1",
     KEY_WIFI_PORT: "34271",
     KEY_ENDCODING: "UTF8",
@@ -247,6 +249,30 @@ class Config(object):
     bluetooth = property(__pget_bluetooth, __pset_bluetooth, None,
                          __pget_bluetooth.__doc__)
 
+    # === property: bluetooth_channel ===
+    
+    def __pget_bluetooth_channel(self):
+        """Channel to use for Bluetooth connections.
+        
+        Default: 0 (select channel automatically)
+        
+        Option name: 'bluetooth-channel'
+        """
+        try:
+            return self.__cp.getint(SEC, KEY_BLUETOOTH_CHAN)
+        except (ValueError, AttributeError), e:
+            log.warning("config '%s' malformed (%s)" % (KEY_BLUETOOTH_CHAN, e))
+            return 0
+    
+    def __pset_bluetooth_channel(self, value):
+        
+        self.__cp.set(SEC, KEY_BLUETOOTH_CHAN, str(value))
+        self.__save()
+    
+    bluetooth_channel = property(__pget_bluetooth_channel,
+                                 __pset_bluetooth_channel, None,
+                                 __pget_bluetooth_channel.__doc__)
+    
     # === property: wifi ===
     
     def __pget_wifi(self):

@@ -20,6 +20,7 @@
 #
 # =============================================================================
 
+import errno
 import socket
 import struct
 import time
@@ -397,11 +398,8 @@ class _Server(object):
         try:
             self._sock = self._create_socket()
             self._sock.settimeout(_Server.SOCKET_TIMEOUT)
-        except IOError, e:
-            log.error("failed to set up %s server (%s)" % (self._get_type(), e))
-            return
-        except socket.error, e:
-            # TODO: this may be removed when 2.5 support is dropped
+        except (IOError, socket.error), e:
+            # TODO: socket.error may be removed when 2.5 support is dropped
             log.error("failed to set up %s server (%s)" % (self._get_type(), e))
             return
         
@@ -482,7 +480,14 @@ class BluetoothServer(_Server):
         
         sock.settimeout(0.33)
         
-        sock.bind(("", bluetooth.PORT_ANY))
+        try:
+            sock.bind(("", self._config.bluetooth_channel or bluetooth.PORT_ANY))
+        except Exception, e:
+            # convert error to regular IO error
+            ioe = IOError()
+            ioe.errno = e[0]
+            ioe.strerror = e[1]
+            raise ioe
         sock.listen(1)
         
         bluetooth.advertise_service(sock, self._pinfo.name,
