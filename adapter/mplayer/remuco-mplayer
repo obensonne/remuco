@@ -38,13 +38,19 @@ import remuco
 from remuco import log
 from remuco.defs import *
 
+FA_APPEND = remuco.ItemAction("Append")
+FA_PLAY = remuco.ItemAction("Play")
+
+FILE_ACTIONS = (FA_APPEND, FA_PLAY)
 
 class MplayerAdapter(remuco.PlayerAdapter):
 
     def __init__(self):
 
         remuco.PlayerAdapter.__init__(self, "MPlayer",
-                                      progress_known=True)
+                                      progress_known=True,
+                                      file_actions=FILE_ACTIONS,
+                                      mime_types=("audio", "video"))
 
         self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
         self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
@@ -183,6 +189,20 @@ class MplayerAdapter(remuco.PlayerAdapter):
     #            ["Joe - Joe's Song", "Sue - Sue's Song"])
 
     # ...
+    
+    # =========================================================================
+    # actions interface
+    # =========================================================================
+    
+    def action_files(self, action_id, files, uris):
+        
+        if action_id == FA_APPEND.id:
+            for file in files:
+                self.__command('loadfile "%s" 1' % file)
+        elif action_id == FA_PLAY.id:
+            self.__command('loadfile "%s"' % files[0])
+        else:
+            log.error("** BUG ** unexpected action ID")
 
     # =========================================================================
     # internal methods
