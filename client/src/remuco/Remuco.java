@@ -210,11 +210,16 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenDeviceSelector.addCommand(CMD.LOG);
 		screenDeviceSelector.addCommand(CMD.EXIT);
 
-		// TODO: handle no device situation
-		if (config.loadedSuccessfully) {
-			display.setCurrent(screenDeviceSelector);
+		final Displayable next;
+		if (config.devices.isEmpty()) {
+			next = screenDeviceSelector.getAddScreen();
 		} else {
-			display.setCurrent(alertLoadConfig, screenDeviceSelector);
+			next = screenDeviceSelector;
+		}
+		if (config.loadedSuccessfully) {
+			display.setCurrent(next);
+		} else {
+			display.setCurrent(alertLoadConfig, next);
 		}
 	}
 

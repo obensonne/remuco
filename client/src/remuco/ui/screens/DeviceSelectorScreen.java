@@ -244,13 +244,7 @@ public final class DeviceSelectorScreen extends List implements
 
 		} else if (c == CMD_ADD) {
 
-			final CommandList dts = new CommandList("Add Connection", CMD.OK);
-			dts.addCommand(CMD_BACK_TO_ME);
-			dts.addCommand(CMD_DT_BLUETOOTH, theme.licBluetooth);
-			dts.addCommand(CMD_DT_WIFI, theme.licWifi);
-			dts.setCommandListener(this);
-
-			display.setCurrent(dts);
+			display.setCurrent(getAddScreen());
 
 		} else if (c == CMD_EDIT) {
 
@@ -302,6 +296,17 @@ public final class DeviceSelectorScreen extends List implements
 		}
 	}
 
+	/** Get displayable used to add a new device. */
+	public Displayable getAddScreen() {
+
+		final CommandList dts = new CommandList("Add Connection", CMD.OK);
+		dts.addCommand(CMD_BACK_TO_ME);
+		dts.addCommand(CMD_DT_BLUETOOTH, theme.licBluetooth);
+		dts.addCommand(CMD_DT_WIFI, theme.licWifi);
+		dts.setCommandListener(this);
+		return dts;
+	}
+
 	public void notifyScannedDevices(BluetoothDevice devs[]) {
 
 		if (devs.length == 0) {
@@ -325,33 +330,6 @@ public final class DeviceSelectorScreen extends List implements
 
 		display.setCurrent(screenScanResults);
 	}
-
-	// /**
-	// * On first time display, use this method instead of
-	// * {@link Display#setCurrent(Displayable)}.
-	// */
-	// public void show() {
-	//
-	// update();
-	//
-	// if (config.devices.isEmpty()) {
-	// if (!BluetoothFactory.BLUETOOTH) {
-	// commandAction(CMD_ADD, this);
-	// } else {
-	// final Alert alert = new Alert("No Bluetooth",
-	// "Bluetooth is not available. "
-	// + "Only Wifi connections are possible.",
-	// theme.aicWifi, AlertType.INFO);
-	// final IDevice device = new IDevice(IDevice.WIFI, ":"
-	// + InetServiceFinder.PORT, "");
-	// commandAction(CMD_DT_WIFI, this);
-	// display.setCurrent(alert, new DeviceEditorScreen(device));
-	// }
-	// commandAction(CMD_ADD, this);
-	// } else
-	// display.setCurrent(this);
-	//
-	// }
 
 	/** Create and show a device editor screen for the given device. */
 	private void showDeviceEditorScreen(IDevice iDevice) {
