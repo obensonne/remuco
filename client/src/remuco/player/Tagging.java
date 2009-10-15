@@ -28,12 +28,21 @@ import remuco.comm.SerialAtom;
 import remuco.util.Log;
 import remuco.util.Tools;
 
+/** Tags (labels) of an item. */
 public class Tagging implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_S,
 			SerialAtom.TYPE_AS };
 
-	public static String[] trimAndFlatten(String tagString) {
+	/**
+	 * Split and trim a comma separated list of tags (bounding whitespace and
+	 * duplicates get removed).
+	 * 
+	 * @param tagString
+	 *            tags as comma separated list
+	 * @return trimmed tags as string array
+	 */
+	public static String[] splitAndTrim(String tagString) {
 
 		final String tags[] = Tools.splitString(tagString, ',', true);
 
@@ -59,10 +68,18 @@ public class Tagging implements ISerializable {
 
 	private final SerialAtom[] atoms;
 
+	/**
+	 * Create a new item tagging.
+	 * 
+	 * @param id
+	 *            the item ID
+	 * @param tags
+	 *            comma separated list of tags (gets trimmed automatically)
+	 */
 	public Tagging(String id, String tags) {
 		atoms = SerialAtom.build(ATOMS_FMT);
 		atoms[0].s = id;
-		atoms[1].as = trimAndFlatten(tags);
+		atoms[1].as = splitAndTrim(tags);
 	}
 
 	public SerialAtom[] getAtoms() {

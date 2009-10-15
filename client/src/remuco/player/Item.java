@@ -300,7 +300,7 @@ public final class Item implements ISerializable {
 	 */
 	public void setTags(String tags) {
 
-		final String[] sa = Tagging.trimAndFlatten(tags);
+		final String[] sa = Tagging.splitAndTrim(tags);
 
 		final StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < sa.length; i++) {
