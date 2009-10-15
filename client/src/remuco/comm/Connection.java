@@ -37,7 +37,7 @@ import remuco.IOptionListener;
 import remuco.MainLoop;
 import remuco.OptionDescriptor;
 import remuco.UserException;
-import remuco.player.Player;
+import remuco.client.common.player.Player;
 import remuco.player.PlayerInfo;
 import remuco.util.Log;
 import remuco.util.Tools;

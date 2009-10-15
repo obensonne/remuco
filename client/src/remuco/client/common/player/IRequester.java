@@ -18,7 +18,10 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.player;
+
+import remuco.player.Item;
+import remuco.player.ItemList;
 
 public interface IRequester {
 

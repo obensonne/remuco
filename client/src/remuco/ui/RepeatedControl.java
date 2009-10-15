@@ -22,7 +22,7 @@ package remuco.ui;
 
 import java.util.TimerTask;
 
-import remuco.player.Player;
+import remuco.client.common.player.Player;
 import remuco.util.Log;
 
 /**

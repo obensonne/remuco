@@ -22,7 +22,7 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.player.Feature;
+import remuco.client.common.player.Feature;
 import remuco.player.PlayerInfo;
 import remuco.player.SliderState;
 import remuco.player.State;

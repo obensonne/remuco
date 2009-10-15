@@ -34,6 +34,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.player.Player;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
@@ -42,7 +43,6 @@ import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IServiceFinder;
 import remuco.comm.IServiceListener;
 import remuco.comm.InetServiceFinder;
-import remuco.player.Player;
 import remuco.ui.CMD;
 import remuco.ui.Theme;
 import remuco.ui.screens.DeviceSelectorScreen;

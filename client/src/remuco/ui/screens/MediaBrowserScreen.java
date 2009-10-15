@@ -29,12 +29,12 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.player.Feature;
+import remuco.client.common.player.IRequester;
+import remuco.client.common.player.Player;
 import remuco.player.ActionParam;
-import remuco.player.Feature;
-import remuco.player.IRequester;
 import remuco.player.Item;
 import remuco.player.ItemList;
-import remuco.player.Player;
 import remuco.ui.CMD;
 import remuco.ui.IItemListController;
 import remuco.ui.Theme;

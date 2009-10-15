@@ -18,10 +18,10 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.player;
 
-public interface IItemListener {
+public interface IProgressListener {
 
-	public void notifyItemChanged();
+	public void notifyProgressChanged();
 	
 }

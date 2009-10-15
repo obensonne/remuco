@@ -22,6 +22,7 @@ package remuco.player;
 
 import java.util.Vector;
 
+import remuco.client.common.player.Feature;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;

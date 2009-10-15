@@ -21,7 +21,7 @@
 package remuco.comm;
 
 import remuco.UserException;
-import remuco.player.Player;
+import remuco.client.common.player.Player;
 
 /**
  * Interface for classes interested in the state of a {@link Connection}.
