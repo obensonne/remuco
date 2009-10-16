@@ -20,13 +20,21 @@
  */
 package remuco.comm;
 
+/**
+ * Interface for classes supposed to get (de)serialized, i.e. send to and
+ * received from the server.
+ */
 public interface ISerializable {
 
-	/** Get the atoms. */
+	/**
+	 * Get the serial atoms of this serializable, i.e. all data fields to
+	 * (de)serialize.
+	 */
 	public SerialAtom[] getAtoms();
 
 	/**
-	 * Signals that the atoms has been updated.
+	 * Notifies that the serial atoms has been updated, i.e. some data has been
+	 * received and deserialized into the serial atoms of this object.
 	 * 
 	 * @throws BinaryDataExecption
 	 *             if the data in the atoms is semantically malformed
