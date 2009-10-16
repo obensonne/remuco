@@ -31,12 +31,12 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.SocketConnection;
 import javax.microedition.io.StreamConnection;
 
-import remuco.ClientInfo;
 import remuco.Config;
 import remuco.IOptionListener;
 import remuco.MainLoop;
 import remuco.OptionDescriptor;
 import remuco.UserException;
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.player.Player;
 import remuco.util.Log;

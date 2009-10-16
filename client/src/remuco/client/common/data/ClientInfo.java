@@ -18,11 +18,14 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco;
+package remuco.client.common.data;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import remuco.Config;
+import remuco.OptionDescriptor;
+import remuco.Remuco;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;

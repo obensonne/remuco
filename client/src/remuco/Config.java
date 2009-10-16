@@ -42,6 +42,7 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import remuco.client.common.data.ClientInfo;
 import remuco.comm.BluetoothDevice;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
