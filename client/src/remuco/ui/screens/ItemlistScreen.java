@@ -35,11 +35,11 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import remuco.player.AbstractAction;
-import remuco.player.ActionParam;
-import remuco.player.ItemAction;
-import remuco.player.ItemList;
-import remuco.player.PlayerInfo;
+import remuco.client.common.data.AbstractAction;
+import remuco.client.common.data.ActionParam;
+import remuco.client.common.data.ItemAction;
+import remuco.client.common.data.ItemList;
+import remuco.client.common.data.PlayerInfo;
 import remuco.ui.CMD;
 import remuco.ui.IItemListController;
 import remuco.ui.Theme;

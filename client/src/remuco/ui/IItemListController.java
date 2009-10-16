@@ -20,7 +20,7 @@
  */
 package remuco.ui;
 
-import remuco.player.ActionParam;
+import remuco.client.common.data.ActionParam;
 import remuco.ui.screens.ItemlistScreen;
 
 public interface IItemListController {

@@ -18,22 +18,26 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.data;
 
-/** Descriptor for a list related action. */
-public class ListAction extends AbstractAction {
+/** Descriptor for an item related action. */
+public class ItemAction extends AbstractAction {
 
-	public ListAction(int id, String label) {
+	public final boolean multiple;
+
+	public ItemAction(int id, String label, boolean multiple) {
+
 		super(id, label);
+
+		this.multiple = multiple;
 	}
 
 	public boolean isItemAction() {
-		return false;
-	}
-
-	public boolean isListAction() {
 		return true;
 	}
 
+	public boolean isListAction() {
+		return false;
+	}
 
 }

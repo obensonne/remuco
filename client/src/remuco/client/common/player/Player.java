@@ -20,20 +20,20 @@
  */
 package remuco.client.common.player;
 
+import remuco.client.common.data.ActionParam;
+import remuco.client.common.data.ControlParam;
+import remuco.client.common.data.Item;
+import remuco.client.common.data.ItemList;
+import remuco.client.common.data.PlayerInfo;
+import remuco.client.common.data.Progress;
+import remuco.client.common.data.RequestParam;
+import remuco.client.common.data.State;
+import remuco.client.common.data.Tagging;
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.Connection;
 import remuco.comm.ISerializable;
 import remuco.comm.Message;
 import remuco.comm.Serial;
-import remuco.player.ActionParam;
-import remuco.player.ControlParam;
-import remuco.player.Item;
-import remuco.player.ItemList;
-import remuco.player.PlayerInfo;
-import remuco.player.Progress;
-import remuco.player.RequestParam;
-import remuco.player.State;
-import remuco.player.Tagging;
 import remuco.util.Log;
 
 /**

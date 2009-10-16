@@ -18,52 +18,56 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.data;
 
 import remuco.comm.BinaryDataExecption;
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
 import remuco.util.Log;
-import remuco.util.Tools;
 
-/** Parameters of a request to send to the server. */
-public class RequestParam implements ISerializable {
+/** Parameters of an action (list or item) to send to the server. */
+public class ActionParam implements ISerializable {
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
-			SerialAtom.TYPE_S, SerialAtom.TYPE_AS, SerialAtom.TYPE_I };
+			SerialAtom.TYPE_AS, SerialAtom.TYPE_AI, SerialAtom.TYPE_AS };
 
 	private final SerialAtom[] atoms;
 
-	/** Request for a playlist or queue. */
-	public RequestParam(int page) {
+	/** Action on playlist/queue or its items. */
+	public ActionParam(int id, int positions[], String itemIDs[]) {
+		this();
+		atoms[0].i = id;
+		atoms[2].ai = positions;
+		atoms[3].as = itemIDs;
+	}
+
+	/** Action on file list. */
+	public ActionParam(int id, String files[]) {
+		this();
+		atoms[0].i = id;
+		atoms[3].as = files;
+	}
+
+	/** Action on a library level or its items. */
+	public ActionParam(int id, String libPath[], int positions[],
+			String itemIDs[]) {
+		this();
+		atoms[0].i = id;
+		atoms[1].as = libPath;
+		atoms[2].ai = positions;
+		atoms[3].as = itemIDs;
+	}
+
+	private ActionParam() {
 		atoms = SerialAtom.build(ATOMS_FMT);
-		atoms[0].i = Tools.RANDOM.nextInt(Integer.MAX_VALUE);
-		atoms[3].i = page;
-	}
-
-	/** Request for an item. */
-	public RequestParam(String id) {
-		this(0);
-		atoms[1].s = id;
-	}
-
-	/** Request for a file system or media lib level or search. */
-	public RequestParam(String path[], int page) {
-		this(page);
-		atoms[2].as = path;
 	}
 
 	public SerialAtom[] getAtoms() {
 		return atoms;
 	}
 
-	/** Get this request's randomly generated ID. */
-	public int getRequestID() {
-		return atoms[0].i;
-	}
-
 	public void notifyAtomsUpdated() throws BinaryDataExecption {
-		Log.bug("Mar 9, 2009.6:34:50 PM");
+		Log.bug("Mar 9, 2009.6:29:32 PM");
 	}
 
 }

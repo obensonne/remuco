@@ -18,31 +18,43 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.data;
 
-import remuco.comm.BinaryDataExecption;
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
-import remuco.util.Log;
+public abstract class AbstractAction {
 
-/** Parameters of a control to send to the server. */
-public class ControlParam implements ISerializable {
+	public final int id;
 
-	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I };
+	public final String label;
 
-	private final SerialAtom[] atoms;
+	private String disabledReason;
 
-	public ControlParam(int param) {
-		atoms = SerialAtom.build(ATOMS_FMT);
-		atoms[0].i = param;
+	private boolean enabled = true;
+
+	public AbstractAction(int id, String label) {
+
+		this.id = id;
+		this.label = label;
 	}
 
-	public SerialAtom[] getAtoms() {
-		return atoms;
+	public void disbale(String reason) {
+		enabled = false;
+		disabledReason = reason;
 	}
 
-	public void notifyAtomsUpdated() throws BinaryDataExecption {
-		Log.bug("Mar 9, 2009.5:36:51 PM");
+	public void enable() {
+		enabled = true;
 	}
+
+	public String getDisabledReason() {
+		return disabledReason;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public abstract boolean isItemAction();
+
+	public abstract boolean isListAction();
 
 }

@@ -26,8 +26,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Image;
 
 import remuco.Config;
+import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.player.Feature;
-import remuco.player.PlayerInfo;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;

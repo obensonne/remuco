@@ -18,26 +18,44 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.data;
 
-/** Descriptor for an item related action. */
-public class ItemAction extends AbstractAction {
+import remuco.comm.ISerializable;
+import remuco.comm.SerialAtom;
+import remuco.util.Tools;
 
-	public final boolean multiple;
+public class Progress implements ISerializable {
 
-	public ItemAction(int id, String label, boolean multiple) {
+	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
+			SerialAtom.TYPE_I };
 
-		super(id, label);
+	private final SerialAtom[] atoms;
 
-		this.multiple = multiple;
+	public Progress() {
+		atoms = SerialAtom.build(ATOMS_FMT);
 	}
 
-	public boolean isItemAction() {
-		return true;
+	public int getProgress() {
+		return atoms[0].i;
 	}
 
-	public boolean isListAction() {
-		return false;
+	public SerialAtom[] getAtoms() {
+		return atoms;
+	}
+
+	public int getLength() {
+		return atoms[1].i;
+	}
+
+	public void notifyAtomsUpdated() {
+	}
+
+	public String getLengthFormatted() {
+		return Tools.formatTime(atoms[1].i);
+	}
+
+	public String getProgressFormatted() {
+		return Tools.formatTime(atoms[0].i);
 	}
 
 }

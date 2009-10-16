@@ -22,9 +22,9 @@ package remuco.ui.screenies;
 
 import javax.microedition.lcdui.Image;
 
+import remuco.client.common.data.PlayerInfo;
+import remuco.client.common.data.Progress;
 import remuco.client.common.player.Feature;
-import remuco.player.PlayerInfo;
-import remuco.player.Progress;
 import remuco.ui.Theme;
 
 /**

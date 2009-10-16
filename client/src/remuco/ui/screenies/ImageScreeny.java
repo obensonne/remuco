@@ -23,7 +23,7 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.player.PlayerInfo;
+import remuco.client.common.data.PlayerInfo;
 import remuco.ui.Theme;
 
 /**

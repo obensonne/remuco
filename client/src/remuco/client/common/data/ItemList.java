@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.common.data;
 
 import java.util.Enumeration;
 import java.util.Vector;

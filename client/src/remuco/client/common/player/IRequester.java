@@ -20,8 +20,8 @@
  */
 package remuco.client.common.player;
 
-import remuco.player.Item;
-import remuco.player.ItemList;
+import remuco.client.common.data.Item;
+import remuco.client.common.data.ItemList;
 
 public interface IRequester {
 
