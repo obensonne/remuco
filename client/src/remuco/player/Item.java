@@ -23,11 +23,8 @@ package remuco.player;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Image;
-
 import remuco.comm.ISerializable;
 import remuco.comm.SerialAtom;
-import remuco.util.Log;
 
 /**
  * A Item is a <i>playable object</i>, which could be a song, a video or ..
@@ -93,7 +90,7 @@ public final class Item implements ISerializable {
 
 	private String id = ID_NONE;
 
-	private Image img;
+	private byte img[];
 
 	private final Hashtable meta;
 
@@ -129,11 +126,11 @@ public final class Item implements ISerializable {
 	}
 
 	/**
-	 * Get the item's image.
+	 * Get the item's image as a byte array.
 	 * 
-	 * @return the image or <code>null</code> is image is missing
+	 * @return the image data (empty array if there is no image)
 	 */
-	public Image getImg() {
+	public byte[] getImg() {
 		return img;
 	}
 
@@ -262,16 +259,7 @@ public final class Item implements ISerializable {
 			setMeta(META_TITLE, META_TITLE_VALUE_NONE);
 		}
 
-		if (atoms[2].ay.length > 0) {
-			try {
-				img = Image.createImage(atoms[2].ay, 0, atoms[2].ay.length);
-			} catch (Exception e) {
-				Log.ln("[IT] creating image failed", e);
-				img = null;
-			}
-		} else {
-			img = null;
-		}
+		img = atoms[2].ay;
 	}
 
 	public void setMeta(String name, String value) {
