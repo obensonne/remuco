@@ -269,10 +269,15 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
             return True
 
-        else: # error
-            if condition == gobject.IO_HUP: # mplayer has probably quit
-                log.info("statusfifo hangup. is mplayer still running?")
+        elif condition == gobject.IO_HUP: # mplayer has probably quit
+            log.info("statusfifo hangup. is mplayer still running?")
 
+            self.stop()
+
+            gobject.idle_add(self.start)
+            return False
+
+        else:
             log.error("statusfifo read error")
             self.watch_id = None
             self.manager.stop()
