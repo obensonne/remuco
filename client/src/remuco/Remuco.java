@@ -36,6 +36,13 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
+import remuco.client.jme.ui.CMD;
+import remuco.client.jme.ui.Theme;
+import remuco.client.jme.ui.screens.DeviceSelectorScreen;
+import remuco.client.jme.ui.screens.LogScreen;
+import remuco.client.jme.ui.screens.PlayerScreen;
+import remuco.client.jme.ui.screens.ServiceSelectorScreen;
+import remuco.client.jme.ui.screens.WaitingScreen;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
@@ -44,13 +51,6 @@ import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IServiceFinder;
 import remuco.comm.IServiceListener;
 import remuco.comm.InetServiceFinder;
-import remuco.ui.CMD;
-import remuco.ui.Theme;
-import remuco.ui.screens.DeviceSelectorScreen;
-import remuco.ui.screens.LogScreen;
-import remuco.ui.screens.PlayerScreen;
-import remuco.ui.screens.ServiceSelectorScreen;
-import remuco.ui.screens.WaitingScreen;
 import remuco.util.FormLogger;
 
 /**
