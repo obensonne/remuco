@@ -45,13 +45,12 @@ import remuco.client.jme.ui.screens.ServiceSelectorScreen;
 import remuco.client.jme.ui.screens.WaitingScreen;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
-import remuco.comm.IDevice;
 import remuco.comm.IConnectionListener;
+import remuco.comm.IDevice;
 import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IServiceFinder;
 import remuco.comm.IServiceListener;
 import remuco.comm.InetServiceFinder;
-import remuco.util.FormLogger;
 
 /**
  * MIDlet of the Remuco client.
@@ -139,7 +138,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 	/** Screen to select a device to connect to */
 	private final DeviceSelectorScreen screenDeviceSelector;
 
-	private final Form screenLog;
+	private final LogScreen screenLog;
 
 	/** Main player interaction screen */
 	private PlayerScreen screenPlayer = null;
@@ -161,7 +160,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 			Log.ln("RUNING IN EMULATION MODE ..");
 			screenLog.append("Emulation -> logging goes to standard out!");
 		} else {
-			Log.setOut(new FormLogger(screenLog));
+			Log.setOut(screenLog);
 		}
 
 		// init configuration
@@ -350,7 +349,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 			sf = null;
 			Log.bug("Jan 26, 2009.7:29:56 PM");
 		}
-		
+
 		if (sf == null) {
 			return;
 		}

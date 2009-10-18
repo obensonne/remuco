@@ -25,13 +25,15 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.StringItem;
 
 import remuco.Config;
 import remuco.Remuco;
+import remuco.client.common.util.ILogPrinter;
 import remuco.client.common.util.Log;
 import remuco.client.jme.ui.CMD;
 
-public class LogScreen extends Form implements CommandListener {
+public class LogScreen extends Form implements ILogPrinter, CommandListener {
 
 	/** Command for the log form to run the garbage collector */
 	private static final Command CMD_RUNGC = new Command("Run GC",
@@ -41,9 +43,13 @@ public class LogScreen extends Form implements CommandListener {
 	private static final Command CMD_SYSINFO = new Command("System",
 			Command.SCREEN, 1);
 
+	private static int MAX_LOG_ELEMENTS = 70;
+
 	private final Display display;
 
 	private CommandListener externalCommandListener;
+
+	private int insertPos = 0;
 
 	private final Form sysInfoForm;
 
@@ -100,11 +106,41 @@ public class LogScreen extends Form implements CommandListener {
 		}
 	}
 
+	public void print(String s) {
+		checkFormSize();
+		insert(insertPos, new StringItem(null, s));
+		insertPos++;
+		// f.append(s);
+	}
+
+	public void println() {
+		checkFormSize();
+		insert(insertPos, new StringItem(null, "\n"));
+		insertPos = 0;
+		// f.append("\n");
+	}
+
+	public void println(String s) {
+		checkFormSize();
+		insert(insertPos, new StringItem(null, s + "\n"));
+		insertPos = 0;
+		// f.append(s + "\n");
+	}
+
 	public void setCommandListener(CommandListener l) {
 		if (l == this) {
 			super.setCommandListener(l);
 		} else {
 			externalCommandListener = l;
+		}
+	}
+
+	private void checkFormSize() {
+		int size = size();
+		if (size >= MAX_LOG_ELEMENTS) {
+			for (int i = size - 1; i > size - 11; i--) {
+				delete(i);
+			}
 		}
 	}
 
