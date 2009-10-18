@@ -25,7 +25,7 @@ import java.util.TimerTask;
 
 import remuco.MainLoop;
 import remuco.UserException;
-import remuco.client.common.util.Tools;
+import remuco.client.jme.util.JMETools;
 
 public final class InetServiceFinder implements IServiceFinder {
 
@@ -53,7 +53,7 @@ public final class InetServiceFinder implements IServiceFinder {
 
 		final WifiDevice wd = (WifiDevice) iDevice;
 
-		final Hashtable services = Tools.buildManualServiceList("socket",
+		final Hashtable services = JMETools.buildManualServiceList("socket",
 			wd.getAddress(), wd.getPort(), wd.getOptions());
 
 		synchronized (lock) {

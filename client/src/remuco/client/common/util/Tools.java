@@ -20,56 +20,19 @@
  */
 package remuco.client.common.util;
 
-import java.util.Hashtable;
 import java.util.Random;
 
 /**
- * Miscellaneous J2ME specific utility constants and methods.
+ * Miscellaneous utility constants and methods.
+ * <p>
+ * Some of the methods already exist in standard Java, but not JavaME! Classes
+ * in package <em>remuco.client.common</em> must use the helper methods provided
+ * here to work in JavaME as well.
  */
 public final class Tools {
 
 	/** A global random number generator instance. */
 	public static final Random RANDOM = new Random();
-
-	/**
-	 * Build a one element service list containing the connection URL for a
-	 * service where all required URL parameters are known.
-	 * 
-	 * @param proto
-	 *            URL parameter
-	 * @param addr
-	 *            URL parameter
-	 * @param port
-	 *            URL parameter
-	 * @param options
-	 *            URL parameter (may be <code>null</code> or empty string)
-	 * 
-	 * @return a hash table mapping the generic service name <em>Player</em> to
-	 *         an URL build from the given parameters
-	 */
-	public static Hashtable buildManualServiceList(String proto, String addr,
-			String port, String options) {
-
-		final StringBuffer url = new StringBuffer(proto);
-
-		url.append("://");
-		url.append(addr);
-		url.append(':');
-		url.append(port);
-
-		if (options != null && options.length() > 0) {
-			if (options.charAt(0) != ';') {
-				url.append(';');
-			}
-			url.append(options);
-		}
-
-		final Hashtable services = new Hashtable(1);
-
-		services.put("Player", url.toString());
-
-		return services;
-	}
 
 	/** Format a time in seconds to something like 'mm:ss'. */
 	public static String formatTime(int seconds) {
