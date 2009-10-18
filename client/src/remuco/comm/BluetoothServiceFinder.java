@@ -38,9 +38,6 @@ import remuco.UserException;
 import remuco.util.Log;
 import remuco.util.Tools;
 
-// TODO: Service finder classes can make use of final instance variables 
-// because they are used only once per instances now
-
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {
 
