@@ -20,8 +20,8 @@
  */
 package remuco.client.common.data;
 
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 import remuco.util.Tools;
 
 public class Progress implements ISerializable {

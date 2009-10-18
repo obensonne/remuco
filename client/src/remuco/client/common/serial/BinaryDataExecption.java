@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.common.serial;
 
 /**
  * An exception which indicates that received binary data is malformed (e.g. not

@@ -23,8 +23,8 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 
 /**
  * A Item is a <i>playable object</i>, which could be a song, a video or ..

@@ -20,6 +20,7 @@
  */
 package remuco.comm;
 
+import remuco.client.common.serial.Serial;
 import remuco.util.Log;
 
 /**

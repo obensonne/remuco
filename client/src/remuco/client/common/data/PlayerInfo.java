@@ -23,9 +23,9 @@ package remuco.client.common.data;
 import java.util.Vector;
 
 import remuco.client.common.player.Feature;
-import remuco.comm.BinaryDataExecption;
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
+import remuco.client.common.serial.BinaryDataExecption;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 
 /** A descriptive interface for the player. */
 public class PlayerInfo implements ISerializable {

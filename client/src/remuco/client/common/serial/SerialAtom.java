@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.common.serial;
 
 public class SerialAtom {
 

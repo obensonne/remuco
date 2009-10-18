@@ -29,11 +29,11 @@ import remuco.client.common.data.Progress;
 import remuco.client.common.data.RequestParam;
 import remuco.client.common.data.State;
 import remuco.client.common.data.Tagging;
-import remuco.comm.BinaryDataExecption;
+import remuco.client.common.serial.BinaryDataExecption;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.Serial;
 import remuco.comm.Connection;
-import remuco.comm.ISerializable;
 import remuco.comm.Message;
-import remuco.comm.Serial;
 import remuco.util.Log;
 
 /**

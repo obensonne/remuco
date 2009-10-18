@@ -43,10 +43,10 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.client.common.data.ClientInfo;
+import remuco.client.common.serial.Serial;
 import remuco.comm.BluetoothDevice;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
-import remuco.comm.Serial;
 import remuco.comm.WifiDevice;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;

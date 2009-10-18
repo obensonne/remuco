@@ -26,8 +26,8 @@ import java.util.Hashtable;
 import remuco.Config;
 import remuco.OptionDescriptor;
 import remuco.Remuco;
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 import remuco.util.Log;
 
 public final class ClientInfo implements ISerializable {

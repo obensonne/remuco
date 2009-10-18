@@ -20,8 +20,8 @@
  */
 package remuco.client.common.data;
 
-import remuco.comm.ISerializable;
-import remuco.comm.SerialAtom;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 
 /**
  * Class to represent all relevant state information of a music player.

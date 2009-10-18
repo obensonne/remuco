@@ -23,9 +23,9 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import remuco.comm.ISerializable;
+import remuco.client.common.serial.ISerializable;
+import remuco.client.common.serial.SerialAtom;
 import remuco.comm.Message;
-import remuco.comm.SerialAtom;
 import remuco.util.Log;
 import remuco.util.Tools;
 
