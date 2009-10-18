@@ -23,7 +23,7 @@ package remuco.client.common.data;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /** Parameters of an action (list or item) to send to the server. */
 public class ActionParam implements ISerializable {

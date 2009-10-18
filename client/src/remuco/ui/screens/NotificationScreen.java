@@ -29,9 +29,9 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.util.Log;
 import remuco.ui.CMD;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 // TODO: maybe this can be used instead of PostActionDialog and ActionAlert
 public class NotificationScreen extends Form implements CommandListener {

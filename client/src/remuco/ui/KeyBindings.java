@@ -23,7 +23,7 @@ package remuco.ui;
 import javax.microedition.lcdui.Canvas;
 
 import remuco.Config;
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /**
  * Key bindings manager. Manages mappings between actions and key codes.

@@ -25,8 +25,8 @@ import java.util.Vector;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
-import remuco.util.Log;
-import remuco.util.Tools;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 
 /** Tags (labels) of an item. */
 public class Tagging implements ISerializable {

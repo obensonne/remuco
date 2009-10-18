@@ -20,7 +20,7 @@
  */
 package remuco.client.common.serial;
 
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /** Serial (de)serializes {@link ISerializable}s. */
 public final class Serial {

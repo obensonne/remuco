@@ -23,8 +23,10 @@ package remuco.util;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.util.ILogPrinter;
+
 /**
- * A {@link remuco.util.ILogPrinter} implementation which prints out log
+ * A {@link remuco.client.common.util.ILogPrinter} implementation which prints out log
  * messages to a {@link Form}. This is useful for inspecting what happens on a
  * mobile device where STDOUT cannot be inspected.
  */

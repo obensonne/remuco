@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.util;
+package remuco.client.common.util;
 
 import java.util.Hashtable;
 import java.util.Random;

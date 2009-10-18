@@ -40,6 +40,7 @@ import remuco.client.common.player.IItemListener;
 import remuco.client.common.player.IProgressListener;
 import remuco.client.common.player.IStateListener;
 import remuco.client.common.player.Player;
+import remuco.client.common.util.Log;
 import remuco.client.jme.util.JMETools;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
@@ -55,7 +56,6 @@ import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
 import remuco.ui.screenies.StateScreeny;
 import remuco.ui.screenies.TitleScreeny;
-import remuco.util.Log;
 
 public final class PlayerScreen extends Canvas implements IItemListener,
 		IStateListener, IProgressListener, CommandListener, IActionListener,

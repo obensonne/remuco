@@ -44,6 +44,8 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.serial.Serial;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 import remuco.comm.BluetoothDevice;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
@@ -52,8 +54,6 @@ import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
 import remuco.ui.screenies.TitleScreeny;
 import remuco.ui.screens.PlayerScreen;
-import remuco.util.Log;
-import remuco.util.Tools;
 
 /**
  * Config provides global access to various configuration options.

@@ -28,10 +28,10 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import remuco.client.common.util.Log;
 import remuco.ui.CMD;
 import remuco.ui.IKeyListener;
 import remuco.ui.KeyBindings;
-import remuco.util.Log;
 
 /** Screen to configure key bindings. */
 public final class KeyBindingsScreen extends List implements CommandListener,

@@ -25,9 +25,9 @@ import java.util.Vector;
 
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 import remuco.comm.Message;
-import remuco.util.Log;
-import remuco.util.Tools;
 
 public final class ItemList implements ISerializable {
 

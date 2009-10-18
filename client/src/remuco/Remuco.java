@@ -35,6 +35,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
 import remuco.client.common.player.Player;
+import remuco.client.common.util.Log;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
 import remuco.comm.IDevice;
@@ -51,7 +52,6 @@ import remuco.ui.screens.PlayerScreen;
 import remuco.ui.screens.ServiceSelectorScreen;
 import remuco.ui.screens.WaitingScreen;
 import remuco.util.FormLogger;
-import remuco.util.Log;
 
 /**
  * MIDlet of the Remuco client.

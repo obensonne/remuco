@@ -24,10 +24,10 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.client.common.data.PlayerInfo;
+import remuco.client.common.util.Log;
 import remuco.ui.IActionListener;
 import remuco.ui.Theme;
 import remuco.ui.screens.PlayerScreen;
-import remuco.util.Log;
 
 /**
  * Screenies are the pieces which compose the {@link PlayerScreen}.

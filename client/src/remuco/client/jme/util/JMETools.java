@@ -22,7 +22,7 @@ package remuco.client.jme.util;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /**
  * Java ME related utility methods.

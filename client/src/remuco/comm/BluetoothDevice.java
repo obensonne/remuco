@@ -20,7 +20,7 @@
  */
 package remuco.comm;
 
-import remuco.util.Tools;
+import remuco.client.common.util.Tools;
 
 public class BluetoothDevice implements IDevice {
 

@@ -28,8 +28,8 @@ import javax.microedition.lcdui.Form;
 
 import remuco.Config;
 import remuco.Remuco;
+import remuco.client.common.util.Log;
 import remuco.ui.CMD;
-import remuco.util.Log;
 
 public class LogScreen extends Form implements CommandListener {
 

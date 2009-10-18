@@ -23,9 +23,9 @@ package remuco.ui.screenies;
 import javax.microedition.lcdui.Image;
 
 import remuco.client.common.data.PlayerInfo;
+import remuco.client.common.util.Log;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
-import remuco.util.Log;
 
 /**
  * A generic screeny to display a button (which may have multiple states). It

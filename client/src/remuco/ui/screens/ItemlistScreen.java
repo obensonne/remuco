@@ -40,10 +40,10 @@ import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.data.PlayerInfo;
+import remuco.client.common.util.Log;
 import remuco.ui.CMD;
 import remuco.ui.IItemListController;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 public final class ItemlistScreen extends List implements CommandListener {
 

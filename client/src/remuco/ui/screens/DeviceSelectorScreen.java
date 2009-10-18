@@ -33,6 +33,7 @@ import javax.microedition.lcdui.List;
 
 import remuco.Config;
 import remuco.UserException;
+import remuco.client.common.util.Log;
 import remuco.comm.BluetoothDevice;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.IDevice;
@@ -43,7 +44,6 @@ import remuco.comm.WifiDevice;
 import remuco.ui.CMD;
 import remuco.ui.CommandList;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanListener {

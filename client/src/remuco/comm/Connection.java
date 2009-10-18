@@ -41,8 +41,8 @@ import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.player.Player;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.Serial;
-import remuco.util.Log;
-import remuco.util.Tools;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 
 /**
  * Send and receive messages.

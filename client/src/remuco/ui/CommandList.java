@@ -28,7 +28,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /**
  * A screen to organize commands as a list.

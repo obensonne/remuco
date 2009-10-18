@@ -18,20 +18,14 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.util;
+package remuco.client.common.util;
 
-public final class ConsoleLogger implements ILogPrinter {
+public interface ILogPrinter {
 
-    public void print(String s) {
-        System.out.print(s);
-    }
-
-    public void println(String s) {
-        System.out.println(s);
-    }
-
-    public void println() {
-        System.out.println();
-    }
-
+    public void print(String s);
+    
+    public void println(String s);
+    
+    public void println();
+    
 }

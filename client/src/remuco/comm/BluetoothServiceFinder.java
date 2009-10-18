@@ -35,8 +35,8 @@ import javax.bluetooth.UUID;
 
 import remuco.MainLoop;
 import remuco.UserException;
-import remuco.util.Log;
-import remuco.util.Tools;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {

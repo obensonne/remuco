@@ -29,10 +29,10 @@ import javax.microedition.lcdui.Image;
 
 import remuco.Config;
 import remuco.OptionDescriptor;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 import remuco.ui.screenies.Screeny;
 import remuco.ui.screenies.ScreenyException;
-import remuco.util.Log;
-import remuco.util.Tools;
 
 public final class Theme {
 

@@ -20,7 +20,7 @@
  */
 package remuco.comm;
 
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /**
  * On devices which have no JSR-82 support, references to bluetooth classes

@@ -20,7 +20,7 @@
  */
 package remuco;
 
-import remuco.util.Tools;
+import remuco.client.common.util.Tools;
 
 /**
  * Description of an option (store ID, label for options screen, default value

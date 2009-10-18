@@ -25,11 +25,11 @@ import javax.microedition.lcdui.Image;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.data.State;
 import remuco.client.common.player.Feature;
+import remuco.client.common.util.Log;
 import remuco.player.SliderState;
 import remuco.ui.IActionListener;
 import remuco.ui.KeyBindings;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 /**
  * A container screeny to display the state of a player.

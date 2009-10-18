@@ -28,7 +28,7 @@ import remuco.OptionDescriptor;
 import remuco.Remuco;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 public final class ClientInfo implements ISerializable {
 

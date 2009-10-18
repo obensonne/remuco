@@ -23,7 +23,7 @@ package remuco.ui;
 import java.util.TimerTask;
 
 import remuco.client.common.player.Player;
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 /**
  * Timer task to periodically do a player control (intended for controls

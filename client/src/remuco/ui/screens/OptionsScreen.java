@@ -31,8 +31,8 @@ import javax.microedition.lcdui.TextField;
 
 import remuco.Config;
 import remuco.OptionDescriptor;
-import remuco.util.Log;
-import remuco.util.Tools;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 
 /**
  * Screen to adjust all options given by {@link Config#OPTION_DESCRIPTORS}.

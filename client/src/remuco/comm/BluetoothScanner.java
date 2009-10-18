@@ -32,7 +32,7 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 
 import remuco.UserException;
-import remuco.util.Log;
+import remuco.client.common.util.Log;
 
 public final class BluetoothScanner implements DiscoveryListener, IScanner {
 

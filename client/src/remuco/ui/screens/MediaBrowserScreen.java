@@ -35,10 +35,10 @@ import remuco.client.common.data.ItemList;
 import remuco.client.common.player.Feature;
 import remuco.client.common.player.IRequester;
 import remuco.client.common.player.Player;
+import remuco.client.common.util.Log;
 import remuco.ui.CMD;
 import remuco.ui.IItemListController;
 import remuco.ui.Theme;
-import remuco.util.Log;
 
 public final class MediaBrowserScreen extends List implements CommandListener,
 		IRequester, IItemListController {

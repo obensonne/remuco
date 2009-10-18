@@ -23,8 +23,8 @@ package remuco.client.common.data;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
-import remuco.util.Log;
-import remuco.util.Tools;
+import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 
 /** Parameters of a request to send to the server. */
 public class RequestParam implements ISerializable {
