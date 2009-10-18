@@ -50,7 +50,7 @@ public final class BluetoothScanner implements DiscoveryListener, IScanner {
 
 	private final LocalDevice localDevice;
 
-	private Vector remoteDevices = new Vector();
+	private final Vector remoteDevices = new Vector();
 
 	private final UserException startScanException;
 

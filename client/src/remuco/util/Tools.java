@@ -22,7 +22,6 @@ package remuco.util;
 
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Vector;
 
 /**
  * Miscellaneous J2ME specific utility constants and methods.
@@ -70,118 +69,6 @@ public final class Tools {
 		services.put("Player", url.toString());
 
 		return services;
-	}
-
-	/**
-	 * Compare two byte arrays.
-	 * 
-	 * @param ba1
-	 *            (may be null)
-	 * @param ba2
-	 *            (may be null)
-	 * @return <code>true</code> if the arrays equal, <code>false</code>
-	 *         otherwise
-	 */
-	public static boolean compare(byte[] ba1, byte[] ba2) {
-
-		if (ba1 == ba2)
-			return true;
-		if (ba1 == null || ba2 == null)
-			return false;
-		if (ba1.length != ba2.length)
-			return false;
-
-		for (int i = 0; i < ba2.length; i++) {
-			if (ba1[i] != ba2[i]) {
-				return false;
-			}
-
-		}
-		return true;
-	}
-
-	/**
-	 * Compare two integer arrays.
-	 * 
-	 * @param ia1
-	 *            (may be null)
-	 * @param ia2
-	 *            (may be null)
-	 * @return <code>true</code> if the arrays equal, <code>false</code>
-	 *         otherwise
-	 */
-	public static boolean compare(int[] ia1, int[] ia2) {
-
-		if (ia1 == ia2)
-			return true;
-		if (ia1 == null || ia2 == null)
-			return false;
-		if (ia1.length != ia2.length)
-			return false;
-
-		for (int i = 0; i < ia1.length; i++) {
-			if (ia1[i] != ia2[i])
-				return false;
-		}
-
-		return true;
-
-	}
-
-	/**
-	 * Compare two string arrays.
-	 * 
-	 * @param sa1
-	 *            (may be null)
-	 * @param sa2
-	 *            (may be null)
-	 * @return <code>true</code> if the arrays equal, <code>false</code>
-	 *         otherwise
-	 */
-	public static boolean compare(String[] sa1, String[] sa2) {
-
-		if (sa1 == sa2)
-			return true;
-		if (sa1 == null || sa2 == null)
-			return false;
-		if (sa1.length != sa2.length)
-			return false;
-
-		for (int i = 0; i < sa1.length; i++) {
-			if (!sa1[i].equals(sa2[i]))
-				return false;
-		}
-
-		return true;
-
-	}
-
-	/**
-	 * Compare two vectors.
-	 * 
-	 * @param v1
-	 *            (may be null)
-	 * @param v2
-	 *            (may be null)
-	 * @return <code>true</code> if the vectors equal, <code>false</code>
-	 *         otherwise
-	 */
-	public static boolean compare(Vector v1, Vector v2) {
-
-		if (v1 == v2)
-			return true;
-		if (v1 == null || v2 == null)
-			return false;
-		if (v1.size() != v2.size())
-			return false;
-
-		for (int i = 0; i < v1.size(); i++) {
-			if (!v1.elementAt(i).equals(v2.elementAt(i)))
-				return false;
-		}
-
-		return true;
-
 	}
 
 	/** Format a time in seconds to something like 'mm:ss'. */

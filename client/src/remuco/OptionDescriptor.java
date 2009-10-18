@@ -49,19 +49,69 @@ public class OptionDescriptor {
 	/** Option type. */
 	public final int type;
 
+	/**
+	 * Create a new option descriptor for <em>int</em> value options.
+	 * 
+	 * @param id
+	 *            option ID (used as key when saving the option)
+	 * @param label
+	 *            option label (as shown in options screens)
+	 * @param def
+	 *            default value
+	 * @param min
+	 *            minimum allowed value
+	 * @param max
+	 *            maximum allowed value
+	 */
 	public OptionDescriptor(String id, String label, int def, int min, int max) {
 		this(TYPE_INT, id, label, String.valueOf(def), min, max, null);
 	}
 
+	/**
+	 * Create a new option descriptor for <em>string</em> value options.
+	 * 
+	 * @param id
+	 *            option ID (used as key when saving the option)
+	 * @param label
+	 *            option label (as shown in options screens)
+	 * @param def
+	 *            default value
+	 */
 	public OptionDescriptor(String id, String label, String def) {
 		this(TYPE_STRING, id, label, def, 0, 0, null);
 	}
 
+	/**
+	 * Create a new option descriptor for <em>choice</em> options.
+	 * 
+	 * @param id
+	 *            option ID (used as key when saving the option)
+	 * @param label
+	 *            option label (as shown in options screens)
+	 * @param def
+	 *            default value
+	 * @param choices
+	 *            comma separated list of possible choice values
+	 * 
+	 */
 	public OptionDescriptor(String id, String label, String def, String choices) {
 		this(TYPE_CHOICE, id, label, def, 0, 0, Tools.splitString(choices, ',',
 			false));
 	}
 
+	/**
+	 * Create a new option descriptor for <em>choice</em> options.
+	 * 
+	 * @param id
+	 *            option ID (used as key when saving the option)
+	 * @param label
+	 *            option label (as shown in options screens)
+	 * @param def
+	 *            default value
+	 * @param choices
+	 *            array of possible choice values
+	 * 
+	 */
 	public OptionDescriptor(String id, String label, String def,
 			String choices[]) {
 		this(TYPE_CHOICE, id, label, def, 0, 0, choices);
