@@ -28,8 +28,8 @@ import remuco.client.common.player.Feature;
 import remuco.client.common.util.Log;
 import remuco.client.jme.ui.IActionListener;
 import remuco.client.jme.ui.KeyBindings;
+import remuco.client.jme.ui.SliderState;
 import remuco.client.jme.ui.Theme;
-import remuco.player.SliderState;
 
 /**
  * A container screeny to display the state of a player.

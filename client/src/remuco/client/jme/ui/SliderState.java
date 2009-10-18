@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.player;
+package remuco.client.jme.ui;
 
 public final class SliderState {
 

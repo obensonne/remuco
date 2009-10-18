@@ -25,7 +25,7 @@ import javax.microedition.lcdui.Image;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.jme.ui.IActionListener;
 import remuco.client.jme.ui.KeyBindings;
-import remuco.player.SliderState;
+import remuco.client.jme.ui.SliderState;
 
 /**
  * A generic screeny to display a {@link SliderState}. It issues lower and raise
