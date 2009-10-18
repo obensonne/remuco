@@ -21,16 +21,26 @@
 package remuco;
 
 /**
- * An exception containing a error describing message suitable to display it to
- * the user.
+ * User exceptions are used for raising errors up to the user interface (e.g. if
+ * a connection is broken). They should describe errors in a user friendly way.
  * <p>
- * <em>Note:</em> The precompiled exceptions do not provide valid stack traces.
- * They only provide some textual information.
+ * The normal use case is to catch low level exceptions (e.g. IO errors),
+ * translate them to a user exception and then throw this exception. Of course
+ * this only works if some upper code (in exception handling terms) has access
+ * to the UI to finally show the error to the user.
  */
 public final class UserException extends Exception {
 
 	private String error, details;
 
+	/**
+	 * Create a new user exception.
+	 * 
+	 * @param error
+	 *            the error title (short)
+	 * @param details
+	 *            optional details of the error
+	 */
 	public UserException(String error, String details) {
 
 		this(error, details, null);
@@ -40,7 +50,7 @@ public final class UserException extends Exception {
 	 * Create a new user exception.
 	 * 
 	 * @param error
-	 *            the error title
+	 *            the error title (short)
 	 * @param details
 	 *            optional details of the error
 	 * @param ex
@@ -70,10 +80,12 @@ public final class UserException extends Exception {
 
 	}
 
+	/** Get the error details. */
 	public String getDetails() {
 		return details;
 	}
 
+	/** Get the error title. */
 	public String getError() {
 		return error;
 	}
