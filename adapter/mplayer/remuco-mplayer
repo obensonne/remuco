@@ -173,7 +173,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
         gobject.idle_add(self.poll)
 
     def ctrl_volume(self, direction):
-        self.__command('volume %s\n' % direction)
+        self.__command('volume %d %d\n' % (direction, direction==0))
         gobject.idle_add(self.poll)
 
     def ctrl_seek(self, direction):
@@ -189,13 +189,13 @@ class MplayerAdapter(remuco.PlayerAdapter):
     #            ["Joe - Joe's Song", "Sue - Sue's Song"])
 
     # ...
-    
+
     # =========================================================================
     # actions interface
     # =========================================================================
-    
+
     def action_files(self, action_id, files, uris):
-        
+
         if action_id == FA_APPEND.id:
             for file in files:
                 self.__command('loadfile "%s" 1' % file)
@@ -233,7 +233,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
         if condition == gobject.IO_IN:
             # read from fd (fd is self.fd_statusfifo)
             status_str = self.__read_fifo(fd)
-            
+
             if self.pause_regex.search(status_str):
                 self.__playback = PLAYBACK_PAUSE
                 self.update_playback(PLAYBACK_PAUSE)
@@ -269,10 +269,15 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
             return True
 
-        else: # error
-            if condition == gobject.IO_HUP: # mplayer has probably quit
-                log.info("statusfifo hangup. is mplayer still running?")
+        elif condition == gobject.IO_HUP: # mplayer has probably quit
+            log.info("statusfifo hangup. is mplayer still running?")
 
+            self.stop()
+
+            gobject.idle_add(self.start)
+            return False
+
+        else:
             log.error("statusfifo read error")
             self.watch_id = None
             self.manager.stop()
@@ -296,7 +301,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
             self.update_item(self.info[INFO_TITLE], self.info, None)
         elif name == 'volume': # lower case because we use the get_property command
             self.update_volume(float(value))
-            
+
     def __set_default_info(self):
         """ Set default playback information """
 
