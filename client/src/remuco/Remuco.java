@@ -263,7 +263,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 				((IServiceFinder) property).cancelServiceSearch();
 			} else if (property instanceof Connection) {
 				// currently waiting for player description
-				((Connection) property).down();
+				((Connection) property).close();
 			} else {
 				Log.bug("Mar 17, 2009.9:40:43 PM");
 			}

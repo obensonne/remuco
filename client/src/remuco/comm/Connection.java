@@ -115,12 +115,12 @@ public final class Connection implements Runnable, IOptionListener {
 	}
 
 	/**
-	 * Shut down the connection. If the connection is already down, this method
+	 * Close the connection. If the connection is already closed, this method
 	 * has no effect. There will be no connection events for a
 	 * {@link IConnectionListener} after a call to this method.
 	 * 
 	 */
-	public void down() {
+	public void close() {
 
 		Log.ln("[CN] down by user");
 
@@ -159,7 +159,7 @@ public final class Connection implements Runnable, IOptionListener {
 		// delay startup a little bit to give UI a chance to update
 		try {
 			Thread.sleep(200);
-		} catch (InterruptedException e1) {
+		} catch (InterruptedException e) {
 		}
 
 		final PlayerInfo pinfo;

@@ -381,7 +381,7 @@ public final class Player {
 
 	/** Disconnect from the remote player. */
 	public void disconnect() {
-		conn.down();
+		conn.close();
 	}
 
 	/** Check if there still is a connection to the remote player. */
