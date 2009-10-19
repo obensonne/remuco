@@ -18,36 +18,30 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.common.io;
 
-import remuco.UserException;
-import remuco.client.common.io.ISocket;
-import remuco.client.common.player.Player;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * Interface for classes interested in the state of a {@link Connection}.
- * 
- * @see Connection#Connection(String, IConnectionListener, IMessageListener)
+ * A simple socket interface to abstract device specific details about sockets
+ * and stream connections.
  */
-public interface IConnectionListener {
+public interface ISocket {
 
 	/**
-	 * Notifies a successful connection.
-	 * 
-	 * @param player
-	 *            the connected player
+	 * Close this socket and all its streams.
 	 */
-	public void notifyConnected(Player player);
+	public void close();
 
 	/**
-	 * Notifies a disconnection.
-	 * 
-	 * @param sock
-	 *            the socket used by the broken connection - if it is worth
-	 *            trying to reconnect, otherwise <code>null</code>
-	 * @param reason
-	 *            the user exception describing the reason for disconnecting
+	 * Get the input stream for this socket.
 	 */
-	public void notifyDisconnected(ISocket sock, UserException reason);
+	public InputStream getInputStream();
+
+	/**
+	 * Get the output stream for this socket.
+	 */
+	public OutputStream getOutputStream();
 
 }

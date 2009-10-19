@@ -34,8 +34,10 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.io.ISocket;
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
+import remuco.client.jme.io.Socket;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.Theme;
 import remuco.client.jme.ui.screens.DeviceSelectorScreen;
@@ -326,11 +328,12 @@ public class Remuco implements CommandListener, IConnectionListener,
 		display.setCurrent(screenPlayer);
 	}
 
-	public void notifyDisconnected(String url, UserException reason) {
+	public void notifyDisconnected(ISocket sock, UserException reason) {
 
 		disconnect();
-
-		if (url != null) {
+		
+		if (sock != null) {
+			final String url = ((Socket) sock).url;
 			display.setCurrent(new ReconnectDialog(url, reason.getDetails()));
 		} else {
 			alert(reason, screenDeviceSelector);
@@ -429,14 +432,16 @@ public class Remuco implements CommandListener, IConnectionListener,
 	 */
 	private void connect(String url) {
 
-		final Connection conn;
+		final Socket sock;
 
 		try {
-			conn = new Connection(url, this);
+			sock = new Socket(url);
 		} catch (UserException e) {
 			alert(e, screenDeviceSelector);
 			return;
 		}
+		
+		final Connection conn = new Connection(sock, this);
 
 		screenConnecting.attachProperty(conn);
 		screenConnecting.setMessage("Connecting to player.");
