@@ -269,19 +269,17 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
             return True
 
-        elif condition == gobject.IO_HUP: # mplayer has probably quit
-            log.info("statusfifo hangup. is mplayer still running?")
+        else:
+            if condition == gobject.IO_HUP: # mplayer has probably quit
+                log.info("statusfifo hangup. is mplayer still running?")
+            else:
+                log.error("statusfifo read error")
 
             self.stop()
 
             gobject.idle_add(self.start)
             return False
 
-        else:
-            log.error("statusfifo read error")
-            self.watch_id = None
-            self.manager.stop()
-            return False
 
     def __set_info(self, name, value):
         """ Set global information of current item
