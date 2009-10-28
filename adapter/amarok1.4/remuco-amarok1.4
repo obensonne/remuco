@@ -1,0 +1,145 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""FooPlay adapter for Remuco, implemented as an executable script."""
+
+import time
+import commands
+import os
+import remuco
+from remuco import log
+
+
+class FooPlayAdapter(remuco.PlayerAdapter):
+    
+    def __init__(self):
+        
+        remuco.PlayerAdapter.__init__(self, "Test",
+                                      playback_known=True,
+                                      volume_known=True,
+                                      progress_known=True,
+                                      mime_types=("audio",)
+        )
+        
+    def start(self):
+        
+        remuco.PlayerAdapter.start(self)
+
+        log.debug("here we go")
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+
+        log.debug("bye, turning off the light")
+    
+    
+    def poll(self):
+        
+        import random
+        
+        volume = commands.getoutput("dcop amarok player getVolume")
+        self.update_volume(volume)
+        
+        playing = commands.getoutput("dcop amarok player isPlaying")
+        if playing == "true":
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        else:
+            self.update_playback(remuco.PLAYBACK_PAUSE)
+            
+        #~ Get and calculate total time and progress
+        cmin, csec = commands.getoutput("dcop amarok player currentTime").split(":")
+        
+        tmin,tsec = commands.getoutput("dcop amarok player totalTime").split(":")
+        
+        cmin, csec, tmin, tsec = int(cmin), int(csec), int(tmin), int(tsec)
+        current = (cmin*60)+csec
+        total = (tmin*60)+tsec
+        self.update_progress(progress=current, length=total)
+        
+        info = {}
+        info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
+        info[remuco.INFO_ALBUM] = commands.getoutput("dcop amarok player album")
+        info[remuco.INFO_TITLE] = commands.getoutput("dcop amarok player title")
+        info[remuco.INFO_GENRE] = commands.getoutput("dcop amarok player genre")
+        info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
+        info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
+        info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
+        #~ info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
+        
+        self.update_item("", info, self.find_image(commands.getoutput("dcop amarok player path"), True))
+
+        
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
+    def ctrl_volume(self, direction):
+        current = int(commands.getoutput("dcop amarok player getVolume"))
+        if(direction == 1 ):
+            os.system("dcop amarok player setVolume "+str(current+10))
+        elif(direction == -1):
+            os.system("dcop amarok player setVolume "+str(current-10))
+        elif(direction == 0):
+            os.system("dcop amarok player mute")
+            
+    
+    
+    def ctrl_toggle_playing(self):
+        os.system("dcop amarok player playPause")
+        #~ print commands.getoutput("dcop amarok player isPlaying")
+        log.debug("toggle FooPlay's playing status")
+        
+    def ctrl_next(self):
+        os.system("dcop amarok player next")
+        time.sleep(1)
+        self.poll()
+        
+    def ctrl_previous(self):
+        os.system("dcop amarok player prev")
+        time.sleep(1)
+        self.poll()
+    # ...
+        
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    def request_playlist(self, reply):
+        
+        reply.ids = ["1", "2"]
+        reply.names = ["Joe - Joe's Song", "Sue - Sue's Song"]
+        reply.send()
+
+    # ...
+    
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+    
+    pa = FooPlayAdapter() # create the player adapter
+    mg = remuco.Manager(pa)# # pass it to a manager
+    mg.run() # run the manager (blocks until interrupt signal)
