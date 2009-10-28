@@ -22,7 +22,7 @@
 #
 # =============================================================================
 
-"""FooPlay adapter for Remuco, implemented as an executable script."""
+"""Amarok1.4 adapter for Remuco, implemented as an executable script."""
 
 import time
 import commands
@@ -35,7 +35,7 @@ class FooPlayAdapter(remuco.PlayerAdapter):
     
     def __init__(self):
         
-        remuco.PlayerAdapter.__init__(self, "Test",
+        remuco.PlayerAdapter.__init__(self, "Amarok 1.4",
                                       playback_known=True,
                                       volume_known=True,
                                       progress_known=True,
@@ -126,11 +126,7 @@ class FooPlayAdapter(remuco.PlayerAdapter):
     # request interface
     # =========================================================================
     
-    def request_playlist(self, reply):
-        
-        reply.ids = ["1", "2"]
-        reply.names = ["Joe - Joe's Song", "Sue - Sue's Song"]
-        reply.send()
+   
 
     # ...
     
