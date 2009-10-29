@@ -39,7 +39,10 @@ class FooPlayAdapter(remuco.PlayerAdapter):
                                       playback_known=True,
                                       volume_known=True,
                                       progress_known=True,
-                                      mime_types=("audio",)
+                                      shuffle_known=True,
+                                      repeat_known=True,
+                                      mime_types=("audio",),
+                                      poll=10
         )
         
     def start(self):
@@ -59,9 +62,22 @@ class FooPlayAdapter(remuco.PlayerAdapter):
         
         import random
         
+        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        if(current_state == "true"):
+            self.update_shuffle(True)
+        else:
+            self.update_shuffle(False)
+
+        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        if(current_state == "true"):
+            self.update_repeat(True)
+        else:
+            self.update_repeat(False)
+
+        
         volume = commands.getoutput("dcop amarok player getVolume")
         self.update_volume(volume)
-        
+
         playing = commands.getoutput("dcop amarok player isPlaying")
         if playing == "true":
             self.update_playback(remuco.PLAYBACK_PLAY)
@@ -70,9 +86,7 @@ class FooPlayAdapter(remuco.PlayerAdapter):
             
         #~ Get and calculate total time and progress
         cmin, csec = commands.getoutput("dcop amarok player currentTime").split(":")
-        
         tmin,tsec = commands.getoutput("dcop amarok player totalTime").split(":")
-        
         cmin, csec, tmin, tsec = int(cmin), int(csec), int(tmin), int(tsec)
         current = (cmin*60)+csec
         total = (tmin*60)+tsec
@@ -86,7 +100,6 @@ class FooPlayAdapter(remuco.PlayerAdapter):
         info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
         info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
         info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
-        #~ info[remuco.INFO_TAGS] = minfo.get(MINFO_KEY_TAGS, "")
         
         self.update_item("", info, self.find_image(commands.getoutput("dcop amarok player path"), True))
 
@@ -103,8 +116,26 @@ class FooPlayAdapter(remuco.PlayerAdapter):
             os.system("dcop amarok player setVolume "+str(current-10))
         elif(direction == 0):
             os.system("dcop amarok player mute")
-            
+        
+
+    def ctrl_toggle_shuffle(self):
+        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        if(current_state == "true"):
+            os.system("dcop amarok player enableRandomMode false")
+            self.update_shuffle(False)
+        else:
+            os.system("dcop amarok player enableRandomMode true")
+            self.update_shuffle(True)
     
+    def ctrl_toggle_repeat(self):
+        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        if(current_state == "true"):
+            os.system("dcop amarok player enableRepeatPlaylist false")
+            self.update_repeat(False)
+        else:
+            os.system("dcop amarok player enableRepeatPlaylist true")
+            self.update_repeat(True)
+            
     
     def ctrl_toggle_playing(self):
         os.system("dcop amarok player playPause")
