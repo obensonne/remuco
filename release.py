@@ -188,8 +188,9 @@ def tarball():
     
     command("%s/%s/client/setup.sh" % (build_dir, pkg_src))
     command("ant -f %s/client/build.xml dist" % pkg_src_dir)
-    
+    command("ant -f %s/client/build.xml -Djsr82.off= dist" % pkg_src_dir)
     shutil.move("%s/client/app" % pkg_src_dir, build_dir)
+    
     shutil.rmtree(pkg_src_dir)
     command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
     shutil.move("%s/app" % build_dir, "%s/client" % pkg_src_dir )
