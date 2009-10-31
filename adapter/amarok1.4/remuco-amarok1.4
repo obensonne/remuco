@@ -29,9 +29,16 @@ import commands
 import os
 import remuco
 from remuco import log
+import eyeD3
 
+#Definitions
+IA_JUMP = remuco.ItemAction("Jump to")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
 
-class FooPlayAdapter(remuco.PlayerAdapter):
+class Amarok14Adapter(remuco.PlayerAdapter):
+    
+    lastpath = ""
     
     def __init__(self):
         
@@ -42,6 +49,7 @@ class FooPlayAdapter(remuco.PlayerAdapter):
                                       shuffle_known=True,
                                       repeat_known=True,
                                       mime_types=("audio",),
+                                      max_rating=10,
                                       poll=10
         )
         
@@ -74,7 +82,6 @@ class FooPlayAdapter(remuco.PlayerAdapter):
         else:
             self.update_repeat(False)
 
-        
         volume = commands.getoutput("dcop amarok player getVolume")
         self.update_volume(volume)
 
@@ -85,28 +92,45 @@ class FooPlayAdapter(remuco.PlayerAdapter):
             self.update_playback(remuco.PLAYBACK_PAUSE)
             
         #~ Get and calculate total time and progress
-        cmin, csec = commands.getoutput("dcop amarok player currentTime").split(":")
-        tmin,tsec = commands.getoutput("dcop amarok player totalTime").split(":")
+        current = commands.getoutput("dcop amarok player currentTime")
+        if(len(current.split(":")) == 2):
+            cmin, csec = current.split(":")
+        else:
+            cmin, csec = 0,0
+            
+        total = commands.getoutput("dcop amarok player totalTime")
+        if(len(total.split(":")) == 2):
+            tmin, tsec = total.split(":")
+        else:
+            tmin, tsec = 0,0
+            
         cmin, csec, tmin, tsec = int(cmin), int(csec), int(tmin), int(tsec)
         current = (cmin*60)+csec
         total = (tmin*60)+tsec
         self.update_progress(progress=current, length=total)
         
-        info = {}
-        info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
-        info[remuco.INFO_ALBUM] = commands.getoutput("dcop amarok player album")
-        info[remuco.INFO_TITLE] = commands.getoutput("dcop amarok player title")
-        info[remuco.INFO_GENRE] = commands.getoutput("dcop amarok player genre")
-        info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
-        info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
-        info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
+        if(self.lastpath != commands.getoutput("dcop amarok player path")):
         
-        self.update_item("", info, self.find_image(commands.getoutput("dcop amarok player path"), True))
+            info = {}
+            info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
+            info[remuco.INFO_ALBUM] = commands.getoutput("dcop amarok player album")
+            info[remuco.INFO_TITLE] = commands.getoutput("dcop amarok player title")
+            info[remuco.INFO_GENRE] = commands.getoutput("dcop amarok player genre")
+            info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
+            info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
+            info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
+            
+            path = commands.getoutput("dcop amarok player path")
+            self.update_item("", info, self.find_image(path, True))
+            self.lastpath = path
 
         
     # =========================================================================
     # control interface
     # =========================================================================
+    
+    def ctrl_rate(self, rate):
+        os.system("dcop amarok player setRating " + str(rate))
     
     def ctrl_volume(self, direction):
         current = int(commands.getoutput("dcop amarok player getVolume"))
@@ -139,27 +163,53 @@ class FooPlayAdapter(remuco.PlayerAdapter):
     
     def ctrl_toggle_playing(self):
         os.system("dcop amarok player playPause")
-        #~ print commands.getoutput("dcop amarok player isPlaying")
-        log.debug("toggle FooPlay's playing status")
         
     def ctrl_next(self):
         os.system("dcop amarok player next")
-        time.sleep(1)
+        time.sleep(0.15)
         self.poll()
         
     def ctrl_previous(self):
         os.system("dcop amarok player prev")
-        time.sleep(1)
+        time.sleep(0.15)
         self.poll()
-    # ...
         
     # =========================================================================
     # request interface
     # =========================================================================
     
-   
+    def request_playlist(self, reply):
+        os.system("dcop amarok playlist saveM3u ./current.m3u false")
+        f = open("current.m3u")
+        list = {}
+        ids = {}
+        tag = eyeD3.Tag()
+        while 1:
+            line = f.readline()
+            if not line: break
+            
+            if line.find("#") == -1:
+                tag.link(line.rstrip())
+                reply.ids.append(len(reply.names))
+                reply.names.append(tag.getArtist() + " - " + tag.getTitle())
+                
+        f.close
+        reply.item_actions = PLAYLIST_ACTIONS
+        reply.send()
 
-    # ...
+    # =========================================================================
+    # Actions
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
+        if(action_id == IA_JUMP.id):
+            os.system("dcop amarok playlist playByIndex " + str(positions[0]))
+        elif(action_id == IA_REMOVE.id):
+            for i, v in enumerate(positions):
+                os.system("dcop amarok playlist removeByIndex " + str(v))
+        else:
+            print "Unknown action" + str(action_id)
+
     
 # =============================================================================
 # main (example startup using remuco.Manager)
@@ -167,6 +217,6 @@ class FooPlayAdapter(remuco.PlayerAdapter):
 
 if __name__ == '__main__':
     
-    pa = FooPlayAdapter() # create the player adapter
+    pa = Amarok14Adapter() # create the player adapter
     mg = remuco.Manager(pa)# # pass it to a manager
     mg.run() # run the manager (blocks until interrupt signal)
