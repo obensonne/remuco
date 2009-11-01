@@ -36,9 +36,8 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
-import remuco.comm.IDevice;
 import remuco.comm.IConnectionListener;
-import remuco.comm.IDeviceSelectionListener;
+import remuco.comm.IDevice;
 import remuco.comm.IServiceFinder;
 import remuco.comm.IServiceListener;
 import remuco.comm.InetServiceFinder;
@@ -50,6 +49,7 @@ import remuco.ui.screens.LogScreen;
 import remuco.ui.screens.PlayerScreen;
 import remuco.ui.screens.ServiceSelectorScreen;
 import remuco.ui.screens.WaitingScreen;
+import remuco.ui.screens.DeviceSelectorScreen.IDeviceSelectionListener;
 import remuco.util.FormLogger;
 import remuco.util.Log;
 
@@ -350,7 +350,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 			sf = null;
 			Log.bug("Jan 26, 2009.7:29:56 PM");
 		}
-		
+
 		if (sf == null) {
 			return;
 		}

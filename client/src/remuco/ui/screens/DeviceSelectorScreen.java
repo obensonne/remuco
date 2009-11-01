@@ -36,7 +36,6 @@ import remuco.UserException;
 import remuco.comm.BluetoothDevice;
 import remuco.comm.BluetoothFactory;
 import remuco.comm.IDevice;
-import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.IScanListener;
 import remuco.comm.IScanner;
 import remuco.comm.WifiDevice;
@@ -47,6 +46,18 @@ import remuco.util.Log;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanListener {
+
+	public interface IDeviceSelectionListener {
+
+		/**
+		 * Notify a device selection.
+		 * 
+		 * @param iDevice
+		 *            the selected device
+		 */
+		public void notifySelectedDevice(IDevice iDevice);
+
+	}
 
 	private static final Command CMD_ADD = new Command("Add", Command.SCREEN,
 			10);
