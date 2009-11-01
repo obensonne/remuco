@@ -36,11 +36,11 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.comm.BluetoothFactory;
 import remuco.comm.Connection;
-import remuco.comm.IConnectionListener;
 import remuco.comm.IDevice;
 import remuco.comm.IServiceFinder;
 import remuco.comm.IServiceListener;
 import remuco.comm.InetServiceFinder;
+import remuco.comm.Connection.IConnectionListener;
 import remuco.player.Player;
 import remuco.ui.CMD;
 import remuco.ui.Theme;

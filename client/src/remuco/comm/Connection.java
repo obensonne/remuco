@@ -50,6 +50,32 @@ import remuco.util.Tools;
  */
 public final class Connection implements Runnable, IOptionListener {
 
+	/**
+	 * Interface for classes interested in the state of a {@link Connection}.
+	 */
+	public interface IConnectionListener {
+
+		/**
+		 * Notifies a successful connection.
+		 * 
+		 * @param player
+		 *            the connected player
+		 */
+		public void notifyConnected(Player player);
+
+		/**
+		 * Notifies a disconnection.
+		 * 
+		 * @param url
+		 *            the URL of the broken connection if it is worth trying to
+		 *            reconnect, or <code>null</code> otherwise
+		 * @param reason
+		 *            the user exception describing the reason for disconnecting
+		 */
+		public void notifyDisconnected(String url, UserException reason);
+
+	}
+
 	private class PingTask extends TimerTask {
 
 		private final Message m;
