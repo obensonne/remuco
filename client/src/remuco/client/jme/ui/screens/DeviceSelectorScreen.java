@@ -42,11 +42,22 @@ import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.CommandList;
 import remuco.client.jme.ui.Theme;
 import remuco.comm.IDevice;
-import remuco.comm.IDeviceSelectionListener;
 import remuco.comm.WifiDevice;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanListener {
+
+	public interface IDeviceSelectionListener {
+
+		/**
+		 * Notify a device selection.
+		 * 
+		 * @param iDevice
+		 *            the selected device
+		 */
+		public void notifySelectedDevice(IDevice iDevice);
+
+	}
 
 	private static final Command CMD_ADD = new Command("Add", Command.SCREEN,
 			10);
