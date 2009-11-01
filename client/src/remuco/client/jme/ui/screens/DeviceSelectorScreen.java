@@ -34,15 +34,15 @@ import javax.microedition.lcdui.List;
 import remuco.Config;
 import remuco.UserException;
 import remuco.client.common.util.Log;
+import remuco.client.jme.io.BluetoothDevice;
+import remuco.client.jme.io.BluetoothFactory;
+import remuco.client.jme.io.IScanListener;
+import remuco.client.jme.io.IScanner;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.CommandList;
 import remuco.client.jme.ui.Theme;
-import remuco.comm.BluetoothDevice;
-import remuco.comm.BluetoothFactory;
 import remuco.comm.IDevice;
 import remuco.comm.IDeviceSelectionListener;
-import remuco.comm.IScanListener;
-import remuco.comm.IScanner;
 import remuco.comm.WifiDevice;
 
 public final class DeviceSelectorScreen extends List implements

@@ -196,8 +196,10 @@
 			<outjar path="build/preverified" />
 			<libraryjar refid="cp.preverify" />
 			<keep access="public" extends="javax.microedition.midlet.MIDlet" />
-			<keep access="public" name="remuco.comm.BluetoothServiceFinder" />
-			<keep access="public" name="remuco.comm.BluetoothScanner" />
+			<keep access="public"
+			      name="remuco.client.jme.io.BluetoothServiceFinder" />
+			<keep access="public"
+			      name="remuco.client.jme.io.BluetoothScanner" />
 		</proguard>
 	</target>
 
@@ -411,7 +413,7 @@
 		<delete dir="build" />
 		<delete dir="design/themes/build" />
 	</target>
-	
+
 	<target name="clean" depends="clean.keep-app" description="--> clean project">
 		<delete dir="app" />
 	</target>

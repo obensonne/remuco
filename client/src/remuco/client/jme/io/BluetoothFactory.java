@@ -18,9 +18,10 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.jme.io;
 
 import remuco.client.common.util.Log;
+import remuco.comm.IServiceFinder;
 
 /**
  * On devices which have no JSR-82 support, references to bluetooth classes
@@ -40,8 +41,8 @@ public class BluetoothFactory {
 
 		try {
 			Class.forName("javax.bluetooth.LocalDevice");
-			Class.forName("remuco.comm.BluetoothScanner");
-			Class.forName("remuco.comm.BluetoothServiceFinder");
+			Class.forName("remuco.client.jme.io.BluetoothScanner");
+			Class.forName("remuco.client.jme.io.BluetoothServiceFinder");
 			Log.ln("[BF] bluetooth: yes");
 		} catch (Exception e) {
 			Log.ln("[BF] bluetooth: no");
@@ -57,7 +58,7 @@ public class BluetoothFactory {
 		final Class c;
 
 		try {
-			c = Class.forName("remuco.comm.BluetoothScanner");
+			c = Class.forName("remuco.client.jme.io.BluetoothScanner");
 		} catch (ClassNotFoundException e) {
 			Log.bug("Feb 2, 2009.11:26:27 PM", e);
 			return null;
@@ -79,7 +80,7 @@ public class BluetoothFactory {
 
 		final Class c;
 		try {
-			c = Class.forName("remuco.comm.BluetoothServiceFinder");
+			c = Class.forName("remuco.client.jme.io.BluetoothServiceFinder");
 		} catch (ClassNotFoundException e) {
 			Log.bug("Feb 3, 2009.12:47:14 AM", e);
 			return null;

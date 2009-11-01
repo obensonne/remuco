@@ -18,15 +18,22 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.jme.io;
 
-import remuco.UserException;
 
-public interface IScanner {
+/**
+ * Interface for classes interested in device scan results.
+ * 
+ * @see IScanner#startScan(IScanListener)
+ */
+public interface IScanListener {
 
-	public void cancelScan();
-
-	public void startScan(IScanListener listener)
-			throws UserException;
+	/**
+	 * Hands out the found devices.
+	 * 
+	 * @param devices
+	 *            the found devices
+	 */
+	public void notifyScannedDevices(BluetoothDevice devices[]);
 
 }

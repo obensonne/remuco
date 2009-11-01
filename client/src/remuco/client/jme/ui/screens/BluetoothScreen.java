@@ -28,7 +28,7 @@ import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import remuco.comm.BluetoothDevice;
+import remuco.client.jme.io.BluetoothDevice;
 import remuco.comm.IDevice;
 
 /** Screen to configure a Bluetooth connection. */
