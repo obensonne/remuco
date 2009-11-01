@@ -185,23 +185,13 @@ for pa in player_adapters:
 
 CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
 
-client_from_path = None
-
-if client:
-    if os.path.exists("client/dist/remuco.jar"):
-        client_from_path = "client/dist"
-    elif os.path.exists("client/app/remuco.jar"):
-        client_from_path = "client/app"
-    elif os.path.exists("client/remuco.jar"):
-        client_from_path = "client"
-    else:
-        pass
-        #raise StandardError("client needs to be built first, run: "
-        #                    "ant -f client/build.xml dist")
-
-if client_from_path is not None:
-    data_files.append((CLIENT_DEST, ["%s/remuco.jar" % client_from_path,
-                                     "%s/remuco.jad" % client_from_path]))
+if client and os.path.exists("client/app/remuco.jar"):
+    data_files.append((CLIENT_DEST,
+                       ["client/app/remuco.jar", "client/app/remuco.jad"]))
+    
+if client and os.path.exists("client/app/no-bluetooth/remuco.jar"):
+    data_files.append(("%s/no-bluetooth" % CLIENT_DEST,
+                       ["client/app/remuco.jar", "client/app/remuco.jad"]))
 
 # =============================================================================
 # setup

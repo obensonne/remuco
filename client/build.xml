@@ -59,6 +59,15 @@
 	<property name="midlet.jar" value="${midlet.name.lc}.jar" />
 	<property name="midlet.jad" value="${midlet.name.lc}.jad" />
 
+	<condition property="bluetooth">
+		<and>
+			<isset property="jsr82.jar" />
+			<not>
+				<isset property="jsr82.off" />
+			</not>
+		</and>
+	</condition>
+
 	<!-- - - - - - - - -Target dependent configuration - - - - - - - - - - -->
 
 	<target name="configure.emulation">
@@ -77,6 +86,9 @@
 		<property name="compile.debug" value="${dist.debug}" />
 		<property name="preverifier" value="${dist.preverifier}" />
 		<property name="proguard.optimize" value="${dist.proguard.optimize}" />
+		<condition property="app.dir" value="app" else="app/no-bluetooth">
+			<isset property="bluetooth"/>
+		</condition>
 		<antcall target="echo.configuration" />
 	</target>
 
@@ -85,10 +97,10 @@
 		<echo message="compile with debug symbols : ${compile.debug}" />
 		<echo message="preverifier                : ${preverifier}" />
 		<echo message="proguard optimizes         : ${proguard.optimize}" />
-		<condition property="bluetooth" value="yes" else="no">
-			<isset property="jsr82.jar"/>
+		<condition property="bluetooth.yn" value="yes" else="no">
+			<isset property="bluetooth"/>
 		</condition>
-		<echo message="bluetooth                  : ${bluetooth}" />
+		<echo message="bluetooth                  : ${bluetooth.yn}" />
 	</target>
 
 	<!-- =================== Libraries and Classpath ====================== -->
@@ -156,7 +168,7 @@
 			<src path="build/sources" />
 			<!-- exclude classes based on conditions -->
 			<not>
-				<selector unless="jsr82.jar">
+				<selector unless="bluetooth">
 					<containsregexp expression="^import javax.bluetooth" />
 				</selector>
 			</not>
@@ -252,10 +264,10 @@
 	<!-- =================== Dist ========================================= -->
 
 	<target name="dist"
-	        depends="clean,configure.dist,jad"
+	        depends="clean.keep-app,configure.dist,jad"
 	        description="--> create distributable jar and jad file">
-		<mkdir dir="app" />
-		<copy todir="app">
+		<mkdir dir="${app.dir}" />
+		<copy todir="${app.dir}">
 			<fileset dir="build/jar">
 				<include name="${midlet.jar}" />
 				<include name="${midlet.jad}" />
@@ -395,9 +407,12 @@
 
 	<!-- =================== Clean ======================================== -->
 
-	<target name="clean" description="--> clean project">
+	<target name="clean.keep-app" description="--> clean project">
 		<delete dir="build" />
 		<delete dir="design/themes/build" />
+	</target>
+	
+	<target name="clean" depends="clean.keep-app" description="--> clean project">
 		<delete dir="app" />
 	</target>
 

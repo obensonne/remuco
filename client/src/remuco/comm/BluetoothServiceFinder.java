@@ -95,8 +95,6 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 	 */
 	private static final int ATTRIBUTE_LIST_FS[] = null;
 
-	private static final String DEFAULT_SERVICE_NAME = "NoName";
-
 	/** Remuco service UUID */
 	private final static String UUID = "025fe2ae07624bed90f2d8d778f020fe";
 
@@ -130,34 +128,6 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 		sb.append(";authenticate=");
 		sb.append(authenticate || encrypt);
 		return sb.toString();
-	}
-
-	/**
-	 * Get the name of a service (the player behind the remuco service).
-	 * 
-	 * @param sr
-	 *            the service to get the name from
-	 * @return the name or {@value #DEFAULT_SERVICE_NAME} if name is not
-	 *         available;
-	 */
-	private static String getServiceName(ServiceRecord sr) {
-
-		DataElement de = sr.getAttributeValue(ATTRIBUTE_NAME);
-
-		if (de == null) {
-			Log.ln("failed to get service name");
-			return DEFAULT_SERVICE_NAME;
-		}
-
-		try {
-			return (String) de.getValue();
-		} catch (ClassCastException e) {
-			Log.ln("failed to get service name", e);
-			return DEFAULT_SERVICE_NAME;
-		}
-
-		// TODO: return null on error and then assign name as in failsafe mode
-
 	}
 
 	private DiscoveryAgent agent = null;
@@ -294,10 +264,12 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 				final String url = srs[i].getConnectionURL(security, false);
 
 				final String name;
-				if (search.failsafe) {
-					name = "Player " + i;
+				final DataElement de = srs[i].getAttributeValue(ATTRIBUTE_NAME);
+				if (de != null && de.getDataType() == DataElement.STRING) {
+					name = (String) de.getValue();
 				} else {
-					name = getServiceName(srs[i]);
+					Log.ln("failed to get service name (" + de + ")");
+					name = "Player " + i;
 				}
 
 				search.services.put(name, url); // assuming names are unique
