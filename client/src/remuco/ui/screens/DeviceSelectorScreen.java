@@ -203,7 +203,6 @@ public final class DeviceSelectorScreen extends List implements
 
 				try {
 					bluetoothScanner.startScan(this);
-					screenScanning.attachProperty(iDevice);
 					display.setCurrent(screenScanning);
 				} catch (UserException e) {
 					alertScanProblem.setTitle("Scan Error");
@@ -240,7 +239,7 @@ public final class DeviceSelectorScreen extends List implements
 
 			update();
 
-			listener.notifySelectedDevice(iDevice);
+			display.setCurrent(this);
 
 		} else if (c == CMD_ADD) {
 
