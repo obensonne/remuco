@@ -442,7 +442,8 @@ public class Remuco implements CommandListener, IConnectionListener,
 			return;
 		}
 		
-		final Connection conn = new Connection(sock, this);
+		final int ping = Integer.parseInt(config.getOption(Config.OD_PING));
+		final Connection conn = new Connection(sock, this, ping);
 
 		screenConnecting.attachProperty(conn);
 		screenConnecting.setMessage("Connecting to player.");

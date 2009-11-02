@@ -26,7 +26,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.TimerTask;
 
-import remuco.OptionDescriptor;
 import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
@@ -38,16 +37,12 @@ import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
-import remuco.client.jme.Config;
-import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
 
 /**
- * Send and receive messages.
- * <p>
- * All connection related events (state change and incoming data) are passed to
- * the global timer thread for delivering to event listener.
+ * A connection sets up a connection to the server and handles receiving and
+ * sending of messages from/to the server.
  */
-public final class Connection implements Runnable, IOptionListener {
+public final class Connection implements Runnable {
 
 	/**
 	 * Interface for classes interested in the state of a {@link Connection}.
@@ -94,10 +89,6 @@ public final class Connection implements Runnable, IOptionListener {
 
 	}
 
-	/** Ping interval option. */
-	public static final OptionDescriptor OD_PING = new OptionDescriptor("ping",
-			"Ping interval", 20, 0, 300);
-
 	private static final int HELLO_TIMEOUT = 2000;
 
 	private static final byte[] PREFIX = { (byte) 0xFF, (byte) 0xFF,
@@ -121,6 +112,8 @@ public final class Connection implements Runnable, IOptionListener {
 
 	private final DataOutputStream dos;
 
+	private final int initialPingInterval;
+
 	private TimerTask ping;
 
 	/** Flag indicating if a reconnect has chance to succeed. */
@@ -128,10 +121,35 @@ public final class Connection implements Runnable, IOptionListener {
 
 	private final ISocket sock;
 
-	public Connection(ISocket sock, IConnectionListener connectionListener) {
+	/**
+	 * Create a new connection.
+	 * <p>
+	 * A new thread for receiving data is created automatically. Once this
+	 * thread has set up a connection to the server, it notifies the listener
+	 * using {@link IConnectionListener#notifyConnected(Player)}. If setting up
+	 * the connection fails the listener is notified using
+	 * {@link IConnectionListener#notifyDisconnected(ISocket, UserException)}.
+	 * <p>
+	 * If the connection has been set up, a {@link Player} object is created and
+	 * received messages are passed to that player.
+	 * <p>
+	 * Notifications and messages are passed via the {@link MainLoop} thread to
+	 * decouple their handling from the receiver thread used by this connection.
+	 * 
+	 * @param sock
+	 *            socket providing streams for the connection
+	 * @param connectionListener
+	 *            connection event listener
+	 * @param ping
+	 *            initial ping interval (may be adjusted later using
+	 *            {@link #setPing(int)})
+	 */
+	public Connection(ISocket sock, IConnectionListener connectionListener,
+			int ping) {
 
 		this.sock = sock;
 		this.connectionListener = connectionListener;
+		this.initialPingInterval = ping;
 
 		Log.ln("[CN] sock: " + sock);
 
@@ -160,27 +178,6 @@ public final class Connection implements Runnable, IOptionListener {
 		return closed;
 	}
 
-	public boolean isSessionOptionListener() {
-		return true;
-	}
-
-	public void optionChanged(OptionDescriptor od) {
-
-		if (od == ClientInfo.OD_IMG_SIZE || od == ClientInfo.OD_PAGE_SIZE
-				|| od == ClientInfo.OD_IMG_TYPE) {
-
-			final Message m = new Message();
-			m.id = Message.CONN_CINFO;
-			m.data = Serial.out(new ClientInfo(false));
-			send(m);
-
-		} else if (od == OD_PING) {
-
-			ping(true);
-		}
-
-	}
-
 	public void run() {
 
 		// delay startup a little bit to give UI a chance to update
@@ -198,7 +195,7 @@ public final class Connection implements Runnable, IOptionListener {
 			return;
 		}
 
-		ping(true);
+		setPing(initialPingInterval);
 
 		final Player player = new Player(this, pinfo);
 
@@ -246,6 +243,10 @@ public final class Connection implements Runnable, IOptionListener {
 
 	/**
 	 * Sends a message.
+	 * <p>
+	 * If sending fails, the listener set in
+	 * {@link #Connection(ISocket, IConnectionListener, int)} is notified using
+	 * {@link IConnectionListener#notifyDisconnected(ISocket, UserException)}.
 	 * 
 	 * @param m
 	 *            The message to send. Content does not get changed.
@@ -269,13 +270,32 @@ public final class Connection implements Runnable, IOptionListener {
 		}
 	}
 
+	/**
+	 * Set ping interval.
+	 * 
+	 * @param interval
+	 *            in seconds (0 disables pinging)
+	 */
+	public void setPing(int interval) {
+
+		if (ping != null) {
+			ping.cancel();
+			ping = null;
+		}
+
+		if (interval > 0) {
+			ping = new PingTask();
+			MainLoop.schedule(ping, interval * 1000, interval * 1000);
+		}
+	}
+
 	private void downPrivate() {
 
 		closed = true;
 
 		Log.ln("[CN] going down");
 
-		ping(false);
+		setPing(0);
 
 		sock.close();
 	}
@@ -307,37 +327,6 @@ public final class Connection implements Runnable, IOptionListener {
 							: null, ue);
 				}
 			});
-		}
-	}
-
-	/**
-	 * Enable or disable pinging.
-	 * <p>
-	 * If pinging is already enabled, it is disabled first and then enabled
-	 * according to its current configuration (which may also be 0, i.e. no
-	 * pinging at all).
-	 * 
-	 * @param enable
-	 *            if <code>true</code> ping as defined by option
-	 *            {@link #OD_PING}, if <code>false</code>, stop pinging
-	 * 
-	 */
-	private void ping(boolean enable) {
-
-		if (ping != null) {
-			ping.cancel();
-			ping = null;
-		}
-
-		if (!enable) {
-			return;
-		}
-
-		final int v = Integer.parseInt(Config.getInstance().getOption(OD_PING));
-
-		if (v > 0) {
-			ping = new PingTask();
-			MainLoop.schedule(ping, v * 1000, v * 1000);
 		}
 	}
 
@@ -575,9 +564,6 @@ public final class Connection implements Runnable, IOptionListener {
 			throw new UserException("Connecting failed",
 					"Received player description data is malformed.", e);
 		}
-
-		// now we are ready to handle changes in client info config
-		Config.getInstance().addOptionListener(this);
 
 		return pinfo;
 	}

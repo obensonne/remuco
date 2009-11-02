@@ -55,7 +55,6 @@ import remuco.client.jme.ui.Theme;
 import remuco.client.jme.ui.screenies.TitleScreeny;
 import remuco.client.jme.ui.screens.PlayerScreen;
 import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
-import remuco.comm.Connection;
 
 /**
  * Config provides global access to various configuration options.
@@ -65,6 +64,10 @@ public final class Config {
 	public static final String DEVICE_NAME;
 
 	public static final int IMG_MAX_SIZE;
+
+	/** Ping interval option. */
+	public static final OptionDescriptor OD_PING = new OptionDescriptor("ping",
+			"Ping interval", 20, 0, 300);
 
 	/** List of all option descriptors. */
 	public static final Vector OPTION_DESCRIPTORS;
@@ -141,7 +144,7 @@ public final class Config {
 		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_SIZE);
 		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_TYPE);
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_KEEPFS);
-		OPTION_DESCRIPTORS.addElement(Connection.OD_PING);
+		OPTION_DESCRIPTORS.addElement(Config.OD_PING);
 
 	}
 
