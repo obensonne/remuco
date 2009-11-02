@@ -26,12 +26,15 @@ import javax.microedition.lcdui.Image;
 
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
+import remuco.client.common.util.Tools;
 import remuco.client.jme.Config;
 import remuco.client.jme.ui.screens.ItemlistScreen;
 import remuco.client.jme.ui.screens.PlayerScreen;
 
 /**
- * Java ME related utility methods.
+ * Utility methods specific to the JME client.
+ * 
+ * @see Tools
  */
 public class JMETools {
 
