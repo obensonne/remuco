@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.common.io;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,8 +30,6 @@ import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.PlayerInfo;
-import remuco.client.common.io.ISocket;
-import remuco.client.common.io.Message;
 import remuco.client.common.player.Player;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.Serial;

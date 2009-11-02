@@ -22,7 +22,6 @@ package remuco.client.common.io;
 
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
-import remuco.comm.Connection;
 
 /**
  * A message received from or to send to the Remuco server.

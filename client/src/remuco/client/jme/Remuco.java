@@ -35,7 +35,9 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
 import remuco.client.common.UserException;
+import remuco.client.common.io.Connection;
 import remuco.client.common.io.ISocket;
+import remuco.client.common.io.Connection.IConnectionListener;
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
 import remuco.client.jme.io.BluetoothFactory;
@@ -52,8 +54,6 @@ import remuco.client.jme.ui.screens.LogScreen;
 import remuco.client.jme.ui.screens.PlayerScreen;
 import remuco.client.jme.ui.screens.ServiceSelectorScreen;
 import remuco.client.jme.ui.screens.WaitingScreen;
-import remuco.comm.Connection;
-import remuco.comm.Connection.IConnectionListener;
 
 /**
  * MIDlet of the Remuco client.

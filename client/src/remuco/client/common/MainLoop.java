@@ -23,8 +23,8 @@ package remuco.client.common;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import remuco.client.common.io.Connection;
 import remuco.client.common.util.Log;
-import remuco.comm.Connection;
 
 /**
  * Global main loop, supposed to be used for
