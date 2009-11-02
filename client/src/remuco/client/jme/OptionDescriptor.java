@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco;
+package remuco.client.jme;
 
 import remuco.client.common.util.Tools;
 

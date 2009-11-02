@@ -30,7 +30,6 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.OptionDescriptor;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.Item;
@@ -43,6 +42,7 @@ import remuco.client.common.player.Player;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.client.jme.Config;
+import remuco.client.jme.OptionDescriptor;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.CommandList;
 import remuco.client.jme.ui.IActionListener;

@@ -29,10 +29,10 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
 
-import remuco.OptionDescriptor;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
 import remuco.client.jme.Config;
+import remuco.client.jme.OptionDescriptor;
 
 /**
  * Screen to adjust all options given by {@link Config#OPTION_DESCRIPTORS}.

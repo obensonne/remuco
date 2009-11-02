@@ -42,7 +42,6 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
-import remuco.OptionDescriptor;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
