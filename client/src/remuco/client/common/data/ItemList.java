@@ -23,11 +23,11 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import remuco.client.common.io.Message;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
-import remuco.comm.Message;
 
 public final class ItemList implements ISerializable {
 

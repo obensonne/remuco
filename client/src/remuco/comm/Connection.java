@@ -34,6 +34,7 @@ import remuco.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.io.ISocket;
+import remuco.client.common.io.Message;
 import remuco.client.common.player.Player;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.Serial;

@@ -29,12 +29,12 @@ import remuco.client.common.data.Progress;
 import remuco.client.common.data.RequestParam;
 import remuco.client.common.data.State;
 import remuco.client.common.data.Tagging;
+import remuco.client.common.io.Message;
 import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.comm.Connection;
-import remuco.comm.Message;
 
 /**
  * A player mirrors the state of a remote player and provides methods to control
