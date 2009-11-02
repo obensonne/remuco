@@ -24,7 +24,11 @@ import java.util.Hashtable;
 
 import javax.microedition.lcdui.Image;
 
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
+import remuco.client.jme.Config;
+import remuco.client.jme.ui.screens.ItemlistScreen;
+import remuco.client.jme.ui.screens.PlayerScreen;
 
 /**
  * Java ME related utility methods.
@@ -35,7 +39,7 @@ public class JMETools {
 	 * Create an image from its byte array representation.
 	 * 
 	 * @param ay
-	 *            the bate array
+	 *            the byte array
 	 * @return an image or <code>null</code> if <em>ay</em> is <code>null</code>
 	 *         or empty or if <em>ay</em> is malformed
 	 */
@@ -51,6 +55,39 @@ public class JMETools {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Build a client info object.
+	 * 
+	 * @param config
+	 *            config instance to access required values
+	 * @param extra
+	 *            whether to include extra information in the client info
+	 * @return a client info object
+	 */
+	public static ClientInfo buildClientInfo(Config config, boolean extra) {
+
+		final Hashtable info;
+
+		if (extra) {
+			info = new Hashtable();
+
+			info.put("name", Config.DEVICE_NAME);
+			info.put("touch", Config.TOUCHSCREEN ? "yes" : "no");
+			info.put("utf8", Config.UTF8 ? "yes" : "no");
+
+		} else {
+			info = null;
+		}
+
+		final ClientInfo ci = new ClientInfo(
+				Integer.parseInt(config.getOption(PlayerScreen.OD_IMG_SIZE)),
+				config.getOption(PlayerScreen.OD_IMG_SIZE),
+				Integer.parseInt(config.getOption(ItemlistScreen.OD_PAGE_SIZE)),
+				info);
+
+		return ci;
 	}
 
 	/**

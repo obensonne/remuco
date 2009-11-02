@@ -110,6 +110,8 @@ public final class Connection implements Runnable {
 
 	private final DataOutputStream dos;
 
+	private final ClientInfo initialClientInfo;
+
 	private final int initialPingInterval;
 
 	private TimerTask ping;
@@ -136,18 +138,22 @@ public final class Connection implements Runnable {
 	 * 
 	 * @param sock
 	 *            socket providing streams for the connection
-	 * @param connectionListener
+	 * @param listener
 	 *            connection event listener
 	 * @param ping
 	 *            initial ping interval (may be adjusted later using
 	 *            {@link #setPing(int)})
+	 * @param ci
+	 *            initial client info to send to the server (client info updates
+	 *            can be sent using {@link #send(ClientInfo)})
 	 */
-	public Connection(ISocket sock, IConnectionListener connectionListener,
-			int ping) {
+	public Connection(ISocket sock, IConnectionListener listener, int ping,
+			ClientInfo ci) {
 
 		this.sock = sock;
-		this.connectionListener = connectionListener;
+		this.connectionListener = listener;
 		this.initialPingInterval = ping;
+		this.initialClientInfo = ci;
 
 		Log.ln("[CN] sock: " + sock);
 
@@ -237,6 +243,27 @@ public final class Connection implements Runnable {
 
 		}
 
+	}
+
+	/**
+	 * Send client info to the server.
+	 * <p>
+	 * To be called whenever client info related options (e.g. image size or
+	 * item list page size) change.
+	 * <p>
+	 * Errors are handled as in {@link #send(Message)}.
+	 * 
+	 * @param ci
+	 *            the new client info to send
+	 */
+	public void send(ClientInfo ci) {
+
+		final Message msg = new Message();
+
+		msg.id = Message.CONN_CINFO;
+		msg.data = Serial.out(ci);
+
+		send(msg);
 	}
 
 	/**
@@ -538,14 +565,14 @@ public final class Connection implements Runnable {
 		final Message msgCI = new Message();
 
 		msgCI.id = Message.CONN_CINFO;
-		msgCI.data = Serial.out(new ClientInfo(true));
+		msgCI.data = Serial.out(initialClientInfo);
 
 		try {
 			sendPrivate(msgCI);
 		} catch (IOException e) {
 			downPrivate();
 			throw new UserException("Connecting failed",
-					"IO error while sending client description.", e);
+					"IO error while sending client info.", e);
 		}
 
 		final Message msgPI = recv();

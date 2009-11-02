@@ -41,11 +41,15 @@ import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.util.Log;
+import remuco.client.jme.OptionDescriptor;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.IItemListController;
 import remuco.client.jme.ui.Theme;
 
 public final class ItemlistScreen extends List implements CommandListener {
+
+	public static final OptionDescriptor OD_PAGE_SIZE = new OptionDescriptor(
+			"page-size", "Page size of lists", 50, 10, 10000);
 
 	private static final Command CMD_GOTO_PAGE = new Command("Page go to",
 			Command.SCREEN, 10);

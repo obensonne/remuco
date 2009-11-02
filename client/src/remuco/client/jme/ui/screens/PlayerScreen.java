@@ -33,13 +33,11 @@ import javax.microedition.lcdui.Image;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.Item;
-import remuco.client.common.io.Message;
 import remuco.client.common.player.Feature;
 import remuco.client.common.player.IItemListener;
 import remuco.client.common.player.IProgressListener;
 import remuco.client.common.player.IStateListener;
 import remuco.client.common.player.Player;
-import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.client.jme.Config;
 import remuco.client.jme.OptionDescriptor;
@@ -66,6 +64,14 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 	public static final OptionDescriptor OD_IMG_KEEPFS = new OptionDescriptor(
 			"keep-img-fs", "Image fullscreen persistent", "No", "Yes,No");
+
+	public static final OptionDescriptor OD_IMG_SIZE = new OptionDescriptor(
+			"img-size", "Image size", Math.min(200, Config.IMG_MAX_SIZE), 0,
+			Config.IMG_MAX_SIZE);
+
+	public static final OptionDescriptor OD_IMG_TYPE = new OptionDescriptor(
+			"img-type", "Image type", ClientInfo.IMG_TYPE_JPEG, new String[] {
+					ClientInfo.IMG_TYPE_JPEG, ClientInfo.IMG_TYPE_PNG });
 
 	/**
 	 * A wrapper command for the command {@link CMD#BACK} added externally to
@@ -556,27 +562,25 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	public void optionChanged(OptionDescriptor od) {
 
 		if (od == Theme.OD_THEME) {
-			
+
 			theme.load(config.getOption(Theme.OD_THEME));
 			initScreenies();
-			
-		} else if (od == TitleScreeny.OD_INFO_LEVEL) {
-			
-			initScreenies();
-			
-		} else if (od == ClientInfo.OD_IMG_SIZE
-				|| od == ClientInfo.OD_PAGE_SIZE
-				|| od == ClientInfo.OD_IMG_TYPE) {
 
-			final Message m = new Message();
-			m.id = Message.CONN_CINFO;
-			m.data = Serial.out(new ClientInfo(false));
-			player.getConnection().send(m);
+		} else if (od == TitleScreeny.OD_INFO_LEVEL) {
+
+			initScreenies();
+
+		} else if (od == PlayerScreen.OD_IMG_SIZE
+				|| od == ItemlistScreen.OD_PAGE_SIZE
+				|| od == PlayerScreen.OD_IMG_TYPE) {
+
+			final ClientInfo ci = JMETools.buildClientInfo(config, false);
+			player.getConnection().send(ci);
 
 		} else if (od == Config.OD_PING) {
-			
+
 			// FIXME: semantically this could be handled elsewhere .. where?
-			
+
 			final int interval = Integer.parseInt(config.getOption(Config.OD_PING));
 			player.getConnection().setPing(interval);
 		}

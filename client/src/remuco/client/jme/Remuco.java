@@ -36,6 +36,7 @@ import javax.microedition.lcdui.StringItem;
 
 import remuco.client.common.Const;
 import remuco.client.common.UserException;
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.io.Connection;
 import remuco.client.common.io.ISocket;
 import remuco.client.common.io.Connection.IConnectionListener;
@@ -55,15 +56,10 @@ import remuco.client.jme.ui.screens.LogScreen;
 import remuco.client.jme.ui.screens.PlayerScreen;
 import remuco.client.jme.ui.screens.ServiceSelectorScreen;
 import remuco.client.jme.ui.screens.WaitingScreen;
+import remuco.client.jme.util.JMETools;
 
 /**
- * MIDlet of the Remuco client.
- * <p>
- * <h1>Emulator Code</h1>
- * Some code is only used while running inside the WTK emulator. All
- * corresponding code is either tagged with <code>emulator</code> in its JavaDoc
- * or is located inside an if-statement block using the condition
- * {@link Const#EMULATION}.
+ * Main controller class of the Remuco JME client.
  */
 public class Remuco implements CommandListener, IConnectionListener,
 		IServiceListener, IDeviceSelectionListener {
@@ -322,7 +318,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 	public void notifyDisconnected(ISocket sock, UserException reason) {
 
 		disconnect();
-		
+
 		if (sock != null) {
 			final String url = ((Socket) sock).url;
 			display.setCurrent(new ReconnectDialog(url, reason.getDetails()));
@@ -419,7 +415,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 	 * Connect to the given service and set up a waiting screen.
 	 * 
 	 * @param url
-	 *            the service url
+	 *            the service URL
 	 */
 	private void connect(String url) {
 
@@ -431,9 +427,10 @@ public class Remuco implements CommandListener, IConnectionListener,
 			alert(e, screenDeviceSelector);
 			return;
 		}
-		
+
 		final int ping = Integer.parseInt(config.getOption(Config.OD_PING));
-		final Connection conn = new Connection(sock, this, ping);
+		final ClientInfo ci = JMETools.buildClientInfo(config, true);
+		final Connection conn = new Connection(sock, this, ping, ci);
 
 		screenConnecting.attachProperty(conn);
 		screenConnecting.setMessage("Connecting to player.");

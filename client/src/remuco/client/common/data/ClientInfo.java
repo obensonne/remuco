@@ -24,60 +24,71 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import remuco.client.common.Const;
+import remuco.client.common.io.Connection;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
 import remuco.client.common.util.Log;
-import remuco.client.jme.Config;
-import remuco.client.jme.OptionDescriptor;
 
 public final class ClientInfo implements ISerializable {
-
-	public static final OptionDescriptor OD_IMG_SIZE = new OptionDescriptor(
-			"img-size", "Image size", Math.min(200, Config.IMG_MAX_SIZE), 0,
-			Config.IMG_MAX_SIZE);
-
-	public static final OptionDescriptor OD_IMG_TYPE = new OptionDescriptor(
-			"img-type", "Image type", "JPEG", "JPEG,PNG");
-
-	public static final OptionDescriptor OD_PAGE_SIZE = new OptionDescriptor(
-			"page-size", "Page size of lists", 50, 10, 10000);
 
 	private static final int[] ATOMS_FMT = new int[] { SerialAtom.TYPE_I,
 			SerialAtom.TYPE_S, SerialAtom.TYPE_I, SerialAtom.TYPE_AS,
 			SerialAtom.TYPE_AS };
 
+	/** Possible image type of images send from server to client. */
+	public static final String IMG_TYPE_JPEG = "JPEG";
+	
+	/** Possible image type of images send from server to client. */
+	public static final String IMG_TYPE_PNG = "PNG";
+
 	private final SerialAtom[] atoms;
 
 	/**
 	 * Create a new client info.
+	 * <p>
+	 * A client info is needed for initial setup of a {@link Connection}.
+	 * Later, when the user decides to change one of the values given here as
+	 * parameters, a new client info should be send to the server using
+	 * {@link Connection#send(ClientInfo)}.
 	 * 
-	 * @param complete
-	 *            if <code>true</code>, also include informative device
-	 *            information, if <code>false</code>, just include user
-	 *            configuration options and required device information
+	 * @param imgSize
+	 *            preferred size of images (cover art) for this client device
+	 * @param imgType
+	 *            preferred type of images (cover art) for this client device
+	 *            (one of {@link #IMG_TYPE_JPEG} or {@link #IMG_TYPE_PNG})
+	 * @param ilPageSize
+	 *            preferred maximum length of item list pages for this client
+	 *            device (when browsing a player's media library, track lists
+	 *            may be very long and exceed capabilities of client devices -
+	 *            this value is used to split media library track lists into
+	 *            multiple pages)
+	 * @param extra
+	 *            optional extra information as a string hash table (used by the
+	 *            tool <em>remuco-report</em>) - this is only useful for an
+	 *            initial client info and may be <code>null</code> when sending
+	 *            an updated client info to the server
 	 */
-	public ClientInfo(boolean complete) {
+	public ClientInfo(int imgSize, String imgType, int ilPageSize,
+			Hashtable extra) {
 
 		atoms = SerialAtom.build(ATOMS_FMT);
 
-		final Config config = Config.getInstance();
+		atoms[0].i = imgSize;
+		atoms[1].s = imgType;
+		atoms[2].i = ilPageSize;
 
-		atoms[0].i = Integer.parseInt(config.getOption(OD_IMG_SIZE));
-		atoms[1].s = config.getOption(OD_IMG_TYPE);
-		atoms[2].i = Integer.parseInt(config.getOption(OD_PAGE_SIZE));
+		if (extra != null) {
 
-		if (complete) {
+			extra.put("version", Const.VERSION);
+			
+			atoms[3].as = new String[extra.size()];
+			atoms[4].as = new String[extra.size()];
 
-			final Hashtable info = collectDeviceInfos(config);
-
-			atoms[3].as = new String[info.size()];
-			atoms[4].as = new String[info.size()];
-
-			final Enumeration enu = info.keys();
+			final Enumeration enu = extra.keys();
 			int i = 0;
 			while (enu.hasMoreElements()) {
 				final String key = (String) enu.nextElement();
-				final String val = (String) info.get(key);
+				final String val = (String) extra.get(key);
 				atoms[3].as[i] = key;
 				atoms[4].as[i] = val;
 				i++;
@@ -93,27 +104,5 @@ public final class ClientInfo implements ISerializable {
 		Log.bug("Feb 22, 2009.6:25:29 PM");
 	}
 
-	private void addDeviceInfo(Hashtable info, String key, boolean value) {
-		info.put(key, value ? "yes" : "no");
-	}
-
-	private void addDeviceInfo(Hashtable info, String key, String value) {
-		if (value == null) {
-			value = "unknown";
-		}
-		info.put(key, value);
-	}
-
-	private Hashtable collectDeviceInfos(Config config) {
-
-		final Hashtable info = new Hashtable();
-
-		addDeviceInfo(info, "name", Config.DEVICE_NAME);
-		addDeviceInfo(info, "touch", Config.TOUCHSCREEN);
-		addDeviceInfo(info, "utf8", Config.UTF8);
-		addDeviceInfo(info, "version", Const.VERSION);
-
-		return info;
-	}
 
 }

@@ -42,7 +42,6 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
-import remuco.client.common.data.ClientInfo;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
@@ -52,6 +51,7 @@ import remuco.client.jme.io.WifiDevice;
 import remuco.client.jme.ui.KeyBindings;
 import remuco.client.jme.ui.Theme;
 import remuco.client.jme.ui.screenies.TitleScreeny;
+import remuco.client.jme.ui.screens.ItemlistScreen;
 import remuco.client.jme.ui.screens.PlayerScreen;
 import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
 
@@ -139,9 +139,9 @@ public final class Config {
 
 		OPTION_DESCRIPTORS.addElement(Theme.OD_THEME);
 		OPTION_DESCRIPTORS.addElement(TitleScreeny.OD_INFO_LEVEL);
-		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_PAGE_SIZE);
-		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_SIZE);
-		OPTION_DESCRIPTORS.addElement(ClientInfo.OD_IMG_TYPE);
+		OPTION_DESCRIPTORS.addElement(ItemlistScreen.OD_PAGE_SIZE);
+		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_SIZE);
+		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_TYPE);
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_KEEPFS);
 		OPTION_DESCRIPTORS.addElement(Config.OD_PING);
 
