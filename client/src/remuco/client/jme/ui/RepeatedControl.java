@@ -80,7 +80,7 @@ public class RepeatedControl extends TimerTask {
 		// need to be perfect
 		neverRun = false;
 
-		if (!player.isConnected()) { // be nice and stop if disconnected
+		if (player.getConnection().isClosed()) { // stop if disconnected
 			super.cancel();
 			return;
 		}

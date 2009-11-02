@@ -180,6 +180,11 @@ public final class Player {
 		ctrl(Message.CTRL_VOLUME, direction);
 	}
 
+	/** Get the connection used by this player. */
+	public Connection getConnection() {
+		return conn;
+	}
+
 	/**
 	 * Handle a player related message.
 	 * <p>
@@ -377,16 +382,6 @@ public final class Player {
 	public void setStateListener(IStateListener sl) {
 
 		stateListener = sl;
-	}
-
-	/** Disconnect from the remote player. */
-	public void disconnect() {
-		conn.close();
-	}
-
-	/** Check if there still is a connection to the remote player. */
-	public boolean isConnected() {
-		return !conn.isClosed();
 	}
 
 	private void action(int msgID, ActionParam action) {

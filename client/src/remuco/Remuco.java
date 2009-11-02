@@ -458,7 +458,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		config.removeSessionOptionListener();
 
 		if (screenPlayer != null) {
-			screenPlayer.getPlayer().disconnect();
+			screenPlayer.getPlayer().getConnection().close();
 			screenPlayer = null;
 		}
 	}
