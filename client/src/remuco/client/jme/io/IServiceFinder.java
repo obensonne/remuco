@@ -18,30 +18,31 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
-
-import java.util.Hashtable;
+package remuco.client.jme.io;
 
 import remuco.UserException;
+import remuco.comm.IDevice;
 
-/**
- * Interface for service listener.
- * 
- * @see IServiceFinder
- */
-public interface IServiceListener {
+/** A finder searching for Remuco services. */
+public interface IServiceFinder {
 
 	/**
-	 * Notify a service listener that services has been found.
-	 * 
-	 * @param services
-	 *            a hash table with service names as keys and service connection
-	 *            URLs as values
-	 * @param ex
-	 *            <code>null</code> if service search was successful, otherwise
-	 *            a description of the occurred error (in that case,
-	 *            <i>services</i> is <code>null</code>)
+	 * Cancel a currently active service search.
 	 */
-	public void notifyServices(Hashtable services, UserException ex);
+	public void cancelServiceSearch();
+
+	/**
+	 * Find all available Remuco services on a device.
+	 * 
+	 * @param iDevice
+	 *            device to search for services
+	 * @param listener
+	 *            the {@link IServiceListener} to notify if service search is
+	 *            finished
+	 * @throws UserException
+	 *             if there was an error in starting the search
+	 */
+	public void findServices(IDevice iDevice, IServiceListener listener)
+			throws UserException;
 
 }

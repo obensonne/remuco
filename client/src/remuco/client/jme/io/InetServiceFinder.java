@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.jme.io;
 
 import java.util.Hashtable;
 import java.util.TimerTask;
@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import remuco.MainLoop;
 import remuco.UserException;
 import remuco.client.jme.util.JMETools;
+import remuco.comm.IDevice;
 
 public final class InetServiceFinder implements IServiceFinder {
 

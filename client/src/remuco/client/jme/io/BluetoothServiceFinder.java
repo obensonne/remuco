@@ -38,8 +38,6 @@ import remuco.UserException;
 import remuco.client.common.util.Log;
 import remuco.client.jme.util.JMETools;
 import remuco.comm.IDevice;
-import remuco.comm.IServiceFinder;
-import remuco.comm.IServiceListener;
 
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {

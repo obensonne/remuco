@@ -21,7 +21,6 @@
 package remuco.client.jme.io;
 
 import remuco.client.common.util.Log;
-import remuco.comm.IServiceFinder;
 
 /**
  * On devices which have no JSR-82 support, references to bluetooth classes

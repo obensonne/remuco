@@ -18,9 +18,10 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.comm;
+package remuco.client.jme.io;
 
 import remuco.client.common.util.Tools;
+import remuco.comm.IDevice;
 
 public class WifiDevice implements IDevice {
 

@@ -23,8 +23,8 @@ package remuco.client.jme.ui.screens;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
+import remuco.client.jme.io.WifiDevice;
 import remuco.comm.IDevice;
-import remuco.comm.WifiDevice;
 
 /** Screen to configure a Bluetooth connection. */
 public class WifiScreen extends Form implements IDeviceScreen {
