@@ -49,6 +49,7 @@
 	<property name="midp.ver" value="MIDP-2.0" />
 	<property name="cldc.ver" value="CLDC-1.1" />
 
+	<property name="midlet.class" value="remuco.client.jme.Entry" />
 	<property name="midlet.icon" value="logo.png" />
 	<property name="midlet.vendor" value="remuco.googlecode.com" />
 	<property name="midlet.version" value="0.9.2" />
@@ -246,7 +247,7 @@
 			<attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
 			<attribute name="MicroEdition-Profile" value="${midp.ver}" />
 			<attribute name="MIDlet-1"
-			           value="${midlet.name},${midlet.icon},remuco.Entry" />
+			           value="${midlet.name},${midlet.icon},${midlet.class}" />
 			<attribute name="MIDlet-Name" value="${midlet.name}" />
 			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
 			<attribute name="MIDlet-Version" value="${midlet.version}" />

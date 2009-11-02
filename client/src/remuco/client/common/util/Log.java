@@ -20,8 +20,8 @@
  */
 package remuco.client.common.util;
 
-import remuco.Remuco;
 import remuco.client.common.UserException;
+import remuco.client.jme.Remuco;
 
 public final class Log {
 

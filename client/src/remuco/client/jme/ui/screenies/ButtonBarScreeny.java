@@ -25,10 +25,10 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
 
-import remuco.Config;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.player.Feature;
 import remuco.client.common.util.Log;
+import remuco.client.jme.Config;
 import remuco.client.jme.ui.IActionListener;
 import remuco.client.jme.ui.KeyBindings;
 import remuco.client.jme.ui.Theme;

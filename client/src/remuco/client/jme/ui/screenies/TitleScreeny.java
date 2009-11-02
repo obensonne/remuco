@@ -23,10 +23,10 @@ package remuco.client.jme.ui.screenies;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.Config;
 import remuco.OptionDescriptor;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
+import remuco.client.jme.Config;
 import remuco.client.jme.ui.Theme;
 import remuco.client.jme.util.JMETools;
 

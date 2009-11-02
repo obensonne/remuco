@@ -27,10 +27,10 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
-import remuco.Config;
-import remuco.Remuco;
 import remuco.client.common.util.ILogPrinter;
 import remuco.client.common.util.Log;
+import remuco.client.jme.Config;
+import remuco.client.jme.Remuco;
 import remuco.client.jme.ui.CMD;
 
 public class LogScreen extends Form implements ILogPrinter, CommandListener {

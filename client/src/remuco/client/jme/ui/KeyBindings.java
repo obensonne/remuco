@@ -22,8 +22,8 @@ package remuco.client.jme.ui;
 
 import javax.microedition.lcdui.Canvas;
 
-import remuco.Config;
 import remuco.client.common.util.Log;
+import remuco.client.jme.Config;
 
 /**
  * Key bindings manager. Manages mappings between actions and key codes.

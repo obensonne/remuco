@@ -27,10 +27,10 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import remuco.Config;
 import remuco.OptionDescriptor;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
+import remuco.client.jme.Config;
 import remuco.client.jme.ui.screenies.Screeny;
 import remuco.client.jme.ui.screenies.ScreenyException;
 

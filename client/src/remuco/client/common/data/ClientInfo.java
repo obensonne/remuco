@@ -23,12 +23,12 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import remuco.Config;
 import remuco.OptionDescriptor;
-import remuco.Remuco;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
 import remuco.client.common.util.Log;
+import remuco.client.jme.Config;
+import remuco.client.jme.Remuco;
 
 public final class ClientInfo implements ISerializable {
 
