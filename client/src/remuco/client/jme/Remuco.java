@@ -34,6 +34,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.Const;
 import remuco.client.common.UserException;
 import remuco.client.common.io.Connection;
 import remuco.client.common.io.ISocket;
@@ -62,7 +63,7 @@ import remuco.client.jme.ui.screens.WaitingScreen;
  * Some code is only used while running inside the WTK emulator. All
  * corresponding code is either tagged with <code>emulator</code> in its JavaDoc
  * or is located inside an if-statement block using the condition
- * {@link #EMULATION}.
+ * {@link Const#EMULATION}.
  */
 public class Remuco implements CommandListener, IConnectionListener,
 		IServiceListener, IDeviceSelectionListener {
@@ -102,17 +103,6 @@ public class Remuco implements CommandListener, IConnectionListener,
 			}
 		}
 
-	}
-
-	/**
-	 * @emulator If <code>true</code>, the client runs inside the WTK emulator.
-	 */
-	public static final boolean EMULATION;
-
-	public static final String VERSION = "@VERSION@";
-
-	static {
-		EMULATION = "@EMULATION@".equalsIgnoreCase("true") ? true : false;
 	}
 
 	/** An alert to signal an alerting message :) */
@@ -159,7 +149,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenLog = new LogScreen(display);
 		screenLog.addCommand(CMD.BACK);
 		screenLog.setCommandListener(this);
-		if (EMULATION) {
+		if (Const.EMULATION) {
 			Log.ln("RUNING IN EMULATION MODE ..");
 			screenLog.append("Emulation -> logging goes to standard out!");
 		} else {

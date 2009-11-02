@@ -27,10 +27,10 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.Const;
 import remuco.client.common.util.ILogPrinter;
 import remuco.client.common.util.Log;
 import remuco.client.jme.Config;
-import remuco.client.jme.Remuco;
 import remuco.client.jme.ui.CMD;
 
 public class LogScreen extends Form implements ILogPrinter, CommandListener {
@@ -157,7 +157,7 @@ public class LogScreen extends Form implements ILogPrinter, CommandListener {
 		sb.append("Used  ").append(memUsed).append(" KB\n");
 		sb.append("Free  ").append(memFree).append(" KB\n");
 		sb.append("--- Misc --- \n");
-		sb.append("Version: ").append(Remuco.VERSION);
+		sb.append("Version: ").append(Const.VERSION);
 		sb.append('\n');
 		sb.append("UTF-8: ").append(Config.UTF8 ? "yes" : "no");
 		sb.append('\n');

@@ -23,12 +23,12 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import remuco.client.common.Const;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
 import remuco.client.common.util.Log;
 import remuco.client.jme.Config;
 import remuco.client.jme.OptionDescriptor;
-import remuco.client.jme.Remuco;
 
 public final class ClientInfo implements ISerializable {
 
@@ -111,7 +111,7 @@ public final class ClientInfo implements ISerializable {
 		addDeviceInfo(info, "name", Config.DEVICE_NAME);
 		addDeviceInfo(info, "touch", Config.TOUCHSCREEN);
 		addDeviceInfo(info, "utf8", Config.UTF8);
-		addDeviceInfo(info, "version", Remuco.VERSION);
+		addDeviceInfo(info, "version", Const.VERSION);
 
 		return info;
 	}
