@@ -23,6 +23,7 @@ package remuco;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import remuco.client.common.MainLoop;
 import remuco.client.common.util.Log;
 
 public class Entry extends MIDlet {

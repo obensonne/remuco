@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco;
+package remuco.client.common;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +27,7 @@ import remuco.client.common.util.Log;
 import remuco.comm.Connection;
 
 /**
- * Global main loop which is used for
+ * Global main loop, supposed to be used for
  * <ul>
  * <li>handling events from a {@link Connection} (decoupled from the
  * {@link Connection}'s receiver thread and from the threads calling methods on
@@ -37,11 +37,13 @@ import remuco.comm.Connection;
  * <li>synchronizing access to objects where critical race conditions may occur.
  * </ul>
  * <p>
- * <em>Synchronization note:</em> As the management of this class, i.e. calling
- * the methods {@link #enable()} and {@link #disable()}, is done only by the
- * MIDlet class, there is no need to synchronize anything. Of course this
- * requires that the schedule methods here may only be used from a non-static
- * context to be sure it has been initialized appropriately.
+ * <em>Note:</em> The methods {@link #enable()} and {@link #disable()} should
+ * get called only from the application's entry and exit points to prevent race
+ * conditions and to ensure other methods (<em>schedule...</em>) are not called
+ * before {@link #enable()} or after {@link #disable()}. Further, methods in
+ * this class should be called only from a non-static context (otherwise there
+ * is a risk they get called during class initializations before
+ * {@link #enable()} has been called the first time).
  */
 public class MainLoop {
 
@@ -59,6 +61,25 @@ public class MainLoop {
 	}
 
 	private static Timer timer;
+
+	/** Disable the main loop. Does nothing if the loop is already disabled. */
+	public static void disable() {
+
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+
+	}
+
+	/** Enable the main loop. Does nothing if the loop is already enabled. */
+	public static void enable() {
+
+		if (timer == null) {
+			timer = new Timer();
+			timer.schedule(new AliveLogger(), 60000, 60000);
+		}
+	}
 
 	/** See {@link Timer#schedule(TimerTask, long)} with 10ms delay. */
 	public static void schedule(TimerTask task) {
@@ -78,25 +99,6 @@ public class MainLoop {
 
 		timer.schedule(task, delay, period);
 
-	}
-
-	/** Disable the main loop. Does nothing if the loop is already disabled. */
-	protected static void disable() {
-
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
-		}
-
-	}
-
-	/** Enable the main loop. Does nothing if the loop is already enabled. */
-	protected static void enable() {
-
-		if (timer == null) {
-			timer = new Timer();
-			timer.schedule(new AliveLogger(), 60000, 60000);
-		}
 	}
 
 }

@@ -23,7 +23,7 @@ package remuco.client.jme.io;
 import java.util.Hashtable;
 import java.util.TimerTask;
 
-import remuco.MainLoop;
+import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.jme.util.JMETools;
 

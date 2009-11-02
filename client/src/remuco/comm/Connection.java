@@ -28,8 +28,8 @@ import java.util.TimerTask;
 
 import remuco.Config;
 import remuco.IOptionListener;
-import remuco.MainLoop;
 import remuco.OptionDescriptor;
+import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.PlayerInfo;

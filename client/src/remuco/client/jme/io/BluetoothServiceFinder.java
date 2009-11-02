@@ -33,7 +33,7 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 
-import remuco.MainLoop;
+import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.util.Log;
 import remuco.client.jme.util.JMETools;

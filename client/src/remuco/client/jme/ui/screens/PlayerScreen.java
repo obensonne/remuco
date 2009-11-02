@@ -32,8 +32,8 @@ import javax.microedition.lcdui.Image;
 
 import remuco.Config;
 import remuco.IOptionListener;
-import remuco.MainLoop;
 import remuco.OptionDescriptor;
+import remuco.client.common.MainLoop;
 import remuco.client.common.data.Item;
 import remuco.client.common.player.Feature;
 import remuco.client.common.player.IItemListener;
