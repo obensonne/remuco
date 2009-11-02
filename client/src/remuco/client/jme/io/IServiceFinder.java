@@ -21,7 +21,6 @@
 package remuco.client.jme.io;
 
 import remuco.UserException;
-import remuco.comm.IDevice;
 
 /** A finder searching for Remuco services. */
 public interface IServiceFinder {

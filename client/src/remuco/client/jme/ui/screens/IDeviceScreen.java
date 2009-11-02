@@ -20,7 +20,7 @@
  */
 package remuco.client.jme.ui.screens;
 
-import remuco.comm.IDevice;
+import remuco.client.jme.io.IDevice;
 
 /** IDevice screens are forms to configure a connection to a remote device. */
 public interface IDeviceScreen {

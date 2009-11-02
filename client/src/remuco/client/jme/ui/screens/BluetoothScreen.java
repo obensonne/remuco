@@ -29,7 +29,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import remuco.client.jme.io.BluetoothDevice;
-import remuco.comm.IDevice;
+import remuco.client.jme.io.IDevice;
 
 /** Screen to configure a Bluetooth connection. */
 public class BluetoothScreen extends Form implements IDeviceScreen {

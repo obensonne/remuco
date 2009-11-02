@@ -36,13 +36,13 @@ import remuco.UserException;
 import remuco.client.common.util.Log;
 import remuco.client.jme.io.BluetoothDevice;
 import remuco.client.jme.io.BluetoothFactory;
+import remuco.client.jme.io.IDevice;
 import remuco.client.jme.io.IScanListener;
 import remuco.client.jme.io.IScanner;
 import remuco.client.jme.io.WifiDevice;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.CommandList;
 import remuco.client.jme.ui.Theme;
-import remuco.comm.IDevice;
 
 public final class DeviceSelectorScreen extends List implements
 		CommandListener, IScanListener {

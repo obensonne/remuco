@@ -38,6 +38,7 @@ import remuco.client.common.io.ISocket;
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
 import remuco.client.jme.io.BluetoothFactory;
+import remuco.client.jme.io.IDevice;
 import remuco.client.jme.io.IServiceFinder;
 import remuco.client.jme.io.IServiceListener;
 import remuco.client.jme.io.InetServiceFinder;
@@ -52,7 +53,6 @@ import remuco.client.jme.ui.screens.ServiceSelectorScreen;
 import remuco.client.jme.ui.screens.WaitingScreen;
 import remuco.comm.Connection;
 import remuco.comm.Connection.IConnectionListener;
-import remuco.comm.IDevice;
 
 /**
  * MIDlet of the Remuco client.

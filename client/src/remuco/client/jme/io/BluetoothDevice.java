@@ -21,7 +21,6 @@
 package remuco.client.jme.io;
 
 import remuco.client.common.util.Tools;
-import remuco.comm.IDevice;
 
 public class BluetoothDevice implements IDevice {
 
