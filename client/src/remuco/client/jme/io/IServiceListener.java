@@ -22,7 +22,7 @@ package remuco.client.jme.io;
 
 import java.util.Hashtable;
 
-import remuco.UserException;
+import remuco.client.common.UserException;
 
 /**
  * Interface for service listener.

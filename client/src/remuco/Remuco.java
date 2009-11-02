@@ -34,6 +34,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
+import remuco.client.common.UserException;
 import remuco.client.common.io.ISocket;
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;

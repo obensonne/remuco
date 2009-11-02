@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.TimerTask;
 
 import remuco.MainLoop;
-import remuco.UserException;
+import remuco.client.common.UserException;
 import remuco.client.jme.util.JMETools;
 
 public final class InetServiceFinder implements IServiceFinder {

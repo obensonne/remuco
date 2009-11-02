@@ -30,7 +30,7 @@ import remuco.Config;
 import remuco.IOptionListener;
 import remuco.MainLoop;
 import remuco.OptionDescriptor;
-import remuco.UserException;
+import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.io.ISocket;

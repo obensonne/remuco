@@ -28,7 +28,7 @@ import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
-import remuco.UserException;
+import remuco.client.common.UserException;
 import remuco.client.common.io.ISocket;
 import remuco.client.common.util.Log;
 

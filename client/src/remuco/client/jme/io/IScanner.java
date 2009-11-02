@@ -20,7 +20,7 @@
  */
 package remuco.client.jme.io;
 
-import remuco.UserException;
+import remuco.client.common.UserException;
 
 public interface IScanner {
 

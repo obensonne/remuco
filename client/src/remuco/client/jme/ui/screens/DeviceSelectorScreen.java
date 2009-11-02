@@ -32,7 +32,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
 import remuco.Config;
-import remuco.UserException;
+import remuco.client.common.UserException;
 import remuco.client.common.util.Log;
 import remuco.client.jme.io.BluetoothDevice;
 import remuco.client.jme.io.BluetoothFactory;

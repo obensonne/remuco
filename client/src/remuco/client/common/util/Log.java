@@ -21,7 +21,7 @@
 package remuco.client.common.util;
 
 import remuco.Remuco;
-import remuco.UserException;
+import remuco.client.common.UserException;
 
 public final class Log {
 

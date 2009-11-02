@@ -18,7 +18,7 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco;
+package remuco.client.common;
 
 /**
  * User exceptions are used for raising errors up to the user interface (e.g. if
