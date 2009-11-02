@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.TimerTask;
 
 import remuco.Config;
-import remuco.IOptionListener;
 import remuco.OptionDescriptor;
 import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
@@ -40,6 +39,7 @@ import remuco.client.common.serial.BinaryDataExecption;
 import remuco.client.common.serial.Serial;
 import remuco.client.common.util.Log;
 import remuco.client.common.util.Tools;
+import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
 
 /**
  * Send and receive messages.

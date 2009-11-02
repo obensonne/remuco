@@ -31,7 +31,6 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import remuco.Config;
-import remuco.IOptionListener;
 import remuco.OptionDescriptor;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.Item;
@@ -55,6 +54,7 @@ import remuco.client.jme.ui.screenies.Screeny;
 import remuco.client.jme.ui.screenies.ScreenyException;
 import remuco.client.jme.ui.screenies.StateScreeny;
 import remuco.client.jme.ui.screenies.TitleScreeny;
+import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
 import remuco.client.jme.util.JMETools;
 
 public final class PlayerScreen extends Canvas implements IItemListener,

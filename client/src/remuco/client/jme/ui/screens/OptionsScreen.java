@@ -39,6 +39,29 @@ import remuco.client.common.util.Tools;
  */
 public class OptionsScreen extends Form {
 
+	/** Interface for classes listening for changes of options. */
+	public interface IOptionListener {
+
+		/**
+		 * Check if the option listener is a session listener, i.e. it is only
+		 * alive as long there is a player connection session.
+		 * 
+		 * @return <code>true</code> if this is a session only listener,
+		 *         <code>false</code> if this is a listener which is alive the
+		 *         whole application live time
+		 */
+		public boolean isSessionOptionListener();
+
+		/**
+		 * Notify the change of an option.
+		 * 
+		 * @param od
+		 *            the changed option's descriptor
+		 */
+		public void optionChanged(OptionDescriptor od);
+
+	}
+
 	/**
 	 * Implement item state listener in this class because it is already
 	 * implemented privately by {@link Form}.
