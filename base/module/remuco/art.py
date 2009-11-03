@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2009 Oben Sonne <obensonne@googlemail.com>
 #
 #    This file is part of Remuco.
 #
@@ -22,6 +22,7 @@
 
 import hashlib
 import os
+import glob
 import os.path
 import urllib
 import urlparse
@@ -84,7 +85,14 @@ def __get_art_in_folder(uri):
                 file = os.path.join(path, "%s.%s" % (name.capitalize(), ext))
                 if os.path.isfile(file):
                     return file
-            
+                    
+    for type in ART_FILE_TYPES:
+        for file in glob.glob(os.path.join(path,"00*.%s" % type)):
+            if file.find("front") != -1:
+                return file
+            else: 
+                return file[0]
+    
     return None
 
 def __get_art_from_thumbnails(uri):
