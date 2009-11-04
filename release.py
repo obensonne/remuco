@@ -186,14 +186,14 @@ def tarball():
             (options.version, excludes, pkg_src_tb))
     command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
     
-    command("%s/%s/client/setup.sh" % (build_dir, pkg_src))
-    command("ant -f %s/client/build.xml dist" % pkg_src_dir)
-    command("ant -f %s/client/build.xml -Djsr82.off= dist" % pkg_src_dir)
-    shutil.move("%s/client/app" % pkg_src_dir, build_dir)
+    command("%s/%s/client/jme/setup.sh" % (build_dir, pkg_src))
+    command("ant -f %s/client/jme/build.xml dist" % pkg_src_dir)
+    command("ant -f %s/client/jme/build.xml -Djsr82.off= dist" % pkg_src_dir)
+    shutil.move("%s/client/jme/app" % pkg_src_dir, build_dir)
     
     shutil.rmtree(pkg_src_dir)
     command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
-    shutil.move("%s/app" % build_dir, "%s/client" % pkg_src_dir )
+    shutil.move("%s/app" % build_dir, "%s/client/jme/app" % pkg_src_dir )
     shutil.move(pkg_src_dir, pkg_all_dir)
     command("tar zcf %s -C %s %s" % (pkg_all_tb, build_dir, pkg_all))
     

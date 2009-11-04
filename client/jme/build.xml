@@ -148,6 +148,7 @@
 		<mkdir dir="build/sources" />
 		<copy todir="build/sources">
 			<fileset dir="src" includes="remuco/**/*.java" />
+			<fileset dir="../common/src" includes="remuco/**/*.java" />
 			<filterset>
 				<filter token="VERSION" value="${midlet.version}" />
 				<filter token="THEMES" value="${theme.list}" />
