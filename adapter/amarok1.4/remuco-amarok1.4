@@ -28,19 +28,31 @@ import time
 import commands
 import os
 import eyeD3
-
+import sqlite3
+import os.path
 
 import remuco
 from remuco import log
 
 #Definitions
-IA_JUMP = remuco.ItemAction("Jump to")
+IA_JUMP = remuco.ItemAction("Play Now")
 IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
 PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
+
+IA_ADD = remuco.ItemAction("Add to playlist", multiple=True)
+
+MLIB_ITEM_ACTIONS = (IA_ADD,)
+
+SEARCH_MASK = [ "Artist", "Album", "Title" ]
+
+conn = sqlite3.connect(os.path.expanduser('~/.kde/share/apps/amarok/collection.db'))
+db = conn.cursor()
+
 
 class Amarok14Adapter(remuco.PlayerAdapter):
     
     lastpath = ""
+    search_list = []
     
     def __init__(self):
         
@@ -52,7 +64,8 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                                       repeat_known=True,
                                       mime_types=("audio",),
                                       max_rating=10,
-                                      poll=10
+                                      poll=10,
+                                      search_mask=SEARCH_MASK
         )
         
     def start(self):
@@ -111,7 +124,8 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         total = (tmin*60)+tsec
         self.update_progress(progress=current, length=total)
         
-        if(self.lastpath != commands.getoutput("dcop amarok player path")):
+        curpath = commands.getoutput("dcop amarok player path") 
+        if(self.lastpath != curpath and len(curpath) != 0):
         
             info = {}
             info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
@@ -122,9 +136,8 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
             info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
             
-            path = commands.getoutput("dcop amarok player path")
-            self.update_item("", info, self.find_image(path, True))
-            self.lastpath = path
+            self.update_item("", info, self.find_image(curpath, True))
+            self.lastpath = curpath
 
         
     # =========================================================================
@@ -181,10 +194,10 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     # =========================================================================
     
     def request_playlist(self, reply):
-        os.system("dcop amarok playlist saveM3u ./current.m3u false")
-        f = open("current.m3u")
-        list = {}
-        ids = {}
+        path = os.path.expanduser("~/.cache/current.m3u")
+        print path
+        os.system("dcop amarok playlist saveM3u \""+path + "\" false")
+        f = open(path)
         tag = eyeD3.Tag()
         while 1:
             line = f.readline()
@@ -199,6 +212,68 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         reply.item_actions = PLAYLIST_ACTIONS
         reply.send()
 
+    def request_search(self, reply, query):
+        print "updating search"
+        search = ""
+        if len(query[0]) > 0:
+            search += "lower(artist.name) like \"%"+query[0]+"%\""
+        if len(query[1]) > 0:
+            if len(search) > 0:
+                search += " and "
+            search += "lower(album.name) like \"%"+query[1]+"%\""
+        if len(query[2]) > 0:
+            if len(search) > 0:
+                search += " and "
+            search += "lower(tags.title) like \"%"+query[2]+"%\""
+        
+        sql = """select tags.title as title, artist.name as artist, album.name as album, tags.url as url from tags 
+join artist on (tags.artist = artist.id)
+join album on (tags.album = album.id)
+where """ + search
+        
+        res = db.execute(sql)
+        id = 0
+        self.search_list = []
+        for r in res:
+            self.search_list.append("")
+            self.search_list[len(reply.names)] = r[3]
+            reply.ids.append(len(reply.names))
+            reply.names.append(r[0] + " " + r[1] + " " + r[2])
+            
+        reply.item_actions = MLIB_ITEM_ACTIONS
+        reply.send()
+
+    def request_mlib(self, reply, path):
+        print path
+        reply.nested, reply.names, reply.ids = [], [], []
+        if not path:
+            sql = """select name from artist order by name asc"""
+            res = db.execute(sql)
+            for r in res:
+                reply.nested.append(r[0])
+        elif(len(path) == 1):
+            sql = """select distinct(album.name) from album
+join tags on (tags.album = album.id)
+join artist on (tags.artist = artist.id)
+where artist.name = \"""" + path[0] + """\" and length(album.name) > 0"""
+            res = db.execute(sql)
+            for r in res:
+                reply.nested.append(r[0])
+        elif(len(path) == 2):
+            sql = """select tags.title from tags
+join album on (tags.album = album.id)
+join artist on (tags.artist = artist.id)
+where artist.name = \"""" + path[0] + """\" and length(album.name) > 0 and album.name = \"""" + path[1] + """\"
+order by tags.url"""
+            res = db.execute(sql)
+            for r in res:
+                reply.ids.append(len(reply.names))
+                reply.names.append(r[0])
+            
+        reply.item_actions = MLIB_ITEM_ACTIONS
+        reply.send()
+        
+
     # =========================================================================
     # Actions
     # =========================================================================
@@ -211,7 +286,33 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                 os.system("dcop amarok playlist removeByIndex " + str(v))
         else:
             print "Unknown action" + str(action_id)
-
+            
+    def action_search_item(self, action_id, positions, ids):
+        path = []
+        if action_id == 7: #Add to playlist
+            for pos in positions:
+                path.append(" \""+os.path.abspath("/"+self.search_list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+            
+            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
+            
+    def action_mlib_item(self, action_id, path, positions, ids):
+        if action_id == 7:
+            search = []
+            for name in path:
+                search.append("album.name = \"" + name+"\"")
+            sql = "select tags.url from tags \
+join album on (album.id = tags.album)\
+where " + " OR ".join(search) + "\
+order by tags.url"
+            res = db.execute(sql)
+            list = []
+            for r in res:
+                list.append(r[0])
+                
+            path = []
+            for pos in positions:
+                path.append(" \""+os.path.abspath("/"+list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
     
 # =============================================================================
 # main (example startup using remuco.Manager)
