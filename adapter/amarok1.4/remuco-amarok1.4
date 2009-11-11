@@ -31,6 +31,8 @@ import eyeD3
 import sqlite3
 import os.path
 
+import gobject
+
 import remuco
 from remuco import log
 
@@ -158,7 +160,6 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             os.system("dcop amarok player setVolume "+str(current-10))
         elif(direction == 0):
             os.system("dcop amarok player mute")
-        
 
     def ctrl_toggle_shuffle(self):
         current_state =  commands.getoutput("dcop amarok player randomModeStatus")
@@ -181,16 +182,15 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     
     def ctrl_toggle_playing(self):
         os.system("dcop amarok player playPause")
+        gobject.idle_add(self.poll)
         
     def ctrl_next(self):
         os.system("dcop amarok player next")
-        time.sleep(0.15)
-        self.poll()
+        gobject.timeout_add(150, self.poll)
         
     def ctrl_previous(self):
         os.system("dcop amarok player prev")
-        time.sleep(0.15)
-        self.poll()
+        gobject.timeout_add(150, self.poll)
         
     # =========================================================================
     # request interface
