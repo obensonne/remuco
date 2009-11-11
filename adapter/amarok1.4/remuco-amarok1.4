@@ -216,22 +216,20 @@ class Amarok14Adapter(remuco.PlayerAdapter):
 
     def request_search(self, reply, query):
         print "updating search"
-        search = ""
-        if len(query[0]) > 0:
-            search += "lower(artist.name) like \"%"+query[0]+"%\""
-        if len(query[1]) > 0:
-            if len(search) > 0:
-                search += " and "
-            search += "lower(album.name) like \"%"+query[1]+"%\""
-        if len(query[2]) > 0:
-            if len(search) > 0:
-                search += " and "
-            search += "lower(tags.title) like \"%"+query[2]+"%\""
+        search = []
+        fields = ["artist.name", "album.name", "tags.title"]
+        for q, f in zip(query, fields):
+            if q:
+                search.append('lower(%s) like "%%%s%%"' % (f, q))
         
-        sql = """select tags.title as title, artist.name as artist, album.name as album, tags.url as url from tags 
-join artist on (tags.artist = artist.id)
-join album on (tags.album = album.id)
-where """ + search
+        if not search:
+            reply.send()
+            return
+        
+        sql = ("select tags.title as title, artist.name as artist, album.name "
+               "as album, tags.url as url from tags join artist on "
+               "(tags.artist = artist.id) join album on "
+               "(tags.album = album.id) where %s" % " and ".join(search))
         
         res = db.execute(sql)
         id = 0
