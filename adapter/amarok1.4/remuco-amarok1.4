@@ -83,6 +83,9 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     
     def poll(self):
         
+        if not self._check_running():
+            return # manager will stop us
+        
         import random
         
         current_state =  commands.getoutput("dcop amarok player randomModeStatus")
@@ -314,12 +317,23 @@ order by tags.url"
                 path.append(" \""+os.path.abspath("/"+list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
             os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
     
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
+    def _check_running(self):
+        """Check if amarok is running."""
+        
+        return commands.getstatusoutput("dcop amarok")[0] == 0
+
 # =============================================================================
 # main (example startup using remuco.Manager)
 # =============================================================================
 
+
+
 if __name__ == '__main__':
     
     pa = Amarok14Adapter() # create the player adapter
-    mg = remuco.Manager(pa)# # pass it to a manager
+    mg = remuco.Manager(pa, run_check_fn=pa._check_running) # pass to manager
     mg.run() # run the manager (blocks until interrupt signal)
