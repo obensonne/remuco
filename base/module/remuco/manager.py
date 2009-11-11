@@ -77,23 +77,67 @@ def _stop_pa(pa):
     else:
         log.info("player adapter stopped")
 
+class _CustomObserver():
+    """Helper class used by Manager.
+    
+    A custom observer uses a custom function to periodically check if a media
+    player is running and automatically starts and stops the player adapter
+    accordingly.
+    
+    """
+    def __init__(self, pa, run_check_fn):
+        """Create a new custom observer.
+        
+        @param pa:
+            the PlayerAdapter to automatically start and stop
+        @param run_check_fn:
+            the function to call periodically to check if the player is running
+            
+        """
+        self.__pa = pa
+        self.__run_check_fn = run_check_fn
+        self.__sid = gobject.idle_add(self.__check_first)
+        
+    def __check_first(self):
+        
+        self.__check()
+        self.__sid = gobject.timeout_add(5123, self.__check)
+        return False
+        
+    def __check(self):
+        
+        running = self.__run_check_fn()
+        if running and self.__pa.stopped:
+            _start_pa(self.__pa)
+        elif not running and not self.__pa.stopped:
+            _stop_pa(self.__pa)
+        else:
+            # nothing to do
+            pass
+        
+        return True
+        
+    def disconnect(self):
+        
+        gobject.source_remove(self.__sid)
 
 class _DBusObserver():
     """Helper class used by Manager.
     
-    A DBus observer automatically starts and stops a player adapter if the
-    corresponding media player starts or stops.
-    """
+    A DBus observer uses DBus name owner change notifications to automatically
+    start and stop a player adapter if the corresponding media player starts or
+    stops.
     
+    """
     def __init__(self, pa, dbus_name):
-        """ Create a new DBusManager.
+        """Create a new DBus observer.
         
         @param pa:
             the PlayerAdapter to automatically start and stop
         @param dbus_name:
             the bus name used by the adapter's media player
+            
         """
-
         DBusGMainLoop(set_as_default=True)
 
         self.__pa = pa
@@ -175,7 +219,7 @@ class Manager(object):
     
     """
     
-    def __init__(self, pa, player_dbus_name=None):
+    def __init__(self, pa, player_dbus_name=None, run_check_fn=None):
         """Create a new Manager.
         
         @param pa:
@@ -184,8 +228,15 @@ class Manager(object):
             if the player adapter uses DBus to communicate with its player set
             this to the player's well known bus name (see run() for more
             information)
+        @keyword run_check_fn:
+            optional function to call to check if the player is running, used
+            for automatically starting and stopping the player
+        
+        When neither `player_dbus_name` nor `run_check_fn` is given, the
+        adapter is started immediately, assuming the player is running and
+        the adapter is ready to work.
+        
         """
-
         self.__pa = pa
         self.__pa.manager = self
         
@@ -193,12 +244,19 @@ class Manager(object):
         
         self.__ml = _init_main_loop()
 
-        if player_dbus_name is None:
-            self.__dbus_observer = None
-        else:
+        self.__observer = None
+        
+        if player_dbus_name:
             log.info("start dbus observer")
-            self.__dbus_observer = _DBusObserver(pa, player_dbus_name)
+            self.__observer = _DBusObserver(pa, player_dbus_name)
             log.info("dbus observer started")
+        elif run_check_fn:
+            log.info("start custom observer")
+            self.__observer = _CustomObserver(pa, run_check_fn)
+            log.info("custom observer started")
+        else:
+            # nothing to do
+            pass
         
     def run(self):
         """Activate the manager.
@@ -216,10 +274,9 @@ class Manager(object):
             stopped repeatedly while this method is running.
         
         """
-        if self.__dbus_observer is None: # start pa directly
+        if self.__observer is None: # start pa directly
             ready = _start_pa(self.__pa)
-        else:
-            # dbus observer will start pa
+        else: # observer will start pa
             ready = True
             
         if ready and not self.__stopped: # not stopped since creation 
@@ -231,10 +288,10 @@ class Manager(object):
                 log.exception("** BUG ** %s", e)
             log.info("main loop stopped")
             
-        if self.__dbus_observer is not None: # disconnect dbus observer
-            log.info("stop dbus observer")
-            self.__dbus_observer.disconnect()
-            log.info("dbus observer stopped")
+        if self.__observer is not None: # disconnect observer
+            log.info("stop observer")
+            self.__observer.disconnect()
+            log.info("observer stopped")
         
         # stop pa
         _stop_pa(self.__pa)
