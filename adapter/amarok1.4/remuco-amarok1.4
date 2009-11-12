@@ -1,0 +1,336 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+"""Amarok1.4 adapter for Remuco, implemented as an executable script."""
+
+import commands
+import os
+import os.path
+import sqlite3
+
+import eyeD3
+import gobject
+
+import remuco
+from remuco import log
+
+#Definitions
+IA_JUMP = remuco.ItemAction("Play Now")
+IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
+PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
+
+IA_ADD = remuco.ItemAction("Add to playlist", multiple=True)
+
+MLIB_ITEM_ACTIONS = (IA_ADD,)
+
+SEARCH_MASK = [ "Artist", "Album", "Title" ]
+
+conn = sqlite3.connect(os.path.expanduser('~/.kde/share/apps/amarok/collection.db'))
+db = conn.cursor()
+
+
+class Amarok14Adapter(remuco.PlayerAdapter):
+    
+    lastpath = ""
+    search_list = []
+    
+    def __init__(self):
+        
+        remuco.PlayerAdapter.__init__(self, "Amarok 1.4",
+                                      playback_known=True,
+                                      volume_known=True,
+                                      progress_known=True,
+                                      shuffle_known=True,
+                                      repeat_known=True,
+                                      mime_types=("audio",),
+                                      max_rating=10,
+                                      poll=10,
+                                      search_mask=SEARCH_MASK
+        )
+        
+    def start(self):
+        
+        remuco.PlayerAdapter.start(self)
+
+        log.debug("here we go")
+        
+    def stop(self):
+        
+        remuco.PlayerAdapter.stop(self)
+
+        log.debug("bye, turning off the light")
+    
+    
+    def poll(self):
+        
+        if not self._check_running():
+            return # manager will stop us
+        
+        import random
+        
+        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        if(current_state == "true"):
+            self.update_shuffle(True)
+        else:
+            self.update_shuffle(False)
+
+        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        if(current_state == "true"):
+            self.update_repeat(True)
+        else:
+            self.update_repeat(False)
+
+        volume = commands.getoutput("dcop amarok player getVolume")
+        self.update_volume(volume)
+
+        playing = commands.getoutput("dcop amarok player isPlaying")
+        if playing == "true":
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        else:
+            self.update_playback(remuco.PLAYBACK_PAUSE)
+            
+        #~ Get and calculate total time and progress
+        current = commands.getoutput("dcop amarok player currentTime")
+        if(len(current.split(":")) == 2):
+            cmin, csec = current.split(":")
+        else:
+            cmin, csec = 0,0
+            
+        total = commands.getoutput("dcop amarok player totalTime")
+        if(len(total.split(":")) == 2):
+            tmin, tsec = total.split(":")
+        else:
+            tmin, tsec = 0,0
+            
+        cmin, csec, tmin, tsec = int(cmin), int(csec), int(tmin), int(tsec)
+        current = (cmin*60)+csec
+        total = (tmin*60)+tsec
+        self.update_progress(progress=current, length=total)
+        
+        curpath = commands.getoutput("dcop amarok player path") 
+        if(self.lastpath != curpath and len(curpath) != 0):
+        
+            info = {}
+            info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
+            info[remuco.INFO_ALBUM] = commands.getoutput("dcop amarok player album")
+            info[remuco.INFO_TITLE] = commands.getoutput("dcop amarok player title")
+            info[remuco.INFO_GENRE] = commands.getoutput("dcop amarok player genre")
+            info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
+            info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
+            info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
+            
+            self.update_item("", info, self.find_image(curpath, True))
+            self.lastpath = curpath
+
+        
+    # =========================================================================
+    # control interface
+    # =========================================================================
+    
+    def ctrl_rate(self, rate):
+        os.system("dcop amarok player setRating " + str(rate))
+    
+    def ctrl_volume(self, direction):
+        current = int(commands.getoutput("dcop amarok player getVolume"))
+        if(direction == 1 ):
+            os.system("dcop amarok player setVolume "+str(current+10))
+        elif(direction == -1):
+            os.system("dcop amarok player setVolume "+str(current-10))
+        elif(direction == 0):
+            os.system("dcop amarok player mute")
+
+    def ctrl_toggle_shuffle(self):
+        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        if(current_state == "true"):
+            os.system("dcop amarok player enableRandomMode false")
+            self.update_shuffle(False)
+        else:
+            os.system("dcop amarok player enableRandomMode true")
+            self.update_shuffle(True)
+    
+    def ctrl_toggle_repeat(self):
+        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        if(current_state == "true"):
+            os.system("dcop amarok player enableRepeatPlaylist false")
+            self.update_repeat(False)
+        else:
+            os.system("dcop amarok player enableRepeatPlaylist true")
+            self.update_repeat(True)
+            
+    
+    def ctrl_toggle_playing(self):
+        os.system("dcop amarok player playPause")
+        gobject.idle_add(self.poll)
+        
+    def ctrl_next(self):
+        os.system("dcop amarok player next")
+        gobject.timeout_add(150, self.poll)
+        
+    def ctrl_previous(self):
+        os.system("dcop amarok player prev")
+        gobject.timeout_add(150, self.poll)
+        
+    # =========================================================================
+    # request interface
+    # =========================================================================
+    
+    def request_playlist(self, reply):
+        path = os.path.expanduser("~/.cache/current.m3u")
+        print path
+        os.system("dcop amarok playlist saveM3u \""+path + "\" false")
+        f = open(path)
+        tag = eyeD3.Tag()
+        while 1:
+            line = f.readline()
+            if not line: break
+            
+            if line.find("#") == -1:
+                tag.link(line.rstrip())
+                reply.ids.append(len(reply.names))
+                reply.names.append(tag.getArtist() + " - " + tag.getTitle())
+                
+        f.close
+        reply.item_actions = PLAYLIST_ACTIONS
+        reply.send()
+
+    def request_search(self, reply, query):
+        print "updating search"
+        search = []
+        fields = ["artist.name", "album.name", "tags.title"]
+        for q, f in zip(query, fields):
+            if q:
+                search.append('lower(%s) like "%%%s%%"' % (f, q))
+        
+        if not search:
+            reply.send()
+            return
+        
+        sql = ("select tags.title as title, artist.name as artist, album.name "
+               "as album, tags.url as url from tags join artist on "
+               "(tags.artist = artist.id) join album on "
+               "(tags.album = album.id) where %s" % " and ".join(search))
+        
+        res = db.execute(sql)
+        id = 0
+        self.search_list = []
+        for r in res:
+            self.search_list.append("")
+            self.search_list[len(reply.names)] = r[3]
+            reply.ids.append(len(reply.names))
+            reply.names.append(r[0] + " " + r[1] + " " + r[2])
+            
+        reply.item_actions = MLIB_ITEM_ACTIONS
+        reply.send()
+
+    def request_mlib(self, reply, path):
+        print path
+        reply.nested, reply.names, reply.ids = [], [], []
+        if not path:
+            sql = """select name from artist order by name asc"""
+            res = db.execute(sql)
+            for r in res:
+                reply.nested.append(r[0])
+        elif(len(path) == 1):
+            sql = """select distinct(album.name) from album
+join tags on (tags.album = album.id)
+join artist on (tags.artist = artist.id)
+where artist.name = \"""" + path[0] + """\" and length(album.name) > 0"""
+            res = db.execute(sql)
+            for r in res:
+                reply.nested.append(r[0])
+        elif(len(path) == 2):
+            sql = """select tags.title from tags
+join album on (tags.album = album.id)
+join artist on (tags.artist = artist.id)
+where artist.name = \"""" + path[0] + """\" and length(album.name) > 0 and album.name = \"""" + path[1] + """\"
+order by tags.url"""
+            res = db.execute(sql)
+            for r in res:
+                reply.ids.append(len(reply.names))
+                reply.names.append(r[0])
+            
+        reply.item_actions = MLIB_ITEM_ACTIONS
+        reply.send()
+        
+
+    # =========================================================================
+    # Actions
+    # =========================================================================
+    
+    def action_playlist_item(self, action_id, positions, ids):
+        if(action_id == IA_JUMP.id):
+            os.system("dcop amarok playlist playByIndex " + str(positions[0]))
+        elif(action_id == IA_REMOVE.id):
+            for i, v in enumerate(positions):
+                os.system("dcop amarok playlist removeByIndex " + str(v))
+        else:
+            print "Unknown action" + str(action_id)
+            
+    def action_search_item(self, action_id, positions, ids):
+        path = []
+        if action_id == 7: #Add to playlist
+            for pos in positions:
+                path.append(" \""+os.path.abspath("/"+self.search_list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+            
+            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
+            
+    def action_mlib_item(self, action_id, path, positions, ids):
+        if action_id == 7:
+            search = []
+            for name in path:
+                search.append("album.name = \"" + name+"\"")
+            sql = "select tags.url from tags \
+join album on (album.id = tags.album)\
+where " + " OR ".join(search) + "\
+order by tags.url"
+            res = db.execute(sql)
+            list = []
+            for r in res:
+                list.append(r[0])
+                
+            path = []
+            for pos in positions:
+                path.append(" \""+os.path.abspath("/"+list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
+    
+    # =========================================================================
+    # internal methods
+    # =========================================================================
+    
+    def _check_running(self):
+        """Check if amarok is running."""
+        
+        return commands.getstatusoutput("dcop amarok")[0] == 0
+
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+
+
+if __name__ == '__main__':
+    
+    pa = Amarok14Adapter() # create the player adapter
+    mg = remuco.Manager(pa, run_check_fn=pa._check_running) # pass to manager
+    mg.run() # run the manager (blocks until interrupt signal)

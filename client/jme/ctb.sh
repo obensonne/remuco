@@ -2,12 +2,20 @@
 
 # build client versions between 2 revisions
 
-REV1=$1
-REV2=$2
+if [ $# -gt 2 ] ; then
 
-[ -z "$REV1" -o -z "$REV2" ] && echo "error: need 2 revisions" && exit 1
+	REVS="$@"
 
-REVS=`hg log -I . -r $REV1:$REV2 --template="{rev}\n"`
+else
+	REV1=$1
+	REV2=$2
+	
+	[ -z "$REV1" -o -z "$REV2" ] && echo "error: need 2 revisions" && exit 1
+	
+	REVS=`hg log -I . -r $REV1:$REV2 --template="{rev}\n"`
+fi
+
+echo "$REVS"
 
 TBD=tests.build
 

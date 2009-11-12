@@ -490,7 +490,7 @@ class PlayerAdapter(object):
         self.__poll_ival = max(500, int(poll * 1000))
         self.__poll_sid = 0
         
-        self.__stopped = True
+        self.stopped = True
         
         self.__server_bluetooth = None
         self.__server_wifi = None
@@ -512,11 +512,11 @@ class PlayerAdapter(object):
         
         """
         
-        if not self.__stopped:
+        if not self.stopped:
             log.debug("ignore start, already running")
             return
         
-        self.__stopped = False
+        self.stopped = False
         
         # set up server
         
@@ -555,9 +555,9 @@ class PlayerAdapter(object):
         
         """
 
-        if self.__stopped: return
+        if self.stopped: return
         
-        self.__stopped = True
+        self.stopped = True
         
         for c in self.__clients:
             c.disconnect(remove_from_list=False, send_bye_msg=True)
@@ -1167,7 +1167,7 @@ class PlayerAdapter(object):
     
     def __sync_trigger(self, sync_fn):
         
-        if self.__stopped:
+        if self.stopped:
             return
         
         if sync_fn in self.__sync_triggers:
