@@ -191,13 +191,14 @@ for pa in player_adapters:
 
 CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
 
-if client and os.path.exists("client/app/remuco.jar"):
-    data_files.append((CLIENT_DEST,
-                       ["client/app/remuco.jar", "client/app/remuco.jad"]))
+if client and os.path.exists("client/jme/app/remuco.jar"):
+    data_files.append((CLIENT_DEST, ["client/jme/app/remuco.jar",
+                                     "client/jme/app/remuco.jad"]))
     
-if client and os.path.exists("client/app/no-bluetooth/remuco.jar"):
+if client and os.path.exists("client/jme/app/no-bluetooth/remuco.jar"):
     data_files.append(("%s/no-bluetooth" % CLIENT_DEST,
-                       ["client/app/remuco.jar", "client/app/remuco.jad"]))
+                       ["client/jme/app/no-bluetooth/remuco.jar",
+                        "client/jme/app/no-bluetooth/remuco.jad"]))
 
 # =============================================================================
 # setup

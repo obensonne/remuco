@@ -10,11 +10,11 @@ install.*\.log$
 [./]?build/.*$ # all files in 'build' or '*.build' directories
 [./]?dist/.*$ # all files in 'dist' or '*.dist' directories
 [./]?deployed/.*$ # all files in 'deployed' or '*.deployed' directories
-^client/app$
-^client/bin$
-^client/build\.properties$
-^client/wtk-emulator\.properties$
-^client/tools$
+^client/jme/app$
+^client/jme/bin$
+^client/jme/build\.properties$
+^client/jme/wtk-emulator\.properties$
+^client/jme/tools$
 
 # IDE files:
 ^\.settings$
