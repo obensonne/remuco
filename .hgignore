@@ -16,6 +16,8 @@ install.*\.log$
 ^client/jme/wtk-emulator\.properties$
 ^client/jme/tools$
 ^client/android/local.properties$
+^client/android/bin$
+^client/android/gen$
 
 # IDE files:
 ^\.settings$
