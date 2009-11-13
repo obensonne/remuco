@@ -93,6 +93,7 @@
 
     <!-- Input directories -->
     <property name="source-folder" value="src" />
+    <property name="source-folder-common" value="../common/src" />
     <property name="gen-folder" value="gen" />
     <property name="resource-folder" value="res" />
     <property name="asset-folder" value="assets" />
@@ -180,6 +181,7 @@
                 destdir="${out-classes}"
                 bootclasspathref="android.target.classpath">
             <src path="${source-folder}" />
+            <src path="${source-folder-common}" />
             <src path="${gen-folder}" />
             <classpath>
                 <fileset dir="${external-libs-folder}" includes="*.jar"/>
@@ -226,6 +228,7 @@
                 verbose="false">
             <file path="${intermediate-dex}" />
             <sourcefolder path="${source-folder}" />
+            <sourcefolder path="${source-folder-common}" />
             <jarfolder path="${external-libs-folder}" />
             <nativefolder path="${native-libs-folder}" />
         </apkbuilder>
@@ -241,6 +244,7 @@
                 verbose="false">
             <file path="${intermediate-dex}" />
             <sourcefolder path="${source-folder}" />
+            <sourcefolder path="${source-folder-common}" />
             <jarfolder path="${external-libs-folder}" />
             <nativefolder path="${native-libs-folder}" />
         </apkbuilder>
