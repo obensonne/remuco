@@ -20,10 +20,10 @@ install.*\.log$
 ^client/android/gen$
 
 # IDE files:
-^\.settings$
-^\.project$
-^\.pydevproject$
-^\.classpath$
-^\.eclipseme\.tmp$
-^\.eclipseme$
+(^|/)\.settings$
+(^|/)\.project$
+(^|/)\.pydevproject$
+(^|/)\.classpath$
+(^|/)\.eclipseme\.tmp$
+(^|/)\.eclipseme$
 
