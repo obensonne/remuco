@@ -106,20 +106,6 @@ public class LogScreen extends Form implements ILogPrinter, CommandListener {
 		}
 	}
 
-	public void print(String s) {
-		checkFormSize();
-		insert(insertPos, new StringItem(null, s));
-		insertPos++;
-		// f.append(s);
-	}
-
-	public void println() {
-		checkFormSize();
-		insert(insertPos, new StringItem(null, "\n"));
-		insertPos = 0;
-		// f.append("\n");
-	}
-
 	public void println(String s) {
 		checkFormSize();
 		insert(insertPos, new StringItem(null, s + "\n"));

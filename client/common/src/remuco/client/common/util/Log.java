@@ -43,46 +43,6 @@ public final class Log {
 	}
 
 	/**
-	 * Logs a message with <i>no</i> line break.
-	 * 
-	 * @param msg
-	 *            the log message
-	 */
-	public static void l(String msg) {
-		out.print(msg);
-	}
-
-	/**
-	 * Does a line break on the log sink.
-	 * 
-	 */
-	public static void ln() {
-		out.println();
-	}
-
-	/**
-	 * Logs a byte array as hex values.
-	 * 
-	 * @param ba
-	 *            the byte array to log
-	 */
-	public static void ln(byte[] ba) {
-		
-		for (int i = 0; i < ba.length; i++) {
-			
-			if ((ba[i] & 0xFF) > 0x0F) {
-				out.print(Integer.toHexString((ba[i] & 0xFF)) + " ");
-			} else {
-				out.print("0" + Integer.toHexString((ba[i] & 0xFF)) + " ");
-			}
-			if ((i + 1) % 16 == 0 && i + 1 < ba.length) {
-				out.println();
-			}
-		}
-		out.println();
-	}
-
-	/**
 	 * Logs a message with a line break.
 	 * 
 	 * @param msg

@@ -101,16 +101,4 @@ public final class Message {
 		return "(id: " + id + ", data: " + len + ")";
 	}
 
-	/**
-	 * Dump the message's binary data into the log.
-	 * 
-	 * @see Log
-	 * 
-	 */
-	protected void dumpBin() {
-
-		Log.ln(toString());
-		Log.ln(data);
-	}
-
 }
