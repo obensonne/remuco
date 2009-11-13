@@ -34,7 +34,6 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 
-import remuco.client.common.Const;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.io.Connection;
@@ -51,11 +50,11 @@ import remuco.client.jme.io.Socket;
 import remuco.client.jme.ui.CMD;
 import remuco.client.jme.ui.Theme;
 import remuco.client.jme.ui.screens.DeviceSelectorScreen;
-import remuco.client.jme.ui.screens.DeviceSelectorScreen.IDeviceSelectionListener;
 import remuco.client.jme.ui.screens.LogScreen;
 import remuco.client.jme.ui.screens.PlayerScreen;
 import remuco.client.jme.ui.screens.ServiceSelectorScreen;
 import remuco.client.jme.ui.screens.WaitingScreen;
+import remuco.client.jme.ui.screens.DeviceSelectorScreen.IDeviceSelectionListener;
 import remuco.client.jme.util.JMETools;
 
 /**
@@ -145,7 +144,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		screenLog = new LogScreen(display);
 		screenLog.addCommand(CMD.BACK);
 		screenLog.setCommandListener(this);
-		if (Const.EMULATION) {
+		if (Config.EMULATION) {
 			Log.ln("RUNING IN EMULATION MODE ..");
 			screenLog.append("Emulation -> logging goes to standard out!");
 		} else {

@@ -23,7 +23,6 @@ package remuco.client.common.data;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import remuco.client.common.Const;
 import remuco.client.common.io.Connection;
 import remuco.client.common.serial.ISerializable;
 import remuco.client.common.serial.SerialAtom;
@@ -42,6 +41,9 @@ public final class ClientInfo implements ISerializable {
 	public static final String IMG_TYPE_PNG = "PNG";
 
 	private final SerialAtom[] atoms;
+
+	/** Remuco version */
+	public static final String VERSION = "0.9.2"; // VERSION_CHECK
 
 	/**
 	 * Create a new client info.
@@ -79,7 +81,7 @@ public final class ClientInfo implements ISerializable {
 
 		if (extra != null) {
 
-			extra.put("version", Const.VERSION);
+			extra.put("version", VERSION);
 			
 			atoms[3].as = new String[extra.size()];
 			atoms[4].as = new String[extra.size()];

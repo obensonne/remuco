@@ -20,7 +20,6 @@
  */
 package remuco.client.common.util;
 
-import remuco.client.common.Const;
 import remuco.client.common.UserException;
 
 public final class Log {
@@ -101,16 +100,10 @@ public final class Log {
 	 */
 	public static void ln(String s, Throwable e) {
 		out.println(s + " (" + e.getMessage() + ")");
-		if (Const.EMULATION) {
-			out.println("----------------------- EX ----------------------");
-			e.printStackTrace();
-			out.println("-------------------------------------------------");
-		}
-
 	}
 
 	/**
-	 * Logs an {@link UserException}.
+	 * Logs a {@link UserException}.
 	 * 
 	 * @param s
 	 *            a prefix for the log
@@ -119,13 +112,7 @@ public final class Log {
 	 * 
 	 */
 	public static void ln(String s, UserException e) {
-
 		out.println(s + e.getError() + " (" + e.getDetails() + ")");
-		if (Const.EMULATION) {
-			out.println("----------------------- UE ----------------------");
-			e.printStackTrace();
-			out.println("-------------------------------------------------");
-		}
 	}
 
 	/**

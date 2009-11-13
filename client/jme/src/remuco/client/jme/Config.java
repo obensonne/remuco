@@ -59,8 +59,11 @@ import remuco.client.jme.ui.screens.OptionsScreen.IOptionListener;
  * Config provides global access to various configuration options.
  */
 public final class Config {
-
+	
 	public static final String DEVICE_NAME;
+
+	/** If <code>true</code>, the client runs inside an emulator. */
+	public static final boolean EMULATION;
 
 	public static final int IMG_MAX_SIZE;
 
@@ -90,6 +93,8 @@ public final class Config {
 
 	static {
 
+        EMULATION = "@EMULATION@".equalsIgnoreCase("true") ? true : false;
+        
 		// get screen size
 
 		final Canvas c = new Canvas() {
@@ -565,7 +570,8 @@ public final class Config {
 
 		if (val != null && val.length() > 0) {
 
-			final String flad[] = Tools.splitString(val, IDevice.LIST_SEP, false);
+			final String flad[] = Tools.splitString(val, IDevice.LIST_SEP,
+				false);
 
 			for (int i = 0; i < flad.length; i++) {
 				final IDevice iDevice;
