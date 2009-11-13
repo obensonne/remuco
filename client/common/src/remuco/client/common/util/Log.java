@@ -22,28 +22,62 @@ package remuco.client.common.util;
 
 import remuco.client.common.UserException;
 
+/**
+ * A very stupid logging framework.
+ * <p>
+ * This logging class does not distinguish between different log levels. The
+ * reason is that on JavaME devices everything should be as simple as possible
+ * and having a sophisticated level-based log handler just might slow down
+ * performance on older devices.
+ * <p>
+ * By default logging goes to {@link System#out}. To direct logging to anohter
+ * location, assign a {@link ILogPrinter} using {@link #setOut(ILogPrinter)}.
+ */
 public final class Log {
 
 	private static ILogPrinter out = new ConsoleLogger();
 
+	/**
+	 * Log a bug.
+	 * 
+	 * @param id
+	 *            some unique identifier as a hint where in the source the bug
+	 *            has occurred
+	 */
 	public static void bug(String id) {
-
 		ln("[BUG] " + id);
-
 	}
 
+	/**
+	 * Log a bug related to an exception.
+	 * 
+	 * @param id
+	 *            some unique identifier as a hint where in the source the bug
+	 *            has occurred
+	 * @param ex
+	 *            the exception related to the bug
+	 */
 	public static void bug(String id, Exception ex) {
 
 		ln("[BUG] " + id, ex);
 
 	}
 
+	/**
+	 * Log a debug message.
+	 * <p>
+	 * This is exactly the same as {@link #ln(String)} but using this method
+	 * it's easier to find debug output in the source and to comment or delete
+	 * it when it is not needed anymore.
+	 * 
+	 * @param msg
+	 */
 	public static void debug(String msg) {
 		out.println(msg);
 	}
 
 	/**
-	 * Logs a message with a line break.
+	 * Log a message.
 	 * 
 	 * @param msg
 	 *            the log message
@@ -53,7 +87,7 @@ public final class Log {
 	}
 
 	/**
-	 * Logs an Exception. Output will be in the format 's ( e.getMessage)'
+	 * Log an Exception. Output will be in the format 's ( e.getMessage)'
 	 * 
 	 * @param s
 	 * @param e
@@ -63,7 +97,7 @@ public final class Log {
 	}
 
 	/**
-	 * Logs a {@link UserException}.
+	 * Log a {@link UserException}.
 	 * 
 	 * @param s
 	 *            a prefix for the log
@@ -76,7 +110,7 @@ public final class Log {
 	}
 
 	/**
-	 * Sets the log sink.
+	 * Set the log sink.
 	 * 
 	 * @param out
 	 *            the out sink to use for log messages
