@@ -24,6 +24,7 @@ import hashlib
 import os
 import glob
 import os.path
+import re
 import urllib
 import urlparse
 
@@ -32,17 +33,21 @@ from remuco import log
 TN_DIR = os.path.join(os.getenv("HOME"), ".thumbnails")
 TN_SUBDIRS = ("large", "normal")
 
-ART_FILE_NAMES = ("folder", "front", "album", "cover", "art")
-ART_FILE_TYPES = ("png", "jpeg", "jpg")
+RE_IND = r'(?:front|album|cover|folder|art)' # words indicating art files
+RE_EXT = r'\.(?:png|jpeg|jpg)' # art file extensions
+RE_FILE = (r'^%s%s$' % (RE_IND, RE_EXT), r'^.*%s.*%s$' % (RE_IND, RE_EXT))
+RE_FILE = [re.compile(rx, re.IGNORECASE) for rx in RE_FILE]
 
 def __resource_to_file_uri(resource):
     """Convert a resource to a file URI (file://...).
     
-    @param resource: a local path or an URI (string)
+    @param resource:
+        a local path or an URI (string)
     
-    @return: the resource as a file URI string or None if resource is not local
+    @return:
+        the resource as a file URI string or None if resource is not local
+        
     """
-
     elems = urlparse.urlparse(resource)
     
     if elems[0] == "file": # location already is a file URI
@@ -63,47 +68,42 @@ def __resource_to_file_uri(resource):
 def __get_art_in_folder(uri):
     """Try to find art images in the given URI's folder.
     
-    @param uri: a file URI ('file://...')
+    @param uri:
+        a file URI ('file://...')
     
-    @return: path to an image file or None if there is no matching image file
-             in the URI's folder
+    @return:
+        path to an image file or None if there is no matching image file in the
+        URI's folder
+             
     """
-    
     elems = urlparse.urlparse(uri)
     
     path = urllib.url2pathname(elems[2])
     path = os.path.dirname(path)
     
     log.debug("looking for art image in %s" % path)
-    
-    for name in ART_FILE_NAMES:
-        for type in ART_FILE_TYPES:
-            for ext in (type, type.upper()):
-                file = os.path.join(path, "%s.%s" % (name, ext))
-                if os.path.isfile(file):
-                    return file
-                file = os.path.join(path, "%s.%s" % (name.capitalize(), ext))
-                if os.path.isfile(file):
-                    return file
-                    
-    for type in ART_FILE_TYPES:
-        for file in glob.glob(os.path.join(path,"00*.%s" % type)):
-            if file.find("front") != -1:
-                return file
-            else: 
-                return file[0]
-    
-    return None
 
+    files = glob.glob(os.path.join(path, "*"))
+    files = [os.path.basename(f) for f in files if os.path.isfile(f)]
+    
+    for rx in RE_FILE:
+        for file in files:
+            if rx.match(file):
+                return os.path.join(path, file)
+            
+    return None
+    
 def __get_art_from_thumbnails(uri):
     """Try to find a thumbnail for the given resource.
     
-    @param uri: a file URI ('file://...')
+    @param uri:
+        a file URI ('file://...')
     
-    @return: path to a thumbnail file or None if URI is not local or if there
-             is no thumbnail for that URI
+    @return:
+        path to a thumbnail file or None if URI is not local or if there is no
+        thumbnail for that URI
+        
     """
-    
     if not os.path.isdir(TN_DIR):
         return None
     
