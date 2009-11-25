@@ -1,0 +1,31 @@
+# Garbage, temporary and backup files:
+*~
+install-*.log
+sandbox/
+
+# Build files:
+*.pyc
+build/
+*.build/
+dist/
+.dist/
+deployed/
+.deployed/
+/client/jme/app/
+/client/jme/bin/
+/client/jme/build.properties
+/client/jme/wtk-emulator.properties
+/client/jme/tools/
+/client/android/local.properties
+/client/android/bin
+/client/android/gen
+
+# IDE files:
+.settings
+.project
+.pydevproject
+.classpath
+.eclipseme.tmp
+.eclipseme
+
+
