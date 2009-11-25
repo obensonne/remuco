@@ -91,7 +91,7 @@ if [ "$UI" = "ZENI" ] ; then
 	zenity --question --title="Remuco Report" --text="$TEXT"
 	[ $? = 0 ] || exit
 elif [ "$UI" = "KDIA" ] ; then
-	TEXT="$MSG_INTRO\n\n$DATA\n\nDo you want ot submit this data now?"
+	TEXT="$MSG_INTRO\n\n$DATA\n\nDo you want to submit this data now?"
 	kdialog --title "Remuco Report" --yesno "$TEXT"
 	[ $? = 0 ] || exit
 else
@@ -118,7 +118,7 @@ echo
 
 MSG_SUCCESS=\
 "Successfully submitted the device information.\n\nThank you for your "\
-"contribution! Please run this tools again, once a new client device has "\
+"contribution! Please run this tool again, once a new client device has "\
 "connected."
 
 MSG_FAILED=\
