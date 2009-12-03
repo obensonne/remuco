@@ -51,6 +51,7 @@ KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
 KEY_FB_ROOT_DIRS = "file-browser-root-dirs"
 KEY_FB_XDG_UD = "file-browser-use-xdg-user-dirs"
+KEY_MPRIS_JUMP = "mpris-jump"
 
 DEFAULTS = { # values as saved in config file
     KEY_BLUETOOTH: "1",
@@ -62,7 +63,8 @@ DEFAULTS = { # values as saved in config file
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
     KEY_FB_ROOT_DIRS: "",
-    KEY_FB_XDG_UD: "1" }
+    KEY_FB_XDG_UD: "1",
+    KEY_MPRIS_JUMP: "1"}
 
 class Config(object):
     """Class for getting and setting player adapter specific configurations.
@@ -225,8 +227,30 @@ class Config(object):
         self.__cp.set(SEC, "custom-%s" % option, str(value))
         self.__save()
 
-    # === property: bluetooth ===
+
+    # === propety: mpris-jump ===
+    def __pget_mprisjump(self):
+	"""Flag if mpris-jump is enabled.
+        
+        Default: 0 (disabled)
+        
+        Option name: 'mpris-jump'
+        
+        """
+	try:
+            return self.__cp.getboolean(SEC, KEY_MPRIS_JUMP)
+        except (ValueError, AttributeError), e:
+            log.warning("config '%s' malformed (%s)" % (KEY_MPRIS_JUMP, e))
+            return False
+
+    def __pset_mprisjump(self, value):        
+        self.__cp.set(SEC, KEY_MPRIS_JUMP, str(value))
+        self.__save()
     
+    mprisjump = property(__pget_mprisjump, __pset_mprisjump, None, 
+			   __pget_mprisjump.__doc__)
+
+    # === property: bluetooth ===
     def __pget_bluetooth(self):
         """Flag if Bluetooth is enabled.
         

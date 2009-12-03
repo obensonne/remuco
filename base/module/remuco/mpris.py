@@ -89,6 +89,9 @@ class MPRISAdapter(PlayerAdapter):
                                file_actions=all_file_actions,
                                mime_types=mime_types)
         
+	# Check to enable Jump to option if dynamic playlists are not being used
+	if self.config.mprisjump:
+	    extra_playlist_actions = [IA_JUMP];
         self.__playlist_actions = (PLAYLIST_ACTIONS +
                                    tuple(extra_playlist_actions or ()))
          
