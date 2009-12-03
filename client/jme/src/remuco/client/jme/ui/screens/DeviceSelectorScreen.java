@@ -52,10 +52,10 @@ public final class DeviceSelectorScreen extends List implements
 		/**
 		 * Notify a device selection.
 		 * 
-		 * @param iDevice
+		 * @param device
 		 *            the selected device
 		 */
-		public void notifySelectedDevice(IDevice iDevice);
+		public void notifySelectedDevice(IDevice device);
 
 	}
 
@@ -160,13 +160,13 @@ public final class DeviceSelectorScreen extends List implements
 			}
 
 			// move selected device to top of device list
-			final IDevice iDevice = (IDevice) config.devices.elementAt(index);
+			final IDevice device = (IDevice) config.devices.elementAt(index);
 			config.devices.removeElementAt(index);
-			config.devices.insertElementAt(iDevice, 0);
+			config.devices.insertElementAt(device, 0);
 
 			update();
 
-			listener.notifySelectedDevice(iDevice);
+			listener.notifySelectedDevice(device);
 
 		} else if (c == WaitingScreen.CMD_CANCEL) { // cancel scan
 
@@ -207,10 +207,10 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final IDevice iDevice = des.getDevice();
+			final IDevice device = des.getDevice();
 
-			if (iDevice instanceof BluetoothDevice
-					&& ((BluetoothDevice) iDevice).getAddress().length() == 0) {
+			if (device instanceof BluetoothDevice
+					&& ((BluetoothDevice) device).getAddress().length() == 0) {
 
 				try {
 					bluetoothScanner.startScan(this);
@@ -225,8 +225,8 @@ public final class DeviceSelectorScreen extends List implements
 
 			} else {
 
-				config.devices.removeElement(iDevice);
-				config.devices.insertElementAt(iDevice, 0);
+				config.devices.removeElement(device);
+				config.devices.insertElementAt(device, 0);
 
 				update();
 
@@ -240,13 +240,13 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final IDevice iDevice = scanResults[index];
+			final IDevice device = scanResults[index];
 
-			if (config.devices.contains(iDevice)) {
+			if (config.devices.contains(device)) {
 				Log.debug("dev exists");
 			}
-			config.devices.removeElement(iDevice);
-			config.devices.insertElementAt(iDevice, 0);
+			config.devices.removeElement(device);
+			config.devices.insertElementAt(device, 0);
 
 			update();
 
@@ -263,9 +263,9 @@ public final class DeviceSelectorScreen extends List implements
 				return;
 			}
 
-			final IDevice iDevice = (IDevice) config.devices.elementAt(index);
+			final IDevice device = (IDevice) config.devices.elementAt(index);
 
-			showDeviceEditorScreen(iDevice);
+			showDeviceEditorScreen(device);
 
 		} else if (c == CMD_REMOVE) {
 
@@ -342,14 +342,14 @@ public final class DeviceSelectorScreen extends List implements
 	}
 
 	/** Create and show a device editor screen for the given device. */
-	private void showDeviceEditorScreen(IDevice iDevice) {
+	private void showDeviceEditorScreen(IDevice device) {
 
 		final Displayable d;
 
-		if (iDevice instanceof WifiDevice) {
-			d = new WifiScreen((WifiDevice) iDevice);
-		} else if (iDevice instanceof BluetoothDevice) {
-			d = new BluetoothScreen((BluetoothDevice) iDevice);
+		if (device instanceof WifiDevice) {
+			d = new WifiScreen((WifiDevice) device);
+		} else if (device instanceof BluetoothDevice) {
+			d = new BluetoothScreen((BluetoothDevice) device);
 		} else {
 			Log.bug("Oct 1, 2009.10:55:54 PM");
 			return;
@@ -378,20 +378,20 @@ public final class DeviceSelectorScreen extends List implements
 
 		while (enu.hasMoreElements()) {
 
-			IDevice iDevice = (IDevice) enu.nextElement();
+			IDevice device = (IDevice) enu.nextElement();
 
 			final Image icon;
 
-			if (iDevice.getType() == IDevice.TYPE_BLUETOOTH) {
+			if (device.getType() == IDevice.TYPE_BLUETOOTH) {
 				icon = theme.licBluetooth;
-			} else if (iDevice.getType() == IDevice.TYPE_WIFI) {
+			} else if (device.getType() == IDevice.TYPE_WIFI) {
 				icon = theme.licWifi;
 			} else {
 				Log.bug("Jan 28, 2009.10:57:37 PM");
 				icon = null;
 			}
 
-			append(iDevice.getLabel(), icon);
+			append(device.getLabel(), icon);
 		}
 
 		if (size() > 0) {
