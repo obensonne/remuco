@@ -25,7 +25,6 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
-import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import remuco.client.jme.io.BluetoothDevice;
@@ -62,7 +61,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	}
 
 	private static final String ADDR_CHOICES[] = { "Scan for", "Set manually" };
-	
+
 	/** Text field constraints for address (uneditable). */
 	private static final int ADDR_OFF = TextField.URL | TextField.UNEDITABLE;
 
@@ -88,11 +87,6 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 
 	private static final int SEC_ENCRYPT_INDEX = 1;
 
-	/** Welcome message to show on new devices. */
-	private static final String WELCOME = "In most cases just pressing OK "
-			+ "here is fine. Tweak the fields below if automatic address and "
-			+ "channel search fails.";
-
 	private final ChoiceGroup cgScan, cgSearch, cgSecurity;
 
 	private final BluetoothDevice device;
@@ -109,12 +103,6 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		this.device = device;
 
 		virgin = device.getAddress().length() == 0;
-
-		if (virgin) {
-			final StringItem si = new StringItem(null, WELCOME);
-			si.setLayout(Item.LAYOUT_CENTER);
-			append(si);
-		}
 
 		String label, value;
 		int constraints;
@@ -134,7 +122,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		// address //
 
 		if (virgin) {
-			label = "Manual address:";
+			label = null;
 			value = "001122AABBCC";
 			constraints = ADDR_OFF;
 		} else {
@@ -145,23 +133,32 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		tfAddr = new TextField(label, value, 256, constraints);
 		append(tfAddr);
 
+		if (virgin) {
+			append("When scanning, ensure your computer's Bluetooth is in "
+					+ "visible mode.");
+		}
+
 		// search type //
 
 		label = "Channel";
 		cgSearch = new ChoiceGroup(label, Choice.EXCLUSIVE, CHAN_CHOICES, null);
 		cgSearch.setSelectedIndex(device.getSearch(), true);
-		append(cgSearch);
+		if (!virgin) {
+			append(cgSearch);
+		}
 
 		// channel //
 
-		label = "Manual channel:";
+		label = null;
 		if (device.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
 			constraints = CHAN_ON;
 		} else {
 			constraints = CHAN_OFF;
 		}
 		tfChan = new TextField(label, device.getChan(), 256, constraints);
-		append(tfChan);
+		if (!virgin) {
+			append(tfChan);
+		}
 
 		// security //
 
@@ -170,13 +167,17 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 		cgSecurity.setSelectedIndex(SEC_AUTHENTICATE_INDEX,
 			device.isAuthenticate());
 		cgSecurity.setSelectedIndex(SEC_ENCRYPT_INDEX, device.isEncrypt());
-		append(cgSecurity);
+		if (!virgin) {
+			append(cgSecurity);
+		}
 
 		// name //
 
 		label = "Name (optional):";
 		tfName = new TextField(label, device.getName(), 256, TextField.ANY);
-		append(tfName);
+		if (!virgin) {
+			append(tfName);
+		}
 
 		setItemStateListener(new SearchSelectionChangeListener());
 
