@@ -225,8 +225,9 @@ public final class DeviceSelectorScreen extends List implements
 
 			} else {
 
-				config.devices.removeElement(device);
-				config.devices.insertElementAt(device, 0);
+				if (!config.devices.contains(device)) {
+					config.devices.addElement(device);
+				}
 
 				update();
 
@@ -242,11 +243,7 @@ public final class DeviceSelectorScreen extends List implements
 
 			final IDevice device = scanResults[index];
 
-			if (config.devices.contains(device)) {
-				Log.debug("dev exists");
-			}
-			config.devices.removeElement(device);
-			config.devices.insertElementAt(device, 0);
+			config.devices.addElement(device);
 
 			update();
 

@@ -72,27 +72,6 @@ public class WifiDevice implements IDevice {
 		name = sa[4];
 	}
 
-	/** Compares 2 device based on address and port. */
-	public boolean equals(Object obj) {
-
-		if (obj == this) {
-			return true;
-		}
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (!(obj instanceof WifiDevice)) {
-			return false;
-		}
-
-		final WifiDevice other = (WifiDevice) obj;
-
-		return other.address.equals(address) && other.port.equals(port);
-
-	}
-
 	public String getAddress() {
 		return address;
 	}

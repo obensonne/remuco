@@ -91,26 +91,6 @@ public class BluetoothDevice implements IDevice {
 		name = sa[6];
 	}
 
-	/** Compares 2 device based solely on its address. */
-	public boolean equals(Object obj) {
-
-		if (obj == this) {
-			return true;
-		}
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (!(obj instanceof BluetoothDevice)) {
-			return false;
-		}
-
-		final BluetoothDevice other = (BluetoothDevice) obj;
-
-		return other.address.equals(address);
-	}
-
 	public String getAddress() {
 		return address;
 	}
