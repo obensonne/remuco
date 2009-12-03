@@ -149,14 +149,14 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     # =========================================================================
     
     def ctrl_rate(self, rate):
-        os.system("dcop amarok player setRating " + str(rate))
+        os.system("dcop amarok player setRating %s" % (rate))
     
     def ctrl_volume(self, direction):
         current = int(commands.getoutput("dcop amarok player getVolume"))
         if(direction == 1 ):
-            os.system("dcop amarok player setVolume "+str(current+10))
+            os.system("dcop amarok player setVolume %s" % (current+10))
         elif(direction == -1):
-            os.system("dcop amarok player setVolume "+str(current-10))
+            os.system("dcop amarok player setVolume %s" % (current-10))
         elif(direction == 0):
             os.system("dcop amarok player mute")
 
@@ -197,8 +197,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     
     def request_playlist(self, reply):
         path = os.path.expanduser("~/.cache/current.m3u")
-        print path
-        os.system("dcop amarok playlist saveM3u \""+path + "\" false")
+        os.system('dcop amarok playlist saveM3u "%s" false' % path)
         f = open(path)
         tag = eyeD3.Tag()
         while 1:
@@ -208,14 +207,13 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             if line.find("#") == -1:
                 tag.link(line.rstrip())
                 reply.ids.append(len(reply.names))
-                reply.names.append(tag.getArtist() + " - " + tag.getTitle())
+                reply.names.append("%s - %s" % (tag.getArtist(), tag.getTitle()))
                 
         f.close
         reply.item_actions = PLAYLIST_ACTIONS
         reply.send()
 
     def request_search(self, reply, query):
-        print "updating search"
         search = []
         fields = ["artist.name", "album.name", "tags.title"]
         for q, f in zip(query, fields):
@@ -238,33 +236,37 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             self.search_list.append("")
             self.search_list[len(reply.names)] = r[3]
             reply.ids.append(len(reply.names))
-            reply.names.append(r[0] + " " + r[1] + " " + r[2])
+            reply.names.append(" ".join(r[0:3]))
             
         reply.item_actions = MLIB_ITEM_ACTIONS
         reply.send()
 
     def request_mlib(self, reply, path):
-        print path
         reply.nested, reply.names, reply.ids = [], [], []
         if not path:
-            sql = """select name from artist order by name asc"""
+            sql = "select name from artist order by name asc"
             res = db.execute(sql)
             for r in res:
                 reply.nested.append(r[0])
         elif(len(path) == 1):
-            sql = """select distinct(album.name) from album
-join tags on (tags.album = album.id)
-join artist on (tags.artist = artist.id)
-where artist.name = \"""" + path[0] + """\" and length(album.name) > 0"""
+            sql = ('select distinct(album.name) from album '
+                    'join tags on (tags.album = album.id) '
+                    'join artist on (tags.artist = artist.id) '
+                    'where artist.name = "%s"' % path[0])
             res = db.execute(sql)
             for r in res:
-                reply.nested.append(r[0])
+                if(len(r[0]) == 0):
+                    reply.nested.append("_no_album_")
+                else:
+                    reply.nested.append(r[0])
+
         elif(len(path) == 2):
-            sql = """select tags.title from tags
-join album on (tags.album = album.id)
-join artist on (tags.artist = artist.id)
-where artist.name = \"""" + path[0] + """\" and length(album.name) > 0 and album.name = \"""" + path[1] + """\"
-order by tags.url"""
+            album = (path[1] != "_no_album_") and ' and album.name = "%s"' % (path[1]) or ""
+            sql = ('select tags.title from tags '
+                    'join album on (tags.album = album.id) '
+                    'join artist on (tags.artist = artist.id) '
+                    'where artist.name = "%s"%s '
+                    'order by tags.url' % (path[0], album))
             res = db.execute(sql)
             for r in res:
                 reply.ids.append(len(reply.names))
@@ -280,39 +282,44 @@ order by tags.url"""
     
     def action_playlist_item(self, action_id, positions, ids):
         if(action_id == IA_JUMP.id):
-            os.system("dcop amarok playlist playByIndex " + str(positions[0]))
+            os.system("dcop amarok playlist playByIndex %s" % (positions[0]))
         elif(action_id == IA_REMOVE.id):
             for i, v in enumerate(positions):
-                os.system("dcop amarok playlist removeByIndex " + str(v))
+                os.system("dcop amarok playlist removeByIndex %s" % (v))
         else:
-            print "Unknown action" + str(action_id)
+            print "Unknown action %s" %s (action_id)
             
     def action_search_item(self, action_id, positions, ids):
         path = []
         if action_id == 7: #Add to playlist
             for pos in positions:
-                path.append(" \""+os.path.abspath("/"+self.search_list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+                path.append('"%s"' % (os.path.abspath("/%s" % (self.search_list[pos])))) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
             
-            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
+            os.system("dcop amarok playlist addMediaList [ %s ]" % " ".join(path))
             
     def action_mlib_item(self, action_id, path, positions, ids):
         if action_id == 7:
             search = []
-            for name in path:
-                search.append("album.name = \"" + name+"\"")
-            sql = "select tags.url from tags \
-join album on (album.id = tags.album)\
-where " + " OR ".join(search) + "\
-order by tags.url"
+            if(len(path[0]) > 0):
+                search.append('artist.name = "%s"' % path[0])
+            if(len(path[1]) > 0 and path[1] != "_no_album_"):
+                search.append('album.name = "%s"' % path[1])
+            
+            sql = ('select tags.url from tags '
+                    'join album on (album.id = tags.album) '
+                    'join artist on (artist.id = tags.artist) '
+                    'where %s '
+                    'order by tags.url' % " AND ".join(search))
             res = db.execute(sql)
             list = []
             for r in res:
                 list.append(r[0])
                 
             path = []
-            for pos in positions:
-                path.append(" \""+os.path.abspath("/"+list[pos])+"\"") #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
-            os.system("dcop amarok playlist addMediaList [ "+ " ".join(path) +" ]")
+            if(len(list) > 0):
+                for pos in positions:
+                    path.append(' "%s"' % os.path.abspath("/%s" % list[pos])) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+                os.system("dcop amarok playlist addMediaList [ %s ]" % " ".join(path))
     
     # =========================================================================
     # internal methods
