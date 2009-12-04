@@ -37,7 +37,7 @@ DEVICE_FILE = os.path.join(xdg_cache, "remuco", "devices")
 SEC = ConfigParser.DEFAULTSECT
 
 CONFIG_VERSION_MAJOR = "1"
-CONFIG_VERSION_MINOR = "4"
+CONFIG_VERSION_MINOR = "5"
 CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
@@ -51,6 +51,7 @@ KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
 KEY_FB_ROOT_DIRS = "file-browser-root-dirs"
 KEY_FB_XDG_UD = "file-browser-use-xdg-user-dirs"
+KEY_MPRIS_JUMP = "mpris-jump"
 
 DEFAULTS = { # values as saved in config file
     KEY_BLUETOOTH: "1",
@@ -62,7 +63,8 @@ DEFAULTS = { # values as saved in config file
     KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
     KEY_FB_ROOT_DIRS: "",
-    KEY_FB_XDG_UD: "1" }
+    KEY_FB_XDG_UD: "1",
+    KEY_MPRIS_JUMP: "0" }
 
 class Config(object):
     """Class for getting and setting player adapter specific configurations.
@@ -509,6 +511,30 @@ class Config(object):
     fb_xdg_user_dirs = property(__pget_fb_xdg_user_dirs,
                                 __pset_fb_xdg_user_dirs, None,
                                 __pget_fb_xdg_user_dirs.__doc__)
+
+    # === propety: mpris-jump ===
+
+    def __pget_mprisjump(self):
+        """Flag if mpris-jump is enabled.
+
+        Default: 0 (disabled)
+
+        Option name: 'mpris-jump'
+
+        """
+        try:
+            return self.__cp.getboolean(SEC, KEY_MPRIS_JUMP)
+        except (ValueError, AttributeError), e:
+            log.warning("config '%s' malformed (%s)" % (KEY_MPRIS_JUMP, e))
+            return False
+
+    def __pset_mprisjump(self, value):
+
+        self.__cp.set(SEC, KEY_MPRIS_JUMP, str(value))
+        self.__save()
+
+    mprisjump = property(__pget_mprisjump, __pset_mprisjump, None, 
+                         __pget_mprisjump.__doc__)
 
     # === property: config_dir ===
     
