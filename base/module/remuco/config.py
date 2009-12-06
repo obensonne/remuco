@@ -90,10 +90,11 @@ class Config(object):
         
         ###### init directories and file names ######
         
-        name_lower = player_name.lower()
+        # convert descriptive name to a plain canonical one
+        name_plain = player_name.lower().replace(" ", "").replace(".","")
         
-        self.__dir_config = os.path.join(xdg_config, "remuco", name_lower)
-        self.__dir_cache = os.path.join(xdg_cache, "remuco", name_lower)
+        self.__dir_config = os.path.join(xdg_config, "remuco", name_plain)
+        self.__dir_cache = os.path.join(xdg_cache, "remuco", name_plain)
         self.__file_config = os.path.join(self.__dir_config, "conf")
         self.__file_log = os.path.join(self.__dir_cache, "log")
     
