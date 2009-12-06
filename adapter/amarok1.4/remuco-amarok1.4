@@ -35,27 +35,33 @@ import gobject
 import remuco
 from remuco import log
 
-#Definitions
+# =============================================================================
+# constants
+# =============================================================================
+
 IA_JUMP = remuco.ItemAction("Play Now")
 IA_REMOVE = remuco.ItemAction("Remove", multiple=True)
 PLAYLIST_ACTIONS = (IA_JUMP, IA_REMOVE)
 
 IA_ADD = remuco.ItemAction("Add to playlist", multiple=True)
-
 MLIB_ITEM_ACTIONS = (IA_ADD,)
 
 SEARCH_MASK = [ "Artist", "Album", "Title" ]
 
-conn = sqlite3.connect(os.path.expanduser('~/.kde/share/apps/amarok/collection.db'))
-db = conn.cursor()
+AMAROK_DB = os.path.expanduser('~/.kde/share/apps/amarok/collection.db')
+
+# =============================================================================
+# player adapter
+# =============================================================================
 
 class Amarok14Adapter(remuco.PlayerAdapter):
-    
+
     lastpath = ""
     search_list = []
-    
+    db = None
+
     def __init__(self):
-        
+
         remuco.PlayerAdapter.__init__(self, "Amarok 1.4",
                                       playback_known=True,
                                       volume_known=True,
@@ -67,27 +73,26 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                                       poll=10,
                                       search_mask=SEARCH_MASK
         )
-        
+
     def start(self):
-        
+
         remuco.PlayerAdapter.start(self)
 
-        log.debug("here we go")
-        
+        self.db = sqlite3.connect(AMAROK_DB).cursor()
+
     def stop(self):
-        
+
         remuco.PlayerAdapter.stop(self)
 
-        log.debug("bye, turning off the light")
-    
-    
+        self.db = None
+
     def poll(self):
-        
+
         if not self._check_running():
             return # manager will stop us
-        
+
         import random
-        
+
         current_state =  self._amarok("player randomModeStatus")
         if(current_state == "true"):
             self.update_shuffle(True)
@@ -108,28 +113,28 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             self.update_playback(remuco.PLAYBACK_PLAY)
         else:
             self.update_playback(remuco.PLAYBACK_PAUSE)
-            
+
         #~ Get and calculate total time and progress
         current = self._amarok("player currentTime")
         if(len(current.split(":")) == 2):
             cmin, csec = current.split(":")
         else:
             cmin, csec = 0,0
-            
+
         total = self._amarok("player totalTime")
         if(len(total.split(":")) == 2):
             tmin, tsec = total.split(":")
         else:
             tmin, tsec = 0,0
-            
+
         cmin, csec, tmin, tsec = int(cmin), int(csec), int(tmin), int(tsec)
         current = (cmin*60)+csec
         total = (tmin*60)+tsec
         self.update_progress(progress=current, length=total)
-        
-        curpath = self._amarok("player path") 
+
+        curpath = self._amarok("player path")
         if(self.lastpath != curpath and len(curpath) != 0):
-        
+
             info = {}
             info[remuco.INFO_ARTIST] = self._amarok("player artist")
             info[remuco.INFO_ALBUM] = self._amarok("player album")
@@ -138,18 +143,18 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             info[remuco.INFO_YEAR] = self._amarok("player year")
             info[remuco.INFO_BITRATE] = int(self._amarok("player bitrate"))
             info[remuco.INFO_RATING] = self._amarok("player rating")
-            
+
             self.update_item("", info, self.find_image(curpath, True))
             self.lastpath = curpath
 
-        
+
     # =========================================================================
     # control interface
     # =========================================================================
-    
+
     def ctrl_rate(self, rate):
         self._amarok("player setRating %s" % (rate))
-    
+
     def ctrl_volume(self, direction):
         current = int(self._amarok("player getVolume", 50))
         if(direction == 1 ):
@@ -167,7 +172,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         else:
             self._amarok("player enableRandomMode true")
             self.update_shuffle(True)
-    
+
     def ctrl_toggle_repeat(self):
         current_state = self._amarok("player repeatPlaylistStatus")
         if(current_state == "true"):
@@ -176,24 +181,24 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         else:
             self._amarok("player enableRepeatPlaylist true")
             self.update_repeat(True)
-            
-    
+
+
     def ctrl_toggle_playing(self):
         self._amarok("player playPause")
         gobject.idle_add(self.poll)
-        
+
     def ctrl_next(self):
         self._amarok("player next")
         gobject.timeout_add(150, self.poll)
-        
+
     def ctrl_previous(self):
         self._amarok("player prev")
         gobject.timeout_add(150, self.poll)
-        
+
     # =========================================================================
     # request interface
     # =========================================================================
-    
+
     def request_playlist(self, reply):
         path = os.path.expanduser("~/.cache/current.m3u")
         self._amarok('playlist saveM3u "%s" false' % path)
@@ -202,12 +207,12 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         while 1:
             line = f.readline()
             if not line: break
-            
+
             if line.find("#") == -1:
                 tag.link(line.rstrip())
                 reply.ids.append(len(reply.names))
                 reply.names.append("%s - %s" % (tag.getArtist(), tag.getTitle()))
-                
+
         f.close
         reply.item_actions = PLAYLIST_ACTIONS
         reply.send()
@@ -218,17 +223,17 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         for q, f in zip(query, fields):
             if q:
                 search.append('lower(%s) like "%%%s%%"' % (f, q))
-        
+
         if not search:
             reply.send()
             return
-        
+
         sql = ("select tags.title as title, artist.name as artist, album.name "
                "as album, tags.url as url from tags join artist on "
                "(tags.artist = artist.id) join album on "
                "(tags.album = album.id) where %s" % " and ".join(search))
-        
-        res = db.execute(sql)
+
+        res = self.db.execute(sql)
         id = 0
         self.search_list = []
         for r in res:
@@ -236,7 +241,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             self.search_list[len(reply.names)] = r[3]
             reply.ids.append(len(reply.names))
             reply.names.append(" ".join(r[0:3]))
-            
+
         reply.item_actions = MLIB_ITEM_ACTIONS
         reply.send()
 
@@ -244,15 +249,15 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         reply.nested, reply.names, reply.ids = [], [], []
         if not path:
             sql = "select name from artist order by name asc"
-            res = db.execute(sql)
+            res = self.db.execute(sql)
             for r in res:
                 reply.nested.append(r[0])
         elif(len(path) == 1):
             sql = ('select distinct(album.name) from album '
-                    'join tags on (tags.album = album.id) '
-                    'join artist on (tags.artist = artist.id) '
-                    'where artist.name = "%s"' % path[0])
-            res = db.execute(sql)
+                   'join tags on (tags.album = album.id) '
+                   'join artist on (tags.artist = artist.id) '
+                   'where artist.name = "%s"' % path[0])
+            res = self.db.execute(sql)
             for r in res:
                 if(len(r[0]) == 0):
                     reply.nested.append("_no_album_")
@@ -260,25 +265,25 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                     reply.nested.append(r[0])
 
         elif(len(path) == 2):
-            album = (path[1] != "_no_album_") and ' and album.name = "%s"' % (path[1]) or ""
+            album = (path[1] != "_no_album_" and
+                     ' and album.name = "%s"' % path[1] or "")
             sql = ('select tags.title from tags '
-                    'join album on (tags.album = album.id) '
-                    'join artist on (tags.artist = artist.id) '
-                    'where artist.name = "%s"%s '
-                    'order by tags.url' % (path[0], album))
-            res = db.execute(sql)
+                   'join album on (tags.album = album.id) '
+                   'join artist on (tags.artist = artist.id) '
+                   'where artist.name = "%s"%s '
+                   'order by tags.url' % (path[0], album))
+            res = self.db.execute(sql)
             for r in res:
                 reply.ids.append(len(reply.names))
                 reply.names.append(r[0])
-            
+
         reply.item_actions = MLIB_ITEM_ACTIONS
         reply.send()
-        
 
     # =========================================================================
     # Actions
     # =========================================================================
-    
+
     def action_playlist_item(self, action_id, positions, ids):
         if(action_id == IA_JUMP.id):
             self._amarok("playlist playByIndex %s" % (positions[0]))
@@ -287,46 +292,51 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                 self._amarok("playlist removeByIndex %s" % (v))
         else:
             print "Unknown action %s" %s (action_id)
-            
+
     def action_search_item(self, action_id, positions, ids):
         path = []
-        if action_id == 7: #Add to playlist
+        if action_id == IA_ADD.id: #Add to playlist
             for pos in positions:
-                path.append('"%s"' % (os.path.abspath("/%s" % (self.search_list[pos])))) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
-            
+                # Ugly hack but it works. Amarok prefixes all paths with .
+                # (period). Don't know why but this is a quickfix
+                path.append('"%s"' %
+                            (os.path.abspath("/%s" %(self.search_list[pos]))))
+
             self._amarok("playlist addMediaList [ %s ]" % " ".join(path))
-            
+
     def action_mlib_item(self, action_id, path, positions, ids):
-        if action_id == 7:
+        if action_id == IA_ADD.id:
             search = []
             if(len(path[0]) > 0):
                 search.append('artist.name = "%s"' % path[0])
             if(len(path[1]) > 0 and path[1] != "_no_album_"):
                 search.append('album.name = "%s"' % path[1])
-            
+
             sql = ('select tags.url from tags '
-                    'join album on (album.id = tags.album) '
-                    'join artist on (artist.id = tags.artist) '
-                    'where %s '
-                    'order by tags.url' % " AND ".join(search))
-            res = db.execute(sql)
+                   'join album on (album.id = tags.album) '
+                   'join artist on (artist.id = tags.artist) '
+                   'where %s '
+                   'order by tags.url' % " AND ".join(search))
+            res = self.db.execute(sql)
             list = []
             for r in res:
                 list.append(r[0])
-                
+
             path = []
             if(len(list) > 0):
                 for pos in positions:
-                    path.append(' "%s"' % os.path.abspath("/%s" % list[pos])) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
+                     # Ugly hack but it works. Amarok prefixes all paths with .
+                     # (period). Don't know why but this is a quickfix
+                    path.append(' "%s"' % os.path.abspath("/%s" % list[pos]))
                 self._amarok("playlist addMediaList [ %s ]" % " ".join(path))
-    
+
     # =========================================================================
     # internal methods
     # =========================================================================
-    
+
     def _check_running(self):
-        """Check if amarok is running."""
-        
+        """Check if Amarok is running."""
+
         return commands.getstatusoutput("dcop amarok")[0] == 0
 
     def _amarok(self, cmd, default=""):
@@ -340,13 +350,11 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             return out
 
 # =============================================================================
-# main (example startup using remuco.Manager)
+# main
 # =============================================================================
 
-
-
 if __name__ == '__main__':
-    
+
     pa = Amarok14Adapter() # create the player adapter
     mg = remuco.Manager(pa, run_check_fn=pa._check_running) # pass to manager
     mg.run() # run the manager (blocks until interrupt signal)
