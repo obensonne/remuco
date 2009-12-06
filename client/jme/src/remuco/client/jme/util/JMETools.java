@@ -86,7 +86,7 @@ public class JMETools {
 
 		final ClientInfo ci = new ClientInfo(
 				Integer.parseInt(config.getOption(PlayerScreen.OD_IMG_SIZE)),
-				config.getOption(PlayerScreen.OD_IMG_SIZE),
+				config.getOption(PlayerScreen.OD_IMG_TYPE),
 				Integer.parseInt(config.getOption(ItemlistScreen.OD_PAGE_SIZE)),
 				info);
 
