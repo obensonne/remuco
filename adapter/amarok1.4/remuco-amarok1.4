@@ -49,7 +49,6 @@ SEARCH_MASK = [ "Artist", "Album", "Title" ]
 conn = sqlite3.connect(os.path.expanduser('~/.kde/share/apps/amarok/collection.db'))
 db = conn.cursor()
 
-
 class Amarok14Adapter(remuco.PlayerAdapter):
     
     lastpath = ""
@@ -89,35 +88,35 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         
         import random
         
-        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        current_state =  self._amarok("player randomModeStatus")
         if(current_state == "true"):
             self.update_shuffle(True)
         else:
             self.update_shuffle(False)
 
-        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        current_state = self._amarok("player repeatPlaylistStatus")
         if(current_state == "true"):
             self.update_repeat(True)
         else:
             self.update_repeat(False)
 
-        volume = commands.getoutput("dcop amarok player getVolume")
+        volume = self._amarok("player getVolume", 50)
         self.update_volume(volume)
 
-        playing = commands.getoutput("dcop amarok player isPlaying")
+        playing = self._amarok("player isPlaying")
         if playing == "true":
             self.update_playback(remuco.PLAYBACK_PLAY)
         else:
             self.update_playback(remuco.PLAYBACK_PAUSE)
             
         #~ Get and calculate total time and progress
-        current = commands.getoutput("dcop amarok player currentTime")
+        current = self._amarok("player currentTime")
         if(len(current.split(":")) == 2):
             cmin, csec = current.split(":")
         else:
             cmin, csec = 0,0
             
-        total = commands.getoutput("dcop amarok player totalTime")
+        total = self._amarok("player totalTime")
         if(len(total.split(":")) == 2):
             tmin, tsec = total.split(":")
         else:
@@ -128,17 +127,17 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         total = (tmin*60)+tsec
         self.update_progress(progress=current, length=total)
         
-        curpath = commands.getoutput("dcop amarok player path") 
+        curpath = self._amarok("player path") 
         if(self.lastpath != curpath and len(curpath) != 0):
         
             info = {}
-            info[remuco.INFO_ARTIST] = commands.getoutput("dcop amarok player artist")
-            info[remuco.INFO_ALBUM] = commands.getoutput("dcop amarok player album")
-            info[remuco.INFO_TITLE] = commands.getoutput("dcop amarok player title")
-            info[remuco.INFO_GENRE] = commands.getoutput("dcop amarok player genre")
-            info[remuco.INFO_YEAR] = commands.getoutput("dcop amarok player year")
-            info[remuco.INFO_BITRATE] = int(commands.getoutput("dcop amarok player bitrate"))
-            info[remuco.INFO_RATING] = commands.getoutput("dcop amarok player rating")
+            info[remuco.INFO_ARTIST] = self._amarok("player artist")
+            info[remuco.INFO_ALBUM] = self._amarok("player album")
+            info[remuco.INFO_TITLE] = self._amarok("player title")
+            info[remuco.INFO_GENRE] = self._amarok("player genre")
+            info[remuco.INFO_YEAR] = self._amarok("player year")
+            info[remuco.INFO_BITRATE] = int(self._amarok("player bitrate"))
+            info[remuco.INFO_RATING] = self._amarok("player rating")
             
             self.update_item("", info, self.find_image(curpath, True))
             self.lastpath = curpath
@@ -149,46 +148,46 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     # =========================================================================
     
     def ctrl_rate(self, rate):
-        os.system("dcop amarok player setRating %s" % (rate))
+        self._amarok("player setRating %s" % (rate))
     
     def ctrl_volume(self, direction):
-        current = int(commands.getoutput("dcop amarok player getVolume"))
+        current = int(self._amarok("player getVolume", 50))
         if(direction == 1 ):
-            os.system("dcop amarok player setVolume %s" % (current+10))
+            self._amarok("player setVolume %s" % (current+10))
         elif(direction == -1):
-            os.system("dcop amarok player setVolume %s" % (current-10))
+            self._amarok("player setVolume %s" % (current-10))
         elif(direction == 0):
-            os.system("dcop amarok player mute")
+            self._amarok("player mute")
 
     def ctrl_toggle_shuffle(self):
-        current_state =  commands.getoutput("dcop amarok player randomModeStatus")
+        current_state =  self._amarok("player randomModeStatus")
         if(current_state == "true"):
-            os.system("dcop amarok player enableRandomMode false")
+            self._amarok("player enableRandomMode false")
             self.update_shuffle(False)
         else:
-            os.system("dcop amarok player enableRandomMode true")
+            self._amarok("player enableRandomMode true")
             self.update_shuffle(True)
     
     def ctrl_toggle_repeat(self):
-        current_state = commands.getoutput("dcop amarok player repeatPlaylistStatus")
+        current_state = self._amarok("player repeatPlaylistStatus")
         if(current_state == "true"):
-            os.system("dcop amarok player enableRepeatPlaylist false")
+            self._amarok("player enableRepeatPlaylist false")
             self.update_repeat(False)
         else:
-            os.system("dcop amarok player enableRepeatPlaylist true")
+            self._amarok("player enableRepeatPlaylist true")
             self.update_repeat(True)
             
     
     def ctrl_toggle_playing(self):
-        os.system("dcop amarok player playPause")
+        self._amarok("player playPause")
         gobject.idle_add(self.poll)
         
     def ctrl_next(self):
-        os.system("dcop amarok player next")
+        self._amarok("player next")
         gobject.timeout_add(150, self.poll)
         
     def ctrl_previous(self):
-        os.system("dcop amarok player prev")
+        self._amarok("player prev")
         gobject.timeout_add(150, self.poll)
         
     # =========================================================================
@@ -197,7 +196,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     
     def request_playlist(self, reply):
         path = os.path.expanduser("~/.cache/current.m3u")
-        os.system('dcop amarok playlist saveM3u "%s" false' % path)
+        self._amarok('playlist saveM3u "%s" false' % path)
         f = open(path)
         tag = eyeD3.Tag()
         while 1:
@@ -282,10 +281,10 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     
     def action_playlist_item(self, action_id, positions, ids):
         if(action_id == IA_JUMP.id):
-            os.system("dcop amarok playlist playByIndex %s" % (positions[0]))
+            self._amarok("playlist playByIndex %s" % (positions[0]))
         elif(action_id == IA_REMOVE.id):
             for i, v in enumerate(positions):
-                os.system("dcop amarok playlist removeByIndex %s" % (v))
+                self._amarok("playlist removeByIndex %s" % (v))
         else:
             print "Unknown action %s" %s (action_id)
             
@@ -295,7 +294,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             for pos in positions:
                 path.append('"%s"' % (os.path.abspath("/%s" % (self.search_list[pos])))) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
             
-            os.system("dcop amarok playlist addMediaList [ %s ]" % " ".join(path))
+            self._amarok("playlist addMediaList [ %s ]" % " ".join(path))
             
     def action_mlib_item(self, action_id, path, positions, ids):
         if action_id == 7:
@@ -319,7 +318,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
             if(len(list) > 0):
                 for pos in positions:
                     path.append(' "%s"' % os.path.abspath("/%s" % list[pos])) #Ugly hack but it works. Amarok prefixes all paths with . (period). Don't know why but this is a quickfix
-                os.system("dcop amarok playlist addMediaList [ %s ]" % " ".join(path))
+                self._amarok("playlist addMediaList [ %s ]" % " ".join(path))
     
     # =========================================================================
     # internal methods
@@ -329,6 +328,16 @@ class Amarok14Adapter(remuco.PlayerAdapter):
         """Check if amarok is running."""
         
         return commands.getstatusoutput("dcop amarok")[0] == 0
+
+    def _amarok(self, cmd, default=""):
+        """Shortcut for running command 'dcop amarok ...'."""
+
+        ret, out = commands.getstatusoutput("dcop amarok %s" % cmd)
+        if ret != os.EX_OK:
+            log.warning("'dcop amarok %s' failed (%s)" % (cmd, out))
+            return default
+        else:
+            return out
 
 # =============================================================================
 # main (example startup using remuco.Manager)
