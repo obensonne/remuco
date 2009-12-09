@@ -33,6 +33,7 @@ import os
 import os.path
 import gobject
 import re
+import sys
 
 import remuco
 from remuco import log
@@ -43,31 +44,45 @@ FA_PLAY = remuco.ItemAction("Play")
 
 FILE_ACTIONS = (FA_APPEND, FA_PLAY)
 
+MODE_INDEPENDENT = 1 << 0
+MODE_MASTER = 1 << 1
+
 class MplayerAdapter(remuco.PlayerAdapter):
 
-    def __init__(self):
+    def __init__(self, filelist=None):
 
         remuco.PlayerAdapter.__init__(self, "MPlayer",
-                                      progress_known=True,
-                                      file_actions=FILE_ACTIONS,
-                                      mime_types=("audio", "video"))
+            progress_known=True,
+            file_actions=FILE_ACTIONS,
+            mime_types=("audio", "video"))
 
-        self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
-        self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
+        self.__mode = MODE_INDEPENDENT
 
-        self.statusfifo = os.path.join(self.config.cache_dir, "statusfifo")
-        self.statusfifo = self.config.get_custom("mplayer-statusfifo", self.statusfifo)
+        if filelist is not None:
+            import subprocess
 
-        # ensure config is written:
-        self.config.set_custom("mplayer-cmdfifo", self.cmdfifo)
-        self.config.set_custom("mplayer-statusfifo", self.statusfifo)
+            self.filelist = filelist
+            self.__mode = MODE_MASTER
+
+        # TODO put this somewhere else
+        if self.__mode is MODE_INDEPENDENT:
+            self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
+            self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
+
+            self.statusfifo = os.path.join(self.config.cache_dir, "statusfifo")
+            self.statusfifo = self.config.get_custom("mplayer-statusfifo", self.statusfifo)
+
+            # ensure config is written:
+            self.config.set_custom("mplayer-cmdfifo", self.cmdfifo)
+            self.config.set_custom("mplayer-statusfifo", self.statusfifo)
 
         # file descriptors
-        self.fd_cmdfifo = 0
-        self.fd_statusfifo = 0
+        [self.fd_cmd_stream_in, self.fd_cmd_stream_out,
+            self.fd_status_stream_in, self.fd_status_stream_out] = [None]*4
 
-        # gobject's watch: read from mplayer using statusfifo
-        self.watch_id = None
+        # gobject's watches:
+        self.watch_id = None # read from mplayer using statusfifo
+        self.watch_death = None # wait for mplayer exit (MODE_MASTER)
 
         # compile regexes to be used when parsing the status string
         # in __inputevent()
@@ -104,45 +119,48 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
         remuco.PlayerAdapter.start(self)
 
-        if not(os.path.exists(self.cmdfifo)):
-            os.mkfifo(self.cmdfifo)
+        self.__setup_streams()
 
-        if not(os.path.exists(self.statusfifo)):
-            os.mkfifo(self.statusfifo)
-        else:
-            log.warning('statusfifo file already exists. this is not a ' +
-            'problem, but you might end up with a big file if ' +
-            self.statusfifo + ' is not a FIFO.')
-
-        log.debug("opening cmdfifo and waiting for mplayer to read it")
-        self.fd_cmdfifo = os.open(self.cmdfifo, os.O_WRONLY)
-
-        log.debug("opening statusfifo")
-        self.fd_statusfifo = os.open(self.statusfifo, os.O_RDONLY | os.O_NONBLOCK)
-
-        self.watch_id = gobject.io_add_watch(self.fd_statusfifo,
+        self.watch_id = gobject.io_add_watch(self.fd_status_stream_in,
             gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
             self.__inputevent)
+
+        if self.__mode is MODE_MASTER:
+
+            args = ['mplayer', '-slave', '-input', 'file=/dev/null']
+            args += self.filelist
+
+            self.__mplayer_pid = subprocess.Popen(args, bufsize=1,
+                stdin=self.fd_cmd_stream_in, stdout=self.fd_status_stream_out).pid
+
+            def cb(pid, condition, user_data=None): #local callback for watch_death
+                self.manager.stop()
+
+            self.watch_death = gobject.child_watch_add(self.__mplayer_pid, cb)
 
         log.debug("starting mplayer adapter")
 
     def stop(self):
 
+        # FIXME probable bug: call manager.stop from here,
+        # and the manager will call stop_pa again
         remuco.PlayerAdapter.stop(self)
 
-        if self.fd_cmdfifo != 0:
-            os.close(self.fd_cmdfifo)
-            self.fd_cmdfifo = 0
+        os.closerange(self.fd_cmd_stream_in, self.fd_status_stream_out)
 
-        if self.fd_statusfifo != 0:
-            os.close(self.fd_statusfifo)
-            self.fd_statusfifo = 0
+        [self.fd_cmd_stream_in, self.fd_cmd_stream_out,
+            self.fd_status_stream_in, self.fd_status_stream_out] = [None]*4
 
         if self.watch_id is not None:
             gobject.source_remove(self.watch_id)
             self.watch_id = None
 
+        if self.watch_death is not None:
+            gobject.source_remove(self.watch_death)
+            self.watch_death = None
+
         log.debug("stopping mplayer adapter")
+
 
     def poll(self):
 
@@ -212,13 +230,13 @@ class MplayerAdapter(remuco.PlayerAdapter):
         """Write a command to the MPlayer FIFO and handle errors."""
 
         try:
-            os.write(self.fd_cmdfifo, cmd)
+            os.write(self.fd_cmd_stream_out, cmd)
         except OSError, e:
             log.warning("FIFO to MPlayer broken (%s)", e)
             self.manager.stop()
 
-    def __read_fifo(self, fd):
-        """Read from a FIFO and handle errors."""
+    def __read_stream(self, fd):
+        """Read from a file descriptor and handle errors."""
 
         try:
             str = os.read(fd, 200) #magic buflength number
@@ -230,9 +248,10 @@ class MplayerAdapter(remuco.PlayerAdapter):
     def __inputevent(self, fd, condition):
         """Parse incoming line from the player"""
 
+
         if condition == gobject.IO_IN:
-            # read from fd (fd is self.fd_statusfifo)
-            status_str = self.__read_fifo(fd)
+            # read from fd (fd is self.fd_status_stream_in)
+            status_str = self.__read_stream(fd)
 
             if self.pause_regex.search(status_str):
                 self.__playback = PLAYBACK_PAUSE
@@ -280,7 +299,6 @@ class MplayerAdapter(remuco.PlayerAdapter):
             gobject.idle_add(self.start)
             return False
 
-
     def __set_info(self, name, value):
         """ Set global information of current item
 
@@ -307,13 +325,61 @@ class MplayerAdapter(remuco.PlayerAdapter):
         self.__playback = PLAYBACK_STOP
         self.info = { INFO_LENGTH: 100, INFO_TITLE: '' }
 
+    def __setup_streams(self):
+        """ Setup information streams.
+            This depends on the mode we are running:
+                MODE_INDEPENDENT - uses FIFOs to issue commands and fetch status
+                information
+                MODE_MASTER - uses a newly created pipe to connect to mplayer
+                directly
+        """
+
+
+        if self.__mode is MODE_INDEPENDENT:
+            if not(os.path.exists(self.cmdfifo)):
+                os.mkfifo(self.cmdfifo)
+
+            if not(os.path.exists(self.statusfifo)):
+                os.mkfifo(self.statusfifo)
+            else:
+                log.warning('statusfifo file already exists. this is not a ' +
+                'problem, but you might end up with a big file if ' +
+                self.statusfifo + ' is not a FIFO.')
+
+            log.debug("opening cmdfifo and waiting for mplayer to read it")
+            self.fd_cmd_stream_out = os.open(self.cmdfifo, os.O_WRONLY)
+            self.fd_cmd_stream_in = self.fd_cmd_stream_out
+
+            log.debug("opening statusfifo")
+            self.fd_status_stream_in = os.open(self.statusfifo, os.O_RDONLY | os.O_NONBLOCK)
+            self.fd_status_stream_out = self.fd_status_stream_in
+
+        else: # MODE_MASTER
+            log.debug("creating pipes to communicate with mplayer")
+            self.fd_cmd_stream_in, self.fd_cmd_stream_out  = os.pipe()
+            self.fd_status_stream_in, self.fd_status_stream_out  = os.pipe()
+
+
+
 # =============================================================================
 # main
 # =============================================================================
 
 if __name__ == '__main__':
 
-    pa = MplayerAdapter() # create the player adapter
+    filepaths = None
+
+    # TODO use 'optparser' module instead
+    if sys.argv.__len__() > 1:
+        filepaths = []
+
+        # TODO parse arguments looking for mplayer options
+
+        #parse arguments looking for video files
+        for arg in sys.argv[1:]:
+            if os.path.isfile(arg): filepaths.append(arg)
+
+    pa = MplayerAdapter(filepaths) # create the player adapter
     mg = remuco.Manager(pa) # pass it to a manager
     mg.run() # run the manager (blocks until interrupt signal)
 
