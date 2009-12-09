@@ -34,6 +34,7 @@ import os.path
 import gobject
 import re
 import sys
+import subprocess
 
 import remuco
 from remuco import log
@@ -59,7 +60,6 @@ class MplayerAdapter(remuco.PlayerAdapter):
         self.__mode = MODE_INDEPENDENT
 
         if filelist is not None:
-            import subprocess
 
             self.filelist = filelist
             self.__mode = MODE_MASTER
