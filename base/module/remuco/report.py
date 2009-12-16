@@ -85,7 +85,7 @@ def __user_notification(summary, text):
     except DBusException, e:
         return
     
-    if not "body-markup" in caps:
+    if not caps or "body-markup" not in caps:
         text = text.replace("<b>", "")
         text = text.replace("</b>", "")
         
