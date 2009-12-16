@@ -11,9 +11,13 @@ Contributors, listed alphabetically:
    - XMMS2 adapter improvements
  * Tim Froidcoeur
    - client touchscreen interface
+ * Kristian "Draco" Nordman <kristian.nordman@scripter.se>
+   - Amarok 1.4 adapter
+ * Rajiv Nair <rajivnair.in@gmail.com>
+   - miscellaneous fixes/enhancements
  * Pawel Szubert <pawel.pbm@gmail.com>
    - Okular, Songbird and QuodLibet adapter
-   
+
 Check the source repository's change log for details.
 
 Thanks
