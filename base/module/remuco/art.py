@@ -35,7 +35,9 @@ TN_SUBDIRS = ("large", "normal")
 
 RE_IND = r'(?:front|album|cover|folder|art)' # words indicating art files
 RE_EXT = r'\.(?:png|jpeg|jpg)' # art file extensions
-RE_FILE = (r'^%s%s$' % (RE_IND, RE_EXT), r'^.*%s.*%s$' % (RE_IND, RE_EXT))
+RE_FILE = (r'^%s%s$' % (RE_IND, RE_EXT), # typical name (e.g. front.jpg)
+           r'^.*%s.*%s$' % (RE_IND, RE_EXT), # typical name with noise
+           r'^.*%s$' % RE_EXT) # any image file
 RE_FILE = [re.compile(rx, re.IGNORECASE) for rx in RE_FILE]
 
 def __resource_to_file_uri(resource):
