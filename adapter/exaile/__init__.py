@@ -288,6 +288,9 @@ class ExaileAdapter(remuco.PlayerAdapter):
                 expr = "%s=%s" % (key, val)
                 tracks = self.__ex.collection.search(expr, tracks=tracks)
                 
+        if tracks is None: # empty query, return _all_ tracks
+            tracks = self.__ex.collection.search("", tracks=tracks)
+
         reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
         reply.item_actions = SEARCH_ACTIONS
         reply.send()

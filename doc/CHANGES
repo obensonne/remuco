@@ -7,6 +7,7 @@ Base
 
 Player adapters
 ---------------
+  * Exaile: Fixed crash on library search with empty query.
   * Amarok 1.4: New Amarok 1.4 adapter
   * Amarok, VLC: New playlist action for jumping to a specific position (must
     be enabled explicitly in the adapter configuration because it fails in
