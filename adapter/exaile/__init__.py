@@ -28,6 +28,7 @@ import gobject
 
 import xl.event
 import xl.settings
+from xl.cover import NoCoverFoundException
 
 import remuco
 from remuco import log
@@ -446,7 +447,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
             info[remuco.INFO_LENGTH] = track.get_duration()
             img = track.get_tag("arturl")
             if not img:
-                img = self.find_image(id)
+                try:
+                    img = self.__ex.covers.get_cover(track)
+                except NoCoverFoundException:
+                    img = self.find_image(id)
             
         self.update_item(id, info, img)
         
