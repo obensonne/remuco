@@ -35,21 +35,41 @@ from remuco import log
 class QuodLibetAdapter(remuco.PlayerAdapter):
     
     def __init__(self):
-        remuco.PlayerAdapter.__init__(self, "QuodLibet")
+        remuco.PlayerAdapter.__init__(self,
+				      "QuodLibet",
+				      progress_known=True,
+				      playback_known=True)
+				    
                     
     def start(self):
         remuco.PlayerAdapter.start(self)
+
+        try:
+            bus = dbus.SessionBus()
+            proxy = bus.get_object("net.sacredchao.QuodLibet",  "/net/sacredchao/QuodLibet")
+            self.__am = dbus.Interface(proxy, "net.sacredchao.QuodLibet")
+        except DBusException, e:
+            raise StandardError("dbus error: %s" % e)
           
     def stop(self):
         remuco.PlayerAdapter.stop(self)
         
     def poll(self):
-        info = {}
-        info[remuco.INFO_ALBUM] = self.quodlibet("--print-playing '<album>'")
-        info[remuco.INFO_ARTIST] = self.quodlibet("--print-playing '<artist>'")
-        info[remuco.INFO_GENRE] = self.quodlibet("--print-playing '<genre>'")
-        info[remuco.INFO_TITLE] = self.quodlibet("--print-playing '<title>'")
-        self.update_item(None, info, None)
+	info = {}
+	if self.__am.IsPlaying() == 1:
+	    info[remuco.INFO_ALBUM] = self.quodlibet("--print-playing '<album>'")
+	    info[remuco.INFO_ARTIST] = self.quodlibet("--print-playing '<artist>'")
+	    info[remuco.INFO_GENRE] = self.quodlibet("--print-playing '<genre>'")
+	    info[remuco.INFO_LENGTH] = self.__am.CurrentSong()['~#length']
+	    info[remuco.INFO_RATING] = self.__am.CurrentSong()['~#rating']
+	    info[remuco.INFO_TITLE] = self.quodlibet("--print-playing '<title>'")
+	    info[remuco.INFO_YEAR] = self.__am.CurrentSong()['date']
+	    self.update_progress(self.__am.GetPosition()/1000, info[remuco.INFO_LENGTH])
+	    self.update_playback(remuco.PLAYBACK_PLAY)
+	else:
+	    self.update_progress(0,0)
+	    self.update_playback(remuco.PLAYBACK_STOP)
+	self.update_item(None, info, None)
 
     def quodlibet(self, action):
         return commands.getoutput("quodlibet " + action)
@@ -60,6 +80,7 @@ class QuodLibetAdapter(remuco.PlayerAdapter):
     # =========================================================================
     def ctrl_toggle_playing(self):
         self.quodlibet("--play-pause")
+	self.poll()
 
     def ctrl_next(self):
         self.quodlibet("--next")
