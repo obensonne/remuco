@@ -1,0 +1,30 @@
+README.windows for remuco
+=========================
+
+Running the remuco server on Windows works on an experimental basis. You will
+need to install binaries for:
+
+Python 2.5 (2.6 might work)
+http://python.org/download/
+
+pywin32-214 (later versions might work)
+http://sourceforge.net/projects/pywin32/files/
+* make sure to match the pywin32 binary to your Python version
+
+You will also need to install a pure Python replacement for gobject:
+http://github.com/cpatulea/purepython-gobject
+(use the Download Source button in the top-right)
+
+Place gobject.py in your Python25\lib directory.
+
+Player Adapters
+===============
+
+Currently, the only player adapter on Windows is Winamp.
+
+Bluetooth
+=========
+
+Bluetooth support on Windows is very buggy, though theoretically supported
+through PyBlueZ if your Bluetooth device uses either the Microsoft stack or
+the Widcomm (aka Broadcom) stack.

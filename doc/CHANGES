@@ -8,11 +8,13 @@ Base
 Player adapters
 ---------------
   * Exaile: Fixed crash on library search with empty query.
-  * Amarok 1.4: New Amarok 1.4 adapter
+  * Amarok 1.4: Added Amarok 1.4 adapter
   * Amarok, VLC: New playlist action for jumping to a specific position (must
     be enabled explicitly in the adapter configuration because it fails in
     dynamic playlists)
-  * Quod Libet: New player adapter for Quod Libet
+  * Windows support (experimental)
+  * Winamp: Added Winamp adapter
+  * Quod Libet: Added Quod Libet adapter
 
 Release 0.9.2
 =============

@@ -15,6 +15,8 @@ Contributors, listed alphabetically:
    - Amarok 1.4 adapter
  * Rajiv Nair <rajivnair.in@gmail.com>
    - miscellaneous fixes/enhancements
+ * Catalin Patulea <cat@vv.carleton.ca>
+   - Windows port, Winamp player adapter
  * Pawel Szubert <pawel.pbm@gmail.com>
    - Okular, Songbird and QuodLibet adapter
 
