@@ -24,96 +24,207 @@
 
 """QuodLibet adapter for Remuco, implemented as an executable script."""
 
+# TODO: This adapter currently is a script. An adapter implemented as a QL
+#       plugin probably would provide significantly more features, especially
+#       concerning media library integration.
+
 import commands
 
 import dbus
 from dbus.exceptions import DBusException
+import gobject
 
 import remuco
 from remuco import log
 
 class QuodLibetAdapter(remuco.PlayerAdapter):
-    
+
     def __init__(self):
         remuco.PlayerAdapter.__init__(self,
-				      "QuodLibet",
-				      progress_known=True,
-				      playback_known=True)
-				    
-                    
+                                      "QuodLibet",
+                                      progress_known=True,
+                                      playback_known=True,
+                                      repeat_known=True,
+                                      shuffle_known=True,
+                                      max_rating=4)
+
+        self.__dbus_signal_handler = ()
+        self.__ql_dbus = None
+        self.__song_len = 0 # need this when polling progress
+
     def start(self):
+
         remuco.PlayerAdapter.start(self)
+
+        # set up DBus connection
 
         try:
             bus = dbus.SessionBus()
-            proxy = bus.get_object("net.sacredchao.QuodLibet",  "/net/sacredchao/QuodLibet")
-            self.__am = dbus.Interface(proxy, "net.sacredchao.QuodLibet")
+            proxy = bus.get_object("net.sacredchao.QuodLibet",
+                                   "/net/sacredchao/QuodLibet")
+            self.__ql_dbus = dbus.Interface(proxy, "net.sacredchao.QuodLibet")
         except DBusException, e:
             raise StandardError("dbus error: %s" % e)
-          
+
+        # connect to DBus signals
+
+        try:
+            self.__dbus_signal_handler = (
+                self.__ql_dbus.connect_to_signal("Paused",
+                                                 self.__on_paused),
+                self.__ql_dbus.connect_to_signal("Unpaused",
+                                                 self.__on_unpaused),
+                self.__ql_dbus.connect_to_signal("SongStarted",
+                                                 self.__on_song_started),
+                self.__ql_dbus.connect_to_signal("SongEnded",
+                                                 self.__on_song_ended),
+            )
+        except DBusException, e:
+            raise StandardError("dbus error: %s" % e)
+
+        # misc initialization
+
+        self.__song_len = 0
+
+        # initial info retrieval
+
+        self.poll()
+
+        if self.__ql_dbus.IsPlaying():
+            self.__on_song_started(self.__ql_dbus.CurrentSong())
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        else:
+            self.update_playback(remuco.PLAYBACK_PAUSE)
+
     def stop(self):
+
         remuco.PlayerAdapter.stop(self)
-        
+
+        # disconnect DBus stuff
+
+        for handler in self.__dbus_signal_handler:
+            handler.remove()
+
+        self.__dbus_signal_handler = ()
+
+        self.__ql_dbus = None
+
     def poll(self):
-	info = {}
-	if self.__am.IsPlaying() == 1:
-	    info[remuco.INFO_ALBUM] = self.quodlibet("--print-playing '<album>'")
-	    info[remuco.INFO_ARTIST] = self.quodlibet("--print-playing '<artist>'")
-	    info[remuco.INFO_GENRE] = self.quodlibet("--print-playing '<genre>'")
-	    info[remuco.INFO_LENGTH] = self.__am.CurrentSong()['~#length']
-	    info[remuco.INFO_RATING] = self.__am.CurrentSong()['~#rating']
-	    info[remuco.INFO_TITLE] = self.quodlibet("--print-playing '<title>'")
-	    info[remuco.INFO_YEAR] = self.__am.CurrentSong()['date']
-	    self.update_progress(self.__am.GetPosition()/1000, info[remuco.INFO_LENGTH])
-	    self.update_playback(remuco.PLAYBACK_PLAY)
-	else:
-	    self.update_progress(0,0)
-	    self.update_playback(remuco.PLAYBACK_STOP)
-	self.update_item(None, info, None)
 
-    def quodlibet(self, action):
-        return commands.getoutput("quodlibet " + action)
-
+        self.__poll_status()
+        self.__poll_progress()
 
     # =========================================================================
     # control interface
     # =========================================================================
+
     def ctrl_toggle_playing(self):
-        self.quodlibet("--play-pause")
-	self.poll()
+        self.__ql_dbus.PlayPause()
 
     def ctrl_next(self):
-        self.quodlibet("--next")
+        self.__ql_dbus.Next()
 
     def ctrl_previous(self):
-        self.quodlibet("--previous")
+        self.__ql_dbus.Previous()
 
     def ctrl_toggle_shuffle(self):
-        self.quodlibet("--order=toggle")
+        self.__ql_cmd("--order=toggle")
+        gobject.idle_add(self.__poll_status)
 
     def ctrl_toggle_repeat(self):
-        self.quodlibet("--repeat=t")
+        self.__ql_cmd("--repeat=t")
+        gobject.idle_add(self.__poll_status)
 
     def ctrl_volume(self, direction):
         if direction == 0:
-            self.quodlibet("--volume=0")
+            self.__ql_cmd("--volume=0")
         elif direction == -1:
-            self.quodlibet("--volume-down")
+            self.__ql_cmd("--volume-down")
         else:
-            self.quodlibet("--volume-up")
-    
+            self.__ql_cmd("--volume-up")
+        gobject.idle_add(self.__poll_status)
+
+    def ctrl_rate(self, rating):
+        self.__ql_cmd("--set-rating=%1.1f" % (float(rating) / 4))
 
     # =========================================================================
     # request interface
     # =========================================================================
-    
-    
+
+    # ... not yet supported, see TODO on top
+
+    # =========================================================================
+    # helper
+    # =========================================================================
+
+    def __ql_cmd(self, action):
+        """QL command line interaction."""
+
+        return commands.getoutput("quodlibet " + action)
+
+    def __on_paused(self):
+        """DBus signal handler."""
+
+        self.update_playback(remuco.PLAYBACK_PAUSE)
+
+    def __on_unpaused(self):
+        """DBus signal handler."""
+
+        self.update_playback(remuco.PLAYBACK_PLAY)
+
+    def __on_song_started(self, song):
+        """DBus signal handler."""
+
+        info = {}
+
+        info[remuco.INFO_ALBUM] = song.get("album", None)
+        info[remuco.INFO_ARTIST] = song.get("artist", None)
+        info[remuco.INFO_GENRE] = song.get("genre", None)
+        info[remuco.INFO_LENGTH] = song.get("~#length", 0)
+        info[remuco.INFO_RATING] = int(float(song.get("~#rating", 0.5)) * 4)
+        info[remuco.INFO_TITLE] = song.get("title", None)
+        info[remuco.INFO_YEAR] = song.get("date", 0)
+        info[remuco.INFO_BITRATE] = int(song.get("~#bitrate", 0)) / 1000
+
+        self.__song_len = info[remuco.INFO_LENGTH]
+
+        # QL does not provide an ID/URI -> no chance to get local cover art
+        self.update_item(None, info, None)
+
+    def __on_song_ended(self, song, skipped):
+        """DBus signal handler."""
+
+        self.update_item(None, None, None)
+        self.__song_len = 0
+        self.update_progress(0, 0)
+
+    def __poll_status(self):
+        """Poll volume, repeat and shuffle."""
+
+        status = self.__ql_cmd("--status").split()
+
+        if status and len(status) == 5:
+            self.update_volume(float(status[2]) * 100)
+            self.update_shuffle(status[3] != "inorder")
+            self.update_repeat(status[4] == "on")
+        else:
+            self.update_volume(50)
+            self.update_shuffle(False)
+            self.update_repeat(False)
+
+    def __poll_progress(self):
+        """Poll playback progress."""
+
+        if self.__ql_dbus.IsPlaying():
+            self.update_progress(self.__ql_dbus.GetPosition() / 1000,
+                                 self.__song_len)
+
 # =============================================================================
-# main (example startup using remuco.Manager)
+# main
 # =============================================================================
 
 if __name__ == '__main__':
-    
+
     pa = QuodLibetAdapter() # create the player adapter
     mg = remuco.Manager(pa, player_dbus_name="net.sacredchao.QuodLibet")
     mg.run() # run the manager (blocks until interrupt signal)
