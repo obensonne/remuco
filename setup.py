@@ -78,6 +78,12 @@ pa_files["okular"] = [
     ["remuco-okular"]
 ]
 
+# --- QuodLibet ------------------------------------------------------------------
+
+pa_files["quodlibet"] = [
+    ["remuco-quodlibet"]
+]
+
 # --- Rhythmbox ---------------------------------------------------------------
 
 # set prefix may not be valid for Rhythmbox -> use a Rhythmbox specific prefix:
