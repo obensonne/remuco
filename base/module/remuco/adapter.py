@@ -864,7 +864,7 @@ class PlayerAdapter(object):
         @note: Override if item actions gets passed to reply_mlib_request().
                 
         """
-        log.error("** BUG ** action_item() not implemented")
+        log.error("** BUG ** action_mlib_item() not implemented")
     
     def action_mlib_list(self, action_id, path):
         """Do an action on a list from the player's media library.
