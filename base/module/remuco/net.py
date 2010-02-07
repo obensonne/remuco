@@ -94,6 +94,7 @@ class ClientConnection(object):
         
         # client info
         self.info = ClientInfo()
+        self.__psave = False
         
         # the following fields are used for iterative receiving on message data
         # see io_recv() and io_recv_buff()
@@ -217,6 +218,16 @@ class ClientConnection(object):
             
             log.debug("received ignore msg (probably a ping)")
             
+        elif msg_id == message.CONN_SLEEP:
+            
+            self.__psave = True
+            
+        elif msg_id == message.CONN_WAKEUP:
+            
+            self.__psave = False
+            
+            self.__msg_handler_fn(self, message.PRIV_INITIAL_SYNC, None)
+            
         elif msg_id == message.CONN_CINFO:
             
             log.debug("received client info from %s" % self)
@@ -303,6 +314,10 @@ class ClientConnection(object):
         
         if self.__sock is None:
             log.debug("cannot send message to %s, already disconnected" % self)
+            return
+
+        if self.__psave:
+            log.debug("%s is in sleep mode, send nothing" % self)
             return
 
         self.__snd_buff = "%s%s" % (self.__snd_buff, msg)

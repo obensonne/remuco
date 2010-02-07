@@ -30,6 +30,8 @@ _CONN = 100
 #CONN_PLIST = _CONN
 CONN_PINFO = _CONN + 10
 CONN_CINFO = _CONN + 20
+CONN_SLEEP = _CONN + 30
+CONN_WAKEUP = _CONN + 40
 CONN_BYE = _CONN + 90
 
 # =============================================================================

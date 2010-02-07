@@ -38,6 +38,7 @@ import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.io.Connection;
 import remuco.client.common.io.ISocket;
+import remuco.client.common.io.Message;
 import remuco.client.common.io.Connection.IConnectionListener;
 import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
@@ -99,6 +100,10 @@ public class Remuco implements CommandListener, IConnectionListener,
 		}
 
 	}
+
+	/** Power saving option. */
+	public static OptionDescriptor OD_PSAVE = new OptionDescriptor("psave",
+			"Power saving", "on", new String[] { "on", "off" });
 
 	/** An alert to signal an alerting message :) */
 	private final Alert alert;
@@ -393,6 +398,38 @@ public class Remuco implements CommandListener, IConnectionListener,
 		disconnect();
 		config.save();
 
+	}
+
+	/**
+	 * Enable sleep mode (for power saving purposes).
+	 * <p/>
+	 * Sleep mode keeps up the connection to the server but stops sending any
+	 * data between client and server (except a BYE message from the server).
+	 */
+	protected void sleep() {
+		if (screenPlayer != null && config.getOption(OD_PSAVE).equals("on")) {
+			final Message m = new Message();
+			m.id = Message.CONN_SLEEP;
+			final Connection conn = screenPlayer.getPlayer().getConnection();
+			conn.setPing(0);
+			conn.send(m);
+		}
+	}
+
+	/**
+	 * Disable sleep mode.
+	 * <p/>
+	 * Enables ping sending (if configured) and sends a WAKEUP message to the
+	 * server which in return will send updated player state information.
+	 */
+	protected void wakeup() {
+		if (screenPlayer != null && config.getOption(OD_PSAVE).equals("on")) {
+			final Message m = new Message();
+			m.id = Message.CONN_WAKEUP;
+			final Connection conn = screenPlayer.getPlayer().getConnection();
+			conn.setPing(Integer.parseInt(config.getOption(Config.OD_PING)));
+			conn.send(m);
+		}
 	}
 
 	/**

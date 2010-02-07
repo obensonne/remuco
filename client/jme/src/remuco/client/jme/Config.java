@@ -149,6 +149,7 @@ public final class Config {
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_TYPE);
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_KEEPFS);
 		OPTION_DESCRIPTORS.addElement(Config.OD_PING);
+		OPTION_DESCRIPTORS.addElement(Remuco.OD_PSAVE);
 
 	}
 
