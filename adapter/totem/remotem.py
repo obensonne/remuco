@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
