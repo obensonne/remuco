@@ -10,6 +10,13 @@ within this script.
 from distutils.core import setup
 import os
 import os.path
+import platform
+
+# used for plugin based adapters which install to /usr/lib...
+if platform.architecture()[0] == "32bit":
+    LIB_DIR = "lib"
+else:
+    LIB_DIR = "lib64"
 
 # =============================================================================
 # specify script and data files for each player adapter (relative file names)
@@ -91,7 +98,7 @@ PREFIX_RHYTHMBOX = os.getenv("PREFIX_RHYTHMBOX", "/usr/")
 
 pa_files["rhythmbox"] = [
     [],
-    ("%slib/rhythmbox/plugins/remuco" % PREFIX_RHYTHMBOX,
+    ("%s%s/rhythmbox/plugins/remuco" % (PREFIX_RHYTHMBOX, LIB_DIR),
      ["remuco.rb-plugin", "remythm.py"])
 ]
 
@@ -108,7 +115,7 @@ PREFIX_TOTEM = os.getenv("PREFIX_TOTEM", "/usr/")
 
 pa_files["totem"] = [
     [],
-    ("%slib/totem/plugins/remuco" % PREFIX_TOTEM,
+    ("%s%s/totem/plugins/remuco" % (PREFIX_TOTEM, LIB_DIR),
      ["remuco.totem-plugin", "remotem.py"])
 ]
 
