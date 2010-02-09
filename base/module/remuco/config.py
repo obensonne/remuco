@@ -26,13 +26,12 @@ import os
 import os.path
 import sys
 
-from xdg.BaseDirectory import xdg_config_home as xdg_config
-from xdg.BaseDirectory import xdg_cache_home as xdg_cache
-
 from remuco import log
 from remuco import defs
+from remuco.remos import user_config
+from remuco.remos import user_cache
 
-DEVICE_FILE = os.path.join(xdg_cache, "remuco", "devices")
+DEVICE_FILE = os.path.join(user_cache, "remuco", "devices")
 
 SEC = ConfigParser.DEFAULTSECT
 
@@ -93,8 +92,8 @@ class Config(object):
         # convert descriptive name to a plain canonical one
         name_plain = player_name.lower().replace(" ", "").replace(".","")
         
-        self.__dir_config = os.path.join(xdg_config, "remuco", name_plain)
-        self.__dir_cache = os.path.join(xdg_cache, "remuco", name_plain)
+        self.__dir_config = os.path.join(user_config, "remuco", name_plain)
+        self.__dir_cache = os.path.join(user_cache, "remuco", name_plain)
         self.__file_config = os.path.join(self.__dir_config, "conf")
         self.__file_log = os.path.join(self.__dir_cache, "log")
     
@@ -111,7 +110,7 @@ class Config(object):
         
         ###### custom volume command ######
         
-        cmd = os.path.join(xdg_config, "remuco", "volume")
+        cmd = os.path.join(user_config, "remuco", "volume")
         if not os.path.isfile(cmd):
             cmd = os.path.join(self.__dir_config, "volume")
         if not os.path.isfile(cmd):
@@ -597,7 +596,7 @@ class Config(object):
 
 def get_system_shutdown_command():
         
-    path = os.path.join(xdg_config, "remuco", "shutdown-system")
+    path = os.path.join(user_config, "remuco", "shutdown-system")
     
     if not os.path.isfile(path):
         log.info("system shutdown command (%s) does not exist" % path)
