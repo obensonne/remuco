@@ -22,28 +22,18 @@
 
 import os
 import os.path
-import re
 import mimetypes
 import sys
 
 from remuco import log
-from remuco.remos import media_dirs
+from remuco.remos import media_dirs, user_home
 
-class _AllMimeTypes(list):
-    
-    def __init__(self):
-        
-        list.__init__(self)
-    
-    def __contains__(self, elem):
-        return True
-    
 class FileSystemLibrary(object):
     
     def __init__(self, root_dirs, mime_types, show_extensions=False,
                  show_hidden=False, use_user_dirs=True):
         
-        self.__mime_types = mime_types or _AllMimeTypes()
+        self.__mime_types = mime_types
         self.__show_extensions = show_extensions
         self.__show_hidden = show_hidden
         
@@ -53,13 +43,15 @@ class FileSystemLibrary(object):
         
         root_dirs = root_dirs or []
         
-        if use_user_dirs:
-            root_dirs += self.__get_mime_dirs(mime_types)
+        if use_user_dirs and mime_types:
+            for mtype in mime_types:
+                if mtype in media_dirs:
+                    root_dirs += media_dirs[mtype]
+                mtype = mtype.split("/")[0] # use main mimetype
+                if mtype in media_dirs:
+                    root_dirs += media_dirs[mtype]
             
-        root_dirs = self.__trim_dirs(root_dirs)
-        
-        if not root_dirs:
-            root_dirs = (os.getenv("HOME", os.path.sep), )
+        root_dirs = self.__trim_root_dirs(root_dirs) or [user_home]
         
         # map root dirs to names
         self.__roots = {}
@@ -81,23 +73,7 @@ class FileSystemLibrary(object):
         if not mimetypes.inited:
             mimetypes.init()
             
-    def __get_mime_dirs(self, mime_types):
-        """Get dirs which probably contain files with the given mime types."""
-        
-        if not mime_types:
-            return []
-        
-        dirs = []
-        for mtype in mime_types:
-            if mtype in media_dirs:
-                dirs += media_dirs[mtype]
-            mtype = mtype.split("/")[0] # use main mimetype
-            if mtype in media_dirs:
-                dirs += media_dirs[mtype]
-        
-        return dirs
-    
-    def __trim_dirs(self, dirs):
+    def __trim_root_dirs(self, dirs):
         """Trim a directory list.
         
         Expands variables and '~' and removes duplicate, relative, non
@@ -132,7 +108,8 @@ class FileSystemLibrary(object):
         def mimetype_is_supported(name):
             type = mimetypes.guess_type(name)[0] or ""
             type_main = type.split("/")[0]
-            return type_main in self.__mime_types or type in self.__mime_types
+            return (not self.__mime_types or type_main in self.__mime_types or
+                    type in self.__mime_types)
         
         nested = []
         ids = []
