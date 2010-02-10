@@ -169,6 +169,8 @@ class Item(serial.Serializable):
                 img = Image.open(img)
             img.thumbnail((img_size, img_size))
             file_tmp = tempfile.TemporaryFile()
+            if img_type == "JPEG" and img.mode == "P":
+                img = img.convert("RGB")
             img.save(file_tmp, img_type)
             file_tmp.seek(0)
             thumb = file_tmp.read()

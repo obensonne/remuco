@@ -31,7 +31,7 @@ from remuco import log
 from remuco.remos import user_home
 
 _RE_IND = r'(?:front|album|cover|folder|art)' # words indicating art files
-_RE_EXT = r'\.(?:png|jpeg|jpg)' # art file extensions
+_RE_EXT = r'\.(?:png|jpeg|jpg|gif)' # art file extensions
 _RE_FILE = (r'^%s%s$' % (_RE_IND,_RE_EXT), # typical name (e.g. front.jpg)
            r'^.*%s.*%s$' % (_RE_IND,_RE_EXT), # typical name with noise
            r'^.*%s$' % _RE_EXT) # any image file
