@@ -75,12 +75,13 @@ from remuco.adapter import PlayerAdapter, ItemAction, ListAction, ListReply
 from remuco.config import Config
 from remuco.defs import *
 from remuco.manager import Manager
+from remuco.mpris import MPRISAdapter
 
 #==============================================================================
 # exports
 #==============================================================================
 
-__all__ = ["PlayerAdapter", "ListReply",
+__all__ = ["PlayerAdapter", "ListReply", "MPRISAdapter",
            "ItemAction", "ListAction", "Manager", "Config",
            
            "INFO_ALBUM", "INFO_ARTIST", "INFO_GENRE", "INFO_LENGTH",
@@ -88,15 +89,5 @@ __all__ = ["PlayerAdapter", "ListReply",
            
            "PLAYBACK_PAUSE", "PLAYBACK_PLAY", "PLAYBACK_STOP",
            ]
-
-#==============================================================================
-# platform dependent
-#==============================================================================
-
-from remuco import remos
-
-if remos.linux:
-    from remuco.mpris import MPRISAdapter
-    __all__.append("MPRISAdapter")
 
 __version__ = REMUCO_VERSION
