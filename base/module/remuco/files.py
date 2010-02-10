@@ -26,8 +26,6 @@ import re
 import mimetypes
 import sys
 
-from xdg.BaseDirectory import xdg_config_home as xdg_config
-
 from remuco import log
 from remuco.remos import media_dirs
 
