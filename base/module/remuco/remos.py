@@ -104,3 +104,48 @@ for mime_type, dirs in list(media_dirs.items()): # list prevents iter/edit confl
     media_dirs[mime_type] = [_real_path(p) for p in dirs]
     media_dirs[mime_type] = [p for p in dirs if os.path.exists(p)]
 
+# =============================================================================
+# user notifications
+# =============================================================================
+
+if _linux:
+
+    import dbus
+    from dbus.exceptions import DBusException
+    
+    def notify(title, text):
+        """Notify the user that a new device has been loggend."""
+    
+        try:
+            bus = dbus.SessionBus()
+        except DBusException, e:
+            log.error("no dbus session bus (%s)" % e)
+            return
+        
+        try:
+            proxy = bus.get_object("org.freedesktop.Notifications",
+                                   "/org/freedesktop/Notifications")
+            notid = dbus.Interface(proxy, "org.freedesktop.Notifications")
+        except DBusException, e:
+            log.error("failed to connect to notification daemon (%s)" % e)
+            return
+    
+        try:
+            caps = notid.GetCapabilities()
+        except DBusException, e:
+            return
+        
+        if not caps or "body-markup" not in caps:
+            text = text.replace("<b>", "")
+            text = text.replace("</b>", "")
+            
+        try:
+            notid.Notify("Remuco", 0, "phone", title, text, [], {}, 15)
+        except DBusException, e:
+            log.warning("user notification failed (%s)" % e)
+            return
+        
+else:
+    def notify(title, text):
+        log.info("%s: %s" % (title, text))
+        # TODO: implementations for mac and win
