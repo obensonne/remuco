@@ -52,6 +52,11 @@ def _real_path(p):
 # locations
 # =============================================================================
 
+# media_dirs:
+#    Maps some mimetypes to a list of locations which typically contain files
+#    of a specific mimetype. For those mime types not mapped, `user_home` may
+#    be used as a fallback.
+
 if _linux:
     
     import xdg.BaseDirectory
@@ -60,19 +65,19 @@ if _linux:
     user_config_dir = xdg.BaseDirectory.xdg_config_home
     user_cache_dir = xdg.BaseDirectory.xdg_cache_home
 
-    _dir_map = {}
+    media_dirs = {}
     try:
         with open(opj(user_config_dir, "user-dirs.dirs")) as fp:
             _udc = fp.read()
     except IOError, e:
         log.warning("failed to load user dirs config (%s)" % e)
-        music_dirs = ["~/Music"]
-        video_dirs = ["~/Videos"]
+        media_dirs["audio"] = ["~/Music"]
+        media_dirs["video"] = ["~/Videos"]
     else:
         m = re.search(r'XDG_MUSIC_DIR="([^"]+)', _udc)
-        music_dirs = [m and m.groups()[0] or "~/Music"]
+        media_dirs["audio"] = [m and m.groups()[0] or "~/Music"]
         m = re.search(r'XDG_VIDEOS_DIR="([^"]+)', _udc)
-        video_dirs = [m and m.groups()[0] or "~/Videos"]
+        media_dirs["video"] = [m and m.groups()[0] or "~/Video"]
     
 elif _windows:
     
@@ -83,21 +88,19 @@ elif _windows:
     user_config_dir = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA,0, 0)
     user_cache_dir = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)
     
-    music_dirs = [shell.SHGetFolderPath(0, shellcon.CSIDL_MYMUSIC, 0, 0),
-                  shell.SHGetFolderPath(0, shellcon.CSIDL_COMMON_MUSIC, 0, 0)]
-    video_dirs = [shell.SHGetFolderPath(0, shellcon.CSIDL_MYVIDEO, 0, 0),
-                  shell.SHGetFolderPath(0, shellcon.CSIDL_COMMON_VIDEO, 0, 0)]
+    media_dirs = {}
+    media_dirs["audio"] = [shell.SHGetFolderPath(0, shellcon.CSIDL_MYMUSIC, 0, 0),
+                          shell.SHGetFolderPath(0, shellcon.CSIDL_COMMON_MUSIC, 0, 0)]
+    media_dirs["video"] = [shell.SHGetFolderPath(0, shellcon.CSIDL_MYVIDEO, 0, 0),
+                          shell.SHGetFolderPath(0, shellcon.CSIDL_COMMON_VIDEO, 0, 0)]
     
 elif _mac:
     raise NotImplementedError
 else:
     assert False
-    
+
 # sanitize locations:
-music_dirs = [_real_path(p) for p in music_dirs] # real path
-music_dirs = [p for p in music_dirs if os.path.exists(p)] # remove non-existent
-music_dirs = music_dirs or [user_home] # fall back to home if list is empty
-video_dirs = [_real_path(p) for p in video_dirs] # real path
-video_dirs = [p for p in video_dirs if os.path.exists(p)] # remove non-existent
-video_dirs = video_dirs or [user_home] # fall back to home if list is empty
+for mime_type, dirs in list(media_dirs.items()): # list prevents iter/edit conflicts
+    media_dirs[mime_type] = [_real_path(p) for p in dirs]
+    media_dirs[mime_type] = [p for p in dirs if os.path.exists(p)]
 
