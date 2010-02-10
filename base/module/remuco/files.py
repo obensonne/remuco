@@ -60,7 +60,7 @@ class FileSystemLibrary(object):
             if name == dir: # == "/"
                 name = "Root"
             else:
-                name.capitalize()
+                name = name.capitalize()
             counter = 2
             name_x = name
             while name_x in self.__roots:
