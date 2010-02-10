@@ -35,9 +35,9 @@ from remuco import log
 # platform detection
 # =============================================================================
 
-_linux = sys.platform == "linux2"
-_windows = sys.platform.startswith("win")
-_mac = sys.platform == "darwin"
+linux = sys.platform.startswith("linux")
+windows = sys.platform.startswith("win")
+mac = sys.platform == "darwin"
 
 # =============================================================================
 # helpers
@@ -57,7 +57,7 @@ def _real_path(p):
 #    of a specific mimetype. For those mime types not mapped, `user_home` may
 #    be used as a fallback.
 
-if _linux:
+if linux:
     
     import xdg.BaseDirectory
 
@@ -79,7 +79,7 @@ if _linux:
         m = re.search(r'XDG_VIDEOS_DIR="([^"]+)', _udc)
         media_dirs["video"] = [m and m.groups()[0] or "~/Video"]
     
-elif _windows:
+elif windows:
     
     from win32com.shell import shell, shellcon
 
@@ -94,7 +94,7 @@ elif _windows:
     media_dirs["video"] = [shell.SHGetFolderPath(0, shellcon.CSIDL_MYVIDEO, 0, 0),
                           shell.SHGetFolderPath(0, shellcon.CSIDL_COMMON_VIDEO, 0, 0)]
     
-elif _mac:
+elif mac:
     raise NotImplementedError
 else:
     assert False
@@ -108,7 +108,7 @@ for mime_type, dirs in list(media_dirs.items()): # list prevents iter/edit confl
 # user notifications
 # =============================================================================
 
-if _linux:
+if linux:
 
     import dbus
     from dbus.exceptions import DBusException
