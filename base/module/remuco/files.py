@@ -30,8 +30,7 @@ from remuco.remos import media_dirs, user_home
 
 class FileSystemLibrary(object):
     
-    def __init__(self, root_dirs, mime_types, show_extensions=False,
-                 show_hidden=False, use_user_dirs=True):
+    def __init__(self, root_dirs, mime_types, show_extensions, show_hidden):
         
         self.__mime_types = mime_types
         self.__show_extensions = show_extensions
@@ -43,13 +42,16 @@ class FileSystemLibrary(object):
         
         root_dirs = root_dirs or []
         
-        if use_user_dirs and mime_types:
-            for mtype in mime_types:
-                if mtype in media_dirs:
-                    root_dirs += media_dirs[mtype]
-                mtype = mtype.split("/")[0] # use main mimetype
-                if mtype in media_dirs:
-                    root_dirs += media_dirs[mtype]
+        # mimetype dependent root dirs
+        if "auto" in root_dirs:
+            root_dirs.remove("auto")
+            if mime_types:
+                for mtype in mime_types:
+                    if mtype in media_dirs:
+                        root_dirs += media_dirs[mtype]
+                    mtype = mtype.split("/")[0] # use main mimetype
+                    if mtype in media_dirs:
+                        root_dirs += media_dirs[mtype]
             
         root_dirs = self.__trim_root_dirs(root_dirs) or [user_home]
         
