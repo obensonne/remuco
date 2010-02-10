@@ -6,7 +6,7 @@ Remuco is written and maintained by Oben Sonne <obensonne@googlemail.com>.
 Contributors, listed alphabetically:
 
  * Igor Almeida <igor.contato@gmail.com>
-   - MPlayer adapter
+   - MPlayer adapter, promotion :), miscellaneous
  * James Le Cuirot
    - XMMS2 adapter improvements
  * Tim Froidcoeur
@@ -15,6 +15,8 @@ Contributors, listed alphabetically:
    - Amarok 1.4 adapter
  * Rajiv Nair <rajivnair.in@gmail.com>
    - miscellaneous fixes/enhancements
+ * Catalin Patulea <cat@vv.carleton.ca>
+   - Windows port, Winamp player adapter
  * Pawel Szubert <pawel.pbm@gmail.com>
    - Okular, Songbird and QuodLibet adapter
 

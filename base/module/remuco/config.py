@@ -24,20 +24,21 @@ import ConfigParser
 from ConfigParser import NoOptionError
 import os
 import os.path
+from os.path import join as opj
+import shutil
 import sys
-
-from xdg.BaseDirectory import xdg_config_home as xdg_config
-from xdg.BaseDirectory import xdg_cache_home as xdg_cache
 
 from remuco import log
 from remuco import defs
+from remuco.remos import user_config_dir
+from remuco.remos import user_cache_dir
 
-DEVICE_FILE = os.path.join(xdg_cache, "remuco", "devices")
+DEVICE_FILE = opj(user_cache_dir, "remuco", "devices")
 
 SEC = ConfigParser.DEFAULTSECT
 
-CONFIG_VERSION_MAJOR = "1"
-CONFIG_VERSION_MINOR = "5"
+CONFIG_VERSION_MAJOR = "2"
+CONFIG_VERSION_MINOR = "0"
 CONFIG_VERSION = "%s.%s" % (CONFIG_VERSION_MAJOR, CONFIG_VERSION_MINOR)
 
 KEY_CONFIG_VERSION = "config-version"
@@ -47,10 +48,8 @@ KEY_WIFI = "wifi-enabled"
 KEY_WIFI_PORT = "wifi-port"
 KEY_ENDCODING = "player-encoding"
 KEY_LOGLEVEL = "log-level"
-KEY_FB = "file-browser-enabled"
 KEY_FB_SHOW_EXT = "file-browser-show-extensions"
 KEY_FB_ROOT_DIRS = "file-browser-root-dirs"
-KEY_FB_XDG_UD = "file-browser-use-xdg-user-dirs"
 KEY_MPRIS_JUMP = "mpris-jump"
 
 DEFAULTS = { # values as saved in config file
@@ -60,10 +59,8 @@ DEFAULTS = { # values as saved in config file
     KEY_WIFI_PORT: "34271",
     KEY_ENDCODING: "UTF8",
     KEY_LOGLEVEL: "INFO",
-    KEY_FB: "1",
     KEY_FB_SHOW_EXT: "0",
-    KEY_FB_ROOT_DIRS: "",
-    KEY_FB_XDG_UD: "1",
+    KEY_FB_ROOT_DIRS: "auto",
     KEY_MPRIS_JUMP: "0" }
 
 class Config(object):
@@ -93,10 +90,10 @@ class Config(object):
         # convert descriptive name to a plain canonical one
         name_plain = player_name.lower().replace(" ", "").replace(".","")
         
-        self.__dir_config = os.path.join(xdg_config, "remuco", name_plain)
-        self.__dir_cache = os.path.join(xdg_cache, "remuco", name_plain)
-        self.__file_config = os.path.join(self.__dir_config, "conf")
-        self.__file_log = os.path.join(self.__dir_cache, "log")
+        self.__dir_config = opj(user_config_dir, "remuco", name_plain)
+        self.__dir_cache = opj(user_cache_dir, "remuco", name_plain)
+        self.__file_config = opj(self.__dir_config, "conf")
+        self.__file_log = opj(self.__dir_cache, "log")
     
         try:
             if not os.path.isdir(self.__dir_config):
@@ -111,9 +108,9 @@ class Config(object):
         
         ###### custom volume command ######
         
-        cmd = os.path.join(xdg_config, "remuco", "volume")
+        cmd = opj(user_config_dir, "remuco", "volume")
         if not os.path.isfile(cmd):
-            cmd = os.path.join(self.__dir_config, "volume")
+            cmd = opj(self.__dir_config, "volume")
         if not os.path.isfile(cmd):
             log.debug("custom volume command does not exist (%s)" % cmd)
             self.__custom_volume_cmd = None
@@ -156,7 +153,10 @@ class Config(object):
 
         if major != CONFIG_VERSION_MAJOR:
             # on major change, reset configuration
-            log.info("config major version changed -> reset config")
+            old_config = "%s.old" % self.__file_config
+            log.info("config major version changed -> reset (backup: %s)" %
+                     old_config)
+            shutil.copy(self.__file_config, old_config)
             self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
             
         # remove old, now unused options:
@@ -393,32 +393,6 @@ class Config(object):
     log_level = property(__pget_log_level, __pset_log_level, None,
                          __pget_log_level.__doc__)
 
-    # === property: fb ===
-    
-    def __pget_fb(self):
-        """Flag if file browser features are enabled.
-        
-        This setting has no effect if a player adapter does not implement any
-        file browser related features.
-        
-        Default: True (enable)
-        
-        Option name: 'file-browser-enabled'
-        
-        """
-        try:
-            return self.__cp.getboolean(SEC, KEY_FB)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_FB, e))
-            return True
-
-    def __pset_fb(self, value):
-
-        self.__cp.set(SEC, KEY_FB, str(value))
-        self.__save()
-    
-    fb = property(__pget_fb, __pset_fb, None, __pget_fb.__doc__)
-
     # === property: fb_extensions ===
     
     def __pget_fb_extensions(self):
@@ -448,7 +422,10 @@ class Config(object):
     def __pget_fb_root_dirs(self):
         """List of directories to show as root directories in the file browser.
         
-        Default: []
+        The reserved directory name `auto` will be replaced by directories
+        containing media of the mimetypes defined in a player adapter.
+        
+        Default: ["auto"]
         
         Option name: 'file-browser-root-dirs'
         
@@ -482,36 +459,6 @@ class Config(object):
     
     fb_root_dirs = property(__pget_fb_root_dirs, __pset_fb_root_dirs, None,
                             __pget_fb_root_dirs.__doc__)
-
-    # === property: fb_xdg_user_dirs ===
-    
-    def __pget_fb_xdg_user_dirs(self):
-        """Flag if file browser integrates XDG user dirs.
-        
-        The user dirs shown depend on the mime types set in this config's
-        player adapter. For instance if mime type 'audio' is supported, then
-        the directory XDG_MUSIC_DIR will be used as a root dir in the file
-        browser.
-        
-        Default: True
-
-        Option name: 'file-browser-use-xdg-user-dirs'
-        
-        """
-        try:
-            return self.__cp.getboolean(SEC, KEY_FB_XDG_UD)
-        except (ValueError, AttributeError), e:
-            log.warning("config '%s' malformed (%s)" % (KEY_FB_XDG_UD, e))
-            return True
-    
-    def __pset_fb_xdg_user_dirs(self, value):
-
-        self.__cp.set(SEC, KEY_FB_XDG_UD, str(value))
-        self.__save()
-    
-    fb_xdg_user_dirs = property(__pget_fb_xdg_user_dirs,
-                                __pset_fb_xdg_user_dirs, None,
-                                __pget_fb_xdg_user_dirs.__doc__)
 
     # === propety: mpris-jump ===
 
@@ -597,15 +544,17 @@ class Config(object):
 
 def get_system_shutdown_command():
         
-    path = os.path.join(xdg_config, "remuco", "shutdown-system")
+    path = opj(user_config_dir, "remuco", "shutdown-system")
     
     if not os.path.isfile(path):
-        log.info("system shutdown command (%s) does not exist" % path)
+        log.info("system shutdown disabled")
         return None
     
     if not os.access(path, os.X_OK):
         log.info("system shutdown command (%s) is not executable" % path)
         return None
+    
+    log.info("system shutdown enabled")
     
     return path
 

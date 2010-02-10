@@ -495,11 +495,12 @@ class PlayerAdapter(object):
         self.__server_bluetooth = None
         self.__server_wifi = None
         
-        if self.__config.fb:
+        if self.__config.fb_root_dirs:
             self.__filelib = files.FileSystemLibrary(
                 self.__config.fb_root_dirs, mime_types,
-                use_user_dirs=self.__config.fb_xdg_user_dirs, 
-                show_extensions=self.__config.fb_extensions)
+                self.__config.fb_extensions, False)
+        else:
+            log.info("file browser is disabled")
             
         self.__manager = DummyManager()
         
@@ -613,7 +614,7 @@ class PlayerAdapter(object):
     # utility methods which may be useful for player adapters
     # =========================================================================
     
-    def find_image(self, resource, prefer_thumbnail=False):
+    def find_image(self, resource):
         """Find a local art image file related to a resource.
         
         This method first looks in the resource' folder for typical art image
@@ -631,7 +632,7 @@ class PlayerAdapter(object):
         
         """
         
-        file = art.get_art(resource, prefer_thumbnail=prefer_thumbnail)
+        file = art.get_art(resource)
         log.debug("image for '%s': %s" % (resource, file))
         return file
     

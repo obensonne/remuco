@@ -22,14 +22,18 @@
 
 import os.path
 
-import dbus
-from dbus.exceptions import DBusException
 import gobject
 
 from remuco.adapter import PlayerAdapter, ItemAction
 from remuco.defs import *
 from remuco import log
 
+try:
+    import dbus
+    from dbus.exceptions import DBusException
+except ImportError:
+    log.warning("dbus not available - MPRIS based player adapters will crash")
+    
 # =============================================================================
 # MPRIS constants
 # =============================================================================

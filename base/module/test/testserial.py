@@ -186,7 +186,7 @@ class SerializationTest(unittest.TestCase):
         la1 = remuco.ListAction("la1_l")
         las = [ la1 ]
         
-        il = data.ItemList(path, nested, ids, names, 0, 1, 2, ias, las)
+        il = data.ItemList(1, path, nested, ids, names, 0, 1, 2, ias, las)
         
         #self.__serialize(il)
         serial.pack(il)
@@ -206,7 +206,7 @@ class SerializationTest(unittest.TestCase):
         #las = [ la1 ]
         las = None
         
-        il = data.ItemList(path, nested, ids, names, 0, 1, 2, ias, las)
+        il = data.ItemList(2, path, nested, ids, names, 0, 1, 2, ias, las)
         
         #self.__serialize(il)
         serial.pack(il)

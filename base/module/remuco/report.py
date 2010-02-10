@@ -27,12 +27,9 @@ import os
 import os.path
 import urllib
 
-import dbus
-from dbus.exceptions import DBusException
-
 from remuco.config import DEVICE_FILE
 from remuco import dictool
-from remuco import log
+from remuco.remos import notify
 
 __HOST = "remuco.sourceforge.net"
 __LOC = "/cgi-bin/report"
@@ -57,43 +54,11 @@ def log_device(device):
                                                 keys=__FIELDS)
     
     if not device in seen_devices:
-        __user_notification("New Remuco Client",
-                            "Please run the tool <b>remuco-report</b> !")
+        notify("New Remuco Client",
+               "Please run the tool <b>remuco-report</b> !")
         seen_devices.append(device)
         dictool.write_dicts_to_file(DEVICE_FILE, seen_devices,
                                     comment=__DEVICE_FILE_COMMENT)
-
-def __user_notification(summary, text):
-    """Notify the user that a new device has been loggend."""
-
-    try:
-        bus = dbus.SessionBus()
-    except DBusException, e:
-        log.error("no dbus session bus (%s)" % e)
-        return
-    
-    try:
-        proxy = bus.get_object("org.freedesktop.Notifications",
-                               "/org/freedesktop/Notifications")
-        notid = dbus.Interface(proxy, "org.freedesktop.Notifications")
-    except DBusException, e:
-        log.error("failed to connect to notification daemon (%s)" % e)
-        return
-
-    try:
-        caps = notid.GetCapabilities()
-    except DBusException, e:
-        return
-    
-    if not caps or "body-markup" not in caps:
-        text = text.replace("<b>", "")
-        text = text.replace("</b>", "")
-        
-    try:
-        notid.Notify("Remuco", 0, "phone", summary, text, [], {}, 15)
-    except DBusException, e:
-        log.warning("user notification failed (%s)" % e)
-        return
 
 def __send_device(device):
     """Send a single device."""

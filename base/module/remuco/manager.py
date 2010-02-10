@@ -22,12 +22,17 @@
 
 import signal
 
-import dbus
-from dbus.exceptions import DBusException
-from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
 from remuco import log
+from remuco import remos
+
+try:
+    import dbus
+    from dbus.exceptions import DBusException
+    from dbus.mainloop.glib import DBusGMainLoop
+except ImportError:
+    log.warning("dbus not available - dbus using player adapters will crash")
 
 _ml = None
 
@@ -124,9 +129,9 @@ class _CustomObserver():
 class _DBusObserver():
     """Helper class used by Manager.
     
-    A DBus observer uses DBus name owner change notifications to automatically
-    start and stop a player adapter if the corresponding media player starts or
-    stops.
+    A DBus observer uses DBus name owner change notifications to
+    automatically start and stop a player adapter if the corresponding
+    media player starts or stops.
     
     """
     def __init__(self, pa, dbus_name):
@@ -160,8 +165,7 @@ class _DBusObserver():
             self.__handlers = (
                 self.__dbus.connect_to_signal("NameOwnerChanged",
                                               self.__notify_owner_change,
-                                              arg0=self.__dbus_name)
-                ,
+                                              arg0=self.__dbus_name),
             )
             self.__dbus.NameHasOwner(self.__dbus_name,
                                      reply_handler=self.__set_has_owner,
