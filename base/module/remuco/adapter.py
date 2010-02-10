@@ -614,7 +614,7 @@ class PlayerAdapter(object):
     # utility methods which may be useful for player adapters
     # =========================================================================
     
-    def find_image(self, resource, prefer_thumbnail=False):
+    def find_image(self, resource):
         """Find a local art image file related to a resource.
         
         This method first looks in the resource' folder for typical art image
@@ -632,7 +632,7 @@ class PlayerAdapter(object):
         
         """
         
-        file = art.get_art(resource, prefer_thumbnail=prefer_thumbnail)
+        file = art.get_art(resource)
         log.debug("image for '%s': %s" % (resource, file))
         return file
     

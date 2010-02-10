@@ -20,128 +20,89 @@
 #
 # =============================================================================
 
-import hashlib
-import os
 import glob
+import hashlib
 import os.path
 import re
 import urllib
 import urlparse
 
 from remuco import log
+from remuco.remos import user_home
 
-TN_DIR = os.path.join(os.getenv("HOME"), ".thumbnails")
-TN_SUBDIRS = ("large", "normal")
+_RE_IND = r'(?:front|album|cover|folder|art)' # words indicating art files
+_RE_EXT = r'\.(?:png|jpeg|jpg)' # art file extensions
+_RE_FILE = (r'^%s%s$' % (_RE_IND,_RE_EXT), # typical name (e.g. front.jpg)
+           r'^.*%s.*%s$' % (_RE_IND,_RE_EXT), # typical name with noise
+           r'^.*%s$' % _RE_EXT) # any image file
+_RE_FILE = [re.compile(rx, re.IGNORECASE) for rx in _RE_FILE]
 
-RE_IND = r'(?:front|album|cover|folder|art)' # words indicating art files
-RE_EXT = r'\.(?:png|jpeg|jpg)' # art file extensions
-RE_FILE = (r'^%s%s$' % (RE_IND, RE_EXT), # typical name (e.g. front.jpg)
-           r'^.*%s.*%s$' % (RE_IND, RE_EXT), # typical name with noise
-           r'^.*%s$' % RE_EXT) # any image file
-RE_FILE = [re.compile(rx, re.IGNORECASE) for rx in RE_FILE]
+# =============================================================================
+# various methods to find local cover art / media images
+# =============================================================================
 
-def __resource_to_file_uri(resource):
-    """Convert a resource to a file URI (file://...).
-    
-    @param resource:
-        a local path or an URI (string)
-    
-    @return:
-        the resource as a file URI string or None if resource is not local
-        
-    """
-    elems = urlparse.urlparse(resource)
-    
-    if elems[0] == "file": # location already is a file URI
-        return resource
-    
-    if not elems[0]: # location is a path
-    
-        elems = list(elems) # make elems assignable
-        elems[0] = "file"
-        elems[2] = urllib.pathname2url(resource)
-        
-        return urlparse.urlunparse(elems)
-        
-    # location is neither a file URI nor a path
-    
-    return None
+_TN_DIR = os.path.join(user_home, ".thumbnails")
 
-def __get_art_in_folder(uri):
-    """Try to find art images in the given URI's folder.
+def _try_thumbnail(resource):
+    """Try to find a thumbnail for a resource (path or URI)."""
     
-    @param uri:
-        a file URI ('file://...')
-    
-    @return:
-        path to an image file or None if there is no matching image file in the
-        URI's folder
-             
-    """
-    elems = urlparse.urlparse(uri)
-    
-    path = urllib.url2pathname(elems[2])
-    path = os.path.dirname(path)
-    
-    log.debug("looking for art image in %s" % path)
-
-    files = glob.glob(os.path.join(path, "*"))
-    files = [os.path.basename(f) for f in files if os.path.isfile(f)]
-    
-    for rx in RE_FILE:
-        for file in files:
-            if rx.match(file):
-                return os.path.join(path, file)
-            
-    return None
-    
-def __get_art_from_thumbnails(uri):
-    """Try to find a thumbnail for the given resource.
-    
-    @param uri:
-        a file URI ('file://...')
-    
-    @return:
-        path to a thumbnail file or None if URI is not local or if there is no
-        thumbnail for that URI
-        
-    """
-    if not os.path.isdir(TN_DIR):
+    if not os.path.isdir(_TN_DIR):
         return None
     
-    log.debug("looking for art image in %s" % TN_DIR)
+    # we need a file://... URI
+    elems = urlparse.urlparse(resource)
+    if elems[0] and elems[0] != "file": # not local
+        return None
+    if not elems[0]: # resource is a path
+        elems = list(elems) # make elems assignable
+        elems[0] = "file"
+        if isinstance(resource, unicode):
+            resource = resource.encode("utf-8")
+        elems[2] = urllib.pathname2url(resource)
+        resource = urlparse.urlunparse(elems)
 
-    hex = hashlib.md5(uri).hexdigest()
-    
-    for subdir in TN_SUBDIRS:
-        file = os.path.join(TN_DIR, subdir, "%s.png" % hex)
+    hex = hashlib.md5(resource).hexdigest()
+    for subdir in ("large", "normal"):
+        file = os.path.join(_TN_DIR, subdir, "%s.png" % hex)
         if os.path.isfile(file):
             return file
     
     return None
+
+def _try_folder(resource):
+    """Try to find an image in the resource's folder."""
+    
+    # we need a local path
+    elems = urlparse.urlparse(resource)
+    if elems[0] and elems[0] != "file": # resource is not local
+        return None
+    rpath = elems[0] and urllib.url2pathname(elems[2]) or elems[2]
+    rpath = os.path.dirname(rpath)
+    
+    log.debug("looking for art image in %s" % rpath)
+
+    files = glob.glob(os.path.join(rpath, "*"))
+    files = [os.path.basename(f) for f in files if os.path.isfile(f)]
+    
+    for rx in _RE_FILE:
+        for file in files:
+            if rx.match(file):
+                return os.path.join(rpath, file)
+            
+    return None
+
+# =============================================================================
 
 def get_art(resource, prefer_thumbnail=False):
     
     if resource is None:
         return None
     
-    uri = __resource_to_file_uri(resource)
-    if uri is None:
-        log.debug("resource '%s' is not local, ignore" % resource)
-        return None
+    fname = None
+    methods = (_try_thumbnail, _try_folder)
+    for meth in methods:
+        fname = meth(resource)
+        if fname:
+            break
     
-    if prefer_thumbnail:
-        file = __get_art_from_thumbnails(uri)
-        if file is not None:
-            return file
-        
-    file = __get_art_in_folder(uri)
-    if file is not None:
-        return file
-    
-    if not prefer_thumbnail:
-        file = __get_art_from_thumbnails(uri)
-        if file is not None:
-            return file
-    
-    return None
+    return fname

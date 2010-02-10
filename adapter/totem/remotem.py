@@ -297,7 +297,7 @@ class TotemAdapter(remuco.PlayerAdapter):
         
         info[remuco.INFO_LENGTH] = int(len / 1000)
         
-        img = self.find_image(mrl, prefer_thumbnail=True)
+        img = self.find_image(mrl)
         
         self.update_item(mrl, info, img)
         
