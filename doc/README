@@ -73,6 +73,7 @@ XMMS2:
 
 Winamp (Windows):
  * Winamp >= 2 and <= 5.56
+ * See README.windows
 
 Client:
  The client runs on mobile devices with this JavaME configurations:

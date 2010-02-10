@@ -3,18 +3,24 @@ Release 0.9.3 (in development)
 
 Base
 ----
-  * Improved local cover art detection
+  * Improved local cover art detection.
+  * Experimental Windows support.
 
 Player adapters
 ---------------
   * Exaile: Fixed crash on library search with empty query.
-  * Amarok 1.4: Added Amarok 1.4 adapter
+  * Exaile: Adjustments for Exaile 3.1 (in progress).
+  * Amarok 1.4: Added Amarok 1.4 adapter.
   * Amarok, VLC: New playlist action for jumping to a specific position (must
     be enabled explicitly in the adapter configuration because it fails in
-    dynamic playlists)
-  * Windows support (experimental)
-  * Winamp: Added Winamp adapter
-  * Quod Libet: Added Quod Libet adapter
+    dynamic playlists).
+  * Winamp: Added Winamp adapter.
+  * Quod Libet: Added Quod Libet adapter.
+  * MPlayer: Improved command line interface.
+
+Client
+------
+  * Power saving support (no communication when client is paused/minimized).
 
 Release 0.9.2
 =============
