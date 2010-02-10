@@ -55,6 +55,7 @@ public final class Message {
 	public static final int CTRL_FULLSCREEN = CTRL + 7;
 	public static final int CTRL_RATE = CTRL + 8;
 	public static final int CTRL_TAG = CTRL + 30;
+	public static final int CTRL_NAVIGATE = CTRL + 40;
 	public static final int CTRL_SHUTDOWN = CTRL + 90;
 
 	private static final int ACT = 400;
