@@ -29,7 +29,7 @@ import sys
 from xdg.BaseDirectory import xdg_config_home as xdg_config
 
 from remuco import log
-
+from remuco.remos import media_dirs
 
 class _AllMimeTypes(list):
     
@@ -39,60 +39,6 @@ class _AllMimeTypes(list):
     
     def __contains__(self, elem):
         return True
-
-class _DirMap(dict):
-    """Maps aliases and mime types to directories. """
-    
-    __DEFAULT = {
-        "XDG_DESKTOP_DIR": "$HOME/Desktop",
-        "XDG_DOWNLOAD_DIR": "$HOME/Download",
-        "XDG_TEMPLATES_DIR": "$HOME/Templates",
-        "XDG_PUBLICSHARE_DIR": "$HOME/Public",
-        "XDG_DOCUMENTS_DIR": "$HOME/Documents",
-        "XDG_MUSIC_DIR": "$HOME/Music",
-        "XDG_PICTURES_DIR": "$HOME/Photos",
-        "XDG_VIDEOS_DIR": "$HOME/Videos" }
-    
-    __MIME_TO_ALIAS_MAP = {
-        "audio": "XDG_MUSIC_DIR",
-        "video": "XDG_VIDEOS_DIR",
-        "image": "XDG_PICTURES_DIR" }
-
-    def __init__(self):
-        
-        dict.__init__(self)
-
-        self.update(_DirMap.__DEFAULT)
-        
-        udc = self.__load_xdg_user_dirs_config()
-        
-        self.update(udc)
-        
-        for mime_type in _DirMap.__MIME_TO_ALIAS_MAP:
-            alias = _DirMap.__MIME_TO_ALIAS_MAP[mime_type]
-            self[mime_type] = self[alias]
-            
-    def __load_xdg_user_dirs_config(self):
-    
-        filename = os.path.join(xdg_config, "user-dirs.dirs")
-    
-        if not os.path.isfile(filename):
-            return {}
-        
-        try:
-            udc_file = open(filename, "r")
-            udc_content = udc_file.read()
-        except IOError, e:
-            log.warning("failed to load user dirs config (%s)" % e)
-            return {}
-    
-        pattern = re.compile("\\n(XDG_[_A-Z]+)=\"([^\\n]+)\"")
-        tuples = re.findall(pattern, udc_content)
-        
-        config = {}
-        for kv in tuples: config[kv[0]] = kv[1]
-        
-        return config
     
 class FileSystemLibrary(object):
     
@@ -143,15 +89,13 @@ class FileSystemLibrary(object):
         if not mime_types:
             return []
         
-        dm = _DirMap()
-        
         dirs = []
-        for type in mime_types:
-            if type in dm:
-                dirs.append(dm[type])
-            type = type.split("/")[0] # use main mime type
-            if type in dm:
-                dirs.append(dm[type])
+        for mtype in mime_types:
+            if mtype in media_dirs:
+                dirs += media_dirs[mtype]
+            mtype = mtype.split("/")[0] # use main mimetype
+            if mtype in media_dirs:
+                dirs += media_dirs[mtype]
         
         return dirs
     
