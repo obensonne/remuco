@@ -59,6 +59,9 @@ def __resource_to_file_uri(resource):
     
         elems = list(elems) # make elems assignable
         elems[0] = "file"
+        if isinstance(resource, unicode):
+            resource = resource.encode("utf-8")
+            # TODO: does this work on systems not using utf-8 as default?
         elems[2] = urllib.pathname2url(resource)
         
         return urlparse.urlunparse(elems)
