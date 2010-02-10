@@ -25,6 +25,7 @@ from ConfigParser import NoOptionError
 import os
 import os.path
 from os.path import join as opj
+import shutil
 import sys
 
 from remuco import log
@@ -152,7 +153,10 @@ class Config(object):
 
         if major != CONFIG_VERSION_MAJOR:
             # on major change, reset configuration
-            log.info("config major version changed -> reset config")
+            old_config = "%s.old" % self.__file_config
+            log.info("config major version changed -> reset (backup: %s)" %
+                     old_config)
+            shutil.copy(self.__file_config, old_config)
             self.__cp = ConfigParser.SafeConfigParser(DEFAULTS)
             
         # remove old, now unused options:
