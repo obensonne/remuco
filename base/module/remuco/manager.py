@@ -22,12 +22,10 @@
 
 import signal
 
-import dbus
-from dbus.exceptions import DBusException
-from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
 from remuco import log
+from remuco import remos
 
 _ml = None
 
@@ -121,86 +119,93 @@ class _CustomObserver():
         
         gobject.source_remove(self.__sid)
 
-class _DBusObserver():
-    """Helper class used by Manager.
+if remos.linux:
     
-    A DBus observer uses DBus name owner change notifications to automatically
-    start and stop a player adapter if the corresponding media player starts or
-    stops.
+    # the DBus observer is only used on Linux systems
+
+    import dbus
+    from dbus.exceptions import DBusException
+    from dbus.mainloop.glib import DBusGMainLoop
     
-    """
-    def __init__(self, pa, dbus_name):
-        """Create a new DBus observer.
+    class _DBusObserver():
+        """Helper class used by Manager.
         
-        @param pa:
-            the PlayerAdapter to automatically start and stop
-        @param dbus_name:
-            the bus name used by the adapter's media player
-            
+        A DBus observer uses DBus name owner change notifications to
+        automatically start and stop a player adapter if the corresponding
+        media player starts or stops.
+        
         """
-        DBusGMainLoop(set_as_default=True)
-
-        self.__pa = pa
-        self.__dbus_name = dbus_name
-        
-        try:
-            bus = dbus.SessionBus()
-        except DBusException, e:
-            log.error("no dbus session bus (%s)" % e)
-            return
-        
-        try:
-            proxy = bus.get_object(dbus.BUS_DAEMON_NAME, dbus.BUS_DAEMON_PATH)
-            self.__dbus = dbus.Interface(proxy, dbus.BUS_DAEMON_IFACE)
-        except DBusException, e:
-            log.error("failed to connect to dbus daemon (%s)" % e)
-            return
-
-        try:
-            self.__handlers = (
-                self.__dbus.connect_to_signal("NameOwnerChanged",
-                                              self.__notify_owner_change,
-                                              arg0=self.__dbus_name)
-                ,
-            )
-            self.__dbus.NameHasOwner(self.__dbus_name,
-                                     reply_handler=self.__set_has_owner,
-                                     error_handler=self.__dbus_error)
-        except DBusException, e:
-            log.error("failed to talk with dbus daemon (%s)" % e)
-            return
-        
-    def __notify_owner_change(self, name, old, new):
-        
-        log.debug("dbus name owner changed: '%s' -> '%s'" % (old, new))
-        
-        _stop_pa(self.__pa)
-        
-        if not new:
-            return
-        
-        _start_pa(self.__pa)
-    
-    def __set_has_owner(self, has_owner):
-        
-        log.debug("dbus name has owner: %s" % has_owner)
-
-        if not has_owner:
-            return
-        
-        _start_pa(self.__pa)
-    
-    def __dbus_error(self, error):
-        log.warning("dbus error: %s" % error)
-        
-    def disconnect(self):
-        
-        for handler in self.__handlers:
-            handler.remove()
+        def __init__(self, pa, dbus_name):
+            """Create a new DBus observer.
             
-        self.__handlers = ()
+            @param pa:
+                the PlayerAdapter to automatically start and stop
+            @param dbus_name:
+                the bus name used by the adapter's media player
+                
+            """
+            DBusGMainLoop(set_as_default=True)
+    
+            self.__pa = pa
+            self.__dbus_name = dbus_name
+            
+            try:
+                bus = dbus.SessionBus()
+            except DBusException, e:
+                log.error("no dbus session bus (%s)" % e)
+                return
+            
+            try:
+                proxy = bus.get_object(dbus.BUS_DAEMON_NAME, dbus.BUS_DAEMON_PATH)
+                self.__dbus = dbus.Interface(proxy, dbus.BUS_DAEMON_IFACE)
+            except DBusException, e:
+                log.error("failed to connect to dbus daemon (%s)" % e)
+                return
+    
+            try:
+                self.__handlers = (
+                    self.__dbus.connect_to_signal("NameOwnerChanged",
+                                                  self.__notify_owner_change,
+                                                  arg0=self.__dbus_name),
+                )
+                self.__dbus.NameHasOwner(self.__dbus_name,
+                                         reply_handler=self.__set_has_owner,
+                                         error_handler=self.__dbus_error)
+            except DBusException, e:
+                log.error("failed to talk with dbus daemon (%s)" % e)
+                return
+            
+        def __notify_owner_change(self, name, old, new):
+            
+            log.debug("dbus name owner changed: '%s' -> '%s'" % (old, new))
+            
+            _stop_pa(self.__pa)
+            
+            if not new:
+                return
+            
+            _start_pa(self.__pa)
         
-        self.__dbus = None
+        def __set_has_owner(self, has_owner):
+            
+            log.debug("dbus name has owner: %s" % has_owner)
+    
+            if not has_owner:
+                return
+            
+            _start_pa(self.__pa)
+        
+        def __dbus_error(self, error):
+            log.warning("dbus error: %s" % error)
+            
+        def disconnect(self):
+            
+            for handler in self.__handlers:
+                handler.remove()
+                
+            self.__handlers = ()
+            
+            self.__dbus = None
 
 class Manager(object):
     """ Manages life cycle of a player adapter.
