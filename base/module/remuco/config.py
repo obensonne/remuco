@@ -24,6 +24,7 @@ import ConfigParser
 from ConfigParser import NoOptionError
 import os
 import os.path
+from os.path import join as opj
 import sys
 
 from remuco import log
@@ -31,7 +32,7 @@ from remuco import defs
 from remuco.remos import user_config_dir
 from remuco.remos import user_cache_dir
 
-DEVICE_FILE = os.path.join(user_cache_dir, "remuco", "devices")
+DEVICE_FILE = opj(user_cache_dir, "remuco", "devices")
 
 SEC = ConfigParser.DEFAULTSECT
 
@@ -92,10 +93,10 @@ class Config(object):
         # convert descriptive name to a plain canonical one
         name_plain = player_name.lower().replace(" ", "").replace(".","")
         
-        self.__dir_config = os.path.join(user_config_dir, "remuco", name_plain)
-        self.__dir_cache = os.path.join(user_cache_dir, "remuco", name_plain)
-        self.__file_config = os.path.join(self.__dir_config, "conf")
-        self.__file_log = os.path.join(self.__dir_cache, "log")
+        self.__dir_config = opj(user_config_dir, "remuco", name_plain)
+        self.__dir_cache = opj(user_cache_dir, "remuco", name_plain)
+        self.__file_config = opj(self.__dir_config, "conf")
+        self.__file_log = opj(self.__dir_cache, "log")
     
         try:
             if not os.path.isdir(self.__dir_config):
@@ -110,9 +111,9 @@ class Config(object):
         
         ###### custom volume command ######
         
-        cmd = os.path.join(user_config_dir, "remuco", "volume")
+        cmd = opj(user_config_dir, "remuco", "volume")
         if not os.path.isfile(cmd):
-            cmd = os.path.join(self.__dir_config, "volume")
+            cmd = opj(self.__dir_config, "volume")
         if not os.path.isfile(cmd):
             log.debug("custom volume command does not exist (%s)" % cmd)
             self.__custom_volume_cmd = None
@@ -596,7 +597,7 @@ class Config(object):
 
 def get_system_shutdown_command():
         
-    path = os.path.join(user_config_dir, "remuco", "shutdown-system")
+    path = opj(user_config_dir, "remuco", "shutdown-system")
     
     if not os.path.isfile(path):
         log.info("system shutdown command (%s) does not exist" % path)
