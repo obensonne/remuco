@@ -28,7 +28,12 @@ import gobject
 
 import xl.event
 import xl.settings
-from xl.cover import NoCoverFoundException
+
+try:
+    from xl.cover import NoCoverFoundException # exaile 3.0
+except ImportError:
+    class NoCoverFoundException(Exception): # exaile 3.1 dropped this exception
+        pass
 
 import remuco
 from remuco import log
@@ -449,8 +454,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
             if not img:
                 try:
                     img = self.__ex.covers.get_cover(track)
-                except NoCoverFoundException:
-                    img = self.find_image(id)
+                except NoCoverFoundException: # exaile 3.0 only
+                    img = None
+            if not img:
+                img = self.find_image(id)
             
         self.update_item(id, info, img)
         
