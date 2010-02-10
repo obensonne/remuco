@@ -547,12 +547,14 @@ def get_system_shutdown_command():
     path = opj(user_config_dir, "remuco", "shutdown-system")
     
     if not os.path.isfile(path):
-        log.info("system shutdown command (%s) does not exist" % path)
+        log.info("system shutdown disabled")
         return None
     
     if not os.access(path, os.X_OK):
         log.info("system shutdown command (%s) is not executable" % path)
         return None
+    
+    log.info("system shutdown enabled")
     
     return path
 
