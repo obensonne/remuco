@@ -22,6 +22,8 @@
 
 """Utility functions to read/write simple str<->str dicts from/to files."""
 
+from __future__ import with_statement
+
 import os.path
 
 from remuco import log
@@ -129,9 +131,8 @@ def write_dicts_to_file(filename, dicts, keys=None, comment=None):
         lines.append("%s\n" % dic)
         
     try:
-        fp = open(filename, "w")
-        fp.writelines(lines)
-        fp.close()
+        with open(filename, "w") as fp:
+            fp.writelines(lines)
     except IOError, e:
         log.warning("failed to write to %s (%s)" % (filename, e))
     
