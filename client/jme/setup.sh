@@ -86,9 +86,10 @@ if [ ! -f build.properties ] ; then
 	cp build.properties.example build.properties
 fi
 
-sed -i build.properties \
+sed -i "" \
 	-e "s,^proguard.jar=.*$,proguard.jar=\${basedir}/tools/$DIR_PROGUARD/lib/proguard.jar," \
 	-e "s,^microemu.home=.*$,microemu.home=\${basedir}/tools/$DIR_MICROEMU," \
+	build.properties
 
 echo "----------------------------------------------------------"
 echo "+ Done"
