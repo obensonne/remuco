@@ -54,7 +54,7 @@ def _real_path(p):
 
 # media_dirs:
 #    Maps some mimetypes to a list of locations which typically contain files
-#    of a specific mimetype. For those mime types not mapped, `user_home` may
+#    of a specific mimetype. For those mimetypes not mapped, `user_home` may
 #    be used as a fallback.
 
 if linux:
