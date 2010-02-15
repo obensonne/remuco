@@ -78,7 +78,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
         try:
             bus = dbus.SessionBus()
             proxy = bus.get_object(DBUS_NAME, DBUS_PATH_ENGINE)
-            self.__bse = dbus.Interface (proxy, DBUS_IFACE_ENGINE)
+            self.__bse = dbus.Interface(proxy, DBUS_IFACE_ENGINE)
             proxy = bus.get_object(DBUS_NAME, DBUS_PATH_CONTROLLER)
             self.__bsc = dbus.Interface(proxy, DBUS_IFACE_CONTROLLER)
         except DBusException, e:
@@ -193,6 +193,15 @@ class BansheeAdapter(remuco.PlayerAdapter):
             # poll with a small delay, otherwise we get 0 as progress
             gobject.timeout_add(100, self.__poll_progress)
         
+    def ctrl_rate(self, rating):
+        
+        try:
+            self.__bse.SetRating(dbus.Byte(rating),
+                                 reply_handler=self.__dbus_ignore,
+                                 error_handler=self.__dbus_error)
+        except DBusException, e:
+            log.warning("dbus error: %s" % e)
+
     def ctrl_volume(self, direction):
         
         if direction == 0:
@@ -267,7 +276,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
             playback = remuco.PLAYBACK_PAUSE
             
         self.update_playback(playback)
-        
+
     def __notify_volume(self, volume):
         
         self.__volume = volume

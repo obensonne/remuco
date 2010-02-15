@@ -8,14 +8,13 @@ Base
 
 Player adapters
 ---------------
+  * New: Amarok 1.4, Quod Libet, Winamp
+  * Banshee: Rating control finally works with Banshee 1.5.3.
   * Exaile: Fixed crash on library search with empty query.
   * Exaile: Adjustments for Exaile 3.1 (in progress).
-  * Amarok 1.4: Added Amarok 1.4 adapter.
   * Amarok, VLC: New playlist action for jumping to a specific position (must
     be enabled explicitly in the adapter configuration because it fails in
     dynamic playlists).
-  * Winamp: Added Winamp adapter.
-  * Quod Libet: Added Quod Libet adapter.
   * MPlayer: Improved command line interface.
 
 Client

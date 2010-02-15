@@ -41,7 +41,7 @@ Audacious:
  * Audacious >= 1.5.1 (previous versions may work, not tested)
 
 Banshee:
- * Banshee >= 1.4
+ * Banshee >= 1.5.3 (>= 1.4 works except rating control)
 
 Exaile:
  * Exaile >= 2.99.3 (aka 3 alpha)
