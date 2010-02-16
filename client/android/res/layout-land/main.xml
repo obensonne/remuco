@@ -4,60 +4,64 @@
 	android:layout_height="fill_parent" android:gravity="bottom">
 
 	<LinearLayout android:id="@+id/InfoAreaLayout"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:orientation="vertical" android:padding="10px"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center_vertical" 
+		android:padding="10px"
 		android:layout_weight="1">
 
 		<!-- Coverart View -->
 
 		<FrameLayout android:id="@+id/FrameLayout01"
-			android:layout_height="wrap_content" 
-			android:layout_weight="1"
-			android:layout_width="fill_parent">
-			
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content">
 			<ImageView android:id="@+id/infoCover"
-				android:layout_width="wrap_content" 
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:src="@drawable/remuco_128" android:adjustViewBounds="true"
+				android:scaleType="centerInside" android:layout_gravity="center" />
+		</FrameLayout>
+
+
+
+		<!-- Album Metainformation TextViews -->
+		<LinearLayout
+			android:layout_height="fill_parent"
+			android:orientation="vertical"
+			android:gravity="center"
+			android:padding="10px" android:layout_width="fill_parent">
+		
+			<TextView android:id="@+id/infoTitle" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Title"
+				android:textStyle="bold" android:gravity="center_horizontal"/>
+	
+			<TextView android:id="@+id/infoArtist" android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:src="@drawable/remuco_128"
-				android:adjustViewBounds="true"
-				android:scaleType="centerInside" 
-				android:layout_gravity="center"
-				/>
+				android:text="Artist" android:gravity="center_horizontal"/>
+	
+			<TextView android:id="@+id/infoAlbum" android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="Album" android:gravity="center_horizontal"/>
 				
 			<RatingBar android:id="@+id/infoRatingBar" 
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content" 
 				android:layout_gravity="bottom|center" 
 				/>
-		</FrameLayout>
-
-
-
-		<!-- Album Metainformation TextViews -->
-
-		<TextView android:id="@+id/infoTitle" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="Title"
-			android:gravity="center_horizontal" android:textStyle="bold" />
-
-		<TextView android:id="@+id/infoArtist" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:gravity="center_horizontal"
-			android:text="Artist" />
-
-		<TextView android:id="@+id/infoAlbum" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:gravity="center_horizontal"
-			android:text="Album" />
+				
+		</LinearLayout>
 
 	</LinearLayout>
 
 	<!-- control area -->
 
-	<LinearLayout 
+	<LinearLayout android:id="@+id/CtrlAreaLayout"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:orientation="vertical" android:padding="10px"
 		android:background="#FF333333">
 
 
-		<LinearLayout
+		<LinearLayout android:id="@+id/controlButtonArea"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:gravity="bottom">
 
@@ -73,16 +77,16 @@
 
 			<ImageButton android:id="@+id/CtrlPlay"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:src="@android:drawable/ic_media_play" android:clickable="false"
-				android:layout_weight="1"  />
+				android:src="@android:drawable/ic_media_play" android:clickable="false" 
+				android:layout_weight="1" />
 
 			<ImageButton android:id="@+id/CtrlNext"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:src="@android:drawable/ic_media_next" android:clickable="false"
-				android:layout_weight="1"  />
+				android:src="@android:drawable/ic_media_next" android:clickable="false" 
+				android:layout_weight="1" />
 
 			<TextView android:id="@+id/CtrlLength" android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_height="wrap_content" 
 				android:gravity="center_horizontal" android:text="0:00" />
 
 		</LinearLayout>

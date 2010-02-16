@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/connect_dialog_root_layout"
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content"
+	android:padding="10px" 
+	android:orientation="vertical">
+  
+  	<EditText android:id="@+id/connect_dialog_hostname" 
+  		android:layout_width="fill_parent" 
+  		android:layout_height="wrap_content"
+  		android:minEms="30"
+  		/>
+  	
+  	<LinearLayout 
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content">
+	
+		<Button android:id="@+id/connect_dialog_ok_button" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:text="@android:string/ok"
+			/>
+			
+		<Button android:id="@+id/connect_dialog_cancel_button" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:text="@android:string/cancel"
+			/>
+	
+	</LinearLayout>
+
+
+
+
+</LinearLayout>

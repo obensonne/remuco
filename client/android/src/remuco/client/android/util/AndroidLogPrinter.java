@@ -13,7 +13,10 @@ public class AndroidLogPrinter implements ILogPrinter {
 
 	@Override
 	public void println(String s) {
+		if(s.startsWith("[BUG]")) 
+			Log.e("Remuco", s);
+		
 		Log.i("Remuco", s);
 	}
-
+	
 }
