@@ -2,28 +2,24 @@ package remuco.client.android.util;
 
 import java.util.TimerTask;
 
-import remuco.client.android.MessageFlag;
-import remuco.client.android.R;
-import remuco.client.android.Remuco;
 import remuco.client.android.io.Socket;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.io.Connection;
 import remuco.client.common.io.Connection.IConnectionListener;
 import remuco.client.common.util.Log;
-import android.widget.Toast;
 
 public class ConnectTask extends TimerTask {
 
 	private String hostname;
-	private Remuco remuco;
+	private ClientInfo clientInfo;
+	private IConnectionListener connectionListener;
 	
 	
-	
-	public ConnectTask(String hostname, Remuco remuco) {
-		super();
+	public ConnectTask(String hostname, ClientInfo clientInfo, IConnectionListener connectionListener) {
 		this.hostname = hostname;
-		this.remuco = remuco;
+		this.clientInfo = clientInfo;
+		this.connectionListener = connectionListener;
 	}
 
 
@@ -48,22 +44,13 @@ public class ConnectTask extends TimerTask {
 			Log.ln("[CT] socket creation failed: ", e);
 			
 			// tell the view that we have no connection
-			remuco.notifyDisconnected(s, e);
+			connectionListener.notifyDisconnected(s, e);
 			
 			return;
 		}
 
 		
-		/* TODO: useful clientinfo
-		 * 
-		 * Create a client info, describing this device. Users should be able to
-		 * set the first 3 parameters.
-		 */
-		ClientInfo ci = new ClientInfo(300, "PNG", 50, null);
-
-		/* TODO: this one is not that pretty ... this should be done via a callback
-		 * 
-		 * 
+		/* 
 		 * Given the socket and the client info, we can set up a connection. A
 		 * connection cares about exchanging initial messages between client and
 		 * server. If a connections has been established it provides a Player
@@ -71,7 +58,7 @@ public class ConnectTask extends TimerTask {
 		 * connection automatically creates it's own thread, so this call
 		 * returns immediately.
 		 */
-		remuco.setConnection(new Connection(s, remuco, 15, ci));
+		new Connection(s, connectionListener, 15, clientInfo);
 	}
 	
 

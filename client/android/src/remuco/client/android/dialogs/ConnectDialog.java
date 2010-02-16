@@ -1,29 +1,33 @@
 package remuco.client.android.dialogs;
 
+import remuco.client.android.PlayerAdapter;
 import remuco.client.android.R;
-import remuco.client.android.R.id;
-import remuco.client.android.R.layout;
-import remuco.client.android.R.string;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
 
 public class ConnectDialog extends Dialog implements OnClickListener{
 
+	PlayerAdapter player;
+	
 	Button okButton;
 	Button cancelButton;
 	
 	EditText hostnameTV;
 	
-	public ConnectDialog(Context context) {
+	public ConnectDialog(Context context, PlayerAdapter player) {
 		super(context);
-		
+		this.player = player;
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+
 		setContentView(R.layout.connect_dialog);
 		setTitle(R.string.connect_dialog_title);
 	
@@ -36,7 +40,6 @@ public class ConnectDialog extends Dialog implements OnClickListener{
 		// setup listener
 		okButton.setOnClickListener(this);
 		cancelButton.setOnClickListener(this);
-		
 	}
 
 	public void setHostname(String hostname){

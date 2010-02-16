@@ -1,53 +1,50 @@
 
 package remuco.client.android;
 
-import java.util.ArrayList;
-import java.util.TimerTask;
-
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
-import remuco.client.android.io.Socket;
 import remuco.client.android.util.AndroidLogPrinter;
-import remuco.client.android.util.ConnectTask;
 import remuco.client.common.MainLoop;
-import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
-import remuco.client.common.io.Connection;
-import remuco.client.common.io.ISocket;
-import remuco.client.common.io.Connection.IConnectionListener;
-import remuco.client.common.player.Player;
+import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-public class Remuco extends Activity implements IConnectionListener{
+public class Remuco extends Activity implements OnClickListener{
 
 	// --- preferences
-	public static final String PREF_NAME = "remucoPreference";
 	private SharedPreferences preference;
 	
+	public static final String PREF_NAME = "remucoPreference";
 	private static final String LAST_HOSTNAME = "connect_dialog_last_hostnames";
 	
-	// --- handlers
-	private ViewHandler viewHandler;
-	private PlayerHandler playerHandler;
-	private ArrayList<Handler> handlers;
+	// --- the player adapter
+	private PlayerAdapter player;
 	
+	
+	
+	// --- client info
+	private ClientInfo clientInfo;
 	
 	// --- dialog ids
 	private static final int CONNECT_DIALOG = 1;
@@ -57,11 +54,30 @@ public class Remuco extends Activity implements IConnectionListener{
 	// --- dialog reference
 	private VolumeDialog volumeDialog;
 	
-	// --- Remuco Connection
-	private Connection connection;
-	private Socket s;
+	// --- view handler
+	private ViewHandler viewHandler;
 	
+	// --- view handles
 	
+	// get view handles
+	TextView infoTitle;
+	TextView infoArtist;
+	TextView infoAlbum;
+
+	ImageView infoCover;
+
+	SeekBar ctrlProgressBar;
+	TextView ctrlProgress;
+	TextView ctrlLength;
+	
+	ImageButton ctrlPrev;
+	ImageButton ctrlPlay;
+	ImageButton ctrlNext;
+	
+	RatingBar infoRatingBar;
+
+	
+	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
 	
 	@Override
@@ -77,10 +93,26 @@ public class Remuco extends Activity implements IConnectionListener{
 		
 		// --- load layout
 		setContentView(R.layout.main);
+		
+		// --- get view handles
+		getViewHandles();
+		
+		// --- set listeners
+		ctrlPlay.setOnClickListener(this);
+		ctrlPrev.setOnClickListener(this);
+		ctrlNext.setOnClickListener(this);
+		
+		// TODO: externalize these
+		infoTitle.setText("not connected");
+		infoArtist.setText("use the menu to connect");
+		infoAlbum.setText("to your remuco server");
 
 		// --- load preferences
 		preference = getPreferences(Context.MODE_PRIVATE);
 
+		// --- create view handler
+		viewHandler = new ViewHandler(this);
+		
 		// ------
 		// remuco related initialization
 		// ------
@@ -91,46 +123,56 @@ public class Remuco extends Activity implements IConnectionListener{
 		// --- enable the remuco main loop (timer thread)
 		MainLoop.enable();
 		
+		// --- construct client info
+		clientInfo = new ClientInfo(250, "PNG", 50, null);
 		
 		// ------
 		// communication initialization
 		// ------
 		
-		// --- create handler array
-		handlers = new ArrayList<Handler>();
+		// --- create player adapter
+		player = new PlayerAdapter();
 		
-		// --- create view handler
-		viewHandler = new ViewHandler(this); 
-		handlers.add(viewHandler);
+		// --- register view handler at player
+		player.addHandler(viewHandler);
 		
-		// create and add player handler
-		playerHandler = new PlayerHandler(this);
-		handlers.add(playerHandler);
-		
-
 	}
 	
+	private void getViewHandles() {
+		// get view handles
+		infoTitle 	= (TextView) findViewById(R.id.infoTitle);
+		infoArtist 	= (TextView) findViewById(R.id.infoArtist);
+		infoAlbum 	= (TextView) findViewById(R.id.infoAlbum);
+
+		infoCover 	= (ImageView) findViewById(R.id.infoCover);
+		
+		infoRatingBar = (RatingBar) findViewById(R.id.infoRatingBar);
+		
+		ctrlProgressBar 	= (SeekBar) findViewById(R.id.CtrlProgressBar);
+		ctrlLength 			= (TextView) findViewById(R.id.CtrlLength);
+		ctrlProgress 		= (TextView) findViewById(R.id.CtrlProgress);
+		
+		ctrlPrev = (ImageButton) findViewById(R.id.CtrlPrev);
+		ctrlPlay = (ImageButton) findViewById(R.id.CtrlPlay);
+		ctrlNext = (ImageButton) findViewById(R.id.CtrlNext);
+	}
+
 	/**
 	 * this method gets called after on create
 	 */
 	@Override
-	protected void onStart() {
+	protected void onResume() {
 		super.onStart();
 		
-		Log.ln("--- onStart()");
+		Log.debug("--- onResume()");
 
-		
 		// --- initialize the connection here if we can
 
-		// 1. try to get back our last connection if it exists in our bundle
-//		connection = (Connection)getLastNonConfigurationInstance();
-//		if(connection != null)
-//			return;
 		
-		// 2. try to connect to the last hostname
+		// try to connect to the last hostname
 		String lastHostname = preference.getString(LAST_HOSTNAME, "");
 		if( !lastHostname.equals("") ){
-			connect(lastHostname);
+			player.connect(lastHostname, clientInfo);
 		}
 		
 		
@@ -138,93 +180,25 @@ public class Remuco extends Activity implements IConnectionListener{
 	}
 	
 	@Override
-	protected void onStop() {
+	protected void onPause() {
 		super.onStop();
-		Log.ln("--- onStop()");
+		Log.debug("--- onPause()");
 		
 		// stop the connection
-		connection.close();
+		player.disconnect();
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 
-		Log.ln("--- onDestroy()");
+		Log.debug("--- onDestroy()");
 
 		// disable the main loop (timer thread)
 		MainLoop.disable();
 
 	}
 
-	@Override
-	public Object onRetainNonConfigurationInstance() {
-		return connection;
-	}
-	
-	// --- connection methods
-	
-	// TODO: push this to another thread
-	
-	private void connect(String hostname){
-		
-		// opening the connection is done in another thread
-		
-		ConnectTask ct = new ConnectTask(hostname, this);
-		MainLoop.schedule(ct);
-		
-	}
-	
-	private void disconnect(){
-		if(connection!=null){
-			connection.close();
-			
-			// notify handlers about the change
-			for(Handler h : handlers){
-				Message m = h.obtainMessage(MessageFlag.DISCONNECTED);
-				m.sendToTarget();
-			}
-		}
-	}
-	
-
-	// --- connection notifications
-	
-	@Override
-	public void notifyConnected(Player player) {
-
-		Log.ln("connected to player \"" + player.info.getName() + "\"");
-		
-		// notify handlers about the change
-		for(Handler h : handlers){
-			Log.debug("sending connected message");
-			Message m = h.obtainMessage(MessageFlag.CONNECTED, player);
-			m.sendToTarget();
-		}
-		
-	}
-
-	/**
-	 * notifyDisconnected gets called only in case the connection fails
-	 * not if the connection is shut down
-	 * 
-	 * @Override 
-	 */
-	public void notifyDisconnected(ISocket sock, UserException reason) {
-		Log.ln("disconnected, oh no (" + reason + ")");
-		
-		// inform the user:
-		String toast = this.getResources().getString(R.string.connection_failed, sock);
-		Toast.makeText(this, toast, Toast.LENGTH_LONG);
-		
-		// notify handlers about the change
-		for(Handler h : handlers){
-			Message m = h.obtainMessage(MessageFlag.DISCONNECTED);
-			m.sendToTarget();
-		}
-	}
-	
-	
 	// --- Options Menu
 	
 	@Override
@@ -246,9 +220,7 @@ public class Remuco extends Activity implements IConnectionListener{
 			
 		case R.id.options_menu_disconnect:
 			Log.ln("disconnect button pressed");
-			
-			disconnect();
-			
+			player.disconnect();
 			break;
 			
 		case R.id.options_menu_rate:
@@ -259,25 +231,21 @@ public class Remuco extends Activity implements IConnectionListener{
 		return true;
 	}
 	
-
+	// ------------------------
 	// --- dialogs
+	// ------------------------
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		
+
 		switch(id){
 		
 		// --- connection dialog
 		case CONNECT_DIALOG:
 			
 			// create connect dialog
-			ConnectDialog cDialog = new ConnectDialog(this);
+			ConnectDialog cDialog = new ConnectDialog(this, player);
 
-			// fill auto complete with last 5 hostnames
-			
-			String hostname = preference.getString(LAST_HOSTNAME, "");
-			cDialog.setHostname(hostname);
-			
 			// register callback listener
 			
 			cDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -286,7 +254,7 @@ public class Remuco extends Activity implements IConnectionListener{
 					
 					// connect to host
 					String hostname = ((ConnectDialog)dialog).getSelectedHostname();
-					connect(hostname);
+					player.connect(hostname, clientInfo);
 					
 					// save new address in preferences
 					SharedPreferences.Editor editor = preference.edit();
@@ -300,24 +268,58 @@ public class Remuco extends Activity implements IConnectionListener{
 			
 		// --- volume dialog
 		case VOLUME_DIALOG:
-			volumeDialog = new VolumeDialog(this);
-			volumeDialog.setOnKeyListener(playerHandler);
-			
-			volumeDialog.setVolume(playerHandler.player.state.getVolume());
-			
-			return volumeDialog;
-			
+			return new VolumeDialog(this, player);
 			
 		// --- rating dialog
 		case RATING_DIALOG:
-			RatingDialog rDialog = new RatingDialog(this);
-			rDialog.setPlayHandler(playerHandler);
-			return rDialog;
+			return new RatingDialog(this, player);
 		}
 		
 		Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");
 		return null;
 	}
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		
+		switch(id){
+		
+		case CONNECT_DIALOG:
+			
+			ConnectDialog cDialog = (ConnectDialog)dialog;
+			
+			// set last hostname
+			String hostname = preference.getString(LAST_HOSTNAME, "");
+			cDialog.setHostname(hostname);
+			
+			break;
+		
+		}
+		
+		
+	}
+	
+	
+	// --- handle clicks (this is the actual playback control)
+	
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()){
+		case R.id.CtrlPlay:
+			player.getPlayer().ctrlPlayPause();
+			break;
+			
+		case R.id.CtrlPrev:
+			player.getPlayer().ctrlPrev();
+			break;
+			
+		case R.id.CtrlNext:
+			player.getPlayer().ctrlNext();
+			break;
+		}
+	};	
+	
+	
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -334,14 +336,6 @@ public class Remuco extends Activity implements IConnectionListener{
 		}
 		
 		return false;
-	}
-
-	public VolumeDialog getVolumeDialog() {
-		return volumeDialog;
-	}
-
-	public void setConnection(Connection connection) {
-		this.connection = connection;
 	}
 	
 }

@@ -11,4 +11,13 @@ public abstract class MessageFlag {
 	
 	public static final int TICK = 20;
 	
+	// control messages
+	public static final int CTRL_PLAY_PAUSE 	= 30;
+	public static final int CTRL_PREV			= 31;
+	public static final int CTRL_NEXT			= 32;
+	public static final int CTRL_VOLUME_UP		= 33;
+	public static final int CTRL_VOLUME_DOWN	= 34;
+	public static final int CTRL_RATE 			= 35;
+	
+	
 }

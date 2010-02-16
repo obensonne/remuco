@@ -1,61 +1,82 @@
 package remuco.client.android.dialogs;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
+import remuco.client.android.MessageFlag;
+import remuco.client.android.PlayerAdapter;
 import remuco.client.android.R;
+import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
 import android.app.Dialog;
 import android.content.Context;
-import android.widget.SeekBar;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.KeyEvent;
+import android.widget.ProgressBar;
 
 public class VolumeDialog extends Dialog {
 
-	SeekBar volumeBar;
+	private ProgressBar volumeBar;
+	private PlayerAdapter player;
 	
+	private Handler dismissHandler;
 	
-	Timer t;
+	private Runnable dismissRunnable = new Runnable() {
+		@Override
+		public void run() {
+			Log.debug("[VD] dismissing dialog");
+			VolumeDialog.this.dismiss();
+		}
+	};
 	
-	public VolumeDialog(Context context) {
+	public VolumeDialog(Context context, PlayerAdapter player) {
 		super(context);
 		
-		Log.ln("[VD] VolumeDialog-Constructor");
-
-		setContentView(R.layout.volume_dialog);
-		setTitle(R.string.volume);
-		
-		volumeBar = (SeekBar) findViewById(R.id.volume_dialog_volumebar);
-	}
-
-	public void resetTimer(){
-		
-		
-		Log.ln("[VD] resetTimer()");
-		
-		// cancel old task
-		if(t!=null) t.cancel();
-		
-		// create new timer
-		t = new Timer();
-		
-		// create task
-		TimerTask dismissTask = new TimerTask() {
-			@Override
-			public void run() {
-				Log.ln("[VD] dismiss volume dialog");
-				dismiss();
-			}
-		};
-
-		// start task
-		t.schedule(dismissTask, 2000);
-		
+		this.player = player;
+		this.dismissHandler = new Handler();
 	}
 	
-	public void setVolume(int volume) {
-		Log.ln("[VD] set volume: " + volume);
-		volumeBar.setProgress(volume);
-		resetTimer();
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.debug("[VD] onCreate()");
+		setTitle(R.string.volume_dialog_title);
+		setContentView(R.layout.volume_dialog);
+		
+		volumeBar = (ProgressBar) findViewById(R.id.volume_dialog_volumebar);
+		volumeBar.setProgress(player.getPlayer().state.getVolume());
+		
+		player.addHandler(new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				if(msg.what == MessageFlag.STATE_CHANGED){
+					State state = (State)msg.obj;
+					volumeBar.setProgress(state.getVolume());
+				}
+			}
+		});
+		
+		resetDismissTimeout();
 	}
+	
+	private void resetDismissTimeout(){
+		Log.debug("[VD] set timeout to 2000ms");
+		dismissHandler.removeCallbacks(dismissRunnable);
+		dismissHandler.postDelayed(dismissRunnable, 2000);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch(keyCode){
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			player.getPlayer().ctrlVolume(1);
+			resetDismissTimeout();
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			player.getPlayer().ctrlVolume(-1);
+			resetDismissTimeout();
+			return true;
+		}
+		return false;
+	}
+
 
 }

@@ -8,7 +8,8 @@
 <string name="connection_failed">connection failed to \&quot;%s\&quot; failed</string>
 <string name="connecting">connecting to host \&quot;%s\&quot;</string>
 <string name="connection_successful">connection to \&quot;%s\&quot; established</string>
-<string name="volume">Remuco Volume</string><string name="options_menu_connect">Connect</string>
+<string name="volume_dialog_title">Remuco Volume</string><string name="options_menu_connect">Connect</string>
 <string name="options_menu_disconnect">Disconnect</string>
 <string name="options_menu_rate">Rate</string>
+<string name="rating_dialog_title">Rate Song</string>
 </resources>

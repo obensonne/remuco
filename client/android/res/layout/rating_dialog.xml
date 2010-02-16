@@ -10,7 +10,13 @@
 	<RatingBar android:id="@+id/rating_dialog_rating_bar" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
+		android:layout_gravity="center"
 		android:stepSize="1.0"/>
 		
 	
+	<Button android:id="@+id/rating_dialog_ok_button" 
+		android:text="@android:string/ok" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"/>
 </LinearLayout>
