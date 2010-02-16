@@ -2,11 +2,13 @@
 <resources>
     <string name="app_name">Remuco</string>
 
-<string name="menuConnect">Connect</string>
+
 <string name="connect_dialog_hostname">Hostname</string>
 <string name="connect_dialog_title">Connect to Remuco</string>
 <string name="connection_failed">connection failed to \&quot;%s\&quot; failed</string>
 <string name="connecting">connecting to host \&quot;%s\&quot;</string>
 <string name="connection_successful">connection to \&quot;%s\&quot; established</string>
-<string name="volume">Remuco Volume</string>
+<string name="volume">Remuco Volume</string><string name="options_menu_connect">Connect</string>
+<string name="options_menu_disconnect">Disconnect</string>
+<string name="options_menu_rate">Rate</string>
 </resources>

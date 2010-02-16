@@ -1,9 +1,11 @@
+
 package remuco.client.android;
 
 import java.util.ArrayList;
 import java.util.TimerTask;
 
 import remuco.client.android.dialogs.ConnectDialog;
+import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.Socket;
 import remuco.client.android.util.AndroidLogPrinter;
@@ -50,6 +52,7 @@ public class Remuco extends Activity implements IConnectionListener{
 	// --- dialog ids
 	private static final int CONNECT_DIALOG = 1;
 	private static final int VOLUME_DIALOG = 2;
+	private static final int RATING_DIALOG = 3;
 	
 	// --- dialog reference
 	private VolumeDialog volumeDialog;
@@ -248,6 +251,9 @@ public class Remuco extends Activity implements IConnectionListener{
 			
 			break;
 			
+		case R.id.options_menu_rate:
+			showDialog(RATING_DIALOG);
+			break;
 		}
 		
 		return true;
@@ -300,6 +306,13 @@ public class Remuco extends Activity implements IConnectionListener{
 			volumeDialog.setVolume(playerHandler.player.state.getVolume());
 			
 			return volumeDialog;
+			
+			
+		// --- rating dialog
+		case RATING_DIALOG:
+			RatingDialog rDialog = new RatingDialog(this);
+			rDialog.setPlayHandler(playerHandler);
+			return rDialog;
 		}
 		
 		Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");

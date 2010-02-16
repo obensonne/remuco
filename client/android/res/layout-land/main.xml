@@ -44,10 +44,11 @@
 				android:text="Album" android:gravity="center_horizontal"/>
 				
 			<RatingBar android:id="@+id/infoRatingBar" 
+				style="?android:attr/ratingBarStyleSmall"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content" 
 				android:layout_gravity="bottom|center" 
-				/>
+				android:stepSize="1.0"/>
 				
 		</LinearLayout>
 

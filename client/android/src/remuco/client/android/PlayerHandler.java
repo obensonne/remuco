@@ -113,13 +113,13 @@ public class PlayerHandler extends Handler implements OnClickListener, OnKeyList
 	@Override
 	public void onRatingChanged(RatingBar bar, float rating, boolean fromUser) {
 		
-		if(bar == infoRatingBar && fromUser){
+		if(fromUser && (bar.getId() == R.id.infoRatingBar || bar.getId() == R.id.rating_dialog_rating_bar)){
 			
 			Log.ln("[PH] on rating changed: " + rating + ", fromuser: " + fromUser );
 			player.ctrlRate((int)Math.ceil(rating));
 			
 			// hackish stuff
-			bar.setRating((float) Math.ceil(rating));
+//			bar.setRating((float) Math.ceil(rating));
 		}
 		
 	}
