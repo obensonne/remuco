@@ -1,13 +1,14 @@
 
 package remuco.client.android;
 
+import java.util.Hashtable;
+
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
-import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
 import android.app.Activity;
 import android.app.Dialog;
@@ -15,17 +16,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -124,7 +124,39 @@ public class Remuco extends Activity implements OnClickListener{
 		MainLoop.enable();
 		
 		// --- construct client info
-		clientInfo = new ClientInfo(250, "PNG", 50, null);
+		
+		// get screen size
+        WindowManager w = getWindowManager();
+        Display d = w.getDefaultDisplay();
+        int width = d.getWidth();
+        int height = d.getHeight(); 
+        
+        Log.debug("screensize: " + width + "x" + height);
+		
+        // use the smaller dimension
+        int smallerDimension = Math.min(width, height);
+        
+        // calculate golden ratio
+        double phi = (1 + Math.sqrt(5))/2;
+        
+        // get preferred image size
+        int imageSize = (int) (smallerDimension / phi);
+        Log.debug("preferred image size: " + imageSize);
+
+        // create extra info
+
+		Hashtable<String,String> info = new Hashtable<String,String>();
+		
+		info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
+		Log.ln("running on : " + android.os.Build.MODEL);
+		
+		// afaik every android (sofar) has a touchscreen and is using unicode
+		info.put("touch", "yes");
+		info.put("utf8", "yes");
+        
+        
+        // create client info
+		clientInfo = new ClientInfo(imageSize, "PNG", 50, info);
 		
 		// ------
 		// communication initialization
