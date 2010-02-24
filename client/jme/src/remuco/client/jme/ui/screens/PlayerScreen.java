@@ -474,6 +474,15 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			break;
 
+		case KeyBindings.ACTION_NAVIGATE:
+			if (!checkFeature(Feature.CTRL_NAVIGATE)) {
+				break;
+			}
+
+			// TODO where does the parameter come from?
+			action = null;
+			player.ctrlNavigate(action);
+
 		case KeyBindings.ACTION_NOOP:
 
 			break;
@@ -519,6 +528,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				checkFeature(Feature.CTRL_SEEK);
 			}
 			break;
+
+		case KeyBindings.ACTION_NAVIGATE:
+			// TODO think about what does this mean
 
 		default:
 			break;
@@ -696,6 +708,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				break;
 			case Feature.CTRL_TAG:
 				msg = "Sorry, tagging items is not possible.";
+				break;
+			case Feature.CTRL_NAVIGATE:
+				msg = "Sorry, navigation is not possible.";
 				break;
 			default:
 				Log.bug("unexpected feature check: " + feature);
