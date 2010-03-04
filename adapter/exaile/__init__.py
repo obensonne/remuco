@@ -22,6 +22,9 @@
 
 """Exaile adapter for Remuco, implemented as an Exaile plugin."""
 
+from __future__ import with_statement
+
+import os.path
 import re
 
 import gobject
@@ -32,8 +35,7 @@ import xl.settings
 try:
     from xl.cover import NoCoverFoundException # exaile 3.0
 except ImportError:
-    class NoCoverFoundException(Exception): # exaile 3.1 dropped this exception
-        pass
+    class NoCoverFoundException(Exception): pass # exaile 3.1
 
 import remuco
 from remuco import log
@@ -190,7 +192,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         pos = self.__ex.player.get_time()
         pos = pos + direction * 5
-        pos = min(pos, track.get_duration())
+        if self.__ex.get_version() < "0.3.1":
+            pos = min(pos, track.get_duration())
+        else:
+            pos = min(pos, int(track.get_tag_raw("__length")))
         pos = max(pos, 0)
         
         self.__ex.player.seek(pos)
@@ -427,37 +432,42 @@ class ExaileAdapter(remuco.PlayerAdapter):
         """Update meta information of current track."""
         
         def get_tag(key):
-            val = track.get_tag(key)
-            if val:
-                try:
-                    val = val[0]
-                except IndexError:
-                    pass
-            return val
+            if self.__ex.get_version() < "0.3.1":
+                val = track.get_tag(key)
+            else: # Exaile >= 0.3.1
+                val = track.get_tag_raw(key)
+            return val and (isinstance(val, list) and val[0] or val) or None
         
-        if track is None:
-            id = None
-            info = None
-            img = None
-        else:
-            id = track.get_loc()
+        id = None
+        info = None
+        img = None
+        
+        if track:
+            id = track.get_loc_for_io()
             info = {}
             info[remuco.INFO_ARTIST] = get_tag("artist")
             info[remuco.INFO_ALBUM] = get_tag("album")
             info[remuco.INFO_TITLE] = get_tag("title")
             info[remuco.INFO_YEAR] = get_tag("date")
             info[remuco.INFO_GENRE] = get_tag("genre")
-            info[remuco.INFO_BITRATE] = track.get_bitrate().replace('k','')
             info[remuco.INFO_RATING] = track.get_rating()
-            info[remuco.INFO_LENGTH] = track.get_duration()
-            img = track.get_tag("arturl")
-            if not img:
+            if self.__ex.get_version() < "0.3.1":
+                info[remuco.INFO_BITRATE] = track.get_bitrate().replace('k','')
+                info[remuco.INFO_LENGTH] = track.get_duration()
                 try:
                     img = self.__ex.covers.get_cover(track)
                 except NoCoverFoundException: # exaile 3.0 only
-                    img = None
-            if not img:
-                img = self.find_image(id)
+                    pass
+            else: # Exaile >= 0.3.1
+                info[remuco.INFO_BITRATE] = get_tag("__bitrate") // 1000
+                info[remuco.INFO_LENGTH] = int(get_tag("__length"))
+                idata = self.__ex.covers.get_cover(track, set_only=True)
+                if idata:
+                    img = os.path.join(self.config.cache_dir, "cover.dat")
+                    with open(img, "w") as fp:
+                        fp.write(idata)
+            if not img and track.local_file_name(): # loc_for_io may be != UTF-8
+                img = self.find_image(track.local_file_name())
             
         self.update_item(id, info, img)
         
@@ -475,7 +485,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
             len = 0
             pos = 0
         else:
-            len = track.get_duration()
+            if self.__ex.get_version() < "0.3.1":
+                len = track.get_duration()
+            else: # Exaile >= 0.3.1
+                len = int(track.get_tag_raw("__length"))
             pos = self.__ex.player.get_time()
         
         self.update_progress(pos, len)
@@ -529,13 +542,15 @@ class ExaileAdapter(remuco.PlayerAdapter):
         
         for track in track_list:
             
-            ids.append(track.get_loc())
-            artist = track.get_tag("artist")
-            if artist:
-                artist = artist[0]
-            title = track.get_tag("title")
-            if title:
-                title = title[0]
+            ids.append(track.get_loc_for_io())
+            if self.__ex.get_version() < "0.3.1":
+                artist = track.get_tag("artist")
+                title = track.get_tag("title")
+            else:
+                title = track.get_tag_raw("title")
+                artist = track.get_tag_raw("artist")
+            artist = artist and artist[0] or None
+            title = title and title[0] or None
             name = "%s - %s" % (artist or "???", title or "???") 
             names.append(name)
         
