@@ -66,15 +66,11 @@ class MplayerAdapter(remuco.PlayerAdapter):
 
         # TODO put this somewhere else
         if self.__mode is MODE_INDEPENDENT:
-            self.cmdfifo = os.path.join(self.config.cache_dir, "cmdfifo")
-            self.cmdfifo = self.config.get_custom("mplayer-cmdfifo", self.cmdfifo)
+            self.cmdfifo = os.path.join(self.config.cache, "mplayer.cmdfifo")
+            self.cmdfifo = self.config.getx("cmdfifo", self.cmdfifo)
 
-            self.statusfifo = os.path.join(self.config.cache_dir, "statusfifo")
-            self.statusfifo = self.config.get_custom("mplayer-statusfifo", self.statusfifo)
-
-            # ensure config is written:
-            self.config.set_custom("mplayer-cmdfifo", self.cmdfifo)
-            self.config.set_custom("mplayer-statusfifo", self.statusfifo)
+            self.statusfifo = os.path.join(self.config.cache, "mplayer.statusfifo")
+            self.statusfifo = self.config.getx("statusfifo", self.statusfifo)
 
         # file descriptors
         [self.fd_cmd_stream_in, self.fd_cmd_stream_out,

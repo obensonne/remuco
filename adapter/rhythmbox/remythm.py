@@ -561,7 +561,7 @@ class RhythmboxAdapter(remuco.PlayerAdapter):
                 img_file = self.find_image(id)
             else:
                 try:
-                    img_file = "%s/art.png" % self.config.cache_dir
+                    img_file = "%s/rhythmbox.cover" % self.config.cache
                     img_data.save(img_file, "png")
                 except IOError, e:
                     log.warning("failed to save cover art (%s)" % e)

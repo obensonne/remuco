@@ -463,7 +463,7 @@ class ExaileAdapter(remuco.PlayerAdapter):
                 info[remuco.INFO_LENGTH] = int(get_tag("__length"))
                 idata = self.__ex.covers.get_cover(track, set_only=True)
                 if idata:
-                    img = os.path.join(self.config.cache_dir, "cover.dat")
+                    img = os.path.join(self.config.cache, "exaile.cover")
                     with open(img, "w") as fp:
                         fp.write(idata)
             if not img and track.local_file_name(): # loc_for_io may be != UTF-8

@@ -49,7 +49,7 @@ class OkularAdapter(remuco.PlayerAdapter):
                                       mime_types=["application/pdf"])
         self.__am = None
         
-        self.__image = os.path.join(self.config.cache_dir, "img.png")
+        self.__image = os.path.join(self.config.cache, "okular.thumbnail")
 
     def start(self):
         

@@ -77,28 +77,12 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         self.__mpd = mpd.MPDClient()
         
-        self.__mpd_host = self.config.get_custom("mpd-host", "localhost")
-        
-        port = self.config.get_custom("mpd-port", "6600")
-        try:
-            self.__mpd_port = int(port)
-        except ValueError, e:
-            log.error("option mpd-port malformed (%s) -> use default" % port)
-            self.__mpd_port = 6600
-            
-        self.__mpd_pwd = self.config.get_custom("mpd-password", "")
-        
-        self.__mpd_music_dir = self.config.get_custom("mpd-music-dir",
-                                                      "/var/lib/mpd/music")
-        
+        self.__mpd_host = self.config.getx("mpd-host", "localhost")
+        self.__mpd_port = self.config.getx("mpd-port", "6600", int)
+        self.__mpd_pwd = self.config.getx("mpd-password", "")
+        self.__mpd_music = self.config.getx("mpd-music", "/var/lib/mpd/music")
         
         log.debug("MPD is at %s:%d" % (self.__mpd_host, self.__mpd_port))
-        
-        # ensure options are saved:
-        self.config.set_custom("mpd-host", self.__mpd_host)
-        self.config.set_custom("mpd-port", self.__mpd_port)
-        self.config.set_custom("mpd-password", self.__mpd_pwd)
-        self.config.set_custom("mpd-music-dir", self.__mpd_music_dir)
         
         self.__playing = False
         self.__shuffle = False
@@ -468,7 +452,7 @@ class MPDAdapter(remuco.PlayerAdapter):
         info[remuco.INFO_LENGTH] = song.get("time")
         info[remuco.INFO_YEAR] = song.get("year")
         
-        full_file_name = os.path.join(self.__mpd_music_dir, id)
+        full_file_name = os.path.join(self.__mpd_music, id)
         img = self.find_image(full_file_name)
         
         self.update_item(id, info, img)

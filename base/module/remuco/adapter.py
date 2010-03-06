@@ -20,11 +20,11 @@
 #
 # =============================================================================
 
+import commands
 import inspect
 import math # for ceiling
 import os
 import os.path
-import subprocess
 import urllib
 import urlparse
 
@@ -465,11 +465,11 @@ class PlayerAdapter(object):
         
         # init config (config inits logging)
         
-        self.__config = config.Config(self.__name)
+        self.config = config.Config(self.__name)
         
         # init misc fields
         
-        serial.Bin.HOST_ENCODING = self.__config.encoding
+        serial.Bin.HOST_ENCODING = self.config.player_encoding
         
         self.__clients = []
         
@@ -495,10 +495,10 @@ class PlayerAdapter(object):
         self.__server_bluetooth = None
         self.__server_wifi = None
         
-        if self.__config.fb_root_dirs:
+        if self.config.fb_root_dirs:
             self.__filelib = files.FileSystemLibrary(
-                self.__config.fb_root_dirs, mime_types,
-                self.__config.fb_extensions, False)
+                self.config.fb_root_dirs, mime_types,
+                self.config.fb_show_extensions, False)
         else:
             log.info("file browser is disabled")
             
@@ -521,15 +521,15 @@ class PlayerAdapter(object):
         
         # set up server
         
-        if self.__config.bluetooth:
+        if self.config.bluetooth_enabled:
             self.__server_bluetooth = net.BluetoothServer(self.__clients,
-                    self.__info, self.__handle_message, self.__config)
+                    self.__info, self.__handle_message, self.config)
         else:
             self.__server_bluetooth = None
 
-        if self.__config.wifi:
+        if self.config.wifi_enabled:
             self.__server_wifi = net.WifiServer(self.__clients,
-                    self.__info, self.__handle_message, self.__config)
+                    self.__info, self.__handle_message, self.config)
         else:
             self.__server_wifi = None
             
@@ -599,14 +599,14 @@ class PlayerAdapter(object):
     
     def __poll(self):
         
-        if self.config.custom_volume_cmd:
-            self.__update_volume_custom()
+        if self.config.master_volume_enabled:
+            self.__update_volume_master()
         
         try:
             self.poll()
         except NotImplementedError:
-            # poll again if custom volume is used, otherwise not
-            return bool(self.config.custom_volume_cmd)
+            # poll again if master volume is used, otherwise not
+            return self.config.master_volume_enabled
         
         return True
     
@@ -750,29 +750,30 @@ class PlayerAdapter(object):
         """
         log.error("** BUG ** in feature handling")
         
-    def __ctrl_volume_custom(self, direction):
+    def __ctrl_volume_master(self, direction):
         """Adjust volume using custom volume command (instead of player)."""
         
         if direction < 0:
-            arg = "down"
+            cmd = self.config.master_volume_down_cmd
         elif direction > 0:
-            arg = "up"
+            cmd = self.config.master_volume_up_cmd
         else:
-            arg = "mute"
+            cmd = self.config.master_volume_mute_cmd
         
-        self.__util_run_custom_volume_command(arg)
-        
-        gobject.idle_add(self.__update_volume_custom)
+        ret, out = commands.getstatusoutput("sh -c '%s'" % cmd)
+        if ret != os.EX_OK:
+            log.error("master-volume-... failed: %s" % out)
+        else:
+            gobject.idle_add(self.__update_volume_master)
         
     def __ctrl_shutdown_system(self):
         
-        shutdown_cmd = config.get_system_shutdown_command()
-        if shutdown_cmd:
-            log.debug("run shutdown command")
-            try:
-                subprocess.Popen(shutdown_cmd, shell=True)
-            except OSError, e:
-                log.warning("failed to run shutdown command (%s)", e)
+        if self.config.system_shutdown_enabled:
+            log.debug("run system shutdown command")
+            cmd = "sh -c '%s'" % self.config.system_shutdown_cmd
+            ret, out = commands.getstatusoutput(cmd)
+            if ret != os.EX_OK:
+                log.error("system-shutdown failed: %s" % out)
                 return
             self.stop()
 
@@ -1065,7 +1066,7 @@ class PlayerAdapter(object):
         @note: Call to synchronize player state with remote clients.
         
         """
-        if self.config.custom_volume_cmd:
+        if self.config.master_volume_enabled:
             # ignore if custom command has been set
             return
         
@@ -1081,20 +1082,22 @@ class PlayerAdapter(object):
             self.__state.volume = volume
             self.__sync_trigger(self.__sync_state)
     
-    def __update_volume_custom(self):
+    def __update_volume_master(self):
         """Set the current volume (use custom command instead of player)."""
 
-        out = self.__util_run_custom_volume_command(None)
+        cmd = "sh -c '%s'" % self.config.master_volume_get_cmd
+        ret, out = commands.getstatusoutput(cmd)
+        if ret != os.EX_OK:
+            log.error("master-volume-get failed: '%s'" % out)
+            return
         try:
             volume = int(out)
+            if volume < 0 or volume > 100:
+                raise ValueError
         except ValueError:
-            log.warning("output of custom volume command malformed: '%s'" % out)
+            log.error("output of master-volume-get malformed: '%s'" % out)
             return
         
-        if volume < 0 or volume > 100:
-            log.warning("bad volume from custom volume command: %d" % volume)
-            volume = 50
-            
         change = self.__state.volume != volume
         
         if change:
@@ -1289,8 +1292,8 @@ class PlayerAdapter(object):
             if control is None:
                 return
             
-            if self.config.custom_volume_cmd:
-                self.__ctrl_volume_custom(control.param)
+            if self.config.master_volume_enabled:
+                self.__ctrl_volume_master(control.param)
             else:
                 self.ctrl_volume(control.param)
             
@@ -1449,7 +1452,7 @@ class PlayerAdapter(object):
             
             ftc(playback_known, FT_KNOWN_PLAYBACK),
             ftc(volume_known, FT_KNOWN_VOLUME),
-            ftc(self.config.custom_volume_cmd, FT_KNOWN_VOLUME),
+            ftc(self.config.master_volume_enabled, FT_KNOWN_VOLUME),
             ftc(repeat_known, FT_KNOWN_REPEAT),
             ftc(shuffle_known, FT_KNOWN_SHUFFLE),
             ftc(progress_known, FT_KNOWN_PROGRESS),
@@ -1458,7 +1461,7 @@ class PlayerAdapter(object):
 
             ftc(self.ctrl_toggle_playing, FT_CTRL_PLAYBACK),
             ftc(self.ctrl_volume, FT_CTRL_VOLUME),
-            ftc(self.config.custom_volume_cmd, FT_CTRL_VOLUME),
+            ftc(self.config.master_volume_enabled, FT_CTRL_VOLUME),
             ftc(self.ctrl_seek, FT_CTRL_SEEK),
             ftc(self.ctrl_tag, FT_CTRL_TAG),
             ftc(self.ctrl_rate, FT_CTRL_RATE),
@@ -1474,7 +1477,7 @@ class PlayerAdapter(object):
             ftc(self.request_queue, FT_REQ_QU),
             ftc(self.request_mlib, FT_REQ_MLIB),
 
-            ftc(config.get_system_shutdown_command(), FT_SHUTDOWN),
+            ftc(self.config.system_shutdown_enabled, FT_SHUTDOWN),
         
         )
         
@@ -1487,28 +1490,6 @@ class PlayerAdapter(object):
         
         return flags
     
-    def __util_run_custom_volume_command(self, arg):
-
-        args = [self.config.custom_volume_cmd]
-        if arg:
-            args.append(arg)
-            
-        try:
-            p = subprocess.Popen(args,
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except OSError, e:
-            log.warning("failed to run custom volume command (%s)" % e)
-            return
-
-        p.wait()
-        out, err = p.communicate()
-        
-        if p.returncode != os.EX_OK:
-            log.warning("failed to run custom volume command:\n%s" % err)
-            return
-        
-        return out
-
     # =========================================================================
     # properties 
     # =========================================================================
@@ -1527,19 +1508,6 @@ class PlayerAdapter(object):
         return l
     
     clients = property(__pget_clients, None, None, __pget_clients.__doc__)
-
-    # === property: config ===
-    
-    def __pget_config(self):
-        """Player adapter specific configuration (instance of Config).
-        
-        This mirrors the configuration in ~/.config/remuco/PLAYER/conf. Any
-        change to 'config' is saved immediately into the configuration file.
-        
-        """
-        return self.__config
-    
-    config = property(__pget_config, None, None, __pget_config.__doc__)
 
     # === property: manager ===
     
