@@ -94,7 +94,7 @@ class MPRISAdapter(PlayerAdapter):
                                mime_types=mime_types)
         
         self.__playlist_actions = PLAYLIST_ACTIONS
-        if self.config.mpris_jump_enabled: # OK for non-dynamic playlists
+        if self.config.getx("playlist-jump-enabled", "0", int):
             self.__playlist_actions.append(IA_JUMP)
         if extra_playlist_actions:
             self.__playlist_actions.extend(extra_playlist_actions)

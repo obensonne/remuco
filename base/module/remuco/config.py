@@ -73,7 +73,6 @@ _OPTIONS = {
     "log-level": ("INFO", lambda v: getattr(log, v)),
     "fb-show-extensions": ("0", int),
     "fb-root-dirs": ("auto", lambda v: v.split(pathsep)),
-    "mpris-jump-enabled": ("0", int),
     "master-volume-enabled": ("0", int),
     "master-volume-get-cmd": (r'amixer get Master | grep -E "\[[0-9]+%\]" | '
                                'sed -re "s/^.*\[([0-9]+)%\].*$/\\1/"', None),
