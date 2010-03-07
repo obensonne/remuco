@@ -42,19 +42,16 @@ def handler(signum, frame):
     functionality. """
 
     if _paref is not None:
-        count = 0
 
-        print 'Which function should I call?'
-        for f in _cmdlist:
-            #this is the ugliest thing i've ever written
-            print '[', count, ']', f.im_func.__str__().split()[1]
-
-            count = count + 1
+        print('Which function should I call?')
+        for count, f in enumerate(_cmdlist):
+            # there are uglier things than this
+            print('[%d] %s' % (count, f.__name__))
 
         b = int(raw_input('Choice: '))
         if b >= 0 and b < _cmdlist.__len__():
             #TODO ask for parameters
             gobject.idle_add(_cmdlist[b])
         else:
-            print 'Invalid function'
+            print('Invalid function')
 
