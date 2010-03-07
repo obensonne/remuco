@@ -31,9 +31,8 @@ def setup(adapter):
 
     _paref = adapter
 
-    #TODO fetch this automatically
-    _cmdlist = [adapter.ctrl_toggle_playing,
-         adapter.ctrl_toggle_fullscreen]
+    _cmdlist = [getattr(adapter, f) for f in dir(adapter)
+                if f.startswith("ctrl_")]
 
     signal.signal(signal.SIGHUP, handler)
 
