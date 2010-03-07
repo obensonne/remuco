@@ -406,6 +406,8 @@ class PlayerAdapter(object):
         * find_image()
         
     '''
+    
+    manager = DummyManager()
 
     # =========================================================================
     # constructor 
@@ -502,8 +504,6 @@ class PlayerAdapter(object):
         else:
             log.info("file browser is disabled")
             
-        self.__manager = DummyManager()
-        
         log.debug("init done")
     
     def start(self):
@@ -1489,48 +1489,3 @@ class PlayerAdapter(object):
         log.debug("flags: %X" % flags)
         
         return flags
-    
-    # =========================================================================
-    # properties 
-    # =========================================================================
-    
-    # === property: clients ===
-    
-    def __pget_clients(self):
-        """A descriptive list of connected clients.
-        
-        May be useful to integrate connected clients in a media player UI.
-
-        """ 
-        l = []
-        for c in self.__clients:
-            l.append(str(c))
-        return l
-    
-    clients = property(__pget_clients, None, None, __pget_clients.__doc__)
-
-    # === property: manager ===
-    
-    def __pget_manager(self):
-        """The Manager controlling this adapter.
-        
-        This property may be used to call the method stop() on to stop and
-        completely shutdown the adapter from within an adapter. Calling
-        Manager.stop() has the same effect as if the Manager process
-        received a SIGINT or SIGTERM. 
-        
-        If this adapter is not controlled by or has not yet assigned a Manager
-        then this property refers to a dummy manager - so it is allways safe
-        to call stop() on this manager.
-        
-        @see: Manager
-        
-        """
-        return self.__manager
-    
-    def __pset_manager(self, value):
-        self.__manager = value
-    
-    manager = property(__pget_manager, __pset_manager, None,
-                       __pget_manager.__doc__)
-
