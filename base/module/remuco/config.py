@@ -132,7 +132,7 @@ class Config(object):
                     os.makedirs(dname)
             except OSError, e:
                 log.error("failed to make dir: %s", e)
-        if not "--remuco-log-stdout" in sys.argv and isdir(self.cache):
+        if not "REMUCO_LOG_STDOUT" in os.environ and isdir(self.cache):
             log.set_file(join(self.cache, "%s.log" % self.player))
 
         # load
