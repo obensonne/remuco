@@ -44,7 +44,7 @@ from remuco.features import *
 from remuco.data import PlayerInfo, PlayerState, Progress, ItemList, Item
 from remuco.data import Control, Action, Tagging, Request
 
-from remuco.manager import DummyManager
+from remuco.manager import NoManager
 
 # =============================================================================
 # reply class for requests
@@ -407,7 +407,7 @@ class PlayerAdapter(object):
         
     '''
     
-    manager = DummyManager()
+    manager = NoManager()
 
     # =========================================================================
     # constructor 

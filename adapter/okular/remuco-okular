@@ -171,6 +171,6 @@ class OkularAdapter(remuco.PlayerAdapter):
 
 if __name__ == '__main__':
     
-    pa = OkularAdapter() # create the player adapter
-    mg = remuco.Manager(pa)# # pass it to a manager
-    mg.run() # run the manager (blocks until interrupt signal)
+    pa = OkularAdapter()
+    mg = remuco.Manager(pa)
+    mg.run()

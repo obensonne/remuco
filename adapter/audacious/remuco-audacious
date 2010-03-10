@@ -188,7 +188,6 @@ class AudaciousAdapter(remuco.MPRISAdapter):
 if __name__ == '__main__':
 
     pa = AudaciousAdapter()
-    mg = remuco.Manager(pa, player_dbus_name="org.mpris.audacious")
-    
+    mg = remuco.Manager(pa, dbus_name="org.mpris.audacious")
     mg.run()
 
