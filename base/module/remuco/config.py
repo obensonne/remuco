@@ -91,7 +91,7 @@ _DEFAULTS = _odict()
 for k, v in _OPTIONS.items():
     _DEFAULTS[k] = v[0]
 
-# timestamp (used for to backup old config date)
+# timestamp (used for backups of old config data)
 _TS = datetime.now().strftime("%Y%m%d-%H%M%S")
 
 # =============================================================================
