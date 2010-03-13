@@ -60,6 +60,21 @@
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:orientation="vertical" android:padding="10px"
 		android:background="#FF333333">
+		
+		
+		<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+			
+			<ImageButton android:id="@+id/CtrlShuffle"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:src="@drawable/button_noshuffle" android:clickable="false"
+				android:layout_weight="1"  />
+
+			<ImageButton android:id="@+id/CtrlRepeat"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:src="@drawable/button_norepeat" android:clickable="false"
+				android:layout_weight="1"  />
+		
+		</LinearLayout>
 
 
 		<LinearLayout android:id="@+id/controlButtonArea"
@@ -73,18 +88,18 @@
 
 			<ImageButton android:id="@+id/CtrlPrev"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:src="@android:drawable/ic_media_previous" android:clickable="false"
+				android:src="@drawable/button_prev" android:clickable="false"
 				android:layout_weight="1"  />
 
 			<ImageButton android:id="@+id/CtrlPlay"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:src="@android:drawable/ic_media_play" android:clickable="false" 
-				android:layout_weight="1" />
+				android:src="@drawable/button_play" android:clickable="false"
+				android:layout_weight="1"  />
 
 			<ImageButton android:id="@+id/CtrlNext"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:src="@android:drawable/ic_media_next" android:clickable="false" 
-				android:layout_weight="1" />
+				android:src="@drawable/button_next" android:clickable="false"
+				android:layout_weight="1"  />
 
 			<TextView android:id="@+id/CtrlLength" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" 

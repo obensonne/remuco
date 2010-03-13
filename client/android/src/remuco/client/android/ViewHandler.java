@@ -182,11 +182,31 @@ public class ViewHandler extends Handler {
 			
 			// toggle playbutton icon
 			if(state.getPlayback() == State.PLAYBACK_PLAY){
-				remuco.ctrlPlay.setImageResource(android.R.drawable.ic_media_pause);
+				Log.debug("[VH] playback = true");
+				remuco.ctrlPlay.setImageResource(R.drawable.button_pause);
 				running = true;
 			} else {
-				remuco.ctrlPlay.setImageResource(android.R.drawable.ic_media_play);
+				Log.debug("[VH] playback = false");
+				remuco.ctrlPlay.setImageResource(R.drawable.button_play);
 				running = false;
+			}
+			
+			// toggle shuffle icon
+			if(state.isShuffle()){
+				Log.debug("[VH] shuffle = true");
+				remuco.ctrlShuffle.setImageResource(R.drawable.button_shuffle);
+			} else {
+				Log.debug("[VH] shuffle = false");
+				remuco.ctrlShuffle.setImageResource(R.drawable.button_noshuffle);
+			}
+			
+			// toggle repeat icon
+			if(state.isRepeat()){
+				Log.debug("[VH] repeat = true");
+				remuco.ctrlRepeat.setImageResource(R.drawable.button_repeat);
+			} else {
+				Log.debug("[VH] repeat = false");
+				remuco.ctrlRepeat.setImageResource(R.drawable.button_norepeat);
 			}
 			
 //			// set volume

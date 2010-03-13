@@ -77,6 +77,8 @@ public class Remuco extends Activity implements OnClickListener{
 	ImageButton ctrlPrev;
 	ImageButton ctrlPlay;
 	ImageButton ctrlNext;
+	ImageButton ctrlShuffle;
+	ImageButton ctrlRepeat;
 	
 	RatingBar infoRatingBar;
 
@@ -105,6 +107,8 @@ public class Remuco extends Activity implements OnClickListener{
 		ctrlPlay.setOnClickListener(this);
 		ctrlPrev.setOnClickListener(this);
 		ctrlNext.setOnClickListener(this);
+		ctrlShuffle.setOnClickListener(this);
+		ctrlRepeat.setOnClickListener(this);
 		
 		// TODO: externalize these
 		infoTitle.setText("not connected");
@@ -138,13 +142,7 @@ public class Remuco extends Activity implements OnClickListener{
         Log.debug("screensize: " + width + "x" + height);
 		
         // use the smaller dimension
-        int smallerDimension = Math.min(width, height);
-        
-        // calculate golden ratio
-        double phi = (1 + Math.sqrt(5))/2;
-        
-        // get preferred image size
-        int imageSize = (int) (smallerDimension / phi);
+        int imageSize = Math.min(width, height);
         Log.debug("preferred image size: " + imageSize);
 
         // create extra info
@@ -198,6 +196,8 @@ public class Remuco extends Activity implements OnClickListener{
 		ctrlPrev = (ImageButton) findViewById(R.id.CtrlPrev);
 		ctrlPlay = (ImageButton) findViewById(R.id.CtrlPlay);
 		ctrlNext = (ImageButton) findViewById(R.id.CtrlNext);
+		ctrlShuffle = (ImageButton) findViewById(R.id.CtrlShuffle);
+		ctrlRepeat = (ImageButton) findViewById(R.id.CtrlRepeat);
 	}
 
 	
@@ -362,6 +362,15 @@ public class Remuco extends Activity implements OnClickListener{
 		case R.id.CtrlNext:
 			player.getPlayer().ctrlNext();
 			break;
+			
+		case R.id.CtrlShuffle:
+			player.getPlayer().ctrlToggleShuffle();
+			break;
+			
+		case R.id.CtrlRepeat:
+			player.getPlayer().ctrlToggleRepeat();
+			break;
+			
 		}
 	};	
 	
