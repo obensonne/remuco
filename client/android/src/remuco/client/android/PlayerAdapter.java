@@ -7,6 +7,7 @@ import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.Item;
+import remuco.client.common.io.Connection;
 import remuco.client.common.io.ISocket;
 import remuco.client.common.io.Connection.IConnectionListener;
 import remuco.client.common.player.IItemListener;
@@ -19,6 +20,8 @@ import android.os.Message;
 
 public class PlayerAdapter implements IConnectionListener, IItemListener, IProgressListener, IStateListener{
 
+	private static final int PING_INTERVAL = 5;
+	
 	Player player;
 	
 	ArrayList<Handler> handlers;
@@ -56,6 +59,39 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	}
 	
 	
+	// --- connection powersaving
+	
+	public void pauseConnection(){
+		Log.debug("[PA] pausing connection");
+		
+		if(player == null){
+			Log.debug("[PA] cannot pause connection: not connected");
+			return;
+		}
+		
+		Connection conn = player.getConnection();
+		conn.setPing(0);
+		remuco.client.common.io.Message pauseMessage = new remuco.client.common.io.Message();
+		pauseMessage.id = remuco.client.common.io.Message.CONN_SLEEP;
+		conn.send(pauseMessage);
+	}
+	
+	public void resumeConnection(){
+		Log.debug("[PA] waking up connection");
+		
+		if(player == null){
+			Log.debug("[PA] cannot resume connection: not connected");
+			return;
+		}
+		
+	    Connection conn = player.getConnection(); 
+	    conn.setPing(PING_INTERVAL);
+	    remuco.client.common.io.Message m = new remuco.client.common.io.Message();
+	    m.id = remuco.client.common.io.Message.CONN_WAKEUP;
+	    conn.send(m);
+	}
+	
+	
 	// --- remuco event handlers
 	
 	@Override
@@ -66,6 +102,9 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 		this.player.setItemListener(this);
 		this.player.setProgressListener(this);
 		this.player.setStateListener(this);
+		
+		// set ping interval
+		this.player.getConnection().setPing(PING_INTERVAL);
 		
 		notifyHandlers(MessageFlag.CONNECTED, player.info);
 	}
@@ -110,10 +149,12 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	}
 	
 	public void addHandler(Handler h){
+		Log.debug("[PA] adding handler: " + h);
 		handlers.add(h);
 	}
 	
 	public void removeHandler(Handler h){
+		Log.debug("[PA] removing handler: " + h);
 		handlers.remove(h);
 	}
 

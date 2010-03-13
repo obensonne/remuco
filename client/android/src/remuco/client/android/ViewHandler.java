@@ -9,6 +9,7 @@ import remuco.client.common.util.Log;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 public class ViewHandler extends Handler {
 
@@ -39,11 +40,11 @@ public class ViewHandler extends Handler {
 			PlayerInfo info = (PlayerInfo)msg.obj;
 			
 			// inform the user
-//			String toast = remuco.getResources().getString(
-//					R.string.connection_successful, 
-//					info.getName()
-//					);
-//			Toast.makeText(remuco, toast, Toast.LENGTH_SHORT).show();
+			String toast = remuco.getResources().getString(
+					R.string.connection_successful, 
+					info.getName()
+					);
+			Toast.makeText(remuco, toast, Toast.LENGTH_SHORT).show();
 			
 			// enable buttons
 			remuco.ctrlPrev.setClickable(true);
@@ -61,6 +62,10 @@ public class ViewHandler extends Handler {
 		case MessageFlag.DISCONNECTED:
 			
 			Log.ln("[VH] DISCONNECTED!");
+			
+			// inform the user
+			toast = remuco.getResources().getString(R.string.connection_failed);
+			Toast.makeText(remuco, toast, Toast.LENGTH_SHORT).show();
 			
 			// disable buttons
 			remuco.ctrlPrev.setClickable(false);

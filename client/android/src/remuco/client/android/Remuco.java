@@ -9,6 +9,7 @@ import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
+import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.util.Log;
 import android.app.Activity;
 import android.app.Dialog;
@@ -16,6 +17,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Remuco extends Activity implements OnClickListener{
 
@@ -150,7 +154,7 @@ public class Remuco extends Activity implements OnClickListener{
 		info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
 		Log.ln("running on : " + android.os.Build.MODEL);
 		
-		// afaik every android (sofar) has a touchscreen and is using unicode
+		// afaik every android (so far) has a touchscreen and is using unicode
 		info.put("touch", "yes");
 		info.put("utf8", "yes");
         
@@ -167,6 +171,13 @@ public class Remuco extends Activity implements OnClickListener{
 		
 		// --- register view handler at player
 		player.addHandler(viewHandler);
+		
+		
+		// --- try to connect to the last hostname
+		String lastHostname = preference.getString(LAST_HOSTNAME, "");
+		if( !lastHostname.equals("") ){
+			player.connect(lastHostname, clientInfo);
+		}
 		
 	}
 	
@@ -189,6 +200,8 @@ public class Remuco extends Activity implements OnClickListener{
 		ctrlNext = (ImageButton) findViewById(R.id.CtrlNext);
 	}
 
+	
+	
 	/**
 	 * this method gets called after on create
 	 */
@@ -198,14 +211,11 @@ public class Remuco extends Activity implements OnClickListener{
 		
 		Log.debug("--- onResume()");
 
-		// --- initialize the connection here if we can
+		// --- wake up the connection
+		player.resumeConnection();
 
 		
-		// try to connect to the last hostname
-		String lastHostname = preference.getString(LAST_HOSTNAME, "");
-		if( !lastHostname.equals("") ){
-			player.connect(lastHostname, clientInfo);
-		}
+
 		
 		
 		
@@ -216,8 +226,9 @@ public class Remuco extends Activity implements OnClickListener{
 		super.onStop();
 		Log.debug("--- onPause()");
 		
-		// stop the connection
-		player.disconnect();
+		// --- pause the connection if possible
+		player.pauseConnection();
+		
 	}
 	
 	@Override
@@ -226,6 +237,9 @@ public class Remuco extends Activity implements OnClickListener{
 
 		Log.debug("--- onDestroy()");
 
+		// stop the connection
+		player.disconnect();
+		
 		// disable the main loop (timer thread)
 		MainLoop.disable();
 
