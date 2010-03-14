@@ -176,8 +176,12 @@ class TVtimeAdapter(remuco.PlayerAdapter):
 # main
 # =============================================================================
 
+def run_check():
+    """Check if TVTime is running."""
+    return commands.getstatusoutput("tvtime-command NOOP")[0] == 0
+
 if __name__ == '__main__':
     
     pa = TVtimeAdapter()
-    mg = remuco.Manager(pa)
+    mg = remuco.Manager(pa, poll_fn=run_check)
     mg.run()
