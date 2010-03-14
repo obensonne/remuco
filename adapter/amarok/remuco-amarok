@@ -3,7 +3,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -97,7 +97,7 @@ class AmarokAdapter(remuco.MPRISAdapter):
 if __name__ == '__main__':
 
     pa = AmarokAdapter()
-    mg = remuco.Manager(pa, player_dbus_name="org.mpris.amarok")
+    mg = remuco.Manager(pa, dbus_name="org.mpris.amarok")
     
     mg.run()
 

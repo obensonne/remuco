@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -30,6 +30,8 @@ _CONN = 100
 #CONN_PLIST = _CONN
 CONN_PINFO = _CONN + 10
 CONN_CINFO = _CONN + 20
+CONN_SLEEP = _CONN + 30
+CONN_WAKEUP = _CONN + 40
 CONN_BYE = _CONN + 90
 
 # =============================================================================

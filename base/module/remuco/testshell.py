@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -20,22 +20,37 @@
 #
 # =============================================================================
 
-PLAYBACK_PAUSE = 1
-PLAYBACK_PLAY = 2
-PLAYBACK_STOP = 0
+import signal
+import gobject
 
-INFO_ABSTRACT = "__abstract__"
-INFO_ALBUM = "album"
-INFO_ARTIST = "artist"
-INFO_BITRATE = "bitrate"
-INFO_COMMENT = "comment"
-INFO_GENRE = "genre"
-INFO_LENGTH = "length"
-INFO_RATING = "rating"
-INFO_TAGS = "tags"
-INFO_TITLE = "title"
-INFO_TRACK = "track"
-INFO_YEAR = "year"
+_paref = None
+_cmdlist = None
 
-REMUCO_VERSION = "0.9.2"
+def setup(adapter):
+    global _paref, _cmdlist
+
+    _paref = adapter
+
+    _cmdlist = [getattr(adapter, f) for f in dir(adapter)
+                if f.startswith("ctrl_")]
+
+    signal.signal(signal.SIGHUP, handler)
+
+def handler(signum, frame):
+    """Ugly handler to call PlayerAdapter's functions and test
+    functionality. """
+
+    if _paref is not None:
+
+        print('Which function should I call?')
+        for count, f in enumerate(_cmdlist):
+            # there are uglier things than this
+            print('[%d] %s' % (count, f.__name__))
+
+        b = int(raw_input('Choice: '))
+        if b >= 0 and b < _cmdlist.__len__():
+            #TODO ask for parameters
+            gobject.idle_add(_cmdlist[b])
+        else:
+            print('Invalid function')
 

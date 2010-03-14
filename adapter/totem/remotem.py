@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -297,7 +297,7 @@ class TotemAdapter(remuco.PlayerAdapter):
         
         info[remuco.INFO_LENGTH] = int(len / 1000)
         
-        img = self.find_image(mrl, prefer_thumbnail=True)
+        img = self.find_image(mrl)
         
         self.update_item(mrl, info, img)
         

@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -169,6 +169,8 @@ class Item(serial.Serializable):
                 img = Image.open(img)
             img.thumbnail((img_size, img_size))
             file_tmp = tempfile.TemporaryFile()
+            if img_type == "JPEG" and img.mode == "P":
+                img = img.convert("RGB")
             img.save(file_tmp, img_type)
             file_tmp.seek(0)
             thumb = file_tmp.read()

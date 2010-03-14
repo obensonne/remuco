@@ -2,11 +2,12 @@ import sys
 
 try:
     import gobject
-    import xdg.BaseDirectory
+    if sys.platform.startswith("linux"):
+        import xdg.BaseDirectory
+        import dbus
     import Image
     import logging
     import bluetooth
-    import dbus
 except ImportError, e:
     print("")
     print("+-----------------------------------------------------------------+")

@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -61,14 +61,14 @@ class FilesTest(unittest.TestCase):
         
         #print("")
         
-        fs = FileSystemLibrary(None, ["audio","video"], False, False, True)
+        fs = FileSystemLibrary(None, ["audio","video"], False, True)
         
         self.__test_path(fs, None, "", limit=0)
         self.__test_path(fs, [], "", limit=2)
         
-        fs = FileSystemLibrary([ "/home", "/nonexistent" ],
+        fs = FileSystemLibrary([ "/home", "/nonexistent", "auto" ],
             ["audio/mp3", "video/mp4", "application/x-iso9660-image"],
-            True, False, True)
+            False, True)
         
         self.__test_path(fs, [], "", limit=3)
         

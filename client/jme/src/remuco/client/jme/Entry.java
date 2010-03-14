@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -56,6 +56,9 @@ public class Entry extends MIDlet {
 
 	protected void pauseApp() {
 
+		if (remuco != null) {
+			remuco.sleep();
+		}
 		Log.ln("[EN] paused");
 
 	}
@@ -68,6 +71,7 @@ public class Entry extends MIDlet {
 			remuco = new Remuco(this);
 			Log.ln("[EN] started");
 		} else {
+			remuco.wakeup();
 			Log.ln("[EN] resumed");
 		}
 

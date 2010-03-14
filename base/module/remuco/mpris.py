@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -22,14 +22,18 @@
 
 import os.path
 
-import dbus
-from dbus.exceptions import DBusException
 import gobject
 
 from remuco.adapter import PlayerAdapter, ItemAction
 from remuco.defs import *
 from remuco import log
 
+try:
+    import dbus
+    from dbus.exceptions import DBusException
+except ImportError:
+    log.warning("dbus not available - MPRIS based player adapters will crash")
+    
 # =============================================================================
 # MPRIS constants
 # =============================================================================
@@ -90,7 +94,7 @@ class MPRISAdapter(PlayerAdapter):
                                mime_types=mime_types)
         
         self.__playlist_actions = PLAYLIST_ACTIONS
-        if self.config.mprisjump: # OK for non-dynamic playlists
+        if self.config.getx("playlist-jump-enabled", "0", int):
             self.__playlist_actions.append(IA_JUMP)
         if extra_playlist_actions:
             self.__playlist_actions.extend(extra_playlist_actions)

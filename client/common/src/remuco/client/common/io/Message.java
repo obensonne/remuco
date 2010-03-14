@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -36,6 +36,8 @@ public final class Message {
 	// use for player list if needed: CONN
 	public static final int CONN_PINFO = CONN + 10;
 	public static final int CONN_CINFO = CONN + 20;
+	public static final int CONN_SLEEP = CONN + 30;
+	public static final int CONN_WAKEUP = CONN + 40;
 	public static final int CONN_BYE = CONN + 90;
 
 	private static final int SYNC = 200;

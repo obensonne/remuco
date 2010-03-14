@@ -1,7 +1,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -21,6 +21,8 @@
 # =============================================================================
 
 """Utility functions to read/write simple str<->str dicts from/to files."""
+
+from __future__ import with_statement
 
 import os.path
 
@@ -129,9 +131,8 @@ def write_dicts_to_file(filename, dicts, keys=None, comment=None):
         lines.append("%s\n" % dic)
         
     try:
-        fp = open(filename, "w")
-        fp.writelines(lines)
-        fp.close()
+        with open(filename, "w") as fp:
+            fp.writelines(lines)
     except IOError, e:
         log.warning("failed to write to %s (%s)" % (filename, e))
     

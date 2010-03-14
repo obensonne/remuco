@@ -3,7 +3,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -334,11 +334,6 @@ class Amarok14Adapter(remuco.PlayerAdapter):
     # internal methods
     # =========================================================================
 
-    def _check_running(self):
-        """Check if Amarok is running."""
-
-        return commands.getstatusoutput("dcop amarok")[0] == 0
-
     def _amarok(self, cmd, default=""):
         """Shortcut for running command 'dcop amarok ...'."""
 
@@ -353,8 +348,12 @@ class Amarok14Adapter(remuco.PlayerAdapter):
 # main
 # =============================================================================
 
+def run_check():
+    """Check if Amarok is running."""
+    return commands.getstatusoutput("dcop amarok")[0] == 0
+
 if __name__ == '__main__':
 
-    pa = Amarok14Adapter() # create the player adapter
-    mg = remuco.Manager(pa, run_check_fn=pa._check_running) # pass to manager
-    mg.run() # run the manager (blocks until interrupt signal)
+    pa = Amarok14Adapter()
+    mg = remuco.Manager(pa, poll_fn=run_check)
+    mg.run()

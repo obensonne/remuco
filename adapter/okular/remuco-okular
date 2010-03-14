@@ -3,7 +3,7 @@
 # =============================================================================
 #
 #    Remuco - A remote control system for media players.
-#    Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
 #
 #    This file is part of Remuco.
 #
@@ -49,7 +49,7 @@ class OkularAdapter(remuco.PlayerAdapter):
                                       mime_types=["application/pdf"])
         self.__am = None
         
-        self.__image = os.path.join(self.config.cache_dir, "img.png")
+        self.__image = os.path.join(self.config.cache, "okular.thumbnail")
 
     def start(self):
         
@@ -171,6 +171,6 @@ class OkularAdapter(remuco.PlayerAdapter):
 
 if __name__ == '__main__':
     
-    pa = OkularAdapter() # create the player adapter
-    mg = remuco.Manager(pa)# # pass it to a manager
-    mg.run() # run the manager (blocks until interrupt signal)
+    pa = OkularAdapter()
+    mg = remuco.Manager(pa)
+    mg.run()

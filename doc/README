@@ -28,7 +28,11 @@ A. General Information
 
 General:
  * Python >= 2.5 and < 3.0
- * Python modules: dbus, gobject, xdg, Image, logging, bluetooth
+ * Python modules: Image, logging, bluetooth
+
+  On Linux, remuco also requires dbus, gobject, xdg.
+  On Windows, remuco requires pywin32 and purepython-gobject
+  (http://github.com/cpatulea/purepython-gobject).
 
 Amarok:
  * Amarok >= 2.0
@@ -37,7 +41,7 @@ Audacious:
  * Audacious >= 1.5.1 (previous versions may work, not tested)
 
 Banshee:
- * Banshee >= 1.4
+ * Banshee >= 1.5.3 (>= 1.4 works except rating control)
 
 Exaile:
  * Exaile >= 2.99.3 (aka 3 alpha)
@@ -66,6 +70,10 @@ VLC:
 
 XMMS2:
  * Python modules: xmmsclient (>= 0.5)
+
+Winamp (Windows):
+ * Winamp >= 2 and <= 5.56
+ * See README.windows
 
 Client:
  The client runs on mobile devices with this JavaME configurations:

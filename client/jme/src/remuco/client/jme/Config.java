@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2009 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -149,6 +149,7 @@ public final class Config {
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_TYPE);
 		OPTION_DESCRIPTORS.addElement(PlayerScreen.OD_IMG_KEEPFS);
 		OPTION_DESCRIPTORS.addElement(Config.OD_PING);
+		OPTION_DESCRIPTORS.addElement(Remuco.OD_PSAVE);
 
 	}
 
