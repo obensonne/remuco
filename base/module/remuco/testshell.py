@@ -47,10 +47,13 @@ def handler(signum, frame):
             # there are uglier things than this
             print('[%d] %s' % (count, f.__name__))
 
-        b = int(raw_input('Choice: '))
-        if b >= 0 and b < _cmdlist.__len__():
-            #TODO ask for parameters
-            gobject.idle_add(_cmdlist[b])
-        else:
-            print('Invalid function')
+        try:
+            b = int(raw_input('Choice: '))
+            if b >= 0 and b < _cmdlist.__len__():
+                #TODO ask for parameters
+                gobject.idle_add(_cmdlist[b])
+            else:
+                print('Invalid function')
+        except ValueError:
+            pass
 
