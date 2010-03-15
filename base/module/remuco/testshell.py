@@ -22,6 +22,7 @@
 
 import signal
 import gobject
+import inspect
 
 _paref = None
 _cmdlist = None
@@ -46,14 +47,20 @@ def handler(signum, frame):
 
         print('Which function should I call?')
         for count, f in enumerate(_cmdlist):
-            # there are uglier things than this
-            print('[%d] %s' % (count, f.__name__))
+            parms, _, _, _ = inspect.getargspec(f)
+            showparms = ''
+            if parms.__len__() > 1:
+                showparms = parms[1:] #ignore 'self'
+
+            print('[%d] %s (%s)' % (count, f.__name__, showparms))
 
         try:
-            b = int(raw_input('Choice: '))
-            if b >= 0 and b < _cmdlist.__len__():
-                #TODO ask for parameters
-                gobject.idle_add(_cmdlist[b])
+            command = raw_input('Choice: ').split(' ')
+            idx = int(command[0])
+            args = command[1:]
+
+            if idx >= 0 and idx < _cmdlist.__len__():
+                gobject.idle_add(_cmdlist[idx], *args)
             else:
                 print('Invalid function')
         except ValueError:
