@@ -40,6 +40,8 @@ def handler(signum, frame):
     """Ugly handler to call PlayerAdapter's functions and test
     functionality. """
 
+    signal.signal(signal.SIGHUP, signal.SIG_IGN) #ignore further SIGHUPs
+
     if _paref is not None:
 
         print('Which function should I call?')
@@ -57,3 +59,4 @@ def handler(signum, frame):
         except ValueError:
             pass
 
+    signal.signal(signal.SIGHUP, handler) #be ready for the next calls
