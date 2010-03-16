@@ -30,6 +30,7 @@ from os.path import join, isdir, exists, pathsep, basename
 import re
 import shutil
 import sys
+import textwrap
 
 from remuco import log
 from remuco import defs
@@ -58,32 +59,69 @@ class _odict(dict):
 
 DEVICE_FILE = join(user_cache_dir, "remuco", "devices")
 
+_DOC_HEADER = """# Player Adapter Configuration
+# ============================
+#
+# Options defined in section DEFAULT affect *all* player adapters. Individual
+# option values can be defined in each player's section.
+#
+# Options starting with `x-` are player specific options, i.e. they don't
+# appear in section DEFAULT because they only make sense for specific players.  
+#
+# Options
+# =======
+#"""
+
 # should be updated on major changes in config backend (simple removal or
 # additions of options do not require a version update)
 _CONFIG_VERSION = "3"
 
-# standard options with default values and converter functions
+# standard options with default values, converter functions and documentation
 _OPTIONS = {
-    "config-version": ("0", None),
-    "bluetooth-enabled": ("1", int),
-    "bluetooth-channel": ("0", int),
-    "wifi-enabled": ("1", int),
-    "wifi-port": ("34271", int),
-    "player-encoding": ("UTF8", None),
-    "log-level": ("INFO", lambda v: getattr(log, v)),
-    "fb-show-extensions": ("0", int),
-    "fb-root-dirs": ("auto", lambda v: v.split(pathsep)),
-    "master-volume-enabled": ("0", int),
+    "config-version": ("0", None,
+        "Used internally, don't edit."),
+    "bluetooth-enabled": ("1", int,
+        "Enable or disable Bluetooth."),
+    "bluetooth-channel": ("0", int,
+        "Bluetooth channel to use. 0 mean the next free channel."),
+    "wifi-enabled": ("1", int,
+        "Enable or disable WiFi (Inet)."),
+    "wifi-port": ("34271", int,
+        "WiFi port to use. Should be changed if Remuco is used for multiple "
+        "players simultaneously to prevent port conflicts among adapters."),
+    "player-encoding": ("UTF8", None,
+        "Encoding of text coming from the player (i.e. artist, title, ...)."),
+    "log-level": ("INFO", lambda v: getattr(log, v),
+        "Log verbosity. Possible values: ERROR, WARNING, INFO, DEBUG."),
+    "fb-show-extensions": ("0", int,
+        "If to show file name extensions in a client's file browser."),
+    "fb-root-dirs": ("auto", lambda v: v.split(pathsep),
+        "List of directories (separated by `%s`) to show in a client's file "
+        "browser. `auto` expands to all directories which typically contain "
+        "files of the mime types a player supports (e.g. `~/Music` for audio "
+        "players)." % pathsep),
+    "master-volume-enabled": ("0", int,
+        "Enable or disable master volume. By default a player's volume level "
+        "is controlled by and displayed on clients. By setting this to `1` "
+        "the system's master volume is used instead - in that case the "
+        "following options *may* need to get adusted."),
     "master-volume-get-cmd": (r'amixer get Master | grep -E "\[[0-9]+%\]" | '
-                               'sed -re "s/^.*\[([0-9]+)%\].*$/\\1/"', None),
-    "master-volume-up-cmd": ("amixer set Master 5%+", None),
-    "master-volume-down-cmd": ("amixer set Master 5%-", None),
-    "master-volume-mute-cmd": ("amixer set Master 0%", None),
-    "system-shutdown-enabled": ("0", int),
+        'sed -re "s/^.*\[([0-9]+)%\].*$/\\1/"', None,
+        "Command to get the master volume level in percent."),
+    "master-volume-up-cmd": ("amixer set Master 5%+", None,
+        "Command to increase the master volume."),
+    "master-volume-down-cmd": ("amixer set Master 5%-", None,
+        "Command to decrease the master volume."),
+    "master-volume-mute-cmd": ("amixer set Master 0%", None,
+        "Command to mute the master volume."),
+    "system-shutdown-enabled": ("0", int,
+        "Enable or disable system shutdown by clients. If enabled, the "
+        "following option *may* need to get adjusted."),
     "system-shutdown-cmd": ("dbus-send --session --type=method_call "
-                            "--dest=org.freedesktop.PowerManagement "
-                            "/org/freedesktop/PowerManagement "
-                            "org.freedesktop.PowerManagement.Shutdown", None),
+        "--dest=org.freedesktop.PowerManagement "
+        "/org/freedesktop/PowerManagement "
+        "org.freedesktop.PowerManagement.Shutdown", None,
+        "Command to shut down the system."),
 }
 
 # defaults-only version of _OPTIONS to pass to config parser
@@ -231,8 +269,18 @@ class Config(object):
     def __save(self):
         """Save config to it's file."""
         
+        doc = [_DOC_HEADER]
+        for key in _DEFAULTS.keys():
+            idoc = "# %s:" % key 
+            idoc = [idoc] + textwrap.wrap(_OPTIONS[key][2], 73)
+            idoc = "\n#     ".join(idoc)
+            doc.append(idoc)
+        doc = "\n".join(doc)
+        
         try:
             with open(self.file, 'w') as fp:
+                fp.write(doc)
+                fp.write("\n\n")
                 self.__cp.write(fp)
         except IOError, e:
             log.warning("failed to save config to %s (%s)" % (self.file, e))
