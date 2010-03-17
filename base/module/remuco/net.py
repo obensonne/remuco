@@ -33,6 +33,7 @@ from remuco import message
 from remuco import report
 from remuco import serial
 from remuco.data import ClientInfo
+from remuco.remos import zc_publish, zc_unpublish
 
 def build_message(id, serializable):
     """Create a message ready to send on a socket.
@@ -533,8 +534,15 @@ class WifiServer(_Server):
         sock.bind(('', self._config.wifi_port))
         sock.listen(1)
         
+        zc_publish(self._pinfo.name, self._config.wifi_port)
+        
         return sock
 
     def _get_type(self):
         return "wifi"
+
+    def down(self):
+    
+        zc_unpublish()
+        super(WifiServer, self).down()
 
