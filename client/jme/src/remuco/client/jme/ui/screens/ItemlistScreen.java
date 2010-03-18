@@ -182,23 +182,16 @@ public final class ItemlistScreen extends List implements CommandListener {
 		final Enumeration e = list.getActions().elements();
 		while (e.hasMoreElements()) {
 			final AbstractAction a = (AbstractAction) e.nextElement();
-			final String label;
 			if (a.isListAction()) {
 				if (numNested == 0) {
 					continue;
 				}
-				label = a.label + " (list)";
 			} else { // item action
 				if (numItems == 0) {
 					continue;
 				}
-				if (((ItemAction) a).multiple) {
-					label = a.label + " (marked)";
-				} else {
-					label = a.label + " (focussed)";
-				}
 			}
-			final Command c = new Command(label, Command.SCREEN, 10);
+			final Command c = new Command(a.label, Command.SCREEN, 10);
 			actionCommands.put(c, a);
 			addCommand(c);
 		}
@@ -316,9 +309,9 @@ public final class ItemlistScreen extends List implements CommandListener {
 
 			final ItemAction ia = (ItemAction) a;
 
-			if (ia.multiple && numberOfMarkedItems == 0) {
+			if (!ia.multiple && numberOfMarkedItems > 1) {
 
-				actionAlert("This action requires one or more marked items.");
+				actionAlert("This action is not applicable to multiple items.");
 
 			} else if (index < numNested) {
 
@@ -329,7 +322,7 @@ public final class ItemlistScreen extends List implements CommandListener {
 				final int positions[];
 				final String ids[];
 
-				if (!ia.multiple) { // use focussed item
+				if (numberOfMarkedItems == 0) { // use focussed item
 
 					final int itemNo = index - numNested;
 
