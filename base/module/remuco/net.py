@@ -534,7 +534,7 @@ class WifiServer(_Server):
         sock.bind(('', self._config.wifi_port))
         sock.listen(1)
         
-        zc_publish(self._pinfo.name, self._config.wifi_port)
+        zc_publish(self._pinfo.name, sock.getsockname()[1])
         
         return sock
 
