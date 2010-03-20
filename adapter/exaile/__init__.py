@@ -303,14 +303,13 @@ class ExaileAdapter(remuco.PlayerAdapter):
             if tracks is None: # empty query, return _all_ tracks
                 tracks = self.__ex.collection.search("", tracks=tracks)
         else:
-            tracks = self.__ex.collection.tracks.itervalues()
             tml = []
             for key, val in zip(SEARCH_MASK, query):
                 val = val.strip()
                 if val:
                     sexpr = "%s=%s" %  (key.lower(), val)
                     tml.append(xl.trax.TracksMatcher(sexpr, case_sensitive=False))
-            tracks = xl.trax.search_tracks(tracks, tml)
+            tracks = xl.trax.search_tracks(self.__ex.collection, tml)
 
         reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
         reply.item_actions = SEARCH_ACTIONS
