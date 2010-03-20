@@ -292,15 +292,25 @@ class ExaileAdapter(remuco.PlayerAdapter):
 
     def request_search(self, reply, query):
         
-        tracks = None
-        for key, val in zip(SEARCH_MASK, query):
-            val = val.strip()
-            if val:
-                expr = "%s=%s" % (key, val)
-                tracks = self.__ex.collection.search(expr, tracks=tracks)
-                
-        if tracks is None: # empty query, return _all_ tracks
-            tracks = self.__ex.collection.search("", tracks=tracks)
+        if self.__ex.get_version() < "0.3.1":
+            tracks = None
+            for key, val in zip(SEARCH_MASK, query):
+                val = val.strip()
+                if val:
+                    expr = "%s=%s" % (key, val)
+                    tracks = self.__ex.collection.search(expr, tracks=tracks)
+                    
+            if tracks is None: # empty query, return _all_ tracks
+                tracks = self.__ex.collection.search("", tracks=tracks)
+        else:
+            tracks = self.__ex.collection.tracks.itervalues()
+            tml = []
+            for key, val in zip(SEARCH_MASK, query):
+                val = val.strip()
+                if val:
+                    sexpr = "%s=%s" %  (key.lower(), val)
+                    tml.append(xl.trax.TracksMatcher(sexpr, case_sensitive=False))
+            tracks = xl.trax.search_tracks(tracks, tml)
 
         reply.ids, reply.names = self.__tracklist_to_itemlist(tracks)
         reply.item_actions = SEARCH_ACTIONS
@@ -541,7 +551,8 @@ class ExaileAdapter(remuco.PlayerAdapter):
         names = []
         
         for track in track_list:
-            
+            # first, check if track is a SearchResultTrack (since Exaile 0.3.1)
+            track = hasattr(track, "track") and track.track or track
             ids.append(track.get_loc_for_io())
             if self.__ex.get_version() < "0.3.1":
                 artist = track.get_tag("artist")
