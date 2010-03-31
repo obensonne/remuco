@@ -377,7 +377,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             
         result = self.__intersect_dicts(result_dicts)
         
-        reply.ids, reply.names = self.__songs_to_item_list(result.values())
+        reply.ids, reply.names = self.__songs_to_item_list(result.values(), True)
         
         reply.item_actions = MLIB_ITEM_ACTIONS
         
@@ -521,9 +521,12 @@ class MPDAdapter(remuco.PlayerAdapter):
             
         return self.__songs_to_item_list(songs)
     
-    def __songs_to_item_list(self, songs):
+    def __songs_to_item_list(self, songs, sort=False):
         
         ids, names = [], []
+        
+        if sort:
+            songs = sorted(songs, key=lambda s: s.get("album", ""))
         
         for item in songs:
             ids.append(item.get("file", "XXX"))
