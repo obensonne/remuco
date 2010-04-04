@@ -1333,8 +1333,11 @@ class PlayerAdapter(object):
             self.ctrl_tag(tag.id, tag.tags)
 
         elif id == message.CTRL_NAVIGATE:
-            action = None #TODO unpack parameters
-            self.ctrl_navigate(action)
+            control = serial.unpack(Control, bindata)
+            if control is None:
+                return
+
+            self.ctrl_navigate(control.param)
 
         elif id == message.CTRL_FULLSCREEN:
             

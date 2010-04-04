@@ -474,14 +474,21 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			break;
 
-		case KeyBindings.ACTION_NAVIGATE:
+		case KeyBindings.ACTION_NAVUP:
+		case KeyBindings.ACTION_NAVDOWN:
+		case KeyBindings.ACTION_NAVLEFT:
+		case KeyBindings.ACTION_NAVRIGHT:
+		case KeyBindings.ACTION_NAVSELECT:
+		case KeyBindings.ACTION_NAVRETURN:
+		case KeyBindings.ACTION_NAVTOPMENU:
 			if (!checkFeature(Feature.CTRL_NAVIGATE)) {
 				break;
 			}
 
-			// TODO where does the parameter come from?
-			action = null;
-			player.ctrlNavigate(action);
+			int offset = action - KeyBindings.ACTION_NAVUP;
+			player.ctrlNavigate(offset);
+
+			break;
 
 		case KeyBindings.ACTION_NOOP:
 
