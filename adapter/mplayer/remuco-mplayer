@@ -195,6 +195,12 @@ class MplayerAdapter(remuco.PlayerAdapter):
     def ctrl_seek(self, direction):
         self.__command('seek %s0\n' % direction)
 
+    def ctrl_navigate(self, action):
+        button = ['up', 'down', 'left', 'right', 'select', 'prev', 'menu']
+
+        if action >= 0 and action < button.__len__():
+            self.__command('dvdnav %s\n' % button[action])
+
     # =========================================================================
     # request interface
     # =========================================================================
