@@ -525,8 +525,14 @@ class MPDAdapter(remuco.PlayerAdapter):
         
         ids, names = [], []
         
+        def skey(song): # sorting key for songs
+            album = song.get("album", "")
+            track = int(song.get("track", "0").split("/")[0])
+            disc = int(song.get("disc", "0"))
+            return "%s.%02d.%03d" % (album, disc, track)
+
         if sort:
-            songs = sorted(songs, key=lambda s: s.get("album", ""))
+            songs = sorted(songs, key=skey)
         
         for item in songs:
             ids.append(item.get("file", "XXX"))
