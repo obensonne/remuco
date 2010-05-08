@@ -53,7 +53,9 @@ public final class KeyBindings {
 	public static final String[] actionNames = new String[] { "Toggle playing",
 			"Next", "Previous", "Volume up", "Volume down", "Volume mute",
 			"Rate up", "Rate down", "Edit tags", "Show image", "Toggle repeat",
-			"Toggle shuffle", "Toggle fullscreen", "Navigate" };
+			"Toggle shuffle", "Toggle fullscreen",
+			"Navigate up", "Navigate down", "Navigate left", "Navigate right",
+			"Select item", "Previous menu", "Top menu" };
 
 	/**
 	 * Get the key bindings instance. <em>Must not</em> get called from a static

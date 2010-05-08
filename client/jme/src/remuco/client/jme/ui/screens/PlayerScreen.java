@@ -536,9 +536,6 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			}
 			break;
 
-		case KeyBindings.ACTION_NAVIGATE:
-			// TODO think about what does this mean
-
 		default:
 			break;
 		}
