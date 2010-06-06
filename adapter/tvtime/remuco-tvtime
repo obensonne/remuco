@@ -90,20 +90,20 @@ class TVtimeAdapter(remuco.PlayerAdapter):
         
     def ctrl_next(self):
         
-        self.__tvcmd("DOWN")
+        self.__tvcmd("RIGHT")
         
     def ctrl_previous(self):
         
-        self.__tvcmd("UP")
+        self.__tvcmd("LEFT")
         
     def ctrl_volume(self, volume):
         
         if volume == 0:
             self.__tvcmd("TOGGLE_MUTE")
         elif volume < 0:
-            self.__tvcmd("LEFT")
+            self.__tvcmd("DOWN")
         else:
-            self.__tvcmd("RIGHT")
+            self.__tvcmd("UP")
             
     def ctrl_toggle_repeat(self):
         
