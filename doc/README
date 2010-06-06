@@ -33,7 +33,7 @@ Player specific
 -------------------------------------------------------------------------------
 
  - **Amarok:** Amarok ≥ 2.0
- - **Amarok14:** Amarok ≥ 1.4 and < 2.0
+ - **Amarok14:** Amarok ≥ 1.4 and < 2.0 and Python module *eyeD3*
  - **Audacious:** Audacious ≥ 1.5.1
  - **Banshee:** Banshee ≥ 1.5.3 (≥ 1.4 works except rating control)
  - **Exaile:** Exaile ≥ 0.3.0
@@ -116,7 +116,7 @@ which automatically gets created with default values once an adapter has been
 started. Options are described within that file. *You can ignore this for now
 but you might be happy to know this later.* 
 
-### Amarok, Audacious, Banshee, Songbird, VLC ###
+### Amarok, Amarok14, Audacious, Banshee, Songbird, VLC ###
 
 Simply run `remuco-player` (repl. *player* with a real name, e.g. *banshee*).
 
@@ -134,10 +134,6 @@ safely enable this feature (set to `1`).
 VLC at *Tools → Preferences*. 
 
 *Songbird*: Make sure the Songbird [MPRIS Add-on][sbm] is installed.
-
-### Amarok 1.4 ###
-
-**TODO**
 
 ### Exaile, Rhythmbox, Totem ###
 
