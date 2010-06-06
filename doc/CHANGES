@@ -3,11 +3,15 @@ Release 0.9.3 (in development)
 
 Base
 ----
+
   * Improved local cover art detection.
   * Experimental Windows support.
+  * Simplified configuration (one configuration file only, easier to adjust
+    global and player specific options).
 
 Player adapters
 ---------------
+
   * New: Amarok 1.4, Quod Libet, Winamp
   * Banshee: Rating control finally works with Banshee 1.5.3.
   * Exaile: Fixed crash on library search with empty query.
@@ -17,24 +21,31 @@ Player adapters
     dynamic playlists).
   * MPlayer: Improved command line interface.
 
-Client
-------
-  * Power saving support (no communication when client is paused/minimized).
+Clients
+-------
+
+  * MIDP: Power saving support (no communication when client is paused or
+    minimized).
+  * MIDP: Simplified action handling in media browser.
+  * Android: Initial and experimental new client for Android devices.
 
 Release 0.9.2
 =============
 
 General
 -------
+
   * Progress of streams is now shown correctly (see [issue 36][i36]).
 
 Base
 ----
+
   * Added option to player adapter config to set a fixed Bluetooth channel (see
     [issue 5][i5] and [issue 31][i31]).
 
 Player adapters
 ---------------
+
   * Songbird: Added Songbird adapter.
   * MPlayer: Added (roughly working) MPlayer adapter.
   * XMMS2: Made adapter work with XMMS2 0.6.
@@ -44,6 +55,7 @@ Player adapters
 
 Client
 ------
+
   * Service search is now configurable to work around service search issues
     seen on some devices (see [issue 5][i5]).
   * Added a client customization option which makes Remuco usable on Windows
@@ -70,6 +82,7 @@ Release 0.9.1.1
 
 Client
 ------
+
   * Fixed a memory leak bug on the client (which may have occurred when
     browsing item lists a lot).
 
@@ -78,6 +91,7 @@ Release 0.9.1
 
 Base
 ----
+
   * Added client device info report tool `remuco-report`.
  
 Player adapters
@@ -87,6 +101,7 @@ Player adapters
  
 Client
 ------
+
   * Added options screen.
   * Optionally show detailed item information.
   * Size and type of cover art image are now configured on the client.
@@ -99,16 +114,19 @@ Release 0.9.0
 
 General
 -------
+
   * Added paging mechanism to item lists to enable clients to browse very long
     item lists.
   * Added search feature.
   
 Base
 ----
+
   * Volume control optionally controls master volume.
   
 Client
 ------
+
   * Added touch-screen support.
   * Fullscreen cover art is now real fullscreen.
   * Dropped themes Korama and Chocolate, added 4 new themes for touchscreen
@@ -119,6 +137,7 @@ Client
 
 Player adapters
 ---------------
+
   * XMMS2: Implemented search feature.
   * MPD: Implemented search feature.
   * Rhythmbox: Implemented search feature.
@@ -129,10 +148,12 @@ Release 0.8.2.1
 
 General
 -------
+
   * Fixed obsolete client installation in `setup.py`.
   
 Player adapters
 ---------------
+
   * Totem: Adapted to Totem 2.26.
 	
 Release 0.8.2
@@ -140,10 +161,12 @@ Release 0.8.2
 
 Base
 ----
+
   * Fixed Python path issue in Ubuntu Jaunty.
   
 Player adapters
 ---------------
+
   * VLC: Added player adapter for VLC.
   * TVtime: Added player adapter for TVtime.
   * Banshee: Added seek support.
@@ -151,6 +174,7 @@ Player adapters
   
 Client
 ------
+
   * Quick reconnect when connection is broken.
   * Removed some unused icons (smaller JAR size).
   * Logo size configurable in build process.
@@ -160,20 +184,24 @@ Release 0.8.1
 
 General
 -------
+
   * Various minor technical improvements (as always :).
 
 Base
 ----
+
   * base: Added option for WiFi port.
   * base: Added options for size and type of images sent to clients.
   * base: Fixed a bug concerning the system shutdown command.
 
 Player adapters
 ---------------
+
   * MPD: Added player adapter for MPD.
   
 Client
 ------
+
   * Full screen control enabled.
   * Fixed a color bug in theme Karoma.
   * Fixed some drawing issues on Nokia 5310.
@@ -187,6 +215,7 @@ Release 0.8.0.1
 
 General
 -------
+
   * No additional features, just internal adjustments.
   * Added GPL header to source files.
   * Replaced nested make files and setup.py by global setup.py.
@@ -194,10 +223,12 @@ General
   
 Base
 ----
+
   * Replace Python module 'md5' by 'hashlib'.
 
 Client
 ------
+
   * Set 'Vilanco' as default theme ('Chocolate' is too big for some devices).
 
 Release 0.8.0
@@ -205,6 +236,7 @@ Release 0.8.0
 
 General
 -------
+
   * Merged client and server side components into one package.
   * For that reason this change log is a fresh one.
   * The changes from 0.7 to 0.8 are just to many to list them here.

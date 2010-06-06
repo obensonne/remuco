@@ -149,3 +149,70 @@ else:
     def notify(title, text):
         log.info("%s: %s" % (title, text))
         # TODO: implementations for mac and win
+
+# =============================================================================
+# zeroconf
+# =============================================================================
+
+_ZC_TYPE = "_remuco._tcp"
+
+if linux:
+
+    import dbus
+    from dbus.mainloop.glib import DBusGMainLoop
+    from dbus.exceptions import DBusException
+    import gobject
+    
+    dbus.set_default_main_loop(DBusGMainLoop())
+    
+    # Avahi DBus constants (defined here to prevent python-avahi dependency)
+    _DBA_NAME = "org.freedesktop.Avahi"
+    _DBA_INTERFACE_SERVER = _DBA_NAME + ".Server"
+    _DBA_PATH_SERVER = "/"
+    _DBA_INTERFACE_ENTRY_GROUP = _DBA_NAME + ".EntryGroup"
+    
+    _zc_group = None
+    
+    def zc_publish(player, port):
+        """Publish a service for the given player at the given port."""
+        
+        zc_unpublish()
+        
+        log.debug("publishing zeroconf service")
+        try:
+            bus = dbus.SystemBus()
+            obj = bus.get_object(_DBA_NAME, _DBA_PATH_SERVER)
+            server = dbus.Interface(obj, _DBA_INTERFACE_SERVER)
+            obj = bus.get_object(_DBA_NAME, server.EntryGroupNew())
+            group = dbus.Interface(obj, _DBA_INTERFACE_ENTRY_GROUP)
+            group.AddService(-1, -1, 0, "Remuco %s" % player, _ZC_TYPE, "local",
+                             "", port, "")
+            group.Commit()
+        except dbus.DBusException, e:
+            log.warning("failed to publish zeroconf service (%s)" % e)
+            group = None
+        else:
+            log.debug("published zeroconf service")
+
+        global _zc_group
+        _zc_group = group
+        
+    def zc_unpublish():
+        """Unpublish the previously published service."""
+        
+        global _zc_group
+        if _zc_group:
+            try:
+                _zc_group.Reset()
+            except DBusException, e:
+                log.warning("failed to unpublish zeroconf service (%s)" % e)
+            _zc_group = None
+    
+else:
+
+    def zc_publish(player, port):
+        log.warning("publishing zeroconf services not implemented on this OS")
+
+    def zc_unpublish():
+        pass
+
