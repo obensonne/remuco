@@ -155,7 +155,44 @@ def refresh_api_doc():
     
     with open(cp.get("paths", "api"), 'w') as api:
         api.write(content)
-        
+
+README_HTML = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Remuco README</title>
+  <style type="text/css">
+    body {
+      font-family: sans;
+        color: #2e3436;
+    }
+    h1, h2, h3 {
+        font-family: serif;
+        /*font-variant: small-caps;*/
+    }
+    h1 {
+       border-bottom: #888a85 solid 1pt;
+    }
+  </style>
+</head>
+<body>
+%s
+</body>
+</html>
+"""
+
+def readme2html():
+    
+    import markdown
+    import codecs
+    with codecs.open("doc/README", "r", "utf-8") as fp:
+        readme = fp.read()
+    html = markdown.markdown(readme, ['toc', 'tables'])
+    html = README_HTML % html
+    with codecs.open("doc/README.html", "w", "utf-8") as fp:
+        fp.write(html)
+    
+
 # -----------------------------------------------------------------------------
 # Tarballs
 # -----------------------------------------------------------------------------
@@ -215,9 +252,11 @@ def main():
     if options.prepare:
         print("-> prepare release")
         refresh_api_doc()
+        readme2html()
         if not options.test:
             command(["hg", "ci", "-m",
                      "Final changes for release %s" %options.version])
+            
     if options.tag:
         print("-> tag release")
         if not options.test:
