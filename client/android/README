@@ -1,28 +1,16 @@
 Developer Info
 ==============
 
-Initial Android project
------------------------
+Android project
+---------------
 
-This Android project has been created using the following command:
+Initially this Android project has been created using the following command:
 
     $ android create project --target 1 --name Remuco --path . \
           --activity Remuco --package remuco.client.android
 
 The `local.properties` file has been added to `.hgignore`, but an example
 file `local.properties.example` is available in the repository.
-
-The initial commit introducing the Android project files does not have any
-addtional changes, than those mentioned above.
-
-Basic implementation
---------------------
-
-In it's current state the client already connects to a player adapter if the
-client runs in an emulator and if the adapter runs on the host which runs the
-emulator.
-
-I hope it shows how thinks principally work.
 
 IDE vs. Ant
 -----------
@@ -40,10 +28,18 @@ Building the client
 Testing the client
 ------------------
 
-Use the Android SDK *emulator* tool to start an emulator for an Android 1.1
-device. Then install the app:
+Start an emulator for an Android 1.5 device:
+
+    $ /path/to/android-sdk/tools/emulator -avd <virtual-android-1.5-device> 
+
+Then install the app:
 
     $ ant install # or reinstall
 
-Now the app can be started and tested on the emulated device.
+Start the Remuco app in the emulated device and connect to `10.0.0.2`
+(localhost of your machine running the emulator).
 
+Installing the client
+---------------------
+
+See <http://code.google.com/p/remuco/wiki/Android>.
