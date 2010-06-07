@@ -42,6 +42,7 @@ FT_CTRL_SHUFFLE = 1 << 17
 FT_CTRL_NEXT = 1 << 18
 FT_CTRL_PREV = 1 << 19
 FT_CTRL_FULLSCREEN = 1 << 20
+FT_CTRL_NAVIGATE = 1 << 21
         
 # --- request features ---
 
