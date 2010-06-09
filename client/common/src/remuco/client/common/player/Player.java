@@ -180,6 +180,11 @@ public final class Player {
 		ctrl(Message.CTRL_VOLUME, direction);
 	}
 
+	public void ctrlNavigate(int action) {
+
+		ctrl(Message.CTRL_NAVIGATE, action);
+	}
+
 	/** Get the connection used by this player. */
 	public Connection getConnection() {
 		return conn;

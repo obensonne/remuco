@@ -474,6 +474,22 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 			break;
 
+		case KeyBindings.ACTION_NAVUP:
+		case KeyBindings.ACTION_NAVDOWN:
+		case KeyBindings.ACTION_NAVLEFT:
+		case KeyBindings.ACTION_NAVRIGHT:
+		case KeyBindings.ACTION_NAVSELECT:
+		case KeyBindings.ACTION_NAVRETURN:
+		case KeyBindings.ACTION_NAVTOPMENU:
+			if (!checkFeature(Feature.CTRL_NAVIGATE)) {
+				break;
+			}
+
+			int offset = action - KeyBindings.ACTION_NAVUP;
+			player.ctrlNavigate(offset);
+
+			break;
+
 		case KeyBindings.ACTION_NOOP:
 
 			break;
@@ -696,6 +712,9 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				break;
 			case Feature.CTRL_TAG:
 				msg = "Sorry, tagging items is not possible.";
+				break;
+			case Feature.CTRL_NAVIGATE:
+				msg = "Sorry, navigation is not possible.";
 				break;
 			default:
 				Log.bug("unexpected feature check: " + feature);

@@ -59,6 +59,7 @@ CTRL_SHUFFLE = _CTRL + 6
 CTRL_FULLSCREEN = _CTRL + 7
 CTRL_RATE = _CTRL + 8
 CTRL_TAG = _CTRL + 30
+CTRL_NAVIGATE = _CTRL + 40 #31 would be ugly
 CTRL_SHUTDOWN = _CTRL + 90
 
 # =============================================================================
@@ -109,4 +110,4 @@ def is_request(id):
 
 def is_private(id):
     return _is_in_range(_PRIV, id)
-    
+

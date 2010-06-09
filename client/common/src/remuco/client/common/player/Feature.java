@@ -44,6 +44,7 @@ public class Feature {
 	public static final int CTRL_NEXT = 1 << 18;
 	public static final int CTRL_PREV = 1 << 19;
 	public static final int CTRL_FULLSCREEN = 1 << 20;
+	public static final int CTRL_NAVIGATE = 1 << 21;
 	        
 	// --- request features ---
 
