@@ -63,7 +63,7 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 	private static final String ADDR_CHOICES[] = { "Scan for", "Set manually" };
 
 	/** Text field constraints for address (uneditable). */
-	private static final int ADDR_OFF = TextField.URL; //| TextField.UNEDITABLE; // see issue 46
+	private static final int ADDR_OFF = TextField.URL | TextField.UNEDITABLE;
 
 	/** Text field constraints for address (editable). */
 	private static final int ADDR_ON = TextField.URL;
@@ -75,8 +75,8 @@ public class BluetoothScreen extends Form implements IDeviceScreen {
 			"Search for (failsafe)", "Set manually" };
 
 	/** Text field constraints for channel (uneditable). */
-	private static final int CHAN_OFF = TextField.NUMERIC;
-			//| TextField.UNEDITABLE; // see issue 46
+	private static final int CHAN_OFF = TextField.NUMERIC
+			| TextField.UNEDITABLE;
 
 	/** Text field constraints for channel (editable). */
 	private static final int CHAN_ON = TextField.NUMERIC;
