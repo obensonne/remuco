@@ -504,6 +504,10 @@ class PlayerAdapter(object):
             
         self.__manager = DummyManager()
         
+        if "REMUCO_TESTSHELL" in os.environ:
+            from remuco import testshell
+            testshell.setup(self)
+        
         log.debug("init done")
     
     def start(self):

@@ -40,8 +40,6 @@ import remuco
 from remuco import log
 from remuco.defs import *
 
-from remuco import testshell
-
 FA_APPEND = remuco.ItemAction("Append")
 FA_PLAY = remuco.ItemAction("Play")
 
@@ -380,6 +378,5 @@ if __name__ == '__main__':
     pa = MplayerAdapter(filepaths) # create the player adapter
     mg = remuco.Manager(pa) # pass it to a manager
 
-    testshell.setup(pa)
     mg.run() # run the manager (blocks until interrupt signal)
 
