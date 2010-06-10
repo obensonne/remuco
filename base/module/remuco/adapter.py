@@ -505,6 +505,10 @@ class PlayerAdapter(object):
         else:
             log.info("file browser is disabled")
             
+        if "REMUCO_TESTSHELL" in os.environ:
+            from remuco import testshell
+            testshell.setup(self)
+
         log.debug("init done")
     
     def start(self):

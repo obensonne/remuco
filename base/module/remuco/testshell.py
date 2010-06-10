@@ -22,6 +22,7 @@
 
 import signal
 import gobject
+import inspect
 
 _paref = None
 _cmdlist = None
@@ -40,17 +41,36 @@ def handler(signum, frame):
     """Ugly handler to call PlayerAdapter's functions and test
     functionality. """
 
+    signal.signal(signal.SIGHUP, signal.SIG_IGN) #ignore further SIGHUPs
+
     if _paref is not None:
 
         print('Which function should I call?')
         for count, f in enumerate(_cmdlist):
-            # there are uglier things than this
-            print('[%d] %s' % (count, f.__name__))
+            parms, _, _, _ = inspect.getargspec(f)
+            showparms = ''
+            if parms.__len__() > 1:
+                showparms = parms[1:] #ignore 'self'
 
-        b = int(raw_input('Choice: '))
-        if b >= 0 and b < _cmdlist.__len__():
-            #TODO ask for parameters
-            gobject.idle_add(_cmdlist[b])
-        else:
-            print('Invalid function')
+            print('[%d] %s (%s)' % (count, f.__name__, showparms))
 
+        try:
+            command = raw_input('Choice: ').split(' ')
+            idx = int(command[0])
+            args = command[1:]
+
+            #cast what seems to be integer
+            for i in range(len(args)):
+                try:
+                    args[i] = int(args[i])
+                except ValueError:
+                    pass
+
+            if idx >= 0 and idx < _cmdlist.__len__():
+                gobject.idle_add(_cmdlist[idx], *args)
+            else:
+                print('Invalid function')
+        except ValueError:
+            pass
+
+    signal.signal(signal.SIGHUP, handler) #be ready for the next calls
