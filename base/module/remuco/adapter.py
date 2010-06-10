@@ -416,7 +416,6 @@ class PlayerAdapter(object):
     
     def __init__(self, name, playback_known=False, volume_known=False,
                  repeat_known=False, shuffle_known=False, progress_known=False,
-                 navigation_known=False,
                  max_rating=0, poll=2.5, file_actions=None, mime_types=None,
                  search_mask=None):
         """Create a new player adapter and configure its capabilities.
@@ -484,7 +483,7 @@ class PlayerAdapter(object):
         self.__item_img = None
         
         flags = self.__util_calc_flags(playback_known, volume_known,
-            repeat_known, shuffle_known, progress_known, navigation_known)
+            repeat_known, shuffle_known, progress_known)
         
         self.__info = PlayerInfo(name, flags, max_rating, file_actions,
                                  search_mask)
@@ -1447,7 +1446,7 @@ class PlayerAdapter(object):
         return uris
     
     def __util_calc_flags(self, playback_known, volume_known, repeat_known,
-                          shuffle_known, progress_known, navigation_known):
+                          shuffle_known, progress_known):
         """Check player adapter capabilities.
         
         Most capabilities get detected by testing which methods have been
