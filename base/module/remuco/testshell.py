@@ -60,13 +60,11 @@ def handler(signum, frame):
             args = command[1:]
 
             #cast what seems to be integer
-            for i,arg in enumerate(args):
-                possible_number = arg
-
-                if arg.startswith('-'): #negative? isdigit() will allow too
-                    possible_number = arg[1:]
-
-                if possible_number.isdigit(): args[i] = int(args[i])
+            for i in range(len(args)):
+                try:
+                    args[i] = int(args[i])
+                except ValueError:
+                    pass
 
             if idx >= 0 and idx < _cmdlist.__len__():
                 gobject.idle_add(_cmdlist[idx], *args)
