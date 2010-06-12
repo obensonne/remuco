@@ -24,7 +24,6 @@
 
 from __future__ import with_statement
 
-import ConfigParser
 import optparse
 import os
 import os.path
@@ -40,10 +39,7 @@ import sys
 # configuration
 # -----------------------------------------------------------------------------
 
-cp = ConfigParser.SafeConfigParser()
-cp.read("release.conf")
-
-sys.path.insert(0, cp.get("paths", "remuco"))
+sys.path.insert(0, "base/module") # remuco module
 
 import remuco
 
@@ -153,7 +149,7 @@ def refresh_api_doc():
     content = re.sub(patt_module_link, repl_module_link, content)
     content = re.sub(patt_file_link, repl_file_link, content)
     
-    with open(cp.get("paths", "api"), 'w') as api:
+    with open("doc/api.html", 'w') as api:
         api.write(content)
 
 README_HTML = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
@@ -196,7 +192,9 @@ def readme2html():
 # -----------------------------------------------------------------------------
 # Tarballs
 # -----------------------------------------------------------------------------
-   
+
+TARBALL_EXCLUDE = ["release.*", ".hg*", ".git*"]
+
 def tarball():
     """Build release tarballs."""
     
@@ -214,10 +212,7 @@ def tarball():
             shutil.rmtree(dir)
         os.mkdir(dir)
     
-    excludes = ""
-    for exc in zip(*cp.items("tarball-exclude"))[1]:
-        excludes += "--exclude %s " % exc 
-    
+    excludes = " ".join(["--exclude %s" % x for x in TARBALL_EXCLUDE])
     
     command("hg archive --rev %s --type tgz %s %s" %
             (options.version, excludes, pkg_src_tb))
@@ -254,7 +249,7 @@ def main():
         readme2html()
         if not options.test:
             command(["hg", "ci", "-m",
-                     "Final changes for release %s" %options.version])
+                     "Release: final changes for %s" %options.version])
             
     if options.tag:
         print("-> tag release")
