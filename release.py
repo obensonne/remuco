@@ -224,8 +224,7 @@ def tarball():
     command("tar zxf %s -C %s" % (pkg_src_tb, build_dir))
     
     command("%s/%s/client/jme/setup.sh" % (build_dir, pkg_src))
-    command("ant -f %s/client/jme/build.xml dist" % pkg_src_dir)
-    command("ant -f %s/client/jme/build.xml -Djsr82.off= dist" % pkg_src_dir)
+    command("ant -f %s/client/jme/build.xml dist.all" % pkg_src_dir)
     shutil.move("%s/client/jme/app" % pkg_src_dir, build_dir)
     
     shutil.rmtree(pkg_src_dir)
