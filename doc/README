@@ -88,8 +88,17 @@ Installation steps are device dependent. Usually the JAR file has to be sent or
 copied to the device. Some phones then already trigger the installation, others
 require to open the file with the device's file manager. 
 
+Next to the regular client you'll find special variants of the client
+in the above mentioned directory:
+
+ - *motorola-fix*: Use this for older Motorola phones like ROKR E2, ROKR E6,
+   MOTOZINE ZN5 and A1200e.
+ - *no-bluetooth*: A client without Bluetooth functionality. Some Windows based
+   phones (using JBed) are known to require this client version.
+
 *Note:* If you installed Remuco using packages for your distribution, the
 client files usually are located in `/usr/share/remuco/client/`. 
+
 
 *Note:* The source only package (`remuco-source-x.x.x.tar.gz`) does not contain
 the client binaries. Read sections *Client Development* and *Packager
