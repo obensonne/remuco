@@ -1,11 +1,10 @@
-Release 0.9.3 (in development)
-==============================
+Release 0.9.3
+=============
 
 Base
 ----
 
   * Improved local cover art detection.
-  * Experimental Windows support.
   * Simplified configuration (one configuration file only, easier to adjust
     global and player specific options).
   * New menu navigation control support for video players (e.g. for DVD menus).
@@ -31,7 +30,13 @@ Clients
   * MIDP: Power saving support (no communication when client is paused or
     minimized).
   * MIDP: Simplified action handling in media browser.
+  * MIDP: New client variant for some Motorola phones (see [issue 46][i46]).
+  * MIDP: New client variant for some Windows phones using JBed (so you don't
+    need to build it yourself anymore, see [issue 39][i39]).
   * Android: Initial and experimental new client for Android devices.
+
+[i39]: http://code.google.com/p/remuco/issues/detail?id=39
+[i46]: http://code.google.com/p/remuco/issues/detail?id=46
 
 Release 0.9.2
 =============
