@@ -60,11 +60,13 @@
 	<property name="midlet.jar" value="${midlet.name.lc}.jar" />
 	<property name="midlet.jad" value="${midlet.name.lc}.jad" />
 
+	<property name="dist.variant" value="" />
+
 	<condition property="bluetooth">
 		<and>
 			<isset property="jsr82.jar" />
 			<not>
-				<isset property="jsr82.off" />
+				<equals arg1="${dist.variant}" arg2="no-bluetooth" />
 			</not>
 		</and>
 	</condition>
@@ -87,9 +89,7 @@
 		<property name="compile.debug" value="${dist.debug}" />
 		<property name="preverifier" value="${dist.preverifier}" />
 		<property name="proguard.optimize" value="${dist.proguard.optimize}" />
-		<condition property="app.dir" value="app" else="app/no-bluetooth">
-			<isset property="bluetooth"/>
-		</condition>
+		<property name="app.dir" value="app/${dist.variant}" />
 		<antcall target="echo.configuration" />
 	</target>
 
@@ -99,9 +99,10 @@
 		<echo message="preverifier                : ${preverifier}" />
 		<echo message="proguard optimizes         : ${proguard.optimize}" />
 		<condition property="bluetooth.yn" value="yes" else="no">
-			<isset property="bluetooth"/>
+			<isset property="bluetooth" />
 		</condition>
 		<echo message="bluetooth                  : ${bluetooth.yn}" />
+		<echo message="variant                    : ${dist.variant}" />
 	</target>
 
 	<!-- =================== Libraries and Classpath ====================== -->
@@ -155,6 +156,16 @@
 				<filter token="EMULATION" value="${emulation-flag}" />
 			</filterset>
 		</copy>
+		<!-- motorola-fix for unsupported textfield constraint (issue 46) -->
+		<condition property="textfield.uneditable"
+		           value="TextField.ANY"
+		           else="TextField.UNEDITABLE">
+			<equals arg1="${dist.variant}" arg2="motorola-fix" />
+		</condition>
+		<replace dir="build/sources"
+		         includes="**/*.java"
+		         token="TextField.UNEDITABLE"
+		         value="${textfield.uneditable}" />
 	</target>
 
 	<target name="compile" depends="preprocess">
@@ -276,6 +287,19 @@
 				<include name="${midlet.jad}" />
 			</fileset>
 		</copy>
+	</target>
+
+	<!-- build regular and special variants of client -->
+	<target name="dist.all" depends="clean">
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="" />
+		</antcall>
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="motorola-fix" />
+		</antcall>
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="no-bluetooth" />
+		</antcall>
 	</target>
 
 	<!-- =================== Snapshot ===================================== -->
@@ -415,7 +439,9 @@
 		<delete dir="design/themes/build" />
 	</target>
 
-	<target name="clean" depends="clean.keep-app" description="--> clean project">
+	<target name="clean"
+	        depends="clean.keep-app"
+	        description="--> clean project">
 		<delete dir="app" />
 	</target>
 
