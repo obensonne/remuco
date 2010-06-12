@@ -8,6 +8,7 @@ Base
   * Experimental Windows support.
   * Simplified configuration (one configuration file only, easier to adjust
     global and player specific options).
+  * New menu navigation control support for video players (e.g. for DVD menus).
 
 Player adapters
 ---------------
@@ -20,12 +21,13 @@ Player adapters
   * Exaile: Added support for Exaile 3.1.
   * MPD: Sort track search results by album.
   * MPlayer: Improved command line interface.
+  * MPlayer: Implement menu navigation feature.
   * New: Amarok 1.4, Quod Libet
   
 Clients
 -------
 
-  * Original client is now the MIDP client.
+  * Original client is now called MIDP client.
   * MIDP: Power saving support (no communication when client is paused or
     minimized).
   * MIDP: Simplified action handling in media browser.
