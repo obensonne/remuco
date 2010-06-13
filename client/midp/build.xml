@@ -52,7 +52,7 @@
 	<property name="midlet.class" value="remuco.client.midp.Entry" />
 	<property name="midlet.icon" value="logo.png" />
 	<property name="midlet.vendor" value="remuco.googlecode.com" />
-	<property name="midlet.version" value="0.9.2" />
+	<property name="midlet.version" value="0.9.3" />
 	<property name="midlet.data-size" value="2048" />
 
 	<property name="midlet.name" value="Remuco" />

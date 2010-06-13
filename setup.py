@@ -223,7 +223,7 @@ for variant in ("", "no-bluetooth", "motorola-fix"):
 # =============================================================================
 
 setup(name='remuco',
-      version='0.9.2',
+      version='0.9.3',
       description='Remuco is a remote control system for media players.',
       author='Remuco team',
       url='http://remuco.googlecode.com',
