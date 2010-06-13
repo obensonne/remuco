@@ -139,9 +139,10 @@ pa_files["xmms2"] = [
 
 # --- Winamp -------------------------------------------------------------------
 
-pa_files["winamp"] = [
-    ["remuco-winamp", "winamp.py"]
-]
+# development on this adapter seems to have been stopped
+#pa_files["winamp"] = [
+#    ["remuco-winamp", "winamp.py"]
+#]
 
 # =============================================================================
 # select player adapters to build/install (all by default)
