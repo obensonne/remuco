@@ -83,7 +83,7 @@ media players.
 MIDP Client
 -------------------------------------------------------------------------------
 
-You find the required JAR and JAD files in the directory `client/jme/app`.
+You find the required JAR and JAD files in the directory `client/midp/app`.
 Installation steps are device dependent. Usually the JAR file has to be sent or
 copied to the device. Some phones then already trigger the installation, others
 require to open the file with the device's file manager. 
@@ -247,7 +247,7 @@ MIDP Client Development
 MIDP Client
 -------------------------------------------------------------------------------
 
-As a quick start, change into the directory `client/jme` and run `setup.sh` to
+As a quick start, change into the directory `client/midp` and run `setup.sh` to
 set up the client build environment and to get further instructions.
 
 More detailed information can be found at:

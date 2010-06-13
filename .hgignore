@@ -10,11 +10,11 @@ install.*\.log$
 [./]?build/.*$ # all files in 'build' or '*.build' directories
 [./]?dist/.*$ # all files in 'dist' or '*.dist' directories
 [./]?deployed/.*$ # all files in 'deployed' or '*.deployed' directories
-^client/jme/app$
-^client/jme/bin$
-^client/jme/build\.properties$
-^client/jme/wtk-emulator\.properties$
-^client/jme/tools$
+^client/midp/app$
+^client/midp/bin$
+^client/midp/build\.properties$
+^client/midp/wtk-emulator\.properties$
+^client/midp/tools$
 ^client/android/local.properties$
 ^client/android/bin$
 ^client/android/gen$

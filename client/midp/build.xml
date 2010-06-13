@@ -1,0 +1,449 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+
+     Remuco Client
+     A J2ME client for the Remuco system.
+     
+     http://remuco.googlecode.com
+     
+     This build script requires Ant >= 1.7 !
+                   
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     Building the client:
+     ^^^^^^^^^^^^^^^^^^^^
+     
+     Create a file 'build.properties' (either manually using
+     'build.properties.example' or automatically using 'setup.sh').
+
+     Run one of the public targets starting with 'dist' ('opti' means
+     optimized, 'noop' means non-optimized).
+     
+     This will create a jar and jad file in the directory 'dist'.
+     
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     Running the client in the emulator:
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     
+     Create a file 'build.properties' (either manually using
+     'build.properties.example' or automatically using 'setup.sh').
+
+     Run target 'run.microemu' to run the client in the MicroEmu emulator.
+
+     When using the WTK emulator, create a file 'wtk-emulator.properties' (use
+     'wtk-emulator.properties.example' as a template) and edit it if necessary.
+     
+     Run target 'run.wtk' to run the client in the WTK emulator.
+     
+     ====================================================================== -->
+
+<project name="Remuco Client" default="clean">
+
+	<description>A J2ME client for the Remuco system.</description>
+
+	<!-- =================== Configuration =============================== -->
+
+	<property file="build.properties" />
+
+	<property name="midp.ver" value="MIDP-2.0" />
+	<property name="cldc.ver" value="CLDC-1.1" />
+
+	<property name="midlet.class" value="remuco.client.midp.Entry" />
+	<property name="midlet.icon" value="logo.png" />
+	<property name="midlet.vendor" value="remuco.googlecode.com" />
+	<property name="midlet.version" value="0.9.2" />
+	<property name="midlet.data-size" value="2048" />
+
+	<property name="midlet.name" value="Remuco" />
+	<property name="midlet.name.lc" value="remuco" />
+	<property name="midlet.jar" value="${midlet.name.lc}.jar" />
+	<property name="midlet.jad" value="${midlet.name.lc}.jad" />
+
+	<property name="dist.variant" value="" />
+
+	<condition property="bluetooth">
+		<and>
+			<isset property="jsr82.jar" />
+			<not>
+				<equals arg1="${dist.variant}" arg2="no-bluetooth" />
+			</not>
+		</and>
+	</condition>
+
+	<!-- - - - - - - - -Target dependent configuration - - - - - - - - - - -->
+
+	<target name="configure.emulation">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="${run.debug}" />
+		<property name="preverifier" value="${run.preverifier}" />
+		<property name="proguard.optimize" value="${run.proguard.optimize}" />
+		<property name="emulation" value="isset" />
+		<antcall target="echo.configuration" />
+	</target>
+
+	<target name="configure.dist">
+		<fail if="configured" />
+		<property name="configured" value="isset" />
+		<property name="compile.debug" value="${dist.debug}" />
+		<property name="preverifier" value="${dist.preverifier}" />
+		<property name="proguard.optimize" value="${dist.proguard.optimize}" />
+		<property name="app.dir" value="app/${dist.variant}" />
+		<antcall target="echo.configuration" />
+	</target>
+
+	<target name="echo.configuration">
+		<fail unless="configured" />
+		<echo message="compile with debug symbols : ${compile.debug}" />
+		<echo message="preverifier                : ${preverifier}" />
+		<echo message="proguard optimizes         : ${proguard.optimize}" />
+		<condition property="bluetooth.yn" value="yes" else="no">
+			<isset property="bluetooth" />
+		</condition>
+		<echo message="bluetooth                  : ${bluetooth.yn}" />
+		<echo message="variant                    : ${dist.variant}" />
+	</target>
+
+	<!-- =================== Libraries and Classpath ====================== -->
+
+	<path id="cp.compile">
+		<fileset file="${midp.jar}" />
+		<fileset file="${cldc.jar}" />
+		<fileset file="${jsr82.jar}" />
+	</path>
+
+	<property name="cp.compile.cmdline" refid="cp.compile" />
+
+	<path id="cp.preverify">
+		<fileset file="${midp.jar}" />
+		<fileset file="${cldc.jar}" />
+		<fileset file="${jsr82.jar}" />
+	</path>
+
+	<property name="cp.preverify.cmdline" refid="cp.preverify" />
+
+	<!-- =================== Themes ======================================= -->
+
+	<pathconvert property="include.themes" pathsep=",">
+		<dirset dir="res/themes" includes="${theme.list}" />
+		<mapper type="regexp" from="^(.*)$$" to="\1/**/*" />
+		<map from="${basedir}/res/" to="" />
+	</pathconvert>
+
+	<pathconvert property="include.icons" pathsep=",">
+		<dirset dir="res/icons" includes="${theme.lics},uni" />
+		<mapper type="regexp" from="^(.*)$$" to="\1/**/*" />
+		<map from="${basedir}/res/" to="" />
+	</pathconvert>
+
+	<property name="res.include" value="${include.themes},${include.icons}" />
+
+	<!-- =================== Build ======================================== -->
+
+	<target name="preprocess">
+		<fail unless="configured" />
+		<condition property="emulation-flag" value="true" else="false">
+			<isset property="emulation" />
+		</condition>
+		<mkdir dir="build/sources" />
+		<copy todir="build/sources">
+			<fileset dir="src" includes="remuco/**/*.java" />
+			<fileset dir="../common/src" includes="remuco/**/*.java" />
+			<filterset>
+				<filter token="THEMES" value="${theme.list}" />
+				<filter token="LICS" value="${theme.lics}" />
+				<filter token="EMULATION" value="${emulation-flag}" />
+			</filterset>
+		</copy>
+		<!-- motorola-fix for unsupported textfield constraint (issue 46) -->
+		<condition property="textfield.uneditable"
+		           value="TextField.ANY"
+		           else="TextField.UNEDITABLE">
+			<equals arg1="${dist.variant}" arg2="motorola-fix" />
+		</condition>
+		<replace dir="build/sources"
+		         includes="**/*.java"
+		         token="TextField.UNEDITABLE"
+		         value="${textfield.uneditable}" />
+	</target>
+
+	<target name="compile" depends="preprocess">
+		<mkdir dir="build/classes" />
+		<javac destdir="build/classes"
+		       target="1.1"
+		       source="1.3"
+		       bootclasspath="${midp.jar}"
+		       debug="${compile.debug}"
+		       verbose="no">
+			<!-- source paths -->
+			<src path="build/sources" />
+			<!-- exclude classes based on conditions -->
+			<not>
+				<selector unless="bluetooth">
+					<containsregexp expression="^import javax.bluetooth" />
+				</selector>
+			</not>
+			<!-- default classes to include -->
+			<include name="remuco/**/*.java" />
+			<!-- classpath -->
+			<classpath refid="cp.compile" />
+		</javac>
+	</target>
+
+	<!-- - - - - - - - - - - Preverification  - - - - - - - - - - - - - - - -->
+
+	<target name="preverify.proguard">
+		<taskdef resource="proguard/ant/task.properties"
+		         classpath="${proguard.jar}" />
+		<proguard allowaccessmodification="${proguard.optimize}"
+		          overloadaggressively="${proguard.optimize}"
+		          repackageclasses=""
+		          shrink="${proguard.optimize}"
+		          obfuscate="${proguard.optimize}"
+		          usemixedcaseclassnames="no"
+		          optimize="${proguard.optimize}"
+		          microedition="yes">
+			<injar path="build/classes" />
+			<outjar path="build/preverified" />
+			<libraryjar refid="cp.preverify" />
+			<keep access="public" extends="javax.microedition.midlet.MIDlet" />
+			<keep access="public"
+			      name="remuco.client.midp.io.BluetoothServiceFinder" />
+			<keep access="public"
+			      name="remuco.client.midp.io.BluetoothScanner" />
+		</proguard>
+	</target>
+
+	<target name="preverify.wtk">
+		<echo message="pcp: ${cp.preverify.cmdline}" />
+		<exec executable="${wtk.home}/bin/preverify" failonerror="true">
+			<arg line="-classpath ${cp.preverify.cmdline}" />
+			<arg line="-d build/preverified" />
+			<arg line="build/classes" />
+		</exec>
+	</target>
+
+	<target name="preverify" depends="compile">
+		<mkdir dir="build/preverified" />
+		<antcall target="preverify.${preverifier}" />
+	</target>
+
+	<!-- - - - - - - - - - - Create Jar - - - - - - - - - - - - - - - - - - -->
+
+	<target name="jar" depends="preverify,manifest">
+		<mkdir dir="build/jar" />
+		<copy tofile="build/logo.png"
+		      file="design/logos/logo_${logo.size}.png" />
+		<jar jarfile="build/jar/${midlet.jar}" manifest="build/MF">
+			<fileset dir="build/preverified" />
+			<fileset dir="res" includes="${res.include}" />
+			<fileset dir="build">
+				<include name="logo.png" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="jad" depends="jar">
+		<move file="build/MF" tofile="build/jar/${midlet.jad}" />
+		<length file="build/jar/${midlet.jar}" property="midlet.jar.size" />
+		<manifest file="build/jar/${midlet.jad}" mode="update">
+			<attribute name="MIDlet-Jar-URL" value="${midlet.jar}" />
+			<attribute name="MIDlet-Jar-Size" value="${midlet.jar.size}" />
+		</manifest>
+	</target>
+
+	<target name="manifest">
+		<manifest file="build/MF">
+			<attribute name="MicroEdition-Configuration" value="${cldc.ver}" />
+			<attribute name="MicroEdition-Profile" value="${midp.ver}" />
+			<attribute name="MIDlet-1"
+			           value="${midlet.name},${midlet.icon},${midlet.class}" />
+			<attribute name="MIDlet-Name" value="${midlet.name}" />
+			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+			<attribute name="MIDlet-Version" value="${midlet.version}" />
+			<attribute name="MIDlet-Data-Size" value="${midlet.data-size}" />
+			<!--
+			These options cause trouble on certain devices and do not provide
+			a great benefit at all, thus they are commented.
+			<attribute name="MIDlet-Permissions"
+			           value="javax.microedition.io.Connector.socket" />
+			<attribute name="MIDlet-Permissions"
+			           value="javax.microedition.io.Connector.bluetooth.client" />
+			-->
+			<attribute name="Nokia-MIDlet-On-Screen-Keypad" value="no" />
+		</manifest>
+	</target>
+
+	<!-- =================== Dist ========================================= -->
+
+	<target name="dist"
+	        depends="clean.keep-app,configure.dist,jad"
+	        description="--> create distributable jar and jad file">
+		<mkdir dir="${app.dir}" />
+		<copy todir="${app.dir}">
+			<fileset dir="build/jar">
+				<include name="${midlet.jar}" />
+				<include name="${midlet.jad}" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- build regular and special variants of client -->
+	<target name="dist.all" depends="clean">
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="" />
+		</antcall>
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="motorola-fix" />
+		</antcall>
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="no-bluetooth" />
+		</antcall>
+	</target>
+
+	<!-- =================== Snapshot ===================================== -->
+
+	<target name="snapshot"
+	        depends="clean,revision,configure.dist,jad"
+	        description="--> create snapshot tarball">
+		<tstamp />
+		<echo file="build/tmp1"
+		      message="Client snapshot (${TODAY}, Revision ${revision.no})." />
+		<echo file="build/tmp1"
+		      append="true"
+		      message="${line.separator}${line.separator}" />
+		<echoproperties destfile="build/tmp2" />
+		<concat destfile="build/README">
+			<fileset dir="build" includes="tmp*" id="snaptmp" />
+		</concat>
+		<delete>
+			<fileset refid="snaptmp" />
+		</delete>
+		<mkdir dir="dist" />
+		<tar destfile="dist/remuco-client-${revision.no}.tar.gz"
+		     compression="gzip">
+			<fileset dir="build/jar">
+				<include name="${midlet.jar}" />
+				<include name="${midlet.jad}" />
+			</fileset>
+			<fileset dir="build" includes="README" />
+		</tar>
+	</target>
+
+	<target name="revision">
+		<!-- if this does not work, revision is set to 'unknown' -->
+		<exec executable="sh"
+		      outputproperty="svn.rev"
+		      errorproperty="svn.error"
+		      osfamily="unix"
+		      failifexecutionfails="false"
+		      failonerror="false">
+			<arg value="-c" />
+			<arg value="svn info -R | grep '^Revision' | sed -e 's/^Revision: //' | sort -n | tail -n 1" />
+		</exec>
+		<condition property="revision.no" value="${svn.rev}" else="unknown">
+			<and>
+				<equals arg1="${svn.error}" arg2="" />
+				<isset property="svn.rev" />
+				<matches string="${svn.rev}" pattern="^[1-9][0-9]*$" />
+			</and>
+		</condition>
+	</target>
+
+	<!-- =================== Run ========================================== -->
+
+	<target name="run.prepare" depends="clean,configure.emulation,jad" />
+
+	<target name="run.wtk" depends="run.prepare">
+		<exec executable="${wtk.home}/bin/emulator" dir="build/jar">
+			<arg value="-Xprefs:${basedir}/wtk-emulator.properties" />
+			<arg value="-Xdomain:${run.emulator.wtk.domain}" />
+			<arg value="-Xdevice:${wtk.device}" />
+			<arg value="-Xdescriptor:${midlet.jad}" />
+		</exec>
+	</target>
+
+	<target name="run.wtk.default"
+	        description="--> run client in WTK emulator (default skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="DefaultColorPhone" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.media"
+	        description="--> run client in WTK emulator (media skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="MediaControlSkin" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.gray"
+	        description="--> run client in WTK emulator (gray size)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="DefaultGrayPhone" />
+		</antcall>
+	</target>
+
+	<target name="run.wtk.qwerty"
+	        description="--> run client in WTK emulator (qwerty skin)">
+		<antcall target="run.wtk">
+			<param name="wtk.device" value="QwertyDevice" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu" depends="run.prepare">
+		<java fork="yes" classname="org.microemu.app.Main">
+			<arg value="build/jar/${midlet.jad}" />
+			<arg value="--device" />
+			<arg value="org/microemu/device/${microemu.device}/device.xml" />
+			<classpath>
+				<pathelement location="${microemu.home}/devices/microemu-device-${microemu.device}.jar" />
+				<pathelement location="${microemu.home}/microemulator.jar" />
+				<pathelement location="${microemu.bluecove.jar}" />
+				<pathelement location="${microemu.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="run.microemu.default"
+	        description="--> run client in MicroEmu emulator (default size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="default" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu.large"
+	        description="--> run client in MicroEmu emulator (large size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="large" />
+		</antcall>
+	</target>
+
+	<target name="run.microemu.minimum"
+	        description="--> run client in MicroEmu emulator (minimum size)">
+		<antcall target="run.microemu">
+			<param name="microemu.device" value="minimum" />
+		</antcall>
+	</target>
+
+	<target name="run"
+	        description="--> run client in configured default emulator">
+		<antcall target="run.${run.emulator}" />
+	</target>
+
+	<!-- =================== Clean ======================================== -->
+
+	<target name="clean.keep-app" description="--> clean project">
+		<delete dir="build" />
+		<delete dir="design/themes/build" />
+	</target>
+
+	<target name="clean"
+	        depends="clean.keep-app"
+	        description="--> clean project">
+		<delete dir="app" />
+	</target>
+
+</project>
+
