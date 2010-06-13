@@ -238,7 +238,7 @@ adapter before. Otherwise, just add `/path/to/remuco/base/module` to
 starts the FooPlay adapter without installing anything. Try it, it's easy :)
 
 For more information visit:
-http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide
+<http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide>
 
 
 MIDP Client Development
@@ -251,7 +251,7 @@ As a quick start, change into the directory `client/midp` and run `setup.sh` to
 set up the client build environment and to get further instructions.
 
 More detailed information can be found at:
-http://code.google.com/p/remuco/wiki/ClientCustomization
+<http://code.google.com/p/remuco/wiki/ClientCustomization>
 
 Android Client
 -------------------------------------------------------------------------------
