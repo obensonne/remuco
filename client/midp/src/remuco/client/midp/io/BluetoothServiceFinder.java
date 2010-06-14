@@ -36,7 +36,7 @@ import javax.bluetooth.UUID;
 import remuco.client.common.MainLoop;
 import remuco.client.common.UserException;
 import remuco.client.common.util.Log;
-import remuco.client.midp.util.JMETools;
+import remuco.client.midp.util.MIDPTools;
 
 public final class BluetoothServiceFinder implements DiscoveryListener,
 		IServiceFinder {
@@ -181,7 +181,7 @@ public final class BluetoothServiceFinder implements DiscoveryListener,
 
 			if (bd.getSearch() == BluetoothDevice.SEARCH_MANUAL) {
 
-				final Hashtable services = JMETools.buildManualServiceList(
+				final Hashtable services = MIDPTools.buildManualServiceList(
 					"btspp", bd.getAddress(), bd.getChan(), getOptions(
 						bd.isAuthenticate(), bd.isEncrypt()));
 

@@ -56,10 +56,10 @@ import remuco.client.midp.ui.screens.PlayerScreen;
 import remuco.client.midp.ui.screens.ServiceSelectorScreen;
 import remuco.client.midp.ui.screens.WaitingScreen;
 import remuco.client.midp.ui.screens.DeviceSelectorScreen.IDeviceSelectionListener;
-import remuco.client.midp.util.JMETools;
+import remuco.client.midp.util.MIDPTools;
 
 /**
- * Main controller class of the Remuco JME client.
+ * Main controller class of the Remuco MIDP client.
  */
 public class Remuco implements CommandListener, IConnectionListener,
 		IServiceListener, IDeviceSelectionListener {
@@ -465,7 +465,7 @@ public class Remuco implements CommandListener, IConnectionListener,
 		}
 
 		final int ping = Integer.parseInt(config.getOption(Config.OD_PING));
-		final ClientInfo ci = JMETools.buildClientInfo(config, true);
+		final ClientInfo ci = MIDPTools.buildClientInfo(config, true);
 		final Connection conn = new Connection(sock, this, ping, ci);
 
 		screenConnecting.attachProperty(conn);

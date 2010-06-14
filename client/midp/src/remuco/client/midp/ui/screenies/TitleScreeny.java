@@ -28,7 +28,7 @@ import remuco.client.common.data.PlayerInfo;
 import remuco.client.midp.Config;
 import remuco.client.midp.OptionDescriptor;
 import remuco.client.midp.ui.Theme;
-import remuco.client.midp.util.JMETools;
+import remuco.client.midp.util.MIDPTools;
 
 /**
  * A screeny to display meta information like title, artist, album and cover art
@@ -161,7 +161,7 @@ public final class TitleScreeny extends Screeny {
 		if (maxImgHeight < 32) // not enough space for an image
 			return;
 
-		Image plobImg = JMETools.baToImage(item.getImg());
+		Image plobImg = MIDPTools.baToImage(item.getImg());
 
 		if (plobImg == null) {
 			// The logo should not get scaled as this drops the alpha channel.

@@ -56,7 +56,7 @@ import remuco.client.midp.ui.screenies.ScreenyException;
 import remuco.client.midp.ui.screenies.StateScreeny;
 import remuco.client.midp.ui.screenies.TitleScreeny;
 import remuco.client.midp.ui.screens.OptionsScreen.IOptionListener;
-import remuco.client.midp.util.JMETools;
+import remuco.client.midp.util.MIDPTools;
 
 public final class PlayerScreen extends Canvas implements IItemListener,
 		IStateListener, IProgressListener, CommandListener, IActionListener,
@@ -420,7 +420,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		case KeyBindings.ACTION_IMAGE:
 
-			final Image itemImage = JMETools.baToImage(player.item.getImg());
+			final Image itemImage = MIDPTools.baToImage(player.item.getImg());
 			if (itemImage == null) {
 				break; // ignore fullscreen toggles when there is no image
 			}
@@ -590,7 +590,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 				|| od == ItemlistScreen.OD_PAGE_SIZE
 				|| od == PlayerScreen.OD_IMG_TYPE) {
 
-			final ClientInfo ci = JMETools.buildClientInfo(config, false);
+			final ClientInfo ci = MIDPTools.buildClientInfo(config, false);
 			player.getConnection().send(ci);
 
 		} else if (od == Config.OD_PING) {

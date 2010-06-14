@@ -32,11 +32,11 @@ import remuco.client.midp.ui.screens.ItemlistScreen;
 import remuco.client.midp.ui.screens.PlayerScreen;
 
 /**
- * Utility methods specific to the JME client.
+ * Utility methods specific to the MIDP client.
  * 
  * @see Tools
  */
-public class JMETools {
+public class MIDPTools {
 
 	/**
 	 * Create an image from its byte array representation.
