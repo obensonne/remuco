@@ -420,8 +420,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 
 		case KeyBindings.ACTION_IMAGE:
 
-			final Image itemImage = MIDPTools.baToImage(player.item.getImg());
-			if (itemImage == null) {
+			if (player.item.getImg().length == 0) {
 				break; // ignore fullscreen toggles when there is no image
 			}
 			itemImageFullscreenEnabled = !itemImageFullscreenEnabled;
@@ -549,7 +548,8 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 	public void notifyItemChanged() {
 
 		screenyItem.updateData(player.item);
-		screenyItemImageFullscreen.updateData(player.item.getImg());
+		final Image img = MIDPTools.baToImage(player.item.getImg());
+		screenyItemImageFullscreen.updateData(img);
 
 		if (!itemImageFullscreenEnabled) {
 			repaint(screenyItem);
@@ -557,7 +557,7 @@ public final class PlayerScreen extends Canvas implements IItemListener,
 			itemImageFullscreenEnabled = config.getOption(OD_IMG_KEEPFS)
 					.equalsIgnoreCase("yes");
 			itemImageFullscreenActive = itemImageFullscreenEnabled
-					&& player.item.getImg() != null;
+					&& img != null;
 			repaint(screenyItemImageFullscreen);
 		}
 	}
