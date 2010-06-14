@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"> 
-<head> 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-  <title>Remuco README</title> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Remuco README</title>
   <style type="text/css">
     body {
       font-family: sans;
@@ -16,7 +16,7 @@
        border-bottom: #888a85 solid 1pt;
     }
   </style>
-</head> 
+</head>
 <body>
 <p><strong>Remuco - Remote media player control</strong></p>
 <div class="toc">
@@ -37,8 +37,7 @@
 </li>
 <li><a href="#usage">Usage</a><ul>
 <li><a href="#player-adapters_1">Player Adapters</a><ul>
-<li><a href="#amarok-audacious-banshee-songbird-vlc">Amarok, Audacious, Banshee, Songbird, VLC</a></li>
-<li><a href="#amarok-14">Amarok 1.4</a></li>
+<li><a href="#amarok-amarok14-audacious-banshee-songbird-vlc">Amarok, Amarok14, Audacious, Banshee, Songbird, VLC</a></li>
 <li><a href="#exaile-rhythmbox-totem">Exaile, Rhythmbox, Totem</a></li>
 <li><a href="#mpd">MPD</a></li>
 <li><a href="#mplayer">MPlayer</a></li>
@@ -82,7 +81,7 @@ documentation!</em></p>
 <h2 id="player-specific">Player specific</h2>
 <ul>
 <li><strong>Amarok:</strong> Amarok ≥ 2.0</li>
-<li><strong>Amarok14:</strong> Amarok ≥ 1.4 and &lt; 2.0</li>
+<li><strong>Amarok14:</strong> Amarok ≥ 1.4 and &lt; 2.0 and Python module <em>eyeD3</em></li>
 <li><strong>Audacious:</strong> Audacious ≥ 1.5.1</li>
 <li><strong>Banshee:</strong> Banshee ≥ 1.5.3 (≥ 1.4 works except rating control)</li>
 <li><strong>Exaile:</strong> Exaile ≥ 0.3.0</li>
@@ -109,10 +108,18 @@ and a client for your mobile device.</p>
 <p>Run <code>make help</code> to get instructions on how to install Remuco for one or more
 media players.</p>
 <h2 id="midp-client_1">MIDP Client</h2>
-<p>You find the required JAR and JAD files in the directory <code>client/jme/app</code>.
+<p>You find the required JAR and JAD files in the directory <code>client/midp/app</code>.
 Installation steps are device dependent. Usually the JAR file has to be sent or
 copied to the device. Some phones then already trigger the installation, others
 require to open the file with the device's file manager. </p>
+<p>Next to the regular client you'll find special variants of the client
+in the above mentioned directory:</p>
+<ul>
+<li><em>motorola-fix</em>: Use this for older Motorola phones like ROKR E2, ROKR E6,
+   MOTOZINE ZN5 and A1200e.</li>
+<li><em>no-bluetooth</em>: A client without Bluetooth functionality. Some Windows based
+   phones (using JBed) are known to require this client version.</li>
+</ul>
 <p><em>Note:</em> If you installed Remuco using packages for your distribution, the
 client files usually are located in <code>/usr/share/remuco/client/</code>. </p>
 <p><em>Note:</em> The source only package (<code>remuco-source-x.x.x.tar.gz</code>) does not contain
@@ -129,7 +136,7 @@ and solutions.</p>
 which automatically gets created with default values once an adapter has been
 started. Options are described within that file. <em>You can ignore this for now
 but you might be happy to know this later.</em> </p>
-<h3 id="amarok-audacious-banshee-songbird-vlc">Amarok, Audacious, Banshee, Songbird, VLC</h3>
+<h3 id="amarok-amarok14-audacious-banshee-songbird-vlc">Amarok, Amarok14, Audacious, Banshee, Songbird, VLC</h3>
 <p>Simply run <code>remuco-player</code> (repl. <em>player</em> with a real name, e.g. <em>banshee</em>).</p>
 <p>A good choice is to set up <em>remuco-player</em> as a startup application when you
 log in to your desktop session. When the player is not running the adapter is
@@ -142,8 +149,6 @@ safely enable this feature (set to <code>1</code>).</p>
 <p><em>VLC</em>: Remuco requires DBus control in VLC enabled. This can be configured in
 VLC at <em>Tools → Preferences</em>. </p>
 <p><em>Songbird</em>: Make sure the Songbird <a href="http://addons.songbirdnest.com/addon/1626">MPRIS Add-on</a> is installed.</p>
-<h3 id="amarok-14">Amarok 1.4</h3>
-<p><strong>TODO</strong></p>
 <h3 id="exaile-rhythmbox-totem">Exaile, Rhythmbox, Totem</h3>
 <p>The player adapter actually is a plugin of the player. Thus it gets started
 automatically once you activate the Remuco plugin within the player. </p>
@@ -237,13 +242,13 @@ $ /path/to/remuco-tree/adapter/fooplay/remuco-fooplay
 </code></pre>
 <p>starts the FooPlay adapter without installing anything. Try it, it's easy :)</p>
 <p>For more information visit:
-http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide</p>
+<a href="http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide">http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide</a></p>
 <h1 id="midp-client-development">MIDP Client Development</h1>
 <h2 id="midp-client_3">MIDP Client</h2>
-<p>As a quick start, change into the directory <code>client/jme</code> and run <code>setup.sh</code> to
+<p>As a quick start, change into the directory <code>client/midp</code> and run <code>setup.sh</code> to
 set up the client build environment and to get further instructions.</p>
 <p>More detailed information can be found at:
-http://code.google.com/p/remuco/wiki/ClientCustomization</p>
+<a href="http://code.google.com/p/remuco/wiki/ClientCustomization">http://code.google.com/p/remuco/wiki/ClientCustomization</a></p>
 <h2 id="android-client_3">Android Client</h2>
 <p>See <a href="http://code.google.com/p/remuco/wiki/Android">http://code.google.com/p/remuco/wiki/Android</a> and <a href="http://code.google.com/p/remuco/issues/detail?id=34">issue 34</a>.</p>
 <h1 id="packager-information">Packager Information</h1>

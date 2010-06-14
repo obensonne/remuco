@@ -6,7 +6,7 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.2)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>remuco</strong></big></big> (version 0.9.3)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"></font></td></tr></table>
     <p><tt>Remuco&nbsp;player&nbsp;adapter&nbsp;module.<br>
@@ -62,17 +62,19 @@ Logging:<br>
 <a href="api.html">art</a><br>
 <a href="api.html">config</a><br>
 <a href="api.html">data</a><br>
-</td><td width="25%" valign=top><a href="api.html">defs</a><br>
-<a href="api.html">dictool</a><br>
+<a href="api.html">defs</a><br>
+</td><td width="25%" valign=top><a href="api.html">dictool</a><br>
 <a href="api.html">features</a><br>
 <a href="api.html">files</a><br>
-</td><td width="25%" valign=top><a href="api.html">log</a><br>
+<a href="api.html">log</a><br>
 <a href="api.html">manager</a><br>
-<a href="api.html">message</a><br>
+</td><td width="25%" valign=top><a href="api.html">message</a><br>
 <a href="api.html">mpris</a><br>
-</td><td width="25%" valign=top><a href="api.html">net</a><br>
+<a href="api.html">net</a><br>
+<a href="api.html">remos</a><br>
 <a href="api.html">report</a><br>
-<a href="api.html">serial</a><br>
+</td><td width="25%" valign=top><a href="api.html">serial</a><br>
+<a href="api.html">testshell</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -108,34 +110,29 @@ Logging:<br>
 <td colspan=2><tt>Class&nbsp;for&nbsp;getting&nbsp;and&nbsp;setting&nbsp;player&nbsp;adapter&nbsp;specific&nbsp;configurations.<br>
 &nbsp;<br>
 An&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;of&nbsp;a&nbsp;specific&nbsp;player<br>
-adapter&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).&nbsp;Any&nbsp;change&nbsp;to&nbsp;the<br>
-properties&nbsp;of&nbsp;an&nbsp;instance&nbsp;of&nbsp;<a href="#Config">Config</a>&nbsp;automatically&nbsp;gets&nbsp;saved&nbsp;in&nbsp;the<br>
-configuration&nbsp;file.<br>
-&nbsp;<br>
-In&nbsp;most&nbsp;cases&nbsp;player&nbsp;adapters&nbsp;do&nbsp;not&nbsp;need&nbsp;this.&nbsp;It&nbsp;is&nbsp;useful&nbsp;if&nbsp;a&nbsp;player<br>
-adapter&nbsp;wants&nbsp;to&nbsp;provide&nbsp;a&nbsp;UI&nbsp;to&nbsp;configure&nbsp;the&nbsp;adapter.<br>
+adapter&nbsp;(usually&nbsp;~/.config/remuco/PLAYER/conf).<br>
 &nbsp;<br>
 Player&nbsp;adapters&nbsp;are&nbsp;not&nbsp;supposed&nbsp;to&nbsp;create&nbsp;instances&nbsp;of&nbsp;<a href="#Config">Config</a>.&nbsp;Instead<br>
-use&nbsp;the&nbsp;property&nbsp;'config'&nbsp;of&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;access&nbsp;the&nbsp;currently&nbsp;used<br>
-<a href="#Config">Config</a>&nbsp;instance.<br>&nbsp;</tt></td></tr>
+use&nbsp;the&nbsp;'config'&nbsp;attribute&nbsp;of&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;instance&nbsp;to&nbsp;access&nbsp;the<br>
+currently&nbsp;used&nbsp;<a href="#Config">Config</a>&nbsp;instance.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Config-__init__"><strong>__init__</strong></a>(self, player_name)</dt><dd><tt>Do&nbsp;not&nbsp;use&nbsp;this.&nbsp;Use&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>.config&nbsp;instead.</tt></dd></dl>
+<dl><dt><a name="Config-__getattribute__"><strong>__getattribute__</strong></a>(self, attr)</dt><dd><tt>Attribute-style&nbsp;access&nbsp;to&nbsp;standard&nbsp;options.</tt></dd></dl>
 
-<dl><dt><a name="Config-get_custom"><strong>get_custom</strong></a>(self, option, default)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
-&nbsp;<br>
-@param&nbsp;option:&nbsp;name&nbsp;of&nbsp;the&nbsp;option<br>
-&nbsp;<br>
-@see:&nbsp;<a href="#Config-set_custom">set_custom</a>()</tt></dd></dl>
+<dl><dt><a name="Config-__init__"><strong>__init__</strong></a>(self, player_name)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;for&nbsp;the&nbsp;given&nbsp;player&nbsp;(adapter).</tt></dd></dl>
 
-<dl><dt><a name="Config-set_custom"><strong>set_custom</strong></a>(self, option, value)</dt><dd><tt>Set&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;custom&nbsp;configuration&nbsp;option.<br>
+<dl><dt><a name="Config-getx"><strong>getx</strong></a>(self, key, default, converter<font color="#909090">=None</font>, save<font color="#909090">=True</font>)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;non-standard,&nbsp;player&nbsp;specific&nbsp;option.<br>
 &nbsp;<br>
-Using&nbsp;this&nbsp;method,&nbsp;player&nbsp;adapters&nbsp;may&nbsp;integrate&nbsp;additional<br>
-configuration&nbsp;options&nbsp;in&nbsp;the&nbsp;adapter's&nbsp;configuration&nbsp;file.<br>
-&nbsp;<br>
-@param&nbsp;option:&nbsp;name&nbsp;of&nbsp;the&nbsp;option<br>
-&nbsp;<br>
-@note:&nbsp;Internally&nbsp;this&nbsp;is&nbsp;saved&nbsp;as&nbsp;"custom-&lt;OPTION&gt;".</tt></dd></dl>
+@param&nbsp;key:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;config&nbsp;option&nbsp;name<br>
+@param&nbsp;default:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;value&nbsp;(as&nbsp;string!)<br>
+@keyword&nbsp;converter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;converter&nbsp;function,&nbsp;e.g.&nbsp;`int`<br>
+@keyword&nbsp;save:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;save&nbsp;default&nbsp;value&nbsp;in&nbsp;config&nbsp;file&nbsp;if&nbsp;not&nbsp;yet&nbsp;set<br>
+@return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;option&nbsp;value,&nbsp;optionally&nbsp;converted</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -144,113 +141,6 @@ Data descriptors defined here:<br>
 </dl>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>bluetooth</strong></dt>
-<dd><tt>Flag&nbsp;if&nbsp;Bluetooth&nbsp;is&nbsp;enabled.<br>
-&nbsp;<br>
-Default:&nbsp;True&nbsp;(enabled)<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'bluetooth-enabled'</tt></dd>
-</dl>
-<dl><dt><strong>bluetooth_channel</strong></dt>
-<dd><tt>Channel&nbsp;to&nbsp;use&nbsp;for&nbsp;Bluetooth&nbsp;connections.<br>
-&nbsp;<br>
-Default:&nbsp;0&nbsp;(select&nbsp;channel&nbsp;automatically)<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'bluetooth-channel'</tt></dd>
-</dl>
-<dl><dt><strong>cache_dir</strong></dt>
-<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;directory.<br>
-&nbsp;<br>
-Usually&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER.<br>
-&nbsp;<br>
-@note:&nbsp;read-only</tt></dd>
-</dl>
-<dl><dt><strong>config_dir</strong></dt>
-<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;directory.<br>
-&nbsp;<br>
-Usually&nbsp;this&nbsp;is&nbsp;~/.config/remuco/PLAYER.<br>
-&nbsp;<br>
-@note:&nbsp;read-only</tt></dd>
-</dl>
-<dl><dt><strong>custom_volume_cmd</strong></dt>
-<dd><tt>Used&nbsp;internally&nbsp;(read-only)</tt></dd>
-</dl>
-<dl><dt><strong>encoding</strong></dt>
-<dd><tt>Encoding&nbsp;of&nbsp;strings&nbsp;coming&nbsp;from&nbsp;and&nbsp;passed&nbsp;to&nbsp;the&nbsp;player&nbsp;(adapter).<br>
-&nbsp;<br>
-Default:&nbsp;'UTF-8'<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'player-encoding'</tt></dd>
-</dl>
-<dl><dt><strong>fb</strong></dt>
-<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;features&nbsp;are&nbsp;enabled.<br>
-&nbsp;<br>
-This&nbsp;setting&nbsp;has&nbsp;no&nbsp;effect&nbsp;if&nbsp;a&nbsp;player&nbsp;adapter&nbsp;does&nbsp;not&nbsp;implement&nbsp;any<br>
-file&nbsp;browser&nbsp;related&nbsp;features.<br>
-&nbsp;<br>
-Default:&nbsp;True&nbsp;(enable)<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'file-browser-enabled'</tt></dd>
-</dl>
-<dl><dt><strong>fb_extensions</strong></dt>
-<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;shows&nbsp;file&nbsp;name&nbsp;extensions.<br>
-&nbsp;<br>
-Default:&nbsp;False&nbsp;(hide&nbsp;extensions)<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'file-browser-show-extensions'</tt></dd>
-</dl>
-<dl><dt><strong>fb_root_dirs</strong></dt>
-<dd><tt>List&nbsp;of&nbsp;directories&nbsp;to&nbsp;show&nbsp;as&nbsp;root&nbsp;directories&nbsp;in&nbsp;the&nbsp;file&nbsp;browser.<br>
-&nbsp;<br>
-Default:&nbsp;[]<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'file-browser-root-dirs'</tt></dd>
-</dl>
-<dl><dt><strong>fb_xdg_user_dirs</strong></dt>
-<dd><tt>Flag&nbsp;if&nbsp;file&nbsp;browser&nbsp;integrates&nbsp;XDG&nbsp;user&nbsp;dirs.<br>
-&nbsp;<br>
-The&nbsp;user&nbsp;dirs&nbsp;shown&nbsp;depend&nbsp;on&nbsp;the&nbsp;mime&nbsp;types&nbsp;set&nbsp;in&nbsp;this&nbsp;config's<br>
-player&nbsp;adapter.&nbsp;For&nbsp;instance&nbsp;if&nbsp;mime&nbsp;type&nbsp;'audio'&nbsp;is&nbsp;supported,&nbsp;then<br>
-the&nbsp;directory&nbsp;XDG_MUSIC_DIR&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;a&nbsp;root&nbsp;dir&nbsp;in&nbsp;the&nbsp;file<br>
-browser.<br>
-&nbsp;<br>
-Default:&nbsp;True<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'file-browser-use-xdg-user-dirs'</tt></dd>
-</dl>
-<dl><dt><strong>log_file</strong></dt>
-<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;log&nbsp;file.<br>
-&nbsp;<br>
-Usually&nbsp;this&nbsp;is&nbsp;~/.cache/remuco/PLAYER/log.<br>
-&nbsp;<br>
-@attention:&nbsp;Do&nbsp;not&nbsp;use&nbsp;this&nbsp;for&nbsp;writing&nbsp;log&nbsp;messages&nbsp;to&nbsp;(use<br>
-&nbsp;&nbsp;&nbsp;&nbsp;remuco.log.debug()&nbsp;and&nbsp;friends).&nbsp;This&nbsp;property&nbsp;may&nbsp;be&nbsp;useful&nbsp;for<br>
-&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;adapters&nbsp;integrating&nbsp;log&nbsp;information&nbsp;in&nbsp;a&nbsp;UI.<br>
-&nbsp;<br>
-@note:&nbsp;read-only</tt></dd>
-</dl>
-<dl><dt><strong>log_level</strong></dt>
-<dd><tt>Log&nbsp;level&nbsp;to&nbsp;use.<br>
-&nbsp;<br>
-Default:&nbsp;log.INFO<br>
-Possible&nbsp;values:&nbsp;log.DEBUG,&nbsp;log.INFO,&nbsp;log.WARNING,&nbsp;log.ERROR<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'log-level'</tt></dd>
-</dl>
-<dl><dt><strong>wifi</strong></dt>
-<dd><tt>Flag&nbsp;if&nbsp;WiFi/Inet&nbsp;is&nbsp;enabled.<br>
-&nbsp;<br>
-Default:&nbsp;True&nbsp;(enabled)<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'wifi-enabled'</tt></dd>
-</dl>
-<dl><dt><strong>wifi_port</strong></dt>
-<dd><tt>Port&nbsp;to&nbsp;use&nbsp;for&nbsp;WiFi&nbsp;connections.<br>
-&nbsp;<br>
-Default:&nbsp;34271<br>
-&nbsp;<br>
-Option&nbsp;name:&nbsp;'wifi-port'</tt></dd>
 </dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -508,6 +398,12 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
+<dl><dt><a name="MPRISAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus<br>
+&nbsp;<br>
+@param&nbsp;action:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Navigation&nbsp;decision:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU</tt></dd></dl>
+
 <dl><dt><a name="MPRISAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
 @param&nbsp;rating:<br>
@@ -531,7 +427,7 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="MPRISAdapter-find_image"><strong>find_image</strong></a>(self, resource, prefer_thumbnail<font color="#909090">=False</font>)</dt><dd><tt>Find&nbsp;a&nbsp;local&nbsp;art&nbsp;image&nbsp;file&nbsp;related&nbsp;to&nbsp;a&nbsp;resource.<br>
+<dl><dt><a name="MPRISAdapter-find_image"><strong>find_image</strong></a>(self, resource)</dt><dd><tt>Find&nbsp;a&nbsp;local&nbsp;art&nbsp;image&nbsp;file&nbsp;related&nbsp;to&nbsp;a&nbsp;resource.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;first&nbsp;looks&nbsp;in&nbsp;the&nbsp;resource'&nbsp;folder&nbsp;for&nbsp;typical&nbsp;art&nbsp;image<br>
 files&nbsp;(e.g.&nbsp;'cover.png',&nbsp;'front.jpg',&nbsp;...).&nbsp;If&nbsp;there&nbsp;is&nbsp;no&nbsp;such&nbsp;file&nbsp;it<br>
@@ -677,31 +573,10 @@ Data descriptors inherited from <a href="api.html#PlayerAdapter">remuco.adapter.
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-<dl><dt><strong>clients</strong></dt>
-<dd><tt>A&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
-&nbsp;<br>
-May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;media&nbsp;player&nbsp;UI.</tt></dd>
-</dl>
-<dl><dt><strong>config</strong></dt>
-<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;(instance&nbsp;of&nbsp;Config).<br>
-&nbsp;<br>
-This&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any<br>
-change&nbsp;to&nbsp;'config'&nbsp;is&nbsp;saved&nbsp;immediately&nbsp;into&nbsp;the&nbsp;configuration&nbsp;file.</tt></dd>
-</dl>
-<dl><dt><strong>manager</strong></dt>
-<dd><tt>The&nbsp;Manager&nbsp;controlling&nbsp;this&nbsp;adapter.<br>
-&nbsp;<br>
-This&nbsp;property&nbsp;may&nbsp;be&nbsp;used&nbsp;to&nbsp;call&nbsp;the&nbsp;method&nbsp;stop()&nbsp;on&nbsp;to&nbsp;stop&nbsp;and<br>
-completely&nbsp;shutdown&nbsp;the&nbsp;adapter&nbsp;from&nbsp;within&nbsp;an&nbsp;adapter.&nbsp;Calling<br>
-Manager.stop()&nbsp;has&nbsp;the&nbsp;same&nbsp;effect&nbsp;as&nbsp;if&nbsp;the&nbsp;Manager&nbsp;process<br>
-received&nbsp;a&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.&nbsp;<br>
-&nbsp;<br>
-If&nbsp;this&nbsp;adapter&nbsp;is&nbsp;not&nbsp;controlled&nbsp;by&nbsp;or&nbsp;has&nbsp;not&nbsp;yet&nbsp;assigned&nbsp;a&nbsp;Manager<br>
-then&nbsp;this&nbsp;property&nbsp;refers&nbsp;to&nbsp;a&nbsp;dummy&nbsp;manager&nbsp;-&nbsp;so&nbsp;it&nbsp;is&nbsp;allways&nbsp;safe<br>
-to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
-&nbsp;<br>
-@see:&nbsp;Manager</tt></dd>
-</dl>
+<hr>
+Data and other attributes inherited from <a href="api.html#PlayerAdapter">remuco.adapter.PlayerAdapter</a>:<br>
+<dl><dt><strong>manager</strong> = &lt;remuco.manager.NoManager object&gt;</dl>
+
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -709,29 +584,35 @@ to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
 <font color="#000000" face="helvetica, arial"><a name="Manager">class <strong>Manager</strong></a>(<a href="api.html#object">__builtin__.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Manages&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter.<br>
+<td colspan=2><tt>Life&nbsp;cycle&nbsp;manager&nbsp;for&nbsp;a&nbsp;stand-alone&nbsp;player&nbsp;adapter.<br>
 &nbsp;<br>
-A&nbsp;<a href="#Manager">Manager</a>&nbsp;cares&nbsp;about&nbsp;calling&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
+A&nbsp;manager&nbsp;cares&nbsp;about&nbsp;calling&nbsp;a&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>'s&nbsp;start&nbsp;and&nbsp;stop&nbsp;methods.<br>
 Additionally,&nbsp;because&nbsp;Remuco&nbsp;needs&nbsp;a&nbsp;GLib&nbsp;main&nbsp;loop&nbsp;to&nbsp;run,&nbsp;it&nbsp;sets&nbsp;up&nbsp;and<br>
 manages&nbsp;such&nbsp;a&nbsp;loop.<br>
 &nbsp;<br>
 It&nbsp;is&nbsp;intended&nbsp;for&nbsp;player&nbsp;adapters&nbsp;running&nbsp;stand-alone,&nbsp;outside&nbsp;the&nbsp;players<br>
-they&nbsp;adapt.&nbsp;A&nbsp;<a href="#Manager">Manager</a>&nbsp;is&nbsp;not&nbsp;needed&nbsp;for&nbsp;player&nbsp;adapters&nbsp;realized&nbsp;as&nbsp;a<br>
+they&nbsp;adapt.&nbsp;A&nbsp;manager&nbsp;is&nbsp;not&nbsp;needed&nbsp;for&nbsp;player&nbsp;adapters&nbsp;realized&nbsp;as&nbsp;a<br>
 plugin&nbsp;for&nbsp;a&nbsp;media&nbsp;player.&nbsp;In&nbsp;that&nbsp;case&nbsp;the&nbsp;player's&nbsp;plugin&nbsp;interface<br>
 should&nbsp;care&nbsp;about&nbsp;the&nbsp;life&nbsp;cycle&nbsp;of&nbsp;a&nbsp;player&nbsp;adapter&nbsp;(see&nbsp;the&nbsp;Rhythmbox<br>
-player&nbsp;adapter&nbsp;as&nbsp;an&nbsp;example).<br>
-&nbsp;<br>
-To&nbsp;activate&nbsp;a&nbsp;manager&nbsp;call&nbsp;<a href="#Manager-run">run</a>().<br>&nbsp;</tt></td></tr>
+player&nbsp;adapter&nbsp;as&nbsp;an&nbsp;example).<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, player_dbus_name<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;<a href="#Manager">Manager</a>.<br>
+<dl><dt><a name="Manager-__init__"><strong>__init__</strong></a>(self, pa, dbus_name<font color="#909090">=None</font>, poll_fn<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;manager.<br>
 &nbsp;<br>
 @param&nbsp;pa:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;<a href="#PlayerAdapter">PlayerAdapter</a>&nbsp;to&nbsp;manage<br>
-@keyword&nbsp;player_dbus_name:<br>
+@keyword&nbsp;dbus_name:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;player&nbsp;adapter&nbsp;uses&nbsp;DBus&nbsp;to&nbsp;communicate&nbsp;with&nbsp;its&nbsp;player&nbsp;set<br>
 &nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;to&nbsp;the&nbsp;player's&nbsp;well&nbsp;known&nbsp;bus&nbsp;name&nbsp;(see&nbsp;<a href="#Manager-run">run</a>()&nbsp;for&nbsp;more<br>
-&nbsp;&nbsp;&nbsp;&nbsp;information)</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;information)<br>
+@keyword&nbsp;poll_fn:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;DBus&nbsp;is&nbsp;not&nbsp;used,&nbsp;this&nbsp;function&nbsp;may&nbsp;be&nbsp;set&nbsp;for&nbsp;periodic&nbsp;checks<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;player&nbsp;is&nbsp;running,&nbsp;used&nbsp;to&nbsp;automatically&nbsp;start&nbsp;and&nbsp;stop&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;player&nbsp;adapter<br>
+&nbsp;<br>
+When&nbsp;neither&nbsp;`dbus_name`&nbsp;nor&nbsp;`poll_fn`&nbsp;is&nbsp;given,&nbsp;the&nbsp;adapter&nbsp;is&nbsp;started<br>
+immediately,&nbsp;assuming&nbsp;the&nbsp;player&nbsp;is&nbsp;running&nbsp;and&nbsp;the&nbsp;adapter&nbsp;is&nbsp;ready&nbsp;to<br>
+work.</tt></dd></dl>
 
 <dl><dt><a name="Manager-run"><strong>run</strong></a>(self)</dt><dd><tt>Activate&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
@@ -739,18 +620,20 @@ This&nbsp;method&nbsp;starts&nbsp;the&nbsp;player&nbsp;adapter,&nbsp;runs&nbsp;a
 blocks&nbsp;until&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM&nbsp;arrives&nbsp;or&nbsp;until&nbsp;<a href="#Manager-stop">stop</a>()&nbsp;gets&nbsp;called.&nbsp;If<br>
 this&nbsp;happens&nbsp;the&nbsp;player&nbsp;adapter&nbsp;gets&nbsp;stopped&nbsp;and&nbsp;this&nbsp;method&nbsp;returns.<br>
 &nbsp;<br>
-@note:&nbsp;If&nbsp;the&nbsp;keyword&nbsp;'player_dbus_name'&nbsp;has&nbsp;been&nbsp;set&nbsp;in&nbsp;<a href="#Manager-__init__">__init__</a>(),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;then&nbsp;the&nbsp;player&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;an&nbsp;application<br>
-&nbsp;&nbsp;&nbsp;&nbsp;owns&nbsp;the&nbsp;bus&nbsp;name&nbsp;given&nbsp;by&nbsp;'player_dbus_name'.&nbsp;It&nbsp;automatically<br>
-&nbsp;&nbsp;&nbsp;&nbsp;gets&nbsp;started&nbsp;whenever&nbsp;the&nbsp;DBus&nbsp;name&nbsp;has&nbsp;an&nbsp;owner&nbsp;(which&nbsp;means&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;adapter's&nbsp;player&nbsp;is&nbsp;running)&nbsp;and&nbsp;it&nbsp;gets&nbsp;stopped&nbsp;when&nbsp;it&nbsp;has&nbsp;no<br>
-&nbsp;&nbsp;&nbsp;&nbsp;owner.&nbsp;Obvisously&nbsp;here&nbsp;the&nbsp;player&nbsp;adapter&nbsp;may&nbsp;get&nbsp;started&nbsp;and<br>
-&nbsp;&nbsp;&nbsp;&nbsp;stopped&nbsp;repeatedly&nbsp;while&nbsp;this&nbsp;method&nbsp;is&nbsp;running.</tt></dd></dl>
+If&nbsp;`player_dbus_name`&nbsp;or&nbsp;`poll_fn`&nbsp;has&nbsp;been&nbsp;passed&nbsp;to&nbsp;<a href="#Manager-__init__">__init__</a>(),&nbsp;then<br>
+the&nbsp;player&nbsp;adapter&nbsp;does&nbsp;not&nbsp;get&nbsp;started&nbsp;until&nbsp;the&nbsp;player&nbsp;is&nbsp;running<br>
+(according&nbsp;to&nbsp;checks&nbsp;based&nbsp;on&nbsp;the&nbsp;DBus&nbsp;name&nbsp;or&nbsp;poll&nbsp;function).&nbsp;Also&nbsp;the<br>
+adapter&nbsp;gets&nbsp;stopped&nbsp;automatically&nbsp;if&nbsp;the&nbsp;player&nbsp;is&nbsp;not&nbsp;running<br>
+anymore.&nbsp;However,&nbsp;the&nbsp;manager&nbsp;keeps&nbsp;running,&nbsp;i.e.&nbsp;the&nbsp;player&nbsp;adapter<br>
+may&nbsp;get&nbsp;started&nbsp;and&nbsp;stopped&nbsp;multiple&nbsp;times&nbsp;while&nbsp;this&nbsp;method&nbsp;is<br>
+running.</tt></dd></dl>
 
-<dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Manually&nbsp;shut&nbsp;down&nbsp;the&nbsp;manager.<br>
+<dl><dt><a name="Manager-stop"><strong>stop</strong></a>(self)</dt><dd><tt>Shut&nbsp;down&nbsp;the&nbsp;manager.<br>
 &nbsp;<br>
 Stops&nbsp;the&nbsp;manager's&nbsp;main&nbsp;loop&nbsp;and&nbsp;player&nbsp;adapter.&nbsp;As&nbsp;a&nbsp;result&nbsp;a<br>
-previous&nbsp;call&nbsp;to&nbsp;<a href="#Manager-run">run</a>()&nbsp;will&nbsp;return&nbsp;now.</tt></dd></dl>
+previous&nbsp;call&nbsp;to&nbsp;<a href="#Manager-run">run</a>()&nbsp;will&nbsp;return&nbsp;now.&nbsp;This&nbsp;should&nbsp;be&nbsp;used&nbsp;by&nbsp;player<br>
+adapters&nbsp;when&nbsp;there&nbsp;is&nbsp;a&nbsp;crucial&nbsp;error&nbsp;and&nbsp;restarting&nbsp;the&nbsp;adapter&nbsp;won't<br>
+fix&nbsp;this.</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -802,6 +685,7 @@ Methods&nbsp;to&nbsp;override&nbsp;to&nbsp;control&nbsp;the&nbsp;media&nbsp;play
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_volume">ctrl_volume</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_rate">ctrl_rate</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_tag">ctrl_tag</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-ctrl_navigate">ctrl_navigate</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_files">action_files</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;<a href="#PlayerAdapter-action_playlist_item">action_playlist_item</a>()<br>
@@ -991,6 +875,12 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
+<dl><dt><a name="PlayerAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus<br>
+&nbsp;<br>
+@param&nbsp;action:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Navigation&nbsp;decision:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU</tt></dd></dl>
+
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
@@ -1061,7 +951,7 @@ synchronized&nbsp;immediately&nbsp;with&nbsp;clients&nbsp;by&nbsp;calling&nbsp;<
 &nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-find_image"><strong>find_image</strong></a>(self, resource, prefer_thumbnail<font color="#909090">=False</font>)</dt><dd><tt>Find&nbsp;a&nbsp;local&nbsp;art&nbsp;image&nbsp;file&nbsp;related&nbsp;to&nbsp;a&nbsp;resource.<br>
+<dl><dt><a name="PlayerAdapter-find_image"><strong>find_image</strong></a>(self, resource)</dt><dd><tt>Find&nbsp;a&nbsp;local&nbsp;art&nbsp;image&nbsp;file&nbsp;related&nbsp;to&nbsp;a&nbsp;resource.<br>
 &nbsp;<br>
 This&nbsp;method&nbsp;first&nbsp;looks&nbsp;in&nbsp;the&nbsp;resource'&nbsp;folder&nbsp;for&nbsp;typical&nbsp;art&nbsp;image<br>
 files&nbsp;(e.g.&nbsp;'cover.png',&nbsp;'front.jpg',&nbsp;...).&nbsp;If&nbsp;there&nbsp;is&nbsp;no&nbsp;such&nbsp;file&nbsp;it<br>
@@ -1239,31 +1129,10 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-<dl><dt><strong>clients</strong></dt>
-<dd><tt>A&nbsp;descriptive&nbsp;list&nbsp;of&nbsp;connected&nbsp;clients.<br>
-&nbsp;<br>
-May&nbsp;be&nbsp;useful&nbsp;to&nbsp;integrate&nbsp;connected&nbsp;clients&nbsp;in&nbsp;a&nbsp;media&nbsp;player&nbsp;UI.</tt></dd>
-</dl>
-<dl><dt><strong>config</strong></dt>
-<dd><tt>Player&nbsp;adapter&nbsp;specific&nbsp;configuration&nbsp;(instance&nbsp;of&nbsp;Config).<br>
-&nbsp;<br>
-This&nbsp;mirrors&nbsp;the&nbsp;configuration&nbsp;in&nbsp;~/.config/remuco/PLAYER/conf.&nbsp;Any<br>
-change&nbsp;to&nbsp;'config'&nbsp;is&nbsp;saved&nbsp;immediately&nbsp;into&nbsp;the&nbsp;configuration&nbsp;file.</tt></dd>
-</dl>
-<dl><dt><strong>manager</strong></dt>
-<dd><tt>The&nbsp;Manager&nbsp;controlling&nbsp;this&nbsp;adapter.<br>
-&nbsp;<br>
-This&nbsp;property&nbsp;may&nbsp;be&nbsp;used&nbsp;to&nbsp;call&nbsp;the&nbsp;method&nbsp;stop()&nbsp;on&nbsp;to&nbsp;stop&nbsp;and<br>
-completely&nbsp;shutdown&nbsp;the&nbsp;adapter&nbsp;from&nbsp;within&nbsp;an&nbsp;adapter.&nbsp;Calling<br>
-Manager.stop()&nbsp;has&nbsp;the&nbsp;same&nbsp;effect&nbsp;as&nbsp;if&nbsp;the&nbsp;Manager&nbsp;process<br>
-received&nbsp;a&nbsp;SIGINT&nbsp;or&nbsp;SIGTERM.&nbsp;<br>
-&nbsp;<br>
-If&nbsp;this&nbsp;adapter&nbsp;is&nbsp;not&nbsp;controlled&nbsp;by&nbsp;or&nbsp;has&nbsp;not&nbsp;yet&nbsp;assigned&nbsp;a&nbsp;Manager<br>
-then&nbsp;this&nbsp;property&nbsp;refers&nbsp;to&nbsp;a&nbsp;dummy&nbsp;manager&nbsp;-&nbsp;so&nbsp;it&nbsp;is&nbsp;allways&nbsp;safe<br>
-to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
-&nbsp;<br>
-@see:&nbsp;Manager</tt></dd>
-</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>manager</strong> = &lt;remuco.manager.NoManager object&gt;</dl>
+
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -1282,6 +1151,6 @@ to&nbsp;call&nbsp;stop()&nbsp;on&nbsp;this&nbsp;manager.<br>
 <strong>PLAYBACK_PAUSE</strong> = 1<br>
 <strong>PLAYBACK_PLAY</strong> = 2<br>
 <strong>PLAYBACK_STOP</strong> = 0<br>
-<strong>__all__</strong> = ('PlayerAdapter', 'MPRISAdapter', 'ListReply', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP')<br>
-<strong>__version__</strong> = '0.9.2'</td></tr></table>
+<strong>__all__</strong> = ['PlayerAdapter', 'ListReply', 'MPRISAdapter', 'ItemAction', 'ListAction', 'Manager', 'Config', 'INFO_ALBUM', 'INFO_ARTIST', 'INFO_GENRE', 'INFO_LENGTH', 'INFO_RATING', 'INFO_TAGS', 'INFO_TITLE', 'INFO_YEAR', 'PLAYBACK_PAUSE', 'PLAYBACK_PLAY', 'PLAYBACK_STOP']<br>
+<strong>__version__</strong> = '0.9.3'</td></tr></table>
 </body></html>
