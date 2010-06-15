@@ -5,22 +5,14 @@ Remuco is written and maintained by Oben Sonne <obensonne@googlemail.com>.
 
 Contributors, listed alphabetically:
 
- * Igor Almeida <igor.contato@gmail.com>
-   - MPlayer adapter, promotion :), miscellaneous
+ * Igor Almeida
  * James Le Cuirot
-   - XMMS2 adapter improvements
  * Tim Froidcoeur
-   - client touchscreen interface
  * Florian Hofman
-   - Android Client
- * Kristian "Draco" Nordman <kristian.nordman@scripter.se>
-   - Amarok 1.4 adapter
- * Rajiv Nair <rajivnair.in@gmail.com>
-   - miscellaneous fixes/enhancements
- * Catalin Patulea <cat@vv.carleton.ca>
-   - Windows port, Winamp player adapter
- * Pawel Szubert <pawel.pbm@gmail.com>
-   - Okular, Songbird and QuodLibet adapter
+ * Kristian "Draco" Nordman
+ * Rajiv Nair
+ * Catalin Patulea
+ * Pawel Szubert
 
 Check the source repository's change log for details.
 
