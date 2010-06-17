@@ -1,8 +1,4 @@
-**Remuco - Remote media player control**
-
-[TOC]
-
-About
+Remuco
 ===============================================================================
 
 Remuco is a duplex remote control system for media players and mobile devices.
@@ -13,10 +9,49 @@ volume, and more. On the mobile device (the remote control), it displays
 information about the current media, including cover art. Remuco has clients
 for MIDP (JavaME) and Android phones.
 
-Project Website: <http://remuco.googlecode.com>
+ - Project Website: <http://remuco.googlecode.com>
+ - Issues and support: <http://code.google.com/p/remuco/wiki/Issues?tm=3>
+ - Developer mailing list: <http://groups.google.com/group/remuco>
+ - License: GPL3
 
-*Note: The Remuco website usually provides more recent and comprehensive
-documentation!*
+The most recent version of the following documentation can be found at [the
+Remuco website][wgs] - that's probably easier to read. Stick to this
+documentation file if you don't use the most recent Remuco version.
+
+[wgs]: http://code.google.com/p/remuco/wiki/GettingStarted
+
+Outline
+-------------------------------------------------------------------------------
+
+ 1. [Quick Start][]  
+ 2. [Requirements][]  
+ 3. [Installation][]  
+ 4. [Usage][]  
+ 5. [Configuration][]  
+ 6. [Known Issues][]  
+ 7. [Troubleshooting][]  
+ 8. [Development][]  
+ 9. [Packager Information][]  
+
+<!-- WIKI -->
+
+Quick Start
+===============================================================================
+
+In case you can't wait, here's a quick start for using Remuco.
+
+ 1. [Download][dlo] the latest Remuco package and extract it to a place of your
+    choice.
+ 2. In a terminal switch into `/path/to/extracted-remuco-package`.
+ 3. Run `sudo make install-PLAYER` where *PLAYER* is the player you want to use
+    with Remuco. Inspect the output for possibly missing requirements.
+ 4. See section [Usage][] for how to enable the just installed player adapter.
+ 5. Install the client, located in `client/midp/app` onto your phone.
+ 6. Start the client and have fun.
+
+Got it working? Great! Otherwise follow the more detailed documentation below.
+
+[dlo]: http://code.google.com/p/remuco/downloads/list
 
 
 Requirements
@@ -26,27 +61,29 @@ General
 -------------------------------------------------------------------------------
 
  - Python ≥ 2.6 and < 3.0
- - Python modules *Image* (PIL), *logging*, *bluetooth*,*dbus*, *gobject* and
-   *xdg*
+ - Python modules *Image* (a.k.a. PIL), *logging*, *bluetooth*,*dbus*,
+   *gobject* and *xdg*
 
 Player specific
 -------------------------------------------------------------------------------
 
- - **Amarok:** Amarok ≥ 2.0
- - **Amarok14:** Amarok ≥ 1.4 and < 2.0 and Python module *eyeD3*
- - **Audacious:** Audacious ≥ 1.5.1
- - **Banshee:** Banshee ≥ 1.5.3 (≥ 1.4 works except rating control)
- - **Exaile:** Exaile ≥ 0.3.0
- - **MPD:** MPD ≥ 0.13.2 and the Python module [*mpd*][pym] (≥ 0.2)
- - **Rhythmbox:** Rhythmbox ≥ 0.11.5 and the Python module *gconf*
- - **Songbird:** Songbird ≥ 1.2 with the [MPRIS Add-on][sbm] installed
- - **Totem:** Totem ≥ 2.22
- - **TVtime:** TVtime ≥ 0.9.11
- - **VLC:** VLC ≥ 0.9 with DBus control enabled in VLC's preferences
- - **XMMS2:** XMMS2 ≥ 0.5 and the Python module *xmmsclient* (≥ 0.5)
+ - __Amarok:__     Amarok ≥ 2.0
+ - __Amarok14:__   Amarok ≥ 1.4 and < 2.0, Python module *eyeD3*
+ - __Audacious:__  Audacious ≥ 1.5.1 (2.1 has issues, 2.2 works again)
+ - __Banshee:__    Banshee ≥ 1.5.3 (≥ 1.4 works except rating control)
+ - __Exaile:__     Exaile ≥ 0.3.0
+ - __MPD:__        MPD ≥ 0.13.2, Python module [*mpd*][pym] (≥ 0.2)
+ - __Quod Libet:__ Quod Libet ≥ 2.2
+ - __Rhythmbox:__  Rhythmbox ≥ 0.11.5, Python module *gconf*
+ - __Songbird:__   Songbird ≥ 1.2 with the [MPRIS Add-on][sbm] installed
+ - __Totem:__      Totem ≥ 2.22
+ - __TVtime:__     TVtime ≥ 0.9.11
+ - __VLC:__        VLC ≥ 0.9 with DBus control enabled (see [screenshot][vls])
+ - __XMMS2:__      XMMS2 ≥ 0.5, Python module *xmmsclient* (≥ 0.5)
 
 [pym]: http://mpd.wikia.com/wiki/ClientLib:python-mpd
 [sbm]: http://addons.songbirdnest.com/addon/1626
+[vls]: http://wiki.remuco.googlecode.com/hg/images/exos/vlc-preferences.png
 
 MIDP Client
 -------------------------------------------------------------------------------
@@ -56,16 +93,20 @@ and CLDC ≥ 1.1. To connect via Bluetooth the phone must support JSR-82 (Java
 Bluetooth API).  To check if your device matches the requirements take a look
 at the [FPC database][fpc] (add your phone if it's not listed yet).
 
-Additionally you may want to check the [list of client devices known to work]
-[cdl].
-
 [fpc]: http://www.dpsoftware.org/filter.php
-[cdl]: http://code.google.com/p/remuco/wiki/ClientDevices
+
+Additionally check [the list phones successfully used with Remuco][wcd]. Once
+Remuco is running on your system, please help to extend this list by running
+the tool _remuco-report_.
+
+[wcd]: http://code.google.com/p/remuco/wiki/ClientDevices
 
 Android Client
 -------------------------------------------------------------------------------
 
-See <http://code.google.com/p/remuco/wiki/Android>.
+See [Android][wan].
+
+[wan]: http://code.google.com/p/remuco/wiki/Android
 
 
 Installation
@@ -77,16 +118,39 @@ and a client for your mobile device.
 Player Adapters
 -------------------------------------------------------------------------------
 
-Run `make help` to get instructions on how to install Remuco for one or more
-media players.
+You can either install [packages for your distribution][wdp] (may be a bit
+outdated) or you can [download][dlo] the latest Remuco release, extract it to a
+place of your choice and install one or more player adapters as follows:
+
+    $ cd path/to/extracted-remuco-package
+    $ make help
+    ... wow, good to know ...
+    $ sudo make install-PLAYER
+    ... check output for missing requirements ...
+
+The last command installs the player adapter for *PLAYER* (replace this with a
+real name). After installation there are some files called `install-...log`.
+They are needed if you want to uninstall Remuco later.
+
+[wdp]: http://code.google.com/p/remuco/wiki/DistributionPackages
+[dlo]: http://code.google.com/p/remuco/downloads/list
 
 MIDP Client
 -------------------------------------------------------------------------------
 
-You find the required JAR and JAD files in the directory `client/midp/app`.
-Installation steps are device dependent. Usually the JAR file has to be sent or
-copied to the device. Some phones then already trigger the installation, others
-require to open the file with the device's file manager. 
+The MIDP client application consists of 2 files:
+
+ - *remuco.jar*: The client application to install on your mobile phone.
+ - *remuco.jad*: A descriptor file which is needed additionally by some phones
+   for installation.
+
+The files are located in `client/midp/app/` (if you installed using
+distribution packages they probably are at `/usr/share/remuco/client/`).
+
+The concrete steps to install the client depend on your phone. Usually the
+*JAR* file has to be sent or copied to the device. Some phones then already
+trigger the installation, others require to open the file with the device's
+file manager.
 
 Next to the regular client you'll find special variants of the client
 in the above mentioned directory:
@@ -96,89 +160,86 @@ in the above mentioned directory:
  - *no-bluetooth*: A client without Bluetooth functionality. Some Windows based
    phones (using JBed) are known to require this client version.
 
-*Note:* If you installed Remuco using packages for your distribution, the
-client files usually are located in `/usr/share/remuco/client/`. 
-
-
-*Note:* The source only package (`remuco-source-x.x.x.tar.gz`) does not contain
-the client binaries. Read sections *Client Development* and *Packager
-Information* for how to build the client.
-
-*Note:* If the client fails to start on your mobile, have a look at
-<http://code.google.com/p/remuco/wiki/ClientCustomization> for possible reasons
-and solutions.
-
 Android Client
 -------------------------------------------------------------------------------
 
-See <http://code.google.com/p/remuco/wiki/Android>.
+See [Android][wan].
+
+[wan]: http://code.google.com/p/remuco/wiki/Android
 
 
 Usage
 ===============================================================================
 
-Player Adapters
+Amarok, Amarok14, Audacious, Banshee, Quod Libet, Songbird, VLC
 -------------------------------------------------------------------------------
 
-Player adapters can be configured in the file `~/.config/remuco/remuco.cfg`
-which automatically gets created with default values once an adapter has been
-started. Options are described within that file. *You can ignore this for now
-but you might be happy to know this later.* 
+The player adapter can be started with the command `remuco-PLAYER` (replace
+*PLAYER* with a real player name).
 
-### Amarok, Amarok14, Audacious, Banshee, Songbird, VLC ###
+A good choice is to set up `remuco-PLAYER` as a startup application when you
+log in to your desktop session. When the player is not running then the adapter
+is in sleep mode and won't eat much resources.
 
-Simply run `remuco-player` (repl. *player* with a real name, e.g. *banshee*).
+*Note:* Remember to enable DBus control in VLC and to install the Songbird
+MPRIS Add-on (see above in section [Requirements][]).
 
-A good choice is to set up *remuco-player* as a startup application when you
-log in to your desktop session. When the player is not running the adapter is
-in sleep mode and won't eat much resources.
-
-These player adapters have a special option in `~/.config/remuco/remuco.cfg`
-called `x-playlist-jump-enabled`. Setting it to 1 enables the *Jump to*
-action in a client's playlist browser. This is disabled by default because
-it fails on dynamic playlists. If you use static playlists only, you can
-safely enable this feature (set to `1`).
-
-*VLC*: Remuco requires DBus control in VLC enabled. This can be configured in
-VLC at *Tools → Preferences*. 
-
-*Songbird*: Make sure the Songbird [MPRIS Add-on][sbm] is installed.
-
-### Exaile, Rhythmbox, Totem ###
+Exaile, Rhythmbox, Totem
+-------------------------------------------------------------------------------
 
 The player adapter actually is a plugin of the player. Thus it gets started
 automatically once you activate the Remuco plugin within the player. 
 
-### MPD ###
+MPD
+-------------------------------------------------------------------------------
 
-Simply run `remuco-mpd`.
+The player adapter can be started with the command `remuco-mpd`.
 
-A good choice is to set up *remuco-mpd* as a startup application when you log
-in to your desktop session or when MPD itself get's started. It mainly depends
-on your MPD setup. 
+A good choice is to set up `remuco-mpd` as a startup application when you log
+in to your desktop session (in case MPD is already running at this time) or
+when MPD itself get's started. It mainly depends on your MPD setup.
 
-The MPD adapter has some special options in `~/.config/remuco/remuco.cfg`:
+If the player adapter is not running on the same computer as MPD have a look
+into the [Configuration][] section below.
 
- - `x-mpd-host:  localhost`  
-   Host running MPD.
- - `x-mpd-port: 6600`  
-   Port used by MPD.
- - `x-mpd-password: `  
-   Password to use when connecting to MPD. Must be set if MPD is configured to
-   restrict certain actions with a password requirement.
- - `x-mpd-music: /var/lib/mpd/music`  
-   Root directory of MPD's music directory, used for searching cover art files
-   (only works if MPD is at localhost).
+MPlayer
+-------------------------------------------------------------------------------
 
-The defaults should work for most MPD setups.
+**TODO:** update for 0.9.3 !
 
-### MPlayer ###
+Add a line to your `~/.mplayer/config` file, telling *mplayer* to read from the
+file `.cache/remuco/mplayer.cmdfifo` folder:
 
-**TODO** (Igor?)
+    echo "input=file=$HOME/.cache/remuco/mplayer/cmdfifo" >> ~/.mplayer/config
 
-### TVtime ###
+This will allow you to control *mplayer* from the client, and should be done
+only once. Next start the adapter (as of now, you need to run the adapter
+before you run mplayer, and re-run it if mplayer quits):
 
-The player adapter can be started with `remuco-tvtime`.
+    $ remuco-mplayer
+
+To be able to get information from *mplayer* to clients, you need to pipe its
+output to a location known to remuco.
+
+    $ mplayer mymovie.avi | tee $HOME/.cache/remuco/mplayer.statusfifo
+
+This should be all, you can now start the client. But note that you'll need to
+type that last command every time you want to play something with *mplayer*.
+
+To make your life easier, add this script to your `~/bin` directory:
+
+    [ -z $1 ] && echo "Usage: $0 file2 file2 ..." && exit 1
+    
+    # if mplayer is installed elsewhere, change /usr/bin/mplayer to the correct location
+    mplayer $@ | tee $HOME/.cache/remuco/mplayer.statusfifo
+
+Name this script `~/bin/mplayer` and make sure `~/bin` precedes `/usr/bin` in
+your *PATH* environment variable.
+
+TVtime
+-------------------------------------------------------------------------------
+
+The player adapter can be started with the command `remuco-tvtime`.
 
 For navigating in TVtime's menu with the Remuco client, the keys on the client
 have special functions when using the TVtime adapter: 
@@ -190,27 +251,23 @@ Repeat     | *SHOW_MENU*
 Shuffle    | *SHOW_MENU*
 Previous   | *LEFT*
 Next       | *RIGHT*
-Vol. down  | *DOWN*
 Vol. up    | *UP*
+Vol. down  | *DOWN*
 
-### XMMS2 ###
+XMMS2
+-------------------------------------------------------------------------------
 
-The player adapter can be started with `remuco-xmms2`.
+The player adapter can be started with the command `remuco-xmms2`.
 
-To let it start automatically when XMMS2 starts, create a symlink in the XMMS2
-user startup script directory, for instance like this:
+To let it start automatically when XMMS2 starts, create a symbolic link in the
+XMMS2 user startup script directory, for instance like this:
 
     $ ln -s `which remuco-xmms2` ~/.config/xmms2/startup.d/remuco-xmms2
 
-MIDP Client
+Client (MIDP and Android)
 -------------------------------------------------------------------------------
 
-Using the client is not too complicated, just start and use it ;) .
-
-Android Client
--------------------------------------------------------------------------------
-
-See <http://code.google.com/p/remuco/wiki/Android>.
+Using the client should be quite obvious -- just start and use it ;) .
 
 Report Tool
 -------------------------------------------------------------------------------
@@ -220,45 +277,160 @@ of seen Remuco client devices to the Remuco project. Help setting up a Remuco
 compatible device list, by using remuco-report! See the tool's man page for
 more information.
 
-
-Player Adapter Development
+Configuration
 ===============================================================================
 
-To develop a player adapter, use *fooplay* as a template and implement it as
-described in the file `api.html`.
+Each player adapter can be configured in Remuco's configuration file placed in
+`~/.config/remuco/remuco.cfg`. This file is created automatically when a player
+adapter has been started the first time. The file contains a section `DEFAULT`
+which defines options for *all* player adapters and additional sections for
+each player used with Remuco. These sections overwrite global options in
+`DEFAULT`and are used to define options which only make sense for specific
+players (look for options starting with `x-`).
 
-To test the FooPlay adapter, simply run it as a Python script. It requires the
-Python module *remuco* which is available if you installed another player
-adapter before. Otherwise, just add `/path/to/remuco/base/module` to
-*PYTHONPATH* before running the FooPlay adapter. For instance
+Global options in section `DEFAULT` are documented within the configuration
+file. The player specific options are described below.
 
-    $ export PYTHONPATH=/path/to/remuco/base/module
-    $ /path/to/remuco-tree/adapter/fooplay/remuco-fooplay
+Amarok, Audacious, Songbird, VLC (MPRIS based adapters)
+-------------------------------------------------------------------------------
 
-starts the FooPlay adapter without installing anything. Try it, it's easy :)
+ - `x-playlist-jump-enabled`:  
+   Toggle playlist jump action (default: `0`). If enabled, clients may jump
+   within the player's playlist. This is disabled by default because the player
+   interface does not support such an action. Remuco implements a dirty hack to
+   realize that anyway but this only works on *non-dynamic* playlists. If you
+   think that's okay, feel free to set a *1* here.
 
-For more information visit:
-<http://code.google.com/p/remuco/wiki/PlayerAdapterWritingGuide>
+MPD
+-------------------------------------------------------------------------------
 
+ - `x-mpd-host`:  
+   Host running MPD (default: `localhost`).
+ - `x-mpd-port`:  
+   Port used by MPD (default: `6600`).  
+ - `x-mpd-password`:  
+   Password to use when connecting to MPD. Must be set if MPD is configured to
+   restrict certain actions with a password requirement.
+ - `x-mpd-music`:  
+   Root directory of MPD's music directory (default: `/var/lib/mpd/music`).
+   Used for searching cover art files and only works if MPD is at localhost.
 
-MIDP Client Development
+The defaults should work for most MPD setups.
+
+MPlayer
+-------------------------------------------------------------------------------
+
+ - `x-cmdfifo`:  
+   FIFO file to use to send commands to MPlayer (default:
+   `~/.cache/remuco/mplayer.cmdfifo`). For details see MPlayer usage in the
+   [Usage][] section above.
+ - `x-statusfifo`:  
+   FIFO file to use to read output from MPlayer (default:
+   ~/.cache/remuco/mplayer.statusfifo). For details see MPlayer usage in the
+   [Usage][] section above.
+
+Known Issues
 ===============================================================================
+
+Bluetooth service search
+-------------------------------------------------------------------------------
+
+On some phones the Remuco client does not find the player adapter services
+running on a computer. See the [FAQ][faq] for instructions how to fix this.
+
+**BlackBerry devices:** The default service search fails on BlackBerry devices.
+You have to manually set a service channel ≥ 7 in the client *and* in the
+player adapter configuration. For details see the [FAQ][wfq].
+
+[wfq]: http://code.google.com/p/remuco/wiki/FAQ
+
+WiFi connections on BlackBerry devices
+-------------------------------------------------------------------------------
+
+On some BlackBerry devices (e.g. Bold 9000 or Pearl 8120) you need to set the
+option `interface=wifi` in a WiFi connection's configuration screen
+([screenshot][ccs]). Otherwise the phone tries to connect using BIS (BlackBerry
+Internet Service) instead of the real WiFi interface.
+
+Another user [reported][i67] that the option `deviceside=true` had to be set in
+order to circumvent BES proxy connections. If it still fails, have a try with 
+some other [options for WiFi connections on BlackBerry devices][owb] and drop a
+note on the [mailing list][rml] in case you found a useful option.
+
+[ccs]: http://wiki.remuco.googlecode.com/hg/images/exos/emulator-ifacewifi.png
+[owb]: http://www.blackberry.com/developers/docs/5.0.0api/javax/microedition/io/Connector.html#socket
+[rml]: http://groups.google.com/group/remuco
+
+Phones operated by AT&T Wireless or T-Mobile U.S.
+-------------------------------------------------------------------------------
+
+These operators have very restrictive access rights for third party JavaME
+applications. As a result it is likely that the Remuco client is not allowed to
+setup WiFi or Bluetooth connections. Read [all the details][wjp].
+
+[wjp]: http://code.google.com/p/remuco/wiki/JavaMeApiPermissions
+
+Windows Mobile devices
+-------------------------------------------------------------------------------
+
+The default client fails to start on Windows Mobile devices using JBed for
+JavaME apps. Bluetooth is a problem here so you have to use the special client
+in the `no-bluetooth` sub-directory where the default client files are located.
+
+Motorola devices
+-------------------------------------------------------------------------------
+
+Some Motorola devices (ROKR E2, ROKR E6, MOTOZINE ZN5 and A1200e) crash with
+the default client when adding a new Bluetooth connection. This is a bug in the
+devices' Java implementation. There's a special client version with a work
+around for this bug. It's located in the `motorola-fix` sub-directory where
+the default client files are located.
+
+Troubleshooting
+===============================================================================
+
+General
+-------------------------------------------------------------------------------
+
+ - If you experience any problems first have have a look into the log file of
+   the player adapter your are using (`~/.cache/remuco/PLAYER.log` - replace
+   *PLAYER* with a specific player name.
+ - In case this does not help to find and solve the problem, enable debug log
+   by setting the option *log-level* in `~/.config/remuco/remuco.cfg` to
+   *DEBUG*. Restart the player adapter and inspect the log again.
+ - If you are still lost, then it's time to [ask for help][hlp].
+
+[hlp]: http://code.google.com/p/remuco/wiki/Issues?tm=3
 
 MIDP Client
 -------------------------------------------------------------------------------
 
-As a quick start, change into the directory `client/midp` and run `setup.sh` to
-set up the client build environment and to get further instructions.
+ - The client has a menu option called *Log* - check it.
+ - If the client fails to start on your device, although it meets all
+   requirements, have a look at [ClientCustomization][wcc] for possible
+   reasons and solutions.
 
-More detailed information can be found at:
-<http://code.google.com/p/remuco/wiki/ClientCustomization>
+[wcc]: http://code.google.com/p/remuco/wiki/ClientCustomization
 
-Android Client
+Android
 -------------------------------------------------------------------------------
 
-See <http://code.google.com/p/remuco/wiki/Android> and [issue 34][i34].
+ - Go and fix it :-P (client is still in development).
+ 
+<!-- WIKI -->
 
-[i34]: http://code.google.com/p/remuco/issues/detail?id=34
+Development
+===============================================================================
+
+If you'd like to contribute to Remuco, read [Contribute][wco] as a starting
+point. You may also be interested in the other [wiki pages related to
+development][wdv]. Feel free to say hello on the [Remuco development mailing
+list][rml].
+
+
+[wco]: http://code.google.com/p/remuco/wiki/Contribute
+[wdv]: http://code.google.com/p/remuco/w/list?q=label:Development
+[rml]: http://groups.google.com/group/remuco
 
 
 Packager Information
@@ -273,27 +445,23 @@ adjust the installation process. Just search for 'os.getenv' within setup.py
 to get more detailed information.
 
 If your distribution requires source only packages, use the package
-remuco-source-x.x.x.tar.gz. Building the MIDP client requires Ant (including
+`remuco-source-x.x.x.tar.gz`. Building the MIDP client requires Ant (including
 optional tasks), ProGuard and JavaME libraries. You can use JavaME libraries
 from SUN's Wireless Toolkit, from the MicroEmu project or generate them from
-scratch as described in client/ligben/README.
+scratch as described in `client/ligben/README`.
 
 The Android client is still in development and should not yet get packaged.
 
+<!-- ---------------------------------------------------------------------- -->
+<!-- in-document section links                                              -->
+<!-- ---------------------------------------------------------------------- -->
 
-General Information
-===============================================================================
-
-The Remuco project is hosted on GoogleCode at <http://remuco.googlecode.com>.
-It is licensed under the GPLv3 or any newer version.
-
-For bugs, feature and support requests use the [issue tracker][itr]. To discuss
-about Remuco and to get in touch with the developers, join the [mailing
-list][rml].
-
-To browse or checkout the source code visit
-<http://code.google.com/p/remuco/source>. If you would like to contribute to
-Remuco visit <http://code.google.com/p/remuco/wiki/Contribute>.
-
-[itr]: http://code.google.com/p/remuco/wiki/Issues?tm=3
-[rml]: http://groups.google.com/group/remuco
+[Quick Start]:          #Quick_Start
+[Requirements]:         #Requirements
+[Installation]:         #Installation
+[Usage]:                #Usage
+[Configuration]:        #Configuration
+[Known Issues]:    	    #Known_Issues
+[Troubleshooting]:      #Troubleshooting
+[Development]:          #Development
+[Packager Information]: #Packager_Information
