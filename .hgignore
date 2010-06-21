@@ -27,3 +27,6 @@ install.*\.log$
 (^|/)\.eclipseme\.tmp$
 (^|/)\.eclipseme$
 
+# misc
+^wiki$
+
