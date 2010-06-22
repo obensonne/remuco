@@ -398,11 +398,13 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
-<dl><dt><a name="MPRISAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus<br>
+<dl><dt><a name="MPRISAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus&nbsp;(typically&nbsp;DVD&nbsp;menus).<br>
 &nbsp;<br>
 @param&nbsp;action:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Navigation&nbsp;decision:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;number&nbsp;selecting&nbsp;one&nbsp;of&nbsp;these&nbsp;actions:&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU&nbsp;(e.g.&nbsp;0&nbsp;is&nbsp;UP&nbsp;and&nbsp;6&nbsp;is&nbsp;TOPMENU).<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="MPRISAdapter-ctrl_rate"><strong>ctrl_rate</strong></a>(self, rating)</dt><dd><tt>Rate&nbsp;the&nbsp;currently&nbsp;played&nbsp;item.&nbsp;<br>
 &nbsp;<br>
@@ -875,11 +877,13 @@ multiple&nbsp;items,&nbsp;then&nbsp;'positions'&nbsp;and&nbsp;'ids'&nbsp;are&nbs
 &nbsp;&nbsp;&nbsp;&nbsp;<br>
 @note:&nbsp;Override&nbsp;if&nbsp;list&nbsp;actions&nbsp;gets&nbsp;passed&nbsp;to&nbsp;reply_search_request().</tt></dd></dl>
 
-<dl><dt><a name="PlayerAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus<br>
+<dl><dt><a name="PlayerAdapter-ctrl_navigate"><strong>ctrl_navigate</strong></a>(self, action)</dt><dd><tt>Navigate&nbsp;through&nbsp;menus&nbsp;(typically&nbsp;DVD&nbsp;menus).<br>
 &nbsp;<br>
 @param&nbsp;action:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Navigation&nbsp;decision:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;number&nbsp;selecting&nbsp;one&nbsp;of&nbsp;these&nbsp;actions:&nbsp;UP,&nbsp;DOWN,&nbsp;LEFT,&nbsp;RIGHT,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT,&nbsp;RETURN,&nbsp;TOPMENU&nbsp;(e.g.&nbsp;0&nbsp;is&nbsp;UP&nbsp;and&nbsp;6&nbsp;is&nbsp;TOPMENU).<br>
+&nbsp;<br>
+@note:&nbsp;Override&nbsp;if&nbsp;it&nbsp;is&nbsp;possible&nbsp;and&nbsp;makes&nbsp;sense.</tt></dd></dl>
 
 <dl><dt><a name="PlayerAdapter-ctrl_next"><strong>ctrl_next</strong></a>(self)</dt><dd><tt>Play&nbsp;the&nbsp;next&nbsp;item.&nbsp;<br>
 &nbsp;<br>
