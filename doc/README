@@ -358,6 +358,7 @@ some other [options for WiFi connections on BlackBerry devices][owb] and drop a
 note on the [mailing list][rml] in case you found a useful option.
 
 [ccs]: http://wiki.remuco.googlecode.com/hg/images/exos/emulator-ifacewifi.png
+[i67]: http://code.google.com/p/remuco/issues/detail?id=67
 [owb]: http://www.blackberry.com/developers/docs/5.0.0api/javax/microedition/io/Connector.html#socket
 [rml]: http://groups.google.com/group/remuco
 
