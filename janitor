@@ -140,15 +140,14 @@ def build_release_tarballs(release):
 # show_release_reminders
 # -----------------------------------------------------------------------------
 
-RELEASE_REMINDERS = """Things to do before building release tarballs:
+RELEASE_TODOS = """Things to do before building release tarballs:
  - remove "(in development)" marker in doc/CHANGES
- - no uncommitted changes
  - update version numbers (grep for the last release number)
-"""
+ - update wiki (also check version numbers there)"""
 
-def show_release_reminders():
+def show_release_todos():
     
-    print("Check")
+    print(RELEASE_TODOS)
 
 # -----------------------------------------------------------------------------
 # main
