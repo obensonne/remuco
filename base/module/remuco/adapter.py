@@ -743,12 +743,14 @@ class PlayerAdapter(object):
         log.error("** BUG ** in feature handling")
 
     def ctrl_navigate(self, action):
-        """Navigate through menus
+        """Navigate through menus (typically DVD menus).
 
         @param action:
-            Navigation decision:
-            UP, DOWN, LEFT, RIGHT, SELECT, RETURN, TOPMENU
+            A number selecting one of these actions: UP, DOWN, LEFT, RIGHT,
+            SELECT, RETURN, TOPMENU (e.g. 0 is UP and 6 is TOPMENU).
 
+        @note: Override if it is possible and makes sense.
+        
         """
         log.error("** BUG ** in feature handling")
     
