@@ -1,0 +1,173 @@
+#!/usr/bin/env python
+
+import codecs
+import inspect
+import os
+import os.path
+import pydoc
+import re
+import shutil
+import subprocess
+import sys
+import urllib
+
+import markdown
+
+# -----------------------------------------------------------------------------
+# generate_readme_html
+# -----------------------------------------------------------------------------
+
+README_HTML = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Remuco Documentation</title>
+  <style type="text/css">
+    body { width: 850px; font-size: 13px; font-family: sans; color: #2e3436; margin: auto;}
+    h1, h2, h3 { font-family: serif; }
+    h1 { border-bottom: #888a85 solid 1pt; }
+    pre { padding: 0.2em 0.5em; font-size: 11px; background-color: #eee;
+      border-top: solid #ccc 1px; border-bottom: solid #ccc 1px; }
+  </style>
+</head>
+<body>
+%s
+</body>
+</html>
+"""
+
+def generate_readme_html():
+    
+    src = "doc/README"
+    dst = "doc/README.html"
+    
+    # read and convert
+    with codecs.open(src, 'r', 'utf-8') as fp:
+        md = fp.read()
+    html = markdown.markdown(md, extensions=["toc", "tables",])
+
+    # add anchors for section headers
+    heads = re.findall(r'<h[1-5].*?>(.*?)</h[1-5]>', html)
+    for head in set(heads):
+        head_quoted = urllib.quote(head.replace(" ", "_"))
+        pattern = r'(<h[1-5].*?>%s</h[1-5]>)' % head
+        replacement = r'<a name="%s" />\n\1' % head_quoted
+        html = re.sub(pattern, replacement, html)
+
+    # write HTML version
+    html = README_HTML % html
+    with codecs.open(dst, 'w', 'utf-8') as fp:
+        fp.write(html)
+
+# -----------------------------------------------------------------------------
+# generate_api_html
+# -----------------------------------------------------------------------------
+
+def generate_api_html():
+    
+    dst = "doc/api.html"
+    
+    sys.path.insert(0, "base/module")
+    import remuco
+    
+    pydoc.writedoc(remuco)
+    
+    patt_module_link = r'href="[^"]+\.html'
+    repl_module_link = 'href="api.html'
+    patt_file_link = r'<a href="[^"]+">index</a><br><a href="[^"]+">[^<]+</a>'
+    repl_file_link = ''
+    
+    with open("remuco.html", 'r') as fp:
+        content = fp.read()
+        
+    os.remove("remuco.html")
+        
+    content = re.sub(patt_module_link, repl_module_link, content)
+    content = re.sub(patt_file_link, repl_file_link, content)
+    
+    with open(dst, 'w') as fp:
+        fp.write(content)
+
+# -----------------------------------------------------------------------------
+# build_release_tarballs
+# -----------------------------------------------------------------------------
+
+TARBALL_EXCLUDE = ["janitor*", "release.*", ".hg*", ".git*"]
+
+def build_release_tarballs(release):
+    
+    build_dir = "janitor.build"
+    dist_dir = "janitor.dist"
+    pkg_src = "remuco-source-%s" % release
+    pkg_all = "remuco-%s" % release
+    pkg_src_dir = "%s/%s" % (build_dir, pkg_src)
+    pkg_all_dir = "%s/%s" % (build_dir, pkg_all)
+    pkg_src_tb = "%s/%s.tar.gz" % (dist_dir, pkg_src)
+    pkg_all_tb = "%s/%s.tar.gz" % (dist_dir, pkg_all)
+    
+    for dir in (build_dir, dist_dir):
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
+        os.mkdir(dir)
+    
+    excludes = " ".join(["--exclude %s" % x for x in TARBALL_EXCLUDE])
+    
+    cmd = "hg archive -r %s -t tgz %s %s" % (release, excludes, pkg_src_tb)
+    subprocess.check_call(cmd.split())
+    
+    cmd = "tar zxf %s -C %s" % (pkg_src_tb, build_dir)
+    subprocess.check_call(cmd.split())
+    
+    cmd = "%s/%s/client/midp/setup.sh" % (build_dir, pkg_src)
+    subprocess.check_call(cmd.split())
+    
+    cmd = "ant -f %s/client/midp/build.xml dist.all" % pkg_src_dir
+    subprocess.check_call(cmd.split())
+    
+    shutil.move("%s/client/midp/app" % pkg_src_dir, build_dir)
+    shutil.rmtree(pkg_src_dir)
+    
+    cmd = "tar zxf %s -C %s" % (pkg_src_tb, build_dir)
+    subprocess.check_call(cmd.split())
+
+    shutil.move("%s/app" % build_dir, "%s/client/midp/app" % pkg_src_dir )
+    shutil.move(pkg_src_dir, pkg_all_dir)
+    
+    cmd = "tar zcf %s -C %s %s" % (pkg_all_tb, build_dir, pkg_all)
+    subprocess.check_call(cmd.split())
+
+# -----------------------------------------------------------------------------
+# show_release_reminders
+# -----------------------------------------------------------------------------
+
+RELEASE_REMINDERS = """Things to do before building release tarballs:
+ - remove "(in development)" marker in doc/CHANGES
+ - no uncommitted changes
+ - update version numbers (grep for the last release number)
+"""
+
+def show_release_reminders():
+    
+    print("Check")
+
+# -----------------------------------------------------------------------------
+# main
+# -----------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    
+    attrs = locals().copy()
+
+    if len(sys.argv) == 1:
+        
+        print("Tasks and corresponding arguments:")
+        functions = [a for a in attrs if hasattr(attrs[a], 'func_name')]
+        for task in [f for f in functions if not f.startswith("_")]:
+            args = inspect.getargspec(attrs[task]).args
+            print("-> %s %s" % (task.replace("_", "-"), ' '.join(args)))
+    else:
+        
+        func = sys.argv[1].replace("-", "_")
+        args = sys.argv[2:]
+        attrs[func](*args)
+
