@@ -174,14 +174,20 @@ when MPD itself get's started. It mainly depends on your MPD setup.</p>
 into the <a href="#Configuration">Configuration</a> section below.</p>
 <a name="MPlayer" />
 <h2 id="mplayer">MPlayer</h2>
-<p><strong>TODO:</strong> update for 0.9.3 !</p>
-<p>Add a line to your <code>~/.mplayer/config</code> file, telling <em>mplayer</em> to read from the
+<p><strong>The lazy way:</strong>
+Assuming both <em>mplayer</em> and <em>remuco-mplayer</em> are in your PATH variable, just run</p>
+<pre><code>$ remuco-mplayer myawesomefile1 myawesomefile2 ... myawesomefileN
+</code></pre>
+<p>and <em>remuco-mplayer</em> will call <em>mplayer</em> files it can find in that list.
+As of now, you cannot pass arguments to mplayer.</p>
+<p><strong>The kludgy but one-off way:</strong>
+Add a line to your <code>~/.mplayer/config</code> file, telling <em>mplayer</em> to read from the
 file <code>.cache/remuco/mplayer.cmdfifo</code> folder:</p>
 <pre><code>echo "input=file=$HOME/.cache/remuco/mplayer/cmdfifo" &gt;&gt; ~/.mplayer/config
 </code></pre>
 <p>This will allow you to control <em>mplayer</em> from the client, and should be done
 only once. Next start the adapter (as of now, you need to run the adapter
-before you run mplayer, and re-run it if mplayer quits):</p>
+before you run mplayer):</p>
 <pre><code>$ remuco-mplayer
 </code></pre>
 <p>To be able to get information from <em>mplayer</em> to clients, you need to pipe its
@@ -194,7 +200,7 @@ type that last command every time you want to play something with <em>mplayer</e
 <pre><code>[ -z $1 ] &amp;&amp; echo "Usage: $0 file2 file2 ..." &amp;&amp; exit 1
 
 # if mplayer is installed elsewhere, change /usr/bin/mplayer to the correct location
-mplayer $@ | tee $HOME/.cache/remuco/mplayer.statusfifo
+/usr/bin/mplayer $@ | tee $HOME/.cache/remuco/mplayer.statusfifo
 </code></pre>
 <p>Name this script <code>~/bin/mplayer</code> and make sure <code>~/bin</code> precedes <code>/usr/bin</code> in
 your <em>PATH</em> environment variable.</p>
