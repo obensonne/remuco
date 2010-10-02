@@ -528,7 +528,7 @@ class MPDAdapter(remuco.PlayerAdapter):
         def skey(song): # sorting key for songs
             album = song.get("album", "")
             track = int(song.get("track", "0").split("/")[0])
-            disc = int(song.get("disc", "0"))
+            disc = int(song.get("disc", "0").split("/")[0])
             return "%s.%02d.%03d" % (album, disc, track)
 
         if sort:
