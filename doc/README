@@ -61,7 +61,7 @@ General
 -------------------------------------------------------------------------------
 
  - Python ≥ 2.6 and < 3.0
- - Python modules *Image* (a.k.a. PIL), *logging*, *bluetooth*,*dbus*,
+ - Python modules *Image* (a.k.a. PIL), *logging*, *bluetooth*, *dbus*,
    *gobject* and *xdg*
 
 Player specific
@@ -95,9 +95,9 @@ at the [FPC database][fpc] (add your phone if it's not listed yet).
 
 [fpc]: http://www.dpsoftware.org/filter.php
 
-Additionally check [the list phones successfully used with Remuco][wcd]. Once
-Remuco is running on your system, please help to extend this list by running
-the tool _remuco-report_.
+Additionally check [the list of phones successfully used with Remuco][wcd].
+Once Remuco is running on your system, please help to extend this list by
+running the tool _remuco-report_.
 
 [wcd]: http://code.google.com/p/remuco/wiki/ClientDevices
 
@@ -206,7 +206,8 @@ MPlayer
 -------------------------------------------------------------------------------
 
 **The lazy way:**
-Assuming both *mplayer* and *remuco-mplayer* are in your *PATH* variable, just run
+Assuming both *mplayer* and *remuco-mplayer* are in your *PATH* variable, just
+run
 
     $ remuco-mplayer myawesomefile1 myawesomefile2 ... myawesomefileN
 
