@@ -1,3 +1,20 @@
+Release 0.9.3.1
+===============
+
+This is a minor bug fix release.
+
+Base
+----
+
+  * Updated documentation.
+
+Player adapters
+---------------
+
+  * MPD: Fixed disc number formatting issue (see [issue 113][i113]).
+
+[i113]: http://code.google.com/p/remuco/issues/detail?id=113
+
 Release 0.9.3
 =============
 
