@@ -456,7 +456,7 @@ If your distribution requires source only packages, use the package
 `remuco-source-x.x.x.tar.gz`. Building the MIDP client requires Ant (including
 optional tasks), ProGuard and JavaME libraries. You can use JavaME libraries
 from SUN's Wireless Toolkit, from the MicroEmu project or generate them from
-scratch as described in `client/ligben/README`.
+scratch as described in `client/midp/ligben/README`.
 
 The Android client is still in development and should not yet get packaged.
 

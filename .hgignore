@@ -15,6 +15,8 @@ install.*\.log$
 ^client/midp/build\.properties$
 ^client/midp/wtk-emulator\.properties$
 ^client/midp/tools$
+^client/midp/libgen/sources$
+^client/midp/libgen/jar$
 ^client/android/local.properties$
 ^client/android/bin$
 ^client/android/gen$
