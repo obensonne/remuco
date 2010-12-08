@@ -234,8 +234,9 @@ class BansheeAdapter(remuco.PlayerAdapter):
             
     def ctrl_toggle_shuffle(self):
 
+        mode = self.__shuffle and "off" or self.config.getx("shuffle", "song")
         try:
-            self.__bsc.SetShuffleMode(int(not self.__shuffle),
+            self.__bsc.SetShuffleMode(mode,
                                       reply_handler=self.__dbus_ignore,
                                       error_handler=self.__dbus_error)
         except DBusException, e:
@@ -319,7 +320,7 @@ class BansheeAdapter(remuco.PlayerAdapter):
     
     def __notify_shuffle(self, shuffle):
         
-        self.__shuffle = shuffle > 0
+        self.__shuffle = shuffle != "off"
         self.update_shuffle(self.__shuffle)
         
     def __notify_progress(self, ms):
