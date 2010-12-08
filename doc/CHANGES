@@ -1,3 +1,15 @@
+Release 0.9.3.2 (in development)
+================================
+
+This is a minor bug fix release.
+
+Player adapters
+---------------
+
+  * Banshee: Adapted to DBus-API changes in 1.6.0 (see [issue 126][i126]).
+
+[i126]: http://code.google.com/p/remuco/issues/detail?id=126
+
 Release 0.9.3.1
 ===============
 
