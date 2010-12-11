@@ -42,8 +42,11 @@ public class VolumeDialog extends Dialog {
 		setContentView(R.layout.volume_dialog);
 		
 		volumeBar = (ProgressBar) findViewById(R.id.volume_dialog_volumebar);
-		volumeBar.setProgress(player.getPlayer().state.getVolume());
-		
+
+        if (player.getPlayer() != null) {
+            volumeBar.setProgress(player.getPlayer().state.getVolume());
+		}
+
 		player.addHandler(new Handler(){
 			@Override
 			public void handleMessage(Message msg) {
@@ -65,6 +68,8 @@ public class VolumeDialog extends Dialog {
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (player.getPlayer() == null) return false;
+
 		switch(keyCode){
 		case KeyEvent.KEYCODE_VOLUME_UP:
 			player.getPlayer().ctrlVolume(1);
