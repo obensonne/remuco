@@ -3,8 +3,12 @@
     <string name="app_name">Remuco</string>
 
 
+<string name="connect_dialog_type">Type</string>
+<string name="connect_dialog_wifi">Wifi</string>
+<string name="connect_dialog_bluetooth">Bluetooth</string>
 <string name="connect_dialog_hostname">Hostname</string>
 <string name="connect_dialog_port">Port</string>
+<string name="connect_dialog_bluedevice">Bluetooth device</string>
 <string name="connect_dialog_title">Connect to Remuco</string>
 <string name="connection_failed">connection failed</string>
 <string name="connecting">connecting to host \&quot;%s\&quot;</string>

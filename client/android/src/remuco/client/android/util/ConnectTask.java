@@ -2,22 +2,33 @@ package remuco.client.android.util;
 
 import java.util.TimerTask;
 
-import remuco.client.android.io.Socket;
+import remuco.client.android.io.WifiSocket;
+import remuco.client.android.io.BluetoothSocket;
 import remuco.client.common.UserException;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.io.Connection;
 import remuco.client.common.io.Connection.IConnectionListener;
+import remuco.client.common.io.ISocket;
 import remuco.client.common.util.Log;
 
 public class ConnectTask extends TimerTask {
 
+    public final static int WIFI = 0;
+    public final static int BLUETOOTH = 1;
+
+    private int type;
 	private String hostname;
 	private int port;
 	private ClientInfo clientInfo;
 	private IConnectionListener connectionListener;
 	
 	
-	public ConnectTask(String hostname, int port, ClientInfo clientInfo, IConnectionListener connectionListener) {
+	public ConnectTask(int type, String hostname, ClientInfo clientInfo, IConnectionListener connectionListener) {
+        this(type, hostname, 0, clientInfo, connectionListener);
+    }
+	
+	public ConnectTask(int type, String hostname, int port, ClientInfo clientInfo, IConnectionListener connectionListener) {
+        this.type = type;
 		this.hostname = hostname;
 		this.port = port;
 		this.clientInfo = clientInfo;
@@ -28,29 +39,54 @@ public class ConnectTask extends TimerTask {
 
 	@Override
 	public void run() {
-		Log.ln("[CT] trying to connect to " + hostname + " " + port);
-		
-		/*
-		 * Create a socket (note that Socket is a wrapper around java.net.Socket
-		 * which implements ISocket - this is because we need a uniform socket
-		 * interface for JavaME and Android clients). The socket parameters are
-		 * for connecting to localhost from an emulated Android device. The
-		 * socket creation should be done in an extra thread (e.g. using the
-		 * MainLoop) to not block the UI.
-		 */
-		
-		Socket s = null;
-		try {
-			s = new Socket(hostname, port);
-		} catch (UserException e) {
-			Log.ln("[CT] socket creation failed: ", e);
-			
-			// tell the view that we have no connection
-			connectionListener.notifyDisconnected(s, e);
-			
-			return;
-		}
+		Log.ln("[CT] trying to connect " + type + " to " + hostname + " " + port);
+        ISocket s = null;
 
+        if (type == WIFI) {
+            /*
+             * Create a socket (note that WifiSocket is a wrapper around java.net.Socket
+             * which implements ISocket - this is because we need a uniform socket
+             * interface for JavaME and Android clients). The socket parameters are
+             * for connecting to localhost from an emulated Android device. The
+             * socket creation should be done in an extra thread (e.g. using the
+             * MainLoop) to not block the UI.
+             */
+		
+            try {
+                s = new WifiSocket(hostname, port);
+            } catch (UserException e) {
+                Log.ln("[CT] Wifi socket creation failed: ", e);
+			
+                // tell the view that we have no connection
+                connectionListener.notifyDisconnected(s, e);
+			
+                return;
+            }
+        }
+
+        if (type == BLUETOOTH) {
+            /*
+             * Create a socket (note that BluetoothSocket is a wrapper around android.bluetooth.BluetoothSocket
+             * which implements ISocket - this is because we need a uniform socket
+             * interface for JavaME and Android clients). The socket parameters are
+             * for connecting to localhost from an emulated Android device. The
+             * socket creation should be done in an extra thread (e.g. using the
+             * MainLoop) to not block the UI.
+             */
+		
+            try {
+                s = new BluetoothSocket(hostname);
+            } catch (UserException e) {
+                Log.ln("[CT] Bluetooth socket creation failed: ", e);
+			
+                // tell the view that we have no connection
+                connectionListener.notifyDisconnected(s, e);
+			
+                return;
+            }
+        }
+
+        if (s == null) return;
 		
 		/* 
 		 * Given the socket and the client info, we can set up a connection. A

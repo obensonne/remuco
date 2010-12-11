@@ -13,7 +13,7 @@ import remuco.client.common.io.ISocket;
  * Wrapper for a regular socket to be used as an {@link ISocket} a
  * {@link Connection} object.
  */
-public class Socket implements ISocket {
+public class WifiSocket implements ISocket {
 
 	public static final int PORT_DEFAULT = 34271;
 
@@ -33,7 +33,7 @@ public class Socket implements ISocket {
 	 * @throws UserException
 	 *             if setting up the socket and connection fails
 	 */
-	public Socket(String host, int port) throws UserException {
+	public WifiSocket(String host, int port) throws UserException {
 
 		try {
 			this.sock = new java.net.Socket(host, port);

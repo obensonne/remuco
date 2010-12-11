@@ -33,12 +33,22 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	// --- connection related methods
 	
 	/**
-	 * connects to a remote remuco server
+	 * connects to a wifi remote remuco server
+	 * @param hostname the host to connect to
+	 * @param port the port to connect to
+	 * @param clientInfo client info describing this client
+	 */
+	public void connectWifi(String hostname, int port, ClientInfo clientInfo){
+		MainLoop.schedule(new ConnectTask(ConnectTask.WIFI, hostname, port, clientInfo, this));
+	}
+
+	/**
+	 * connects to a bluetooth remote remuco server
 	 * @param hostname the host to connect to
 	 * @param clientInfo client info describing this client
 	 */
-	public void connect(String hostname, int port, ClientInfo clientInfo){
-		MainLoop.schedule(new ConnectTask(hostname, port, clientInfo, this));
+	public void connectBluetooth(String hostname, ClientInfo clientInfo){
+		MainLoop.schedule(new ConnectTask(ConnectTask.BLUETOOTH, hostname, clientInfo, this));
 	}
 	
 	/**

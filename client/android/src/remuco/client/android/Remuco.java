@@ -3,7 +3,7 @@ package remuco.client.android;
 
 import java.util.Hashtable;
 
-import remuco.client.android.io.Socket;
+import remuco.client.android.io.WifiSocket;
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
@@ -41,8 +41,10 @@ public class Remuco extends Activity implements OnClickListener{
 	private SharedPreferences preference;
 	
 	public static final String PREF_NAME = "remucoPreference";
+	private static final String LAST_TYPE = "connect_dialog_last_type";
 	private static final String LAST_HOSTNAME = "connect_dialog_last_hostnames";
 	private static final String LAST_PORT = "connect_dialog_last_ports";
+	private static final String LAST_BLUEDEVICE = "connect_dialog_last_bluedevices";
 	
 	// --- the player adapter
 	private PlayerAdapter player;
@@ -174,10 +176,14 @@ public class Remuco extends Activity implements OnClickListener{
 		
 		
 		// --- try to connect to the last hostname
+        int lastType = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
 		String lastHostname = preference.getString(LAST_HOSTNAME, "");
-		int lastPort = preference.getInt(LAST_PORT, Socket.PORT_DEFAULT);
-		if( !lastHostname.equals("") ){
-			player.connect(lastHostname, lastPort, clientInfo);
+		int lastPort = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
+        String lastBluedevice = preference.getString(LAST_BLUEDEVICE, "");
+		if ((lastType == R.id.connect_dialog_wifi) && (!lastHostname.equals(""))) {
+			player.connectWifi(lastHostname, lastPort, clientInfo);
+		} else if ((lastType == R.id.connect_dialog_bluetooth) && (!lastBluedevice.equals(""))) {
+			player.connectBluetooth(lastBluedevice, clientInfo);
 		}
 		
 	}
@@ -302,13 +308,22 @@ public class Remuco extends Activity implements OnClickListener{
 				public void onDismiss(DialogInterface dialog) {
 					
 					// connect to host
+                    int type = ((ConnectDialog)dialog).getSelectedType();
 					String hostname = ((ConnectDialog)dialog).getSelectedHostname();
-					int port = ((ConnectDialog)dialog).getSelectedPort();
-					player.connect(hostname, port, clientInfo);
+                    int port = ((ConnectDialog)dialog).getSelectedPort();
+                    String bluedevice = ((ConnectDialog)dialog).getSelectedBluedevice();
+                    if (type == R.id.connect_dialog_wifi) {
+                        player.connectWifi(hostname, port, clientInfo);
+                    } else if (type == R.id.connect_dialog_bluetooth) {
+                        player.connectBluetooth(bluedevice, clientInfo);
+                    }
 					
 					// save new address in preferences
 					SharedPreferences.Editor editor = preference.edit();
+					editor.putInt(LAST_TYPE, type);
 					editor.putString(LAST_HOSTNAME, hostname);
+                    editor.putInt(LAST_PORT, port);
+                    editor.putString(LAST_BLUEDEVICE, bluedevice);
 					editor.commit();
 				}
 			});
@@ -339,10 +354,14 @@ public class Remuco extends Activity implements OnClickListener{
 			ConnectDialog cDialog = (ConnectDialog)dialog;
 			
 			// set last hostname port
+			int type = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
+			cDialog.setType(type);
 			String hostname = preference.getString(LAST_HOSTNAME, "");
 			cDialog.setHostname(hostname);
-			int port = preference.getInt(LAST_PORT, Socket.PORT_DEFAULT);
+			int port = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
 			cDialog.setPort(port);
+            String bluedevice = preference.getString(LAST_BLUEDEVICE, "");
+			cDialog.setBluedevice(bluedevice);
 			
 			break;
 		

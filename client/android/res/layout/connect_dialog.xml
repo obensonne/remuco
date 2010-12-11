@@ -5,7 +5,30 @@
 	android:layout_height="wrap_content"
 	android:padding="10px" 
 	android:orientation="vertical">
-  
+
+  <RadioGroup 
+     android:id="@+id/connect_dialog_type" 
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal">
+    <RadioButton 
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content" 
+       android:id="@+id/connect_dialog_wifi" 
+       android:text="Wifi" 
+       android:checked="true" 
+       android:textSize="20sp"
+       />
+    <RadioButton 
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content" 
+       android:id="@+id/connect_dialog_bluetooth" 
+       android:text="Bluetooth" 
+       android:checked="false" 
+       android:textSize="20sp"
+       />
+  </RadioGroup>
+
   	<EditText android:id="@+id/connect_dialog_hostname" 
   		android:layout_width="fill_parent" 
   		android:layout_height="wrap_content"
@@ -17,6 +40,13 @@
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
        />
+
+    <ListView android:id="@+id/connect_dialog_bluedevice"
+  		android:layout_width="fill_parent" 
+  		android:layout_height="wrap_content"
+        android:stackFromBottom="true"
+        android:layout_weight="1"
+        />
 
   	<LinearLayout 
   		android:layout_width="fill_parent"
