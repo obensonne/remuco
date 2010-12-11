@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import net.technologichron.manacalc.NumberPicker;
 
 public class ConnectDialog extends Dialog implements OnClickListener{
 
@@ -19,6 +20,7 @@ public class ConnectDialog extends Dialog implements OnClickListener{
 	Button cancelButton;
 	
 	EditText hostnameTV;
+ 	NumberPicker portTV;
 	
 	public ConnectDialog(Context context, PlayerAdapter player) {
 		super(context);
@@ -36,6 +38,7 @@ public class ConnectDialog extends Dialog implements OnClickListener{
 		cancelButton = (Button) findViewById(R.id.connect_dialog_cancel_button);
 	
 		hostnameTV = (EditText) findViewById(R.id.connect_dialog_hostname);
+ 		portTV = (NumberPicker) findViewById(R.id.connect_dialog_port);
 
 		// setup listener
 		okButton.setOnClickListener(this);
@@ -48,6 +51,14 @@ public class ConnectDialog extends Dialog implements OnClickListener{
 
 	public String getSelectedHostname(){
 		return hostnameTV.getText().toString();
+	}
+
+	public void setPort(int port){
+		portTV.setValue(port);
+	}
+
+	public int getSelectedPort(){
+		return portTV.getValue();
 	}
 	
 	@Override

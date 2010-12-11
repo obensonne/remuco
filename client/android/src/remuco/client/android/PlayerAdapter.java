@@ -37,8 +37,8 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	 * @param hostname the host to connect to
 	 * @param clientInfo client info describing this client
 	 */
-	public void connect(String hostname, ClientInfo clientInfo){
-		MainLoop.schedule(new ConnectTask(hostname, clientInfo, this));
+	public void connect(String hostname, int port, ClientInfo clientInfo){
+		MainLoop.schedule(new ConnectTask(hostname, port, clientInfo, this));
 	}
 	
 	/**

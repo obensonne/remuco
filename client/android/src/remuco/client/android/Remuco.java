@@ -3,6 +3,7 @@ package remuco.client.android;
 
 import java.util.Hashtable;
 
+import remuco.client.android.io.Socket;
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
@@ -41,6 +42,7 @@ public class Remuco extends Activity implements OnClickListener{
 	
 	public static final String PREF_NAME = "remucoPreference";
 	private static final String LAST_HOSTNAME = "connect_dialog_last_hostnames";
+	private static final String LAST_PORT = "connect_dialog_last_ports";
 	
 	// --- the player adapter
 	private PlayerAdapter player;
@@ -173,8 +175,9 @@ public class Remuco extends Activity implements OnClickListener{
 		
 		// --- try to connect to the last hostname
 		String lastHostname = preference.getString(LAST_HOSTNAME, "");
+		int lastPort = preference.getInt(LAST_PORT, Socket.PORT_DEFAULT);
 		if( !lastHostname.equals("") ){
-			player.connect(lastHostname, clientInfo);
+			player.connect(lastHostname, lastPort, clientInfo);
 		}
 		
 	}
@@ -300,7 +303,8 @@ public class Remuco extends Activity implements OnClickListener{
 					
 					// connect to host
 					String hostname = ((ConnectDialog)dialog).getSelectedHostname();
-					player.connect(hostname, clientInfo);
+					int port = ((ConnectDialog)dialog).getSelectedPort();
+					player.connect(hostname, port, clientInfo);
 					
 					// save new address in preferences
 					SharedPreferences.Editor editor = preference.edit();
@@ -334,9 +338,11 @@ public class Remuco extends Activity implements OnClickListener{
 			
 			ConnectDialog cDialog = (ConnectDialog)dialog;
 			
-			// set last hostname
+			// set last hostname port
 			String hostname = preference.getString(LAST_HOSTNAME, "");
 			cDialog.setHostname(hostname);
+			int port = preference.getInt(LAST_PORT, Socket.PORT_DEFAULT);
+			cDialog.setPort(port);
 			
 			break;
 		

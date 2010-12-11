@@ -12,12 +12,14 @@ import remuco.client.common.util.Log;
 public class ConnectTask extends TimerTask {
 
 	private String hostname;
+	private int port;
 	private ClientInfo clientInfo;
 	private IConnectionListener connectionListener;
 	
 	
-	public ConnectTask(String hostname, ClientInfo clientInfo, IConnectionListener connectionListener) {
+	public ConnectTask(String hostname, int port, ClientInfo clientInfo, IConnectionListener connectionListener) {
 		this.hostname = hostname;
+		this.port = port;
 		this.clientInfo = clientInfo;
 		this.connectionListener = connectionListener;
 	}
@@ -26,7 +28,7 @@ public class ConnectTask extends TimerTask {
 
 	@Override
 	public void run() {
-		Log.ln("[CT] trying to connect to " + hostname);
+		Log.ln("[CT] trying to connect to " + hostname + " " + port);
 		
 		/*
 		 * Create a socket (note that Socket is a wrapper around java.net.Socket
@@ -39,7 +41,7 @@ public class ConnectTask extends TimerTask {
 		
 		Socket s = null;
 		try {
-			s = new Socket(hostname, Socket.PORT_DEFAULT);
+			s = new Socket(hostname, port);
 		} catch (UserException e) {
 			Log.ln("[CT] socket creation failed: ", e);
 			
