@@ -90,12 +90,15 @@
     <!-- Properties -->
 
     <property name="android-tools" value="${sdk-location}/tools" />
+    <property name="android.platform.tools.dir" location="${sdk.dir}/platform-tools" />
 
     <!-- Input directories -->
     <property name="source-folder" value="src" />
     <property name="source-folder-common" value="../common/src" />
     <property name="gen-folder" value="gen" />
+    <property name="gen.absolute.dir" location="${gen-folder}" />
     <property name="resource-folder" value="res" />
+    <property name="resource.absolute.dir" location="${resource-folder}" />
     <property name="asset-folder" value="assets" />
     <property name="source-location" value="${basedir}/${source-folder}" />
 
@@ -117,6 +120,8 @@
     <!-- Intermediate files -->
     <property name="dex-file" value="classes.dex" />
     <property name="intermediate-dex" value="${out-folder}/${dex-file}" />
+    <property name="resource.package.file.name"
+                  value="${ant.project.name}.ap_" />
     <!-- dx does not properly support incorrect / or \ based on the platform
          and Ant cannot convert them because the parameter is not a valid path.
          Because of this we have to compute different paths depending on the platform. -->
@@ -131,7 +136,7 @@
 
     <!-- Tools -->
     <condition property="exe" value=".exe" else=""><os family="windows"/></condition>
-    <property name="adb" value="${android-tools}/adb${exe}"/>
+    <property name="adb" location="${android.platform.tools.dir}/adb${exe}" />
 
     <!-- rules -->
 
@@ -148,18 +153,14 @@
     <!-- Generate the R.java file for this project's resources. -->
     <target name="resource-src" depends="dirs">
         <echo>Generating R.java / Manifest.java from the resources...</echo>
-        <exec executable="${aapt}" failonerror="true">
-            <arg value="package" />
-            <arg value="-m" />
-            <arg value="-J" />
-            <arg path="${gen-folder}" />
-            <arg value="-M" />
-            <arg path="AndroidManifest.xml" />
-            <arg value="-S" />
-            <arg path="${resource-folder}" />
-            <arg value="-I" />
-            <arg path="${android-jar}" />
-        </exec>
+        <aaptexec executable="${aapt}"
+                command="package"
+                verbose="false"
+                manifest="AndroidManifest.xml"
+                androidjar="${android.jar}"
+                rfolder="${gen.absolute.dir}">
+            <res path="${resource.absolute.dir}" />
+        </aaptexec>
     </target>
 
     <!-- Generate java classes from .aidl files. -->
@@ -210,12 +211,16 @@
         <echo>Packaging resources</echo>
         <aaptexec executable="${aapt}"
                 command="package"
+                versioncode=""
+                debug="true"
                 manifest="AndroidManifest.xml"
-                resources="${resource-folder}"
                 assets="${asset-folder}"
-                androidjar="${android-jar}"
-                outfolder="${out-folder}"
-                basename="${ant.project.name}" />
+                androidjar="${android.jar}"
+                apkfolder="${out-folder}"
+                resourcefilename="${resource.package.file.name}"
+                resourcefilter="">
+            <res path="${resource.absolute.dir}" />
+        </aaptexec>
     </target>
 
     <!-- Package the application and sign it with a debug key.
@@ -223,10 +228,11 @@
     <target name="debug" depends="dex, package-resources">
         <apkbuilder
                 outfolder="${out-folder}"
-                basename="${ant.project.name}"
-                signed="true"
+                resourcefile="${resource.package.file.name}"
+                apkfilepath="${out-debug-package}"
+                debugsigning="true"
                 verbose="false">
-            <file path="${intermediate-dex}" />
+            <dex path="${intermediate-dex}" />
             <sourcefolder path="${source-folder}" />
             <sourcefolder path="${source-folder-common}" />
             <jarfolder path="${external-libs-folder}" />
@@ -239,10 +245,11 @@
     <target name="release" depends="dex, package-resources">
         <apkbuilder
                 outfolder="${out-folder}"
-                basename="${ant.project.name}"
-                signed="false"
+                resourcefile="${resource.package.file.name}"
+                apkfilepath="${out-debug-package}"
+                debugsigning="true"
                 verbose="false">
-            <file path="${intermediate-dex}" />
+            <dex path="${intermediate-dex}" />
             <sourcefolder path="${source-folder}" />
             <sourcefolder path="${source-folder-common}" />
             <jarfolder path="${external-libs-folder}" />
