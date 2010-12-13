@@ -18,7 +18,6 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-
 package remuco.client.android.dialogs;
 
 import remuco.client.android.MessageFlag;
@@ -32,11 +31,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 public class VolumeDialog extends Dialog {
 
-	private ProgressBar volumeBar;
+	private SeekBar volumeBar;
 	private PlayerAdapter player;
 	
 	private Handler dismissHandler;
@@ -62,9 +61,9 @@ public class VolumeDialog extends Dialog {
 		setTitle(R.string.volume_dialog_title);
 		setContentView(R.layout.volume_dialog);
 		
-		volumeBar = (ProgressBar) findViewById(R.id.volume_dialog_volumebar);
+		volumeBar = (SeekBar) findViewById(R.id.volume_dialog_volumebar);
 
-        if (player.getPlayer() != null) {
+        if (player.getPlayer() != null && player.getPlayer().state != null) {
             volumeBar.setProgress(player.getPlayer().state.getVolume());
 		}
 

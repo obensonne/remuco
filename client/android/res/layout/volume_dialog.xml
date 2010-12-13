@@ -14,7 +14,7 @@
 		/ -->
 		
 		
-	<ProgressBar android:id="@+id/volume_dialog_volumebar"
+	<SeekBar android:id="@+id/volume_dialog_volumebar"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content" 
 		/>

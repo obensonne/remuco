@@ -62,8 +62,14 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
 		ratingBar = (RatingBar) findViewById(R.id.rating_dialog_rating_bar);
 		
 		// TODO: this will break pretty sure as soon as there is no player or item ...
-		ratingBar.setNumStars(player.getPlayer().info.getMaxRating());
-		ratingBar.setProgress(player.getPlayer().item.getRating());
+        if (player.getPlayer() != null) {
+            if (player.getPlayer().info != null) {
+                ratingBar.setNumStars(player.getPlayer().info.getMaxRating());
+            }
+            if (player.getPlayer().item != null) {
+                ratingBar.setProgress(player.getPlayer().item.getRating());
+            }
+        }
 		ratingBar.setStepSize(1);
 		
 		ratingBar.setOnRatingBarChangeListener(this);
@@ -94,6 +100,7 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
 	@Override
 	public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 		if(!fromUser) return;
+		if(player.getPlayer() == null) return;
 		player.getPlayer().ctrlRate((int)Math.ceil(rating));
 	}
 
