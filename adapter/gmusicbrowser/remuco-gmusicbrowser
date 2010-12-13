@@ -1,0 +1,146 @@
+#!/usr/bin/python
+
+# =============================================================================
+#
+#    Remuco - A remote control system for media players.
+#    Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+#
+#    This file is part of Remuco.
+#
+#    Remuco is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Remuco is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+#
+# =============================================================================
+
+
+
+"""Gmusicbrowser adapter for Remuco, implemented as an executable script.
+	By Sayan "Riju" Chakrabarti <me[at]sayanriju.co.cc>
+"""
+import dbus
+from dbus.exceptions import DBusException
+
+import remuco
+from remuco import log
+
+
+class GmusicbrowserAdapter(remuco.PlayerAdapter):
+
+    def __init__(self):
+        remuco.PlayerAdapter.__init__(self, "Gmusicbrowser",
+                                      progress_known=True,
+                                      playback_known=True,
+                                      volume_known=True)
+        self.__ad = None
+        self.__songLen=0
+        self.__pos=0
+        # Following is the value (100%) to which both the player
+        # volume and the client volume is set when either the adapter
+        # started OR the client is unmuted.
+        self.__vol=100
+
+    def start(self):
+        remuco.PlayerAdapter.start(self)
+        log.debug("here we go")
+        try:
+            bus = dbus.SessionBus()
+            obj = bus.get_object("org.gmusicbrowser","/org/gmusicbrowser")
+            self.__ad = dbus.Interface(obj, "org.gmusicbrowser")
+        except DBusException, e:
+            raise StandardError("dbus error: %s" % e)
+
+        # Set Current Song at start
+        self.poll()
+        # Increase player vol until its 100% to match client vol
+        for i in range(0,10):
+            self.__ad.RunCommand("IncVolume")
+        self.update_volume(self.__vol)
+
+    def stop(self):
+        remuco.PlayerAdapter.stop(self)
+        log.debug("bye, turning off the light")
+        self.__ad = None
+
+    def poll(self):
+        item = self.__ad.CurrentSong()
+        self.__songLen = int(item['length'])
+        self.__pos=int(self.__ad.GetPosition())
+        playing = self.__ad.Playing()
+        self.update_item('',item,'')
+        self.update_progress(self.__pos,self.__songLen)
+        if playing:
+            self.update_playback(remuco.PLAYBACK_PLAY)
+        else:
+            self.update_playback(remuco.PLAYBACK_PAUSE)
+        self.update_volume(self.__vol)
+
+
+
+    # =========================================================================
+    # control interface
+    # =========================================================================
+
+    def ctrl_toggle_playing(self):
+        log.debug("toggle FooPlay's playing status")
+        self.__ad.RunCommand("PlayPause")
+        self.poll()
+
+    def ctrl_next(self):
+        self.__ad.RunCommand("NextSongInPlaylist")
+        self.poll()
+
+    def ctrl_previous(self):
+        self.__ad.RunCommand("PrevSongInPlaylist")
+        self.poll()
+
+    def ctrl_volume(self, direction):
+        if direction == 0:
+            self.__ad.RunCommand("TogMute")
+            if self.__vol != 0:
+                self.__vol=0
+            else:
+                self.__vol=100
+                for i in range(0,10):
+                    self.__ad.RunCommand("IncVolume")
+        elif direction == -1:
+            self.__ad.RunCommand("DecVolume")
+            self.__vol=(self.__vol -10) if self.__vol>=10 else 0
+        else:
+            self.__ad.RunCommand("IncVolume")
+            self.__vol=(self.__vol+10) if self.__vol<=90 else 100
+
+        self.update_volume(self.__vol)
+
+    def ctrl_seek(self, direction):
+        if direction == -1:
+            self.__ad.RunCommand("Rewind 5")
+        else:
+            self.__ad.RunCommand("Forward 5")
+        self.poll()
+
+
+    # =========================================================================
+    # request interface
+    # =========================================================================
+
+    # NOT YET IMPLEMENTED IN GMUSICBROWSER
+
+
+# =============================================================================
+# main (example startup using remuco.Manager)
+# =============================================================================
+
+if __name__ == '__main__':
+    pa = GmusicbrowserAdapter() # create the player adapter
+    mg = remuco.Manager(pa,dbus_name="org.gmusicbrowser")# # pass it to a manager
+    mg.run() # run the manager (blocks until interrupt signal
