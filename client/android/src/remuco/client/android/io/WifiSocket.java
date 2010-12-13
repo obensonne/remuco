@@ -1,3 +1,23 @@
+/*   
+ *   Remuco - A remote control system for media players.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *
+ *   This file is part of Remuco.
+ *
+ *   Remuco is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   Remuco is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+ *   
+ */
 package remuco.client.android.io;
 
 import java.io.IOException;
@@ -13,7 +33,7 @@ import remuco.client.common.io.ISocket;
  * Wrapper for a regular socket to be used as an {@link ISocket} a
  * {@link Connection} object.
  */
-public class Socket implements ISocket {
+public class WifiSocket implements ISocket {
 
 	public static final int PORT_DEFAULT = 34271;
 
@@ -33,7 +53,7 @@ public class Socket implements ISocket {
 	 * @throws UserException
 	 *             if setting up the socket and connection fails
 	 */
-	public Socket(String host, int port) throws UserException {
+	public WifiSocket(String host, int port) throws UserException {
 
 		try {
 			this.sock = new java.net.Socket(host, port);

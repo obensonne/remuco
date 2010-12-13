@@ -1,3 +1,24 @@
+/*   
+ *   Remuco - A remote control system for media players.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *
+ *   This file is part of Remuco.
+ *
+ *   Remuco is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   Remuco is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+ *   
+ */
+
 package remuco.client.android.dialogs;
 
 import remuco.client.android.MessageFlag;
@@ -41,8 +62,14 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
 		ratingBar = (RatingBar) findViewById(R.id.rating_dialog_rating_bar);
 		
 		// TODO: this will break pretty sure as soon as there is no player or item ...
-		ratingBar.setNumStars(player.getPlayer().info.getMaxRating());
-		ratingBar.setProgress(player.getPlayer().item.getRating());
+        if (player.getPlayer() != null) {
+            if (player.getPlayer().info != null) {
+                ratingBar.setNumStars(player.getPlayer().info.getMaxRating());
+            }
+            if (player.getPlayer().item != null) {
+                ratingBar.setProgress(player.getPlayer().item.getRating());
+            }
+        }
 		ratingBar.setStepSize(1);
 		
 		ratingBar.setOnRatingBarChangeListener(this);
@@ -73,6 +100,7 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
 	@Override
 	public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 		if(!fromUser) return;
+		if(player.getPlayer() == null) return;
 		player.getPlayer().ctrlRate((int)Math.ceil(rating));
 	}
 

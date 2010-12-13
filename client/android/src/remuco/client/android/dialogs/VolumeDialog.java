@@ -1,3 +1,23 @@
+/*   
+ *   Remuco - A remote control system for media players.
+ *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *
+ *   This file is part of Remuco.
+ *
+ *   Remuco is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   Remuco is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
+ *   
+ */
 package remuco.client.android.dialogs;
 
 import remuco.client.android.MessageFlag;
@@ -11,11 +31,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 public class VolumeDialog extends Dialog {
 
-	private ProgressBar volumeBar;
+	private SeekBar volumeBar;
 	private PlayerAdapter player;
 	
 	private Handler dismissHandler;
@@ -41,9 +61,12 @@ public class VolumeDialog extends Dialog {
 		setTitle(R.string.volume_dialog_title);
 		setContentView(R.layout.volume_dialog);
 		
-		volumeBar = (ProgressBar) findViewById(R.id.volume_dialog_volumebar);
-		volumeBar.setProgress(player.getPlayer().state.getVolume());
-		
+		volumeBar = (SeekBar) findViewById(R.id.volume_dialog_volumebar);
+
+        if (player.getPlayer() != null && player.getPlayer().state != null) {
+            volumeBar.setProgress(player.getPlayer().state.getVolume());
+		}
+
 		player.addHandler(new Handler(){
 			@Override
 			public void handleMessage(Message msg) {
@@ -65,6 +88,8 @@ public class VolumeDialog extends Dialog {
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (player.getPlayer() == null) return false;
+
 		switch(keyCode){
 		case KeyEvent.KEYCODE_VOLUME_UP:
 			player.getPlayer().ctrlVolume(1);
