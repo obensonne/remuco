@@ -41,7 +41,6 @@ import android.os.Message;
 public class PlayerAdapter implements IConnectionListener, IItemListener, IProgressListener, IStateListener{
 
 	private static final int PING_INTERVAL = 5;
-	
 	Player player;
 	
 	ArrayList<Handler> handlers;
@@ -49,7 +48,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	public PlayerAdapter() {
 		handlers = new ArrayList<Handler>();
 	}
-	
+
 	// --- connection related methods
 	
 	/**
@@ -188,5 +187,10 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 		handlers.remove(h);
 	}
 
+	public void clearHandlers(){
+		Log.debug("[PA] clear handler");
+		handlers.clear();
+	}
+	
 	
 }
