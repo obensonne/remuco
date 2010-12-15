@@ -15,7 +15,7 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content" 
        android:id="@+id/connect_dialog_wifi" 
-       android:text="Wifi" 
+       android:text="@string/connect_dialog_wifi" 
        android:checked="true" 
        android:textSize="20sp"
        />
@@ -23,7 +23,7 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content" 
        android:id="@+id/connect_dialog_bluetooth" 
-       android:text="Bluetooth" 
+       android:text="@string/connect_dialog_bluetooth" 
        android:checked="false" 
        android:textSize="20sp"
        />
