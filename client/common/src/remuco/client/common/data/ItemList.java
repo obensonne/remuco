@@ -47,7 +47,7 @@ public final class ItemList implements ISerializable {
 
 	private static final int TYPE_FILES = Message.REQ_FILES;
 
-	private static final String UNKNWON = "#~@X+.YO?/";
+	public static final String UNKNWON = "#~@X+.YO?/";
 
 	/**
 	 * Some list names have a special format which needs to be changed before
