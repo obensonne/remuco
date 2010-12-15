@@ -45,7 +45,7 @@ public class BluetoothSocket implements ISocket {
 
 	private final android.bluetooth.BluetoothSocket sock;
 
-	private boolean isLooped = false;
+	private boolean isClosed = false;
 
 	/** Remuco service UUID */
 	private final UUID REMUCO_UUID = UUID.fromString("025fe2ae-0762-4bed-90f2-d8d778f020fe");
@@ -69,6 +69,7 @@ public class BluetoothSocket implements ISocket {
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(host);
 			this.sock = device.createRfcommSocketToServiceRecord(REMUCO_UUID);
             this.sock.connect();
+            isClosed = false;
 		} catch (SecurityException e) {
 			throw new UserException("Connection Error",
 					"Not allowed to connect.");
@@ -104,6 +105,8 @@ public class BluetoothSocket implements ISocket {
 
 	@Override
 	public void close() {
+        if (isClosed) return;
+        isClosed = true;
 		try {
 			sock.close();
 		} catch (IOException e) {
