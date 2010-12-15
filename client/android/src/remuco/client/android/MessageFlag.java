@@ -39,5 +39,7 @@ public abstract class MessageFlag {
 	public static final int CTRL_VOLUME_DOWN	= 34;
 	public static final int CTRL_RATE 			= 35;
 	
+	public static final int PLAYLIST = 40;
+	public static final int QUEUE = 41;
 	
 }

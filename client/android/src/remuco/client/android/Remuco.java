@@ -21,32 +21,21 @@
 
 package remuco.client.android;
 
-import java.util.Hashtable;
-
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.dialogs.VolumeDialog;
-import remuco.client.android.util.AndroidLogPrinter;
-import remuco.client.common.MainLoop;
-import remuco.client.common.data.ClientInfo;
-import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.util.Log;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,25 +44,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Remuco extends Activity implements OnClickListener{
+public class Remuco extends RemucoActivity implements OnClickListener{
 
-	// --- preferences
-	private SharedPreferences preference;
-	
-	public static final String PREF_NAME = "remucoPreference";
-	private static final String LAST_TYPE = "connect_dialog_last_type";
-	private static final String LAST_HOSTNAME = "connect_dialog_last_hostnames";
-	private static final String LAST_PORT = "connect_dialog_last_ports";
-	private static final String LAST_BLUEDEVICE = "connect_dialog_last_bluedevices";
-	
-	// --- the player adapter
-	private PlayerAdapter player;
-	
-	
-	
-	// --- client info
-	private ClientInfo clientInfo;
-	
 	// --- dialog ids
 	private static final int CONNECT_DIALOG = 1;
 	private static final int VOLUME_DIALOG = 2;
@@ -114,9 +86,6 @@ public class Remuco extends Activity implements OnClickListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		
-		Log.debug("--- onCreate()");
-		
 		// ------
 		// android related initialization
 		// ------
@@ -139,9 +108,6 @@ public class Remuco extends Activity implements OnClickListener{
 		infoArtist.setText("use the menu to connect");
 		infoAlbum.setText("to your remuco server");
 
-		// --- load preferences
-		preference = getPreferences(Context.MODE_PRIVATE);
-
 		// --- create view handler
 		viewHandler = new ViewHandler(this);
 		
@@ -149,63 +115,8 @@ public class Remuco extends Activity implements OnClickListener{
 		// remuco related initialization
 		// ------
 		
-		// --- set log output (classes in common use Log for logging)
-		Log.setOut(new AndroidLogPrinter());
-		
-		// --- enable the remuco main loop (timer thread)
-		MainLoop.enable();
-		
-		// --- construct client info
-		
-		// get screen size
-        WindowManager w = getWindowManager();
-        Display d = w.getDefaultDisplay();
-        int width = d.getWidth();
-        int height = d.getHeight(); 
-        
-        Log.debug("screensize: " + width + "x" + height);
-		
-        // use the smaller dimension
-        int imageSize = Math.min(width, height);
-        Log.debug("preferred image size: " + imageSize);
-
-        // create extra info
-
-		Hashtable<String,String> info = new Hashtable<String,String>();
-		
-		info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
-		Log.ln("running on : " + android.os.Build.MODEL);
-		
-		// afaik every android (so far) has a touchscreen and is using unicode
-		info.put("touch", "yes");
-		info.put("utf8", "yes");
-        
-        
-        // create client info
-		clientInfo = new ClientInfo(imageSize, "PNG", 50, info);
-		
-		// ------
-		// communication initialization
-		// ------
-		
-		// --- create player adapter
-		player = new PlayerAdapter();
-		
 		// --- register view handler at player
 		player.addHandler(viewHandler);
-		
-		
-		// --- try to connect to the last hostname
-        int lastType = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
-		String lastHostname = preference.getString(LAST_HOSTNAME, "");
-		int lastPort = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
-        String lastBluedevice = preference.getString(LAST_BLUEDEVICE, "");
-		if ((lastType == R.id.connect_dialog_wifi) && (!lastHostname.equals(""))) {
-			player.connectWifi(lastHostname, lastPort, clientInfo);
-		} else if ((lastType == R.id.connect_dialog_bluetooth) && (!lastBluedevice.equals(""))) {
-			player.connectBluetooth(lastBluedevice, clientInfo);
-		}
-		
 	}
 	
 	private void getViewHandles() {
@@ -227,51 +138,6 @@ public class Remuco extends Activity implements OnClickListener{
 		ctrlNext = (ImageButton) findViewById(R.id.CtrlNext);
 		ctrlShuffle = (ImageButton) findViewById(R.id.CtrlShuffle);
 		ctrlRepeat = (ImageButton) findViewById(R.id.CtrlRepeat);
-	}
-
-	
-	
-	/**
-	 * this method gets called after on create
-	 */
-	@Override
-	protected void onResume() {
-		super.onStart();
-		
-		Log.debug("--- onResume()");
-
-		// --- wake up the connection
-		player.resumeConnection();
-
-		
-
-		
-		
-		
-	}
-	
-	@Override
-	protected void onPause() {
-		super.onStop();
-		Log.debug("--- onPause()");
-		
-		// --- pause the connection if possible
-		player.pauseConnection();
-		
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
-		Log.debug("--- onDestroy()");
-
-		// stop the connection
-		player.disconnect();
-		
-		// disable the main loop (timer thread)
-		MainLoop.disable();
-
 	}
 
 	// --- Options Menu
@@ -296,6 +162,11 @@ public class Remuco extends Activity implements OnClickListener{
 		case R.id.options_menu_disconnect:
 			Log.ln("disconnect button pressed");
 			player.disconnect();
+			break;
+			
+		case R.id.options_menu_library:
+            final Intent intent = new Intent(this, RemucoLibrary.class);
+            startActivity(intent);
 			break;
 			
 		case R.id.options_menu_rate:
@@ -326,7 +197,8 @@ public class Remuco extends Activity implements OnClickListener{
 			cDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 				@Override
 				public void onDismiss(DialogInterface dialog) {
-					
+                    player.disconnect();
+
 					// connect to host
                     int type = ((ConnectDialog)dialog).getSelectedType();
 					String hostname = ((ConnectDialog)dialog).getSelectedHostname();

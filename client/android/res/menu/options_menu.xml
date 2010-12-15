@@ -3,7 +3,7 @@
 	<item android:id="@+id/options_menu_connect" 
 		android:icon="@android:drawable/ic_menu_share"
 		android:title="@string/options_menu_connect"/>
-		
 	<item android:id="@+id/options_menu_disconnect" android:title="@string/options_menu_disconnect"/>
-<item android:title="@string/options_menu_rate" android:id="@+id/options_menu_rate"></item>
+	<item android:id="@+id/options_menu_library" android:title="@string/options_menu_library"/>
+    <item android:title="@string/options_menu_rate" android:id="@+id/options_menu_rate"/>
 </menu>

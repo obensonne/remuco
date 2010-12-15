@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Remuco</string>
+    <string name="app_name_library">Remuco Library</string>
 
 
 <string name="connect_dialog_type">Type</string>
@@ -13,8 +14,13 @@
 <string name="connection_failed">Verbindung fehlgeschlagen</string>
 <string name="connecting">Verbinde zu \&quot;%s\&quot;</string>
 <string name="connection_successful">Verbindung zu \&quot;%s\&quot; hergestellt</string>
-<string name="volume_dialog_title">Remuco Lautstärke</string><string name="options_menu_connect">Verbinden</string>
+<string name="volume_dialog_title">Remuco Lautstärke</string>
+<string name="options_menu_connect">Verbinden</string>
 <string name="options_menu_disconnect">Trennen</string>
+<string name="options_menu_library">Library</string>
 <string name="options_menu_rate">Bewerten</string>
 <string name="rating_dialog_title">Bewerte Titel</string>
+
+<string name="library_prev">&lt;&lt;</string>
+<string name="library_next">&gt;&gt;</string>
 </resources>
