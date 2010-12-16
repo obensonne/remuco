@@ -119,6 +119,20 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 		player.addHandler(viewHandler);
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+        if (player.getPlayer() != null &&
+            player.getPlayer().getConnection() != null &&
+            !player.getPlayer().getConnection().isClosed())
+            viewHandler.setRunning(true);
+	}
+
+    public PlayerAdapter getPlayer(){
+        return player;
+    }
+
 	private void getViewHandles() {
 		// get view handles
 		infoTitle 	= (TextView) findViewById(R.id.infoTitle);

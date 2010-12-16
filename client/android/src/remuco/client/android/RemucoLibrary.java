@@ -82,6 +82,8 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
         reqHandler = new RequesterAdapter(this);
 		// --- register view handler at player
 		player.addHandler(reqHandler);
+
+        this.getPlaylist();
     }
 	
 	private void getViewHandles() {

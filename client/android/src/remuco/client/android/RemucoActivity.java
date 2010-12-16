@@ -143,7 +143,8 @@ public class RemucoActivity extends Activity{
 		Log.debug("--- " + this.getClass().getName() + ".onPause()");
 		
 		// --- pause the connection if possible
-        player.disconnect();
+        player.clearHandlers();
+        player.pauseConnection();
 	}
 
 }

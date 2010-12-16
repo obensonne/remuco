@@ -41,12 +41,17 @@ import android.os.Message;
 public class PlayerAdapter implements IConnectionListener, IItemListener, IProgressListener, IStateListener{
 
 	private static final int PING_INTERVAL = 5;
-	Player player;
+	private static Player player;
 	
 	ArrayList<Handler> handlers;
 	
 	public PlayerAdapter() {
 		handlers = new ArrayList<Handler>();
+        if (this.player != null) {
+            this.player.setItemListener(this);
+            this.player.setProgressListener(this);
+            this.player.setStateListener(this);
+        }
 	}
 
 	// --- connection related methods
@@ -58,6 +63,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	 * @param clientInfo client info describing this client
 	 */
 	public void connectWifi(String hostname, int port, ClientInfo clientInfo){
+        if (player != null && !player.getConnection().isClosed()) return;
 		MainLoop.schedule(new ConnectTask(ConnectTask.WIFI, hostname, port, clientInfo, this));
 	}
 
@@ -67,6 +73,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	 * @param clientInfo client info describing this client
 	 */
 	public void connectBluetooth(String hostname, ClientInfo clientInfo){
+        if (player != null && !player.getConnection().isClosed()) return;
 		MainLoop.schedule(new ConnectTask(ConnectTask.BLUETOOTH, hostname, clientInfo, this));
 	}
 	

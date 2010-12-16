@@ -48,6 +48,14 @@ public class ViewHandler extends Handler {
 		this.postDelayed(new Ticker(), 1000);
 	}
 
+    public void setRunning(boolean r) {
+        updateItemGui(remuco.getPlayer().getPlayer().item);
+        updateProgressGui(remuco.getPlayer().getPlayer().progress);
+        updateStateGui(remuco.getPlayer().getPlayer().state);
+
+        running = r;
+    }
+
 	@Override
 	public void handleMessage(Message msg) {
 
@@ -124,26 +132,7 @@ public class ViewHandler extends Handler {
 				break;
 			}
 			Item item = (Item)msg.obj;
-			
-			// get song metadata
-			String title = item.getMeta(Item.META_TITLE);
-			String artist = item.getMeta(Item.META_ARTIST);
-			String album = item.getMeta(Item.META_ALBUM);
-			
-			Log.ln(String.format("now playing: \"%s\" by \"%s\" on \"%s\"",
-					title, artist, album));
-			
-			// set song metadata
-			remuco.infoTitle.setText(title);
-			remuco.infoArtist.setText(artist);
-			remuco.infoAlbum.setText(album);
-
-			// set image
-			byte[] image = item.getImg();
-			convertByteArrayToImage(image);
-			
-			// update rating bar
-			remuco.infoRatingBar.setProgress(item.getRating());
+            updateItemGui(item);
 			
 			// done
 			break;
@@ -155,17 +144,7 @@ public class ViewHandler extends Handler {
 			
 			// msg.obj should be of type Progress
 			Progress progress = (Progress)msg.obj;
-			
-			
-			// set progress
-			// the actual progress is set every second in the ticker runnable
-			remuco.ctrlProgressBar.setMax(progress.getLength());
-			remuco.ctrlLength.setText(String.format("%02d:%02d", 
-					progress.getLength()/60,
-					progress.getLength()%60));
-			
-			// set tick
-			tick = progress.getProgress();
+			updateProgressGui(progress);
 			
 			break;
 			
@@ -200,7 +179,66 @@ public class ViewHandler extends Handler {
 			
 			// msg.obj should be of type State
 			State state = (State)msg.obj;
+
+            updateStateGui(state);
 			
+			break;
+			
+		}
+
+
+	}
+
+	// --- convert byte[] to image
+	private void convertByteArrayToImage(byte[] image) {
+		if(image == null || image.length == 0){
+			remuco.infoCover.setImageResource(R.drawable.remuco_128);
+
+            imageCache = null;
+		} else {
+			remuco.infoCover.setImageBitmap(
+					BitmapFactory.decodeByteArray(image, 0, image.length)
+			);
+			
+			imageCache = image;
+		}
+	}
+
+    private void updateItemGui(Item item) {
+        // get song metadata
+        String title = item.getMeta(Item.META_TITLE);
+        String artist = item.getMeta(Item.META_ARTIST);
+        String album = item.getMeta(Item.META_ALBUM);
+			
+        Log.ln(String.format("now playing: \"%s\" by \"%s\" on \"%s\"",
+                             title, artist, album));
+			
+        // set song metadata
+        remuco.infoTitle.setText(title);
+        remuco.infoArtist.setText(artist);
+        remuco.infoAlbum.setText(album);
+
+        // set image
+        byte[] image = item.getImg();
+        convertByteArrayToImage(image);
+			
+        // update rating bar
+        remuco.infoRatingBar.setProgress(item.getRating());
+    }
+
+    private void updateProgressGui(Progress progress) {
+        // set progress
+        // the actual progress is set every second in the ticker runnable
+        remuco.ctrlProgressBar.setMax(progress.getLength());
+        remuco.ctrlLength.setText(String.format("%02d:%02d", 
+					progress.getLength()/60,
+					progress.getLength()%60));
+			
+        // set tick
+        tick = progress.getProgress();
+    }	
+
+    private void updateStateGui(State state) {
 			// toggle playbutton icon
 			if(state.getPlayback() == State.PLAYBACK_PLAY){
 				Log.debug("[VH] playback = true");
@@ -235,28 +273,8 @@ public class ViewHandler extends Handler {
 //			
 //			if(vDialog!=null)
 //				vDialog.setVolume(player.state.getVolume());
-			
-			
-			break;
-			
-		}
+    }
 
-
-	}
-
-	// --- convert byte[] to image
-	private void convertByteArrayToImage(byte[] image) {
-		if(image == null || image.length == 0){
-			remuco.infoCover.setImageResource(R.drawable.remuco_128);
-		} else {
-			remuco.infoCover.setImageBitmap(
-					BitmapFactory.decodeByteArray(image, 0, image.length)
-			);
-			
-			imageCache = image;
-		}
-	}
-	
 	class Ticker implements Runnable {
 		
 		@Override
