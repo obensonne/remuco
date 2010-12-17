@@ -25,4 +25,6 @@
 
 <string name="library_prev">&lt;&lt;</string>
 <string name="library_next">&gt;&gt;</string>
+
+<string name="action_dialog_title">Actions Available</string>
 </resources>

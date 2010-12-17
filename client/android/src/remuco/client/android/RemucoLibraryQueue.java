@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import remuco.client.common.data.ItemList;
+import remuco.client.common.data.ActionParam;
 import remuco.client.common.util.Log;
 
 public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener{
@@ -39,6 +39,10 @@ public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener
         this.getList();
     }
 
+    public void sendAction(ActionParam action) {
+        player.getPlayer().actionQueue(action);
+    }
+
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
@@ -48,16 +52,4 @@ public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener
         player.getPlayer().reqQueue(reqHandler, page);
     }
 
-    public void setList(ItemList list){
-        int i = 0;
-
-        pagemax = list.getPageMax();
-        activateButtons();
-
-        while (!ItemList.UNKNWON.equals(list.getItemName(i))) {
-            mArrayAdapter.add(list.getItemName(i));
-            i++;
-        }
-    }
-	
 }

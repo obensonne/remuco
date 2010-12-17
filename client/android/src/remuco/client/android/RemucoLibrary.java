@@ -20,6 +20,7 @@
  */
 package remuco.client.android;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import remuco.client.android.dialogs.ActionDialog;
+import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;
 import remuco.client.common.util.Log;
@@ -45,6 +48,8 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 	Button nextButton;
     ListView lv;
     ArrayAdapter<String> mArrayAdapter;
+    ItemList list;
+    ActionDialog actiondialog;
 
     int page = 0;
     int pagemax = 0;
@@ -65,23 +70,28 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 
 		// --- get view handles
 		getViewHandles();
+
+		// --- create view handler
+        reqHandler = new RequesterAdapter(this);
+		// --- register view handler at player
+		player.addHandler(reqHandler);
+
+        actiondialog = new ActionDialog(this);
 		
 		// --- set listeners
         lv.setOnItemClickListener(new OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    // When clicked, show a toast with the TextView text
+                    Log.debug("show Dialog Action " + list.getItemID(position) + " " + list.getItemPosAbsolute(position));
+                    actiondialog.setList(list);
+                    actiondialog.setListposition(position);
+                    showDialog(ACTIONS_DIALOG);
                 }
             });
 		prevButton.setOnClickListener(this);
         prevButton.setClickable(false);
 		nextButton.setOnClickListener(this);
         nextButton.setClickable(false);
-
-		// --- create view handler
-        reqHandler = new RequesterAdapter(this);
-		// --- register view handler at player
-		player.addHandler(reqHandler);
     }
 	
 	private void getViewHandles() {
@@ -105,9 +115,22 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		return true;
 	}
 	
+    public abstract void sendAction(ActionParam action);
     public abstract void getList();
-    public abstract void setList(ItemList list);
 
+    public void setList(ItemList l){
+        int i = 0;
+
+        list = l;
+        pagemax = list.getPageMax();
+        activateButtons();
+
+        while (!ItemList.UNKNWON.equals(list.getItemName(i))) {
+            mArrayAdapter.add(list.getItemName(i));
+            i++;
+        }
+    }
+	
     public void clearList() {
         mArrayAdapter.clear();
     }
@@ -125,6 +148,23 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         }
     }
 
+	// ------------------------
+	// --- dialogs
+	// ------------------------
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+        Dialog d = super.onCreateDialog(id);
+        if (d != null) return d;
+
+		switch(id){
+		// --- action dialog
+		case ACTIONS_DIALOG:
+			return actiondialog;
+		}
+		return null;
+	}
+	
 	@Override
 	public void onClick(View v) {
 		
