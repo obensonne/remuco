@@ -21,10 +21,12 @@
 <string name="options_menu_disconnect">Disconnect</string>
 <string name="options_menu_library">Library</string>
 <string name="options_menu_rate">Rate</string>
+<string name="options_menu_search">Search</string>
 <string name="rating_dialog_title">Rate Song</string>
 
 <string name="library_prev">&lt;&lt;</string>
 <string name="library_next">&gt;&gt;</string>
 
 <string name="action_dialog_title">Actions Available</string>
+<string name="search_dialog_title">Search</string>
 </resources>

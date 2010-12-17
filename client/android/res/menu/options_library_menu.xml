@@ -4,4 +4,5 @@
 		android:icon="@android:drawable/ic_menu_share"
 		android:title="@string/options_menu_connect"/>
 	<item android:id="@+id/options_menu_disconnect" android:title="@string/options_menu_disconnect"/>
+	<item android:id="@+id/options_menu_search" android:title="@string/options_menu_search"/>
 </menu>

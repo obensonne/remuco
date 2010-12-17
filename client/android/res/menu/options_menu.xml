@@ -5,5 +5,6 @@
 		android:title="@string/options_menu_connect"/>
 	<item android:id="@+id/options_menu_disconnect" android:title="@string/options_menu_disconnect"/>
 	<item android:id="@+id/options_menu_library" android:title="@string/options_menu_library"/>
+	<item android:id="@+id/options_menu_search" android:title="@string/options_menu_search"/>
     <item android:title="@string/options_menu_rate" android:id="@+id/options_menu_rate"/>
 </menu>

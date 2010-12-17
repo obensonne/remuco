@@ -21,10 +21,12 @@
 <string name="options_menu_disconnect">Trennen</string>
 <string name="options_menu_library">Library</string>
 <string name="options_menu_rate">Bewerten</string>
+<string name="options_menu_search">Search</string>
 <string name="rating_dialog_title">Bewerte Titel</string>
 
 <string name="library_prev">&lt;&lt;</string>
 <string name="library_next">&gt;&gt;</string>
 
 <string name="action_dialog_title">Actions Available</string>
+<string name="search_dialog_title">Search</string>
 </resources>

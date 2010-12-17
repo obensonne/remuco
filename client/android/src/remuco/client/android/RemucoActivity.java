@@ -24,6 +24,7 @@ package remuco.client.android;
 import java.util.Hashtable;
 
 import remuco.client.android.dialogs.ConnectDialog;
+import remuco.client.android.dialogs.SearchDialog;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
@@ -49,7 +50,8 @@ public class RemucoActivity extends Activity{
 	protected static final int VOLUME_DIALOG = 2;
 	protected static final int RATING_DIALOG = 3;
 	protected static final int ACTIONS_DIALOG = 4;
-	
+	protected static final int SEARCH_DIALOG = 5;
+
 	// --- dialog reference
 	private VolumeDialog volumeDialog;
 
@@ -177,6 +179,10 @@ public class RemucoActivity extends Activity{
 			Log.ln("disconnect button pressed");
 			player.disconnect();
             return true;
+
+        case R.id.options_menu_search:
+			showDialog(SEARCH_DIALOG);
+            return true;
 		}
 		
 		return false;
@@ -231,6 +237,11 @@ public class RemucoActivity extends Activity{
 		// --- volume dialog
 		case VOLUME_DIALOG:
 			return new VolumeDialog(this, player);
+
+            // --- Search dialog
+        case SEARCH_DIALOG:
+            return new SearchDialog(this, player);
+
 		}
 		
 		Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");
