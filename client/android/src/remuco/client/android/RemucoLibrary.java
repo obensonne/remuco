@@ -21,6 +21,8 @@
 package remuco.client.android;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -93,6 +95,16 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         lv.setAdapter(mArrayAdapter);
     }
 
+	// --- Options Menu
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater mi = getMenuInflater();
+		mi.inflate(R.menu.options_library_menu, menu);
+		
+		return true;
+	}
+	
     public abstract void getList();
     public abstract void setList(ItemList list);
 

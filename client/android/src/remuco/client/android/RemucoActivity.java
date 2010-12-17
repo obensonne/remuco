@@ -23,19 +23,34 @@ package remuco.client.android;
 
 import java.util.Hashtable;
 
+import remuco.client.android.dialogs.ConnectDialog;
+import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
+
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.WindowManager;
 
 public class RemucoActivity extends Activity{
+
+	// --- dialog ids
+	protected static final int CONNECT_DIALOG = 1;
+	protected static final int VOLUME_DIALOG = 2;
+	protected static final int RATING_DIALOG = 3;
+	
+	// --- dialog reference
+	private VolumeDialog volumeDialog;
 
 	// --- preferences
 	protected SharedPreferences preference;
@@ -147,4 +162,123 @@ public class RemucoActivity extends Activity{
         player.pauseConnection();
 	}
 
+	// --- Options Menu
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		
+		case R.id.options_menu_connect:
+			showDialog(CONNECT_DIALOG);
+            return true;
+			
+		case R.id.options_menu_disconnect:
+			Log.ln("disconnect button pressed");
+			player.disconnect();
+            return true;
+		}
+		
+		return false;
+	}
+	
+	// ------------------------
+	// --- dialogs
+	// ------------------------
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+
+		switch(id){
+		
+		// --- connection dialog
+		case CONNECT_DIALOG:
+			
+			// create connect dialog
+			ConnectDialog cDialog = new ConnectDialog(this, player);
+
+			// register callback listener
+			
+			cDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+                    player.disconnect();
+
+					// connect to host
+                    int type = ((ConnectDialog)dialog).getSelectedType();
+					String hostname = ((ConnectDialog)dialog).getSelectedHostname();
+                    int port = ((ConnectDialog)dialog).getSelectedPort();
+                    String bluedevice = ((ConnectDialog)dialog).getSelectedBluedevice();
+                    if (type == R.id.connect_dialog_wifi) {
+                        player.connectWifi(hostname, port, clientInfo);
+                    } else if (type == R.id.connect_dialog_bluetooth) {
+                        player.connectBluetooth(bluedevice, clientInfo);
+                    }
+					
+					// save new address in preferences
+					SharedPreferences.Editor editor = preference.edit();
+					editor.putInt(LAST_TYPE, type);
+					editor.putString(LAST_HOSTNAME, hostname);
+                    editor.putInt(LAST_PORT, port);
+                    editor.putString(LAST_BLUEDEVICE, bluedevice);
+					editor.commit();
+				}
+			});
+			
+			
+			return cDialog;
+			
+		// --- volume dialog
+		case VOLUME_DIALOG:
+			return new VolumeDialog(this, player);
+		}
+		
+		Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");
+		return null;
+	}
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		
+		switch(id){
+		
+		case CONNECT_DIALOG:
+			
+			ConnectDialog cDialog = (ConnectDialog)dialog;
+			
+			// set last hostname port
+			int type = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
+			cDialog.setType(type);
+			String hostname = preference.getString(LAST_HOSTNAME, "");
+			cDialog.setHostname(hostname);
+			int port = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
+			cDialog.setPort(port);
+            String bluedevice = preference.getString(LAST_BLUEDEVICE, "");
+			cDialog.setBluedevice(bluedevice);
+			
+			break;
+		
+		}
+		
+		
+	}
+	
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		switch(keyCode){
+		
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			showDialog(VOLUME_DIALOG);
+			return true;
+			
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			showDialog(VOLUME_DIALOG);
+			return true;
+		}
+		
+		return false;
+	}
+	
 }
