@@ -50,6 +50,7 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
     ArrayAdapter<String> mArrayAdapter;
 
     int page = 0;
+    int pagemax = 0;
 
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
@@ -76,7 +77,9 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
                 }
             });
 		prevButton.setOnClickListener(this);
+        prevButton.setClickable(false);
 		nextButton.setOnClickListener(this);
+        nextButton.setClickable(false);
 
 		// --- create view handler
         reqHandler = new RequesterAdapter(this);
@@ -110,6 +113,9 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
     public void setPlaylist(ItemList playlist){
         int i = 0;
 
+        pagemax = playlist.getPageMax();
+        activateButtons();
+
         while (!ItemList.UNKNWON.equals(playlist.getItemName(i))) {
             mArrayAdapter.add(playlist.getItemName(i));
             i++;
@@ -128,9 +134,25 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
     public void setQueue(ItemList queue){
         int i = 0;
 
+        pagemax = queue.getPageMax();
+        activateButtons();
+
         while (!ItemList.UNKNWON.equals(queue.getItemName(i))) {
             mArrayAdapter.add(queue.getItemName(i));
             i++;
+        }
+    }
+
+    private void activateButtons() {
+        if (page == 0) {
+            prevButton.setClickable(false);
+        } else {
+            prevButton.setClickable(true);
+        }
+        if (page + 1 > pagemax) {
+            nextButton.setClickable(false);
+        } else {
+            nextButton.setClickable(true);
         }
     }
 
@@ -138,13 +160,11 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
 	public void onClick(View v) {
 		
 		if(v == prevButton){
-            if (page == 0) return;
             page--;
             this.getPlaylist();
 		}
 
 		if(v == nextButton){
-            if (mArrayAdapter.getCount() == 0) return;
             page++;
             this.getPlaylist();
 		}
