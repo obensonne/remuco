@@ -179,7 +179,7 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 			break;
 			
 		case R.id.options_menu_library:
-            final Intent intent = new Intent(this, RemucoLibrary.class);
+            final Intent intent = new Intent(this, RemucoLibraryPlaylist.class);
             startActivity(intent);
 			break;
 			

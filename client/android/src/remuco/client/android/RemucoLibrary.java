@@ -20,28 +20,23 @@
  */
 package remuco.client.android;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import remuco.client.android.io.WifiSocket;
-import remuco.client.common.data.Item;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;
 import remuco.client.common.util.Log;
 
-public class RemucoLibrary extends RemucoActivity implements OnClickListener{
+public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener{
 
 	// --- view handler
-	private RequesterAdapter reqHandler;
+	protected RequesterAdapter reqHandler;
 
 	// get view handles
 	Button prevButton;
@@ -85,8 +80,6 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
         reqHandler = new RequesterAdapter(this);
 		// --- register view handler at player
 		player.addHandler(reqHandler);
-
-        this.getPlaylist();
     }
 	
 	private void getViewHandles() {
@@ -100,50 +93,14 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
         lv.setAdapter(mArrayAdapter);
     }
 
+    public abstract void getList();
+    public abstract void setList(ItemList list);
 
-    public void getPlaylist(){
-        if (player == null || player.getPlayer() == null) return;
-
-		Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
-
+    public void clearList() {
         mArrayAdapter.clear();
-        player.getPlayer().reqPlaylist(reqHandler, page);
     }
 
-    public void setPlaylist(ItemList playlist){
-        int i = 0;
-
-        pagemax = playlist.getPageMax();
-        activateButtons();
-
-        while (!ItemList.UNKNWON.equals(playlist.getItemName(i))) {
-            mArrayAdapter.add(playlist.getItemName(i));
-            i++;
-        }
-    }
-
-    public void getQueue(){
-        if (player == null || player.getPlayer() == null) return;
-
-		Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
-
-        mArrayAdapter.clear();
-        player.getPlayer().reqQueue(reqHandler, page);
-    }
-
-    public void setQueue(ItemList queue){
-        int i = 0;
-
-        pagemax = queue.getPageMax();
-        activateButtons();
-
-        while (!ItemList.UNKNWON.equals(queue.getItemName(i))) {
-            mArrayAdapter.add(queue.getItemName(i));
-            i++;
-        }
-    }
-
-    private void activateButtons() {
+    protected void activateButtons() {
         if (page == 0) {
             prevButton.setClickable(false);
         } else {
@@ -161,12 +118,12 @@ public class RemucoLibrary extends RemucoActivity implements OnClickListener{
 		
 		if(v == prevButton){
             page--;
-            this.getPlaylist();
+            this.getList();
 		}
 
 		if(v == nextButton){
             page++;
-            this.getPlaylist();
+            this.getList();
 		}
 	}
 	

@@ -43,15 +43,19 @@ public class RequesterAdapter extends Handler implements IRequester{
 		switch(msg.what){
 		case MessageFlag.CONNECTED:
 			Log.ln("[VH] CONNECTED!");
-            remucolibrary.getPlaylist();
+            remucolibrary.getList();
 			break;
+		case MessageFlag.DISCONNECTED:
+			Log.ln("[VH] DISCONNECTED!");
+            remucolibrary.clearList();
+            break;
         case MessageFlag.PLAYLIST:
 			Log.ln("[VH] PLAYLIST");
-            remucolibrary.setPlaylist((ItemList) msg.obj);
+            remucolibrary.setList((ItemList) msg.obj);
             break;
         case MessageFlag.QUEUE:
 			Log.ln("[VH] QUEUE");
-            remucolibrary.setQueue((ItemList) msg.obj);
+            remucolibrary.setList((ItemList) msg.obj);
             break;
         }
     }
