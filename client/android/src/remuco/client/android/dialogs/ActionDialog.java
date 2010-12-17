@@ -95,6 +95,7 @@ public class ActionDialog extends Dialog implements OnClickListener{
                     Log.debug("Action " + ((ItemAction) list.getActions().elementAt(position)).label + " " + list.getItemID(listposition) + " " + list.getItemPosAbsolute(listposition));
                     ActionParam a = new ActionParam(actionid, itempos, itemids);
                     library.sendAction(a);
+                    library.getList();
                     ActionDialog.this.dismiss();
                 }
             });
