@@ -50,11 +50,8 @@ public class RequesterAdapter extends Handler implements IRequester{
             remucolibrary.clearList();
             break;
         case MessageFlag.PLAYLIST:
-			Log.ln("[VH] PLAYLIST");
-            remucolibrary.setList((ItemList) msg.obj);
-            break;
         case MessageFlag.QUEUE:
-			Log.ln("[VH] QUEUE");
+        case MessageFlag.SEARCH:
             remucolibrary.setList((ItemList) msg.obj);
             break;
         }
@@ -86,6 +83,8 @@ public class RequesterAdapter extends Handler implements IRequester{
 	
     @Override
 	public void handleSearch(ItemList search){
+        Message msg = this.obtainMessage(MessageFlag.SEARCH, search);
+        msg.sendToTarget();
     }
 
 }
