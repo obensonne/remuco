@@ -89,7 +89,25 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 		ctrlNext.setOnClickListener(this);
 		ctrlShuffle.setOnClickListener(this);
 		ctrlRepeat.setOnClickListener(this);
-		
+
+        ctrlProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                int start = 0;
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress,
+                                              boolean fromUser) {
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                    start = ctrlProgressBar.getProgress();
+                }
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    int end = ctrlProgressBar.getProgress();
+                    player.getPlayer().ctrlSeek((end - start));
+                }
+            });
+
 		// TODO: externalize these
 		infoTitle.setText("not connected");
 		infoArtist.setText("use the menu to connect");
