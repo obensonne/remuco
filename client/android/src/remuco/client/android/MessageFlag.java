@@ -41,6 +41,8 @@ public abstract class MessageFlag {
 	
 	public static final int PLAYLIST = 40;
 	public static final int QUEUE = 41;
-	public static final int SEARCH = 42;
+	public static final int MLIB = 42;
+	public static final int FILES = 43;
+	public static final int SEARCH = 44;
 	
 }

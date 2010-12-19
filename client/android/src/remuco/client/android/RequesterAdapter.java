@@ -51,6 +51,8 @@ public class RequesterAdapter extends Handler implements IRequester{
             break;
         case MessageFlag.PLAYLIST:
         case MessageFlag.QUEUE:
+        case MessageFlag.MLIB:
+        case MessageFlag.FILES:
         case MessageFlag.SEARCH:
             remucolibrary.setList((ItemList) msg.obj);
             break;

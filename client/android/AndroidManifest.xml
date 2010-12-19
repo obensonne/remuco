@@ -29,7 +29,19 @@
                 <category android:name="android.intent.category.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".RemucoLibrarySearch" android:label="@string/app_name_library_queue">
+        <activity android:name=".RemucoLibraryMlib" android:label="@string/app_name_library_mlib">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+                <category android:name="android.intent.category.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RemucoLibraryFiles" android:label="@string/app_name_library_files">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+                <category android:name="android.intent.category.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RemucoLibrarySearch" android:label="@string/app_name_library_search">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
                 <category android:name="android.intent.category.VIEW" />

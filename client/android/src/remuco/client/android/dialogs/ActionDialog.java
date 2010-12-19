@@ -75,8 +75,7 @@ public class ActionDialog extends Dialog implements OnClickListener{
 
         for (int i = 0; i < list.getActions().size(); i++) {
             AbstractAction act = (AbstractAction) list.getActions().elementAt(i);
-            if (act.isItemAction())
-                mArrayAdapter.add(act.label);
+            mArrayAdapter.add(act.label);
         }
 
         // Find and set up the ListView for paired devices
@@ -87,7 +86,8 @@ public class ActionDialog extends Dialog implements OnClickListener{
         actionTV.setOnItemClickListener(new OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    int actionid = ((ItemAction) list.getActions().elementAt(position)).id;
+                    AbstractAction act = ((AbstractAction) list.getActions().elementAt(position));
+                    int actionid = ((ItemAction) act).id;
                     String[] itemids = new String[1];
                     itemids[0] = list.getItemID(listposition);
                     int[] itempos = new int[1];

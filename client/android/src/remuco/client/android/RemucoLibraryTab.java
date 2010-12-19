@@ -52,6 +52,20 @@ public class RemucoLibraryTab extends TabActivity{
             .setContent(intent);
         tabHost.addTab(spec);
 
+        // Tab MLib
+        intent = new Intent().setClass(this, RemucoLibraryMlib.class);
+        spec = tabHost.newTabSpec("mlib").setIndicator("",
+                      res.getDrawable(R.drawable.ic_tab_songs))
+            .setContent(intent);
+        tabHost.addTab(spec);
+
+        // Tab Files
+        intent = new Intent().setClass(this, RemucoLibraryFiles.class);
+        spec = tabHost.newTabSpec("files").setIndicator("",
+                      res.getDrawable(R.drawable.ic_tab_artists))
+            .setContent(intent);
+        tabHost.addTab(spec);
+
         // Tab Playing now
         intent = new Intent().setClass(this, LaunchRemuco.class);
         spec = tabHost.newTabSpec("playingnow").setIndicator("",

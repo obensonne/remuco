@@ -4,6 +4,9 @@
     <string name="app_name_library">Remuco Library</string>
     <string name="app_name_library_playlist">Remuco Library Playlist</string>
     <string name="app_name_library_queue">Remuco Library Queue</string>
+    <string name="app_name_library_mlib">Remuco Library MLib</string>
+    <string name="app_name_library_files">Remuco Library Files</string>
+    <string name="app_name_library_search">Remuco Library Search</string>
 
 
 <string name="connect_dialog_type">Type</string>
