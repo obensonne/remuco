@@ -35,13 +35,6 @@ public class RemucoLibraryMlib extends RemucoLibrary implements OnClickListener{
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
 	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.getList();
-    }
-
     public void sendAction(ActionParam action) {
         player.getPlayer().actionMediaLib(action);
     }

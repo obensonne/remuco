@@ -31,13 +31,6 @@ public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener
 
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.getList();
-    }
 
     public void sendAction(ActionParam action) {
         player.getPlayer().actionQueue(action);
@@ -46,7 +39,7 @@ public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
-		Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
+		Log.debug("--- " + this.getClass().getName() + ".geQueue()");
 
         mArrayAdapter.clear();
         player.getPlayer().reqQueue(reqHandler, page);

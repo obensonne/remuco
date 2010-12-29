@@ -99,6 +99,19 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         registerForContextMenu(lv);
     }
 
+	
+	/**
+	 * this method gets called after on create
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Log.debug("--- " + this.getClass().getName() + ".onResume()");
+
+        this.getList();
+	}
+
 	// --- Options Menu
 	
 	@Override

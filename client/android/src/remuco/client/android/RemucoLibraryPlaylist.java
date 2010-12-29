@@ -32,13 +32,6 @@ public class RemucoLibraryPlaylist extends RemucoLibrary implements OnClickListe
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
 	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.getList();
-    }
-
     public void sendAction(ActionParam action) {
         player.getPlayer().actionPlaylist(action);
     }

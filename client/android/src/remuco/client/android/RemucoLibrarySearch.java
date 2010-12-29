@@ -48,8 +48,6 @@ public class RemucoLibrarySearch extends RemucoLibrary implements OnClickListene
             final String q = this.getIntent().getStringExtra(SearchDialog.class.getName() + "_" + field);
             query[i] = q.trim();
         }
-
-        this.getList();
     }
 
     public void sendAction(ActionParam action) {
