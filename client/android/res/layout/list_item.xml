@@ -13,13 +13,28 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:padding="6dip">
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:gravity="center_vertical"
-    android:paddingLeft="6dip"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-/>
+  <ImageView
+     android:id="@+id/library_list_icon"
+     android:layout_width="wrap_content"
+     android:layout_height="fill_parent"
+     android:layout_alignParentTop="true"
+     android:layout_alignParentBottom="true"
+     android:layout_marginRight="6dip"
+     android:src="@drawable/library_list_icon" />
+
+  <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/library_list_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/library_list_icon"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:gravity="center_vertical"
+            android:paddingLeft="6dip"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            />
+</RelativeLayout>

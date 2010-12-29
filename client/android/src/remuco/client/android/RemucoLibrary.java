@@ -31,10 +31,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import remuco.client.android.util.LibraryAdapter;
+import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.AbstractAction;
 import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ItemAction;
@@ -51,7 +52,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 	Button prevButton;
 	Button nextButton;
     ListView lv;
-    ArrayAdapter<String> mArrayAdapter;
+    LibraryAdapter mArrayAdapter;
     ItemList list;
 
     int page = 0;
@@ -91,7 +92,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		prevButton = (Button) findViewById(R.id.library_prev_button);
 		nextButton = (Button) findViewById(R.id.library_next_button);
 	
-        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_item);
+        mArrayAdapter = new LibraryAdapter(getApplicationContext(), R.layout.list_item);
         lv = (ListView) findViewById(R.id.library_items);
         lv.setTextFilterEnabled(true);
         lv.setAdapter(mArrayAdapter);
@@ -112,7 +113,12 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.library_items) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-            menu.setHeaderTitle(list.getItemName(info.position));
+            LibraryItem item = mArrayAdapter.getItem(info.position);
+
+            if (item.nested) return;
+            if (list.getActions().size() == 0) return;
+
+            menu.setHeaderTitle(list.getItemName(item.position));
             for (int i = 0; i < list.getActions().size(); i++) {
                 AbstractAction act = (AbstractAction) list.getActions().elementAt(i);
                 menu.add(Menu.NONE, i, i, act.label);
@@ -123,16 +129,17 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
     @Override
 	public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        LibraryItem libitem = mArrayAdapter.getItem(info.position);
         int menuItemIndex = item.getItemId();
 
         AbstractAction act = ((AbstractAction) list.getActions().elementAt(menuItemIndex));
         int actionid = ((ItemAction) act).id;
 
         String[] itemids = new String[1];
-        itemids[0] = list.getItemID(info.position);
+        itemids[0] = list.getItemID(libitem.position);
         int[] itempos = new int[1];
-        itempos[0] = list.getItemPosAbsolute(info.position);
-        Log.debug("Action " + ((ItemAction) list.getActions().elementAt(menuItemIndex)).label + " " + list.getItemID(info.position) + " " + list.getItemPosAbsolute(info.position));
+        itempos[0] = list.getItemPosAbsolute(libitem.position);
+        Log.debug("Action " + ((ItemAction) list.getActions().elementAt(menuItemIndex)).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
         ActionParam a = new ActionParam(actionid, itempos, itemids);
         this.sendAction(a);
         this.getList();
@@ -150,11 +157,19 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         activateButtons();
 
         for (int j = 0; j < list.getNumNested(); j++) {
-            mArrayAdapter.add(list.getNested(j));
+            LibraryItem item = new LibraryItem();
+            item.nested = true;
+            item.position = j;
+            item.label = list.getNested(j);
+            mArrayAdapter.add(item);
         }
 
         while (!ItemList.UNKNWON.equals(list.getItemName(i))) {
-            mArrayAdapter.add(list.getItemName(i));
+            LibraryItem item = new LibraryItem();
+            item.nested = false;
+            item.position = i;
+            item.label = list.getItemName(i);
+            mArrayAdapter.add(item);
             i++;
         }
     }
@@ -189,5 +204,4 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
             this.getList();
 		}
 	}
-	
 }
