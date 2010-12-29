@@ -49,8 +49,7 @@ public class RemucoActivity extends Activity{
 	protected static final int CONNECT_DIALOG = 1;
 	protected static final int VOLUME_DIALOG = 2;
 	protected static final int RATING_DIALOG = 3;
-	protected static final int ACTIONS_DIALOG = 4;
-	protected static final int SEARCH_DIALOG = 5;
+	protected static final int SEARCH_DIALOG = 4;
 
 	// --- dialog reference
 	private VolumeDialog volumeDialog;

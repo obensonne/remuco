@@ -22,8 +22,11 @@ package remuco.client.android;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -32,8 +35,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import remuco.client.android.dialogs.ActionDialog;
+import remuco.client.common.data.AbstractAction;
 import remuco.client.common.data.ActionParam;
+import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;
 import remuco.client.common.util.Log;
@@ -49,7 +53,6 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
     ListView lv;
     ArrayAdapter<String> mArrayAdapter;
     ItemList list;
-    ActionDialog actiondialog;
 
     int page = 0;
     int pagemax = 0;
@@ -76,18 +79,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		// --- register view handler at player
 		player.addHandler(reqHandler);
 
-        actiondialog = new ActionDialog(this);
-		
 		// --- set listeners
-        lv.setOnItemClickListener(new OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view,
-                                        int position, long id) {
-                    Log.debug("show Dialog Action " + list.getItemID(position) + " " + list.getItemPosAbsolute(position));
-                    actiondialog.setList(list);
-                    actiondialog.setListposition(position);
-                    showDialog(ACTIONS_DIALOG);
-                }
-            });
 		prevButton.setOnClickListener(this);
         prevButton.setClickable(false);
 		nextButton.setOnClickListener(this);
@@ -99,10 +91,11 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		prevButton = (Button) findViewById(R.id.library_prev_button);
 		nextButton = (Button) findViewById(R.id.library_next_button);
 	
-        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_item);
         lv = (ListView) findViewById(R.id.library_items);
         lv.setTextFilterEnabled(true);
         lv.setAdapter(mArrayAdapter);
+        registerForContextMenu(lv);
     }
 
 	// --- Options Menu
@@ -114,7 +107,38 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		
 		return true;
 	}
-	
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.library_items) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle(list.getItemName(info.position));
+            for (int i = 0; i < list.getActions().size(); i++) {
+                AbstractAction act = (AbstractAction) list.getActions().elementAt(i);
+                menu.add(Menu.NONE, i, i, act.label);
+            }
+        }
+	}
+
+    @Override
+	public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+
+        AbstractAction act = ((AbstractAction) list.getActions().elementAt(menuItemIndex));
+        int actionid = ((ItemAction) act).id;
+
+        String[] itemids = new String[1];
+        itemids[0] = list.getItemID(info.position);
+        int[] itempos = new int[1];
+        itempos[0] = list.getItemPosAbsolute(info.position);
+        Log.debug("Action " + ((ItemAction) list.getActions().elementAt(menuItemIndex)).label + " " + list.getItemID(info.position) + " " + list.getItemPosAbsolute(info.position));
+        ActionParam a = new ActionParam(actionid, itempos, itemids);
+        this.sendAction(a);
+        this.getList();
+        return true;
+	}
+
     public abstract void sendAction(ActionParam action);
     public abstract void getList();
 
@@ -124,6 +148,10 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         list = l;
         pagemax = list.getPageMax();
         activateButtons();
+
+        for (int j = 0; j < list.getNumNested(); j++) {
+            mArrayAdapter.add(list.getNested(j));
+        }
 
         while (!ItemList.UNKNWON.equals(list.getItemName(i))) {
             mArrayAdapter.add(list.getItemName(i));
@@ -148,23 +176,6 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         }
     }
 
-	// ------------------------
-	// --- dialogs
-	// ------------------------
-	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-        Dialog d = super.onCreateDialog(id);
-        if (d != null) return d;
-
-		switch(id){
-		// --- action dialog
-		case ACTIONS_DIALOG:
-			return actiondialog;
-		}
-		return null;
-	}
-	
 	@Override
 	public void onClick(View v) {
 		

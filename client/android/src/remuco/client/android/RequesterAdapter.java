@@ -61,6 +61,8 @@ public class RequesterAdapter extends Handler implements IRequester{
 
     @Override
 	public void handleFiles(ItemList files){
+        Message msg = this.obtainMessage(MessageFlag.FILES, files);
+        msg.sendToTarget();
     }
 
     @Override
@@ -69,6 +71,8 @@ public class RequesterAdapter extends Handler implements IRequester{
 
     @Override
 	public void handleLibrary(ItemList library){
+        Message msg = this.obtainMessage(MessageFlag.MLIB, library);
+        msg.sendToTarget();
     }
 
     @Override
