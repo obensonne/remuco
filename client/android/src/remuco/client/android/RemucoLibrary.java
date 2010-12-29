@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -152,8 +151,13 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         itemids[0] = list.getItemID(libitem.position);
         int[] itempos = new int[1];
         itempos[0] = list.getItemPosAbsolute(libitem.position);
-        Log.debug("Action " + ((ItemAction) list.getActions().elementAt(menuItemIndex)).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
-        ActionParam a = new ActionParam(actionid, itempos, itemids);
+        Log.debug("Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
+        ActionParam a;
+        if (list.isPlaylist() || list.isQueue()) {
+            a = new ActionParam(actionid, itempos, itemids);
+        } else {
+            a = new ActionParam(actionid, list.getPath(), itempos, itemids);
+        }
         this.sendAction(a);
         this.getList();
         return true;
@@ -168,6 +172,16 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         list = l;
         pagemax = list.getPageMax();
         activateButtons();
+
+        if ((list.isMediaLib() ||
+             list.isFiles()) &&
+            !list.isRoot()) {
+            LibraryItem item = new LibraryItem();
+            item.nested = true;
+            item.position = -1;
+            item.label = "..";
+            mArrayAdapter.add(item);
+        }
 
         for (int j = 0; j < list.getNumNested(); j++) {
             LibraryItem item = new LibraryItem();

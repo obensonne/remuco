@@ -23,7 +23,10 @@ package remuco.client.android;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 
+import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.util.Log;
@@ -34,6 +37,31 @@ public class RemucoLibraryMlib extends RemucoLibrary implements OnClickListener{
 
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+		// ------
+		// android related initialization
+		// ------
+		
+		// --- set listeners
+        lv.setOnItemClickListener(new OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    Log.debug("--- " + this.getClass().getName() + " list click");
+                    LibraryItem i = mArrayAdapter.getItem(position);
+                    if (!i.nested) return;
+                    if (i.position == -1) {
+                        path = list.getPathForParent();
+                    } else {
+                        path = list.getPathForNested(i.position);
+                    }
+                    RemucoLibraryMlib.this.getList();
+                }
+            });
+    }
 	
     public void sendAction(ActionParam action) {
         player.getPlayer().actionMediaLib(action);
