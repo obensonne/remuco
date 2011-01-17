@@ -25,9 +25,11 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TabHost;
 
-public class RemucoLibraryTab extends TabActivity{
+public class RemucoLibraryTab extends TabActivity
+    implements TabHost.TabContentFactory, TabHost.OnTabChangeListener{
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +72,20 @@ public class RemucoLibraryTab extends TabActivity{
         intent = new Intent().setClass(this, LaunchRemuco.class);
         spec = tabHost.newTabSpec("playingnow").setIndicator("",
                       res.getDrawable(R.drawable.ic_tab_playback))
-            .setContent(intent);
+            .setContent(this);
         tabHost.addTab(spec);
+        tabHost.setOnTabChangedListener(this);
 
         tabHost.setCurrentTab(0);
+    }
+
+    public View createTabContent(String tag) {
+        return new View(this.getApplicationContext());
+    }
+
+    public void onTabChanged(String tabId) {
+        if ("playingnow".equals(tabId)) {
+            this.finish();
+        }
     }
 }
