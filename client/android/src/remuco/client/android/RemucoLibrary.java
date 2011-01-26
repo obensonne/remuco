@@ -76,8 +76,6 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 
 		// --- create view handler
         reqHandler = new RequesterAdapter(this);
-		// --- register view handler at player
-		player.addHandler(reqHandler);
 
 		// --- set listeners
 		prevButton.setOnClickListener(this);
@@ -107,6 +105,9 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 		super.onResume();
 		
 		Log.debug("--- " + this.getClass().getName() + ".onResume()");
+
+		// --- register view handler at player
+		player.addHandler(reqHandler);
 
         this.getList();
 	}

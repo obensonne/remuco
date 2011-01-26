@@ -48,9 +48,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	public PlayerAdapter() {
 		handlers = new ArrayList<Handler>();
         if (this.player != null) {
-            this.player.setItemListener(this);
-            this.player.setProgressListener(this);
-            this.player.setStateListener(this);
+            this.reconnect();
         }
 	}
 
@@ -120,13 +118,19 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 			return;
 		}
 		
+        this.reconnect();
 	    Connection conn = player.getConnection(); 
 	    conn.setPing(PING_INTERVAL);
 	    remuco.client.common.io.Message m = new remuco.client.common.io.Message();
 	    m.id = remuco.client.common.io.Message.CONN_WAKEUP;
 	    conn.send(m);
 	}
-	
+
+	private void reconnect(){
+		this.player.setItemListener(this);
+		this.player.setProgressListener(this);
+		this.player.setStateListener(this);
+    }
 	
 	// --- remuco event handlers
 	
@@ -135,10 +139,8 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 		Log.ln("[PH] CONNECTED");
 		
 		this.player = player;
-		this.player.setItemListener(this);
-		this.player.setProgressListener(this);
-		this.player.setStateListener(this);
-		
+		this.reconnect();
+
 		// set ping interval
 		this.player.getConnection().setPing(PING_INTERVAL);
 		

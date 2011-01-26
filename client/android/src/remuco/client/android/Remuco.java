@@ -115,23 +115,24 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 
 		// --- create view handler
 		viewHandler = new ViewHandler(this);
-		
+
 		// ------
 		// remuco related initialization
 		// ------
-		
-		// --- register view handler at player
-		player.addHandler(viewHandler);
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 
+		// --- register view handler at player
+        player.addHandler(viewHandler);
+
         if (player.getPlayer() != null &&
             player.getPlayer().getConnection() != null &&
-            !player.getPlayer().getConnection().isClosed())
+            !player.getPlayer().getConnection().isClosed()) {
             viewHandler.setRunning(true);
+        }
 	}
 
     public PlayerAdapter getPlayer(){
