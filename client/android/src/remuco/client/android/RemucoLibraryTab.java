@@ -69,7 +69,6 @@ public class RemucoLibraryTab extends TabActivity
         tabHost.addTab(spec);
 
         // Tab Playing now
-        intent = new Intent().setClass(this, LaunchRemuco.class);
         spec = tabHost.newTabSpec("playingnow").setIndicator("",
                       res.getDrawable(R.drawable.ic_tab_playback))
             .setContent(this);

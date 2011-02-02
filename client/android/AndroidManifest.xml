@@ -47,14 +47,8 @@
                 <category android:name="android.intent.category.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".LaunchRemuco" android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.DEFAULT" />
-                <category android:name="android.intent.category.VIEW" />
-            </intent-filter>
-        </activity>
     </application>
 
-<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
-<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 </manifest> 
