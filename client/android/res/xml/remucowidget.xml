@@ -1,0 +1,6 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="140dp"
+    android:minHeight="140dp"
+    android:updatePeriodMillis="5000"
+    android:initialLayout="@layout/remucowidget">
+</appwidget-provider>
