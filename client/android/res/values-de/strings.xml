@@ -7,6 +7,7 @@
     <string name="app_name_library_mlib">Remuco Library MLib</string>
     <string name="app_name_library_files">Remuco Library Files</string>
     <string name="app_name_library_search">Remuco Library Search</string>
+    <string name="app_name_widget">Remuco Widget</string>
 
 
 <string name="connect_dialog_type">Type</string>

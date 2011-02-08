@@ -47,9 +47,12 @@
                 <category android:name="android.intent.category.VIEW" />
             </intent-filter>
         </activity>
-        <receiver android:name=".RemucoWidget" android:label="@string/app_name">
+        <receiver android:name=".RemucoWidgetProvider">
           <intent-filter>
             <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            <action android:name="remuco.client.android.RemucoWidgetProvider.ACTION_PREV"/>
+            <action android:name="remuco.client.android.RemucoWidgetProvider.ACTION_PLAY"/>
+            <action android:name="remuco.client.android.RemucoWidgetProvider.ACTION_NEXT"/>
           </intent-filter>
           <meta-data android:name="android.appwidget.provider"
                      android:resource="@xml/remucowidget" />
