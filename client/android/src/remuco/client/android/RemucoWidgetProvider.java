@@ -49,6 +49,10 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
             // Get the layout for the App Widget and attach an on-click listener to the button
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.remucowidget);
 
+            Intent intentRemuco = new Intent(context, Remuco.class);
+            PendingIntent pendingIntentRemuco = PendingIntent.getActivity(context, 0, intentRemuco, 0);
+            views.setOnClickPendingIntent(R.id.WidgetBackground, pendingIntentRemuco);
+
             Intent intentPrev = new Intent(context, RemucoWidgetProvider.class);
             intentPrev.setAction(ACTION_PREV);
             PendingIntent pendingIntentPrev = PendingIntent.getBroadcast(context, 0, intentPrev, 0);
