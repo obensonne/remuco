@@ -36,6 +36,9 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public static String ACTION_PLAY = "play";
     public static String ACTION_NEXT = "next";
 
+	// --- the player adapter
+	protected PlayerAdapter player = null;
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
@@ -75,12 +78,17 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        if (player == null) {
+            player = RemucoActivity.connect(context, 140);
+        }
+
         if (intent.getAction().equals(ACTION_PREV)) {
-            Log.debug("RemucoWidgetProvider onReceive prev");
+            player.getPlayer().ctrlPrev();
         } else if (intent.getAction().equals(ACTION_PLAY)) {
-            Log.debug("RemucoWidgetProvider onReceive play");
+            player.getPlayer().ctrlPlayPause();
         } else if (intent.getAction().equals(ACTION_NEXT)) {
-            Log.debug("RemucoWidgetProvider onReceive next");
+            player.getPlayer().ctrlNext();
         } else {
             super.onReceive(context, intent);
         }

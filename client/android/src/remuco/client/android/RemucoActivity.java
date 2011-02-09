@@ -105,31 +105,36 @@ public class RemucoActivity extends Activity{
         // use the smaller dimension
         int imageSize = Math.min(width, height);
         Log.debug("preferred image size: " + imageSize);
-
-        // create extra info
-		Hashtable<String,String> info = new Hashtable<String,String>();
-		
-		info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
-		Log.ln("running on : " + android.os.Build.MODEL);
-		
-		// afaik every android (so far) has a touchscreen and is using unicode
-		info.put("touch", "yes");
-		info.put("utf8", "yes");
-        
-        // create client info
-		clientInfo = new ClientInfo(imageSize, "PNG", 50, info);
 		
 		// ------
 		// communication initialization
 		// ------
 		
+		// --- create player adapter
+        player = connect(this.getApplicationContext(), imageSize);
+	}
+
+    public static PlayerAdapter connect(Context context, int imageSize) {
+        // --- create player adapter
+        PlayerAdapter player = new PlayerAdapter();
+
         // --- enable the remuco main loop (timer thread)
         MainLoop.enable();
 
-		// --- create player adapter
-        player = new PlayerAdapter();
+        // create extra info
+        Hashtable<String,String> info = new Hashtable<String,String>();
+
+        info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
+        Log.ln("running on : " + android.os.Build.MODEL);
+
+        // afaik every android (so far) has a touchscreen and is using unicode
+        info.put("touch", "yes");
+        info.put("utf8", "yes");
 
         // --- try to connect to the last hostname
+        SharedPreferences preference = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        ClientInfo clientInfo = new ClientInfo(imageSize, "PNG", 50, info);
+
         int lastType = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
         String lastHostname = preference.getString(LAST_HOSTNAME, "");
         int lastPort = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
@@ -139,7 +144,9 @@ public class RemucoActivity extends Activity{
         } else if ((lastType == R.id.connect_dialog_bluetooth) && (!lastBluedevice.equals(""))) {
             player.connectBluetooth(lastBluedevice, clientInfo);
         }
-	}
+
+        return player;
+    }
 	
 	/**
 	 * this method gets called after on create
@@ -272,9 +279,7 @@ public class RemucoActivity extends Activity{
 		
 		
 	}
-	
-	
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
