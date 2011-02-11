@@ -39,9 +39,17 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
 	// --- the player adapter
 	protected PlayerAdapter player = null;
 
+    protected static int[] appWidgetIds;
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+
+        if (player == null) {
+            createPlayer(context);
+        }
+
+        this.appWidgetIds = appWidgetIds;
 
         final int N = appWidgetIds.length;
 
@@ -80,7 +88,7 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
 
         if (player == null) {
-            player = RemucoActivity.connect(context, 140);
+            createPlayer(context);
         }
 
         if (intent.getAction().equals(ACTION_PREV)) {
@@ -91,6 +99,33 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
             player.getPlayer().ctrlNext();
         } else {
             super.onReceive(context, intent);
+        }
+    }
+
+    private void createPlayer(Context context) {
+        player = RemucoActivity.connect(context, 140);
+
+        // --- create view handler
+        WidgetHandler viewHandler = new WidgetHandler(context, player);
+
+        if (player.getPlayer() != null &&
+            player.getPlayer().getConnection() != null &&
+            !player.getPlayer().getConnection().isClosed()) {
+            viewHandler.setRunning(true);
+        }
+
+        // --- register view handler at player
+        player.addHandler(viewHandler);
+    }
+
+    public static void updateAllWidgets(Context context, RemoteViews views) {
+        final int N = appWidgetIds.length;
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+        // Perform this loop procedure for each App Widget that belongs to this provider
+        for (int i=0; i<N; i++) {
+            int appWidgetId = appWidgetIds[i];
+            appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
 

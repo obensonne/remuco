@@ -6,15 +6,25 @@
               android:layout_gravity="bottom"
               android:layout_height="wrap_content">
 
-  <LinearLayout  android:id="@+id/WidgetBackground"
+  <LinearLayout android:id="@+id/WidgetBackground"
                 android:layout_width="fill_parent"
                 android:orientation="vertical"
                 android:background="@drawable/remuco_100"
                 android:layout_gravity="bottom"
                 android:layout_height="fill_parent">
 
-    <TextView android:id="@+id/widget_textview"
-              android:text="Remuco"
+    <TextView android:id="@+id/InfoTitle"
+              android:text="Not connected"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:layout_gravity="center_horizontal|center"
+              android:layout_marginTop="5dip"
+              android:padding="10dip"
+              android:textColor="@android:color/white"
+			  android:gravity="bottom"/>
+
+    <TextView android:id="@+id/InfoArtist"
+              android:text=""
               android:layout_height="wrap_content"
               android:layout_width="wrap_content"
               android:layout_gravity="center_horizontal|center"
