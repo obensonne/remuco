@@ -83,11 +83,6 @@ public class WidgetHandler extends Handler {
 					);
 			Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
 			
-			// enable buttons
-            views.setBoolean(R.id.WidgetPrev, "setClickable", false);
-            views.setBoolean(R.id.WidgetPlay, "setClickable", false);
-            views.setBoolean(R.id.WidgetNext, "setClickable", false);
-			
 			// update the display
 			sendEmptyMessage(MessageFlag.ITEM_CHANGED);
 
@@ -101,13 +96,8 @@ public class WidgetHandler extends Handler {
 			toast = context.getResources().getString(R.string.connection_failed);
 			Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
 			
-			// disable buttons
-            views.setBoolean(R.id.WidgetPrev, "setClickable", false);
-            views.setBoolean(R.id.WidgetPlay, "setClickable", false);
-            views.setBoolean(R.id.WidgetNext, "setClickable", false);
-
 			// show ape picture
-            views.setInt(R.id.WidgetBackground, "setBackgroundResource", R.drawable.remuco_100);
+            views.setImageViewResource(R.id.WidgetBackground, R.drawable.remuco_100);
 			
 			// change text
             views.setCharSequence(R.id.InfoTitle, "setText", "Not connected");
@@ -153,12 +143,11 @@ public class WidgetHandler extends Handler {
 	// --- convert byte[] to image
 	private void convertByteArrayToImage(RemoteViews views, byte[] image) {
 		if(image == null || image.length == 0){
-            views.setInt(R.id.WidgetBackground, "setBackgroundResource", R.drawable.remuco_100);
+            views.setImageViewResource(R.id.WidgetBackground, R.drawable.remuco_100);
 
             imageCache = null;
 		} else {
-            //views.setBitmap(R.id.WidgetBackground, "setImageResource",
-            //BitmapFactory.decodeByteArray(image, 0, image.length));
+            views.setImageViewBitmap(R.id.WidgetBackground, BitmapFactory.decodeByteArray(image, 0, image.length));
 			
 			imageCache = image;
 		}

@@ -39,7 +39,7 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
 	// --- the player adapter
 	protected PlayerAdapter player = null;
 
-    protected static int[] appWidgetIds;
+    protected static int[] appWidgetIds = null;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -119,6 +119,8 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     }
 
     public static void updateAllWidgets(Context context, RemoteViews views) {
+        if (appWidgetIds == null) return;
+
         final int N = appWidgetIds.length;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
