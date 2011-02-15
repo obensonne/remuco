@@ -28,7 +28,6 @@ import remuco.client.android.dialogs.SearchDialog;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
-import remuco.client.common.MainLoop;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
 
@@ -36,6 +35,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Display;
@@ -118,8 +118,8 @@ public class RemucoActivity extends Activity{
         // --- create player adapter
         PlayerAdapter player = new PlayerAdapter();
 
-        // --- enable the remuco main loop (timer thread)
-        MainLoop.enable();
+        // --- enable the Remuco Service
+        context.startService(new Intent(context, RemucoService.class));
 
         // create extra info
         Hashtable<String,String> info = new Hashtable<String,String>();

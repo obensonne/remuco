@@ -83,12 +83,14 @@ public class MainLoop {
 
 	/** See {@link Timer#schedule(TimerTask, long)} with 10ms delay. */
 	public static void schedule(TimerTask task) {
+		if (timer == null) return;
 
 		timer.schedule(task, 10);
 	}
 
 	/** See {@link Timer#schedule(TimerTask, long)}. */
 	public static void schedule(TimerTask task, long delay) {
+		if (timer == null) return;
 
 		timer.schedule(task, delay);
 
@@ -96,6 +98,7 @@ public class MainLoop {
 
 	/** See {@link Timer#schedule(TimerTask, long, long)}. */
 	public static void schedule(TimerTask task, long delay, long period) {
+		if (timer == null) return;
 
 		timer.schedule(task, delay, period);
 
