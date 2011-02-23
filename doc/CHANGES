@@ -7,6 +7,7 @@ Player adapters
 ---------------
 
   * Banshee: Adapted to DBus-API changes in 1.6.0 (see [issue 126][i126]).
+  * New: gmusicbrowser
 
 [i126]: http://code.google.com/p/remuco/issues/detail?id=126
 
