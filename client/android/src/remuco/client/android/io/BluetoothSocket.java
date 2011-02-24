@@ -72,10 +72,13 @@ public class BluetoothSocket implements ISocket {
             isClosed = false;
 		} catch (SecurityException e) {
 			throw new UserException("Connection Error",
-					"Not allowed to connect.");
+					"Not allowed to connect to " + host);
 		} catch (IOException e) {
 			throw new UserException("Connection Error",
-					"IO error while setting up the connection");
+					"IO error while setting up the connection to " + host);
+		} catch (Exception e) {
+			throw new UserException("Connection Error",
+					"Error while setting up the connection to " + host);
 		}
 
 		try {
