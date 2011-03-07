@@ -78,17 +78,15 @@ public class ConnectDialog extends Dialog implements OnClickListener, OnCheckedC
         bluedeviceTV.setItemsCanFocus(true);
         bluedeviceTV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        // Get the local Bluetooth adapter
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_single_choice);
-
         // Find and set up the ListView for paired devices
+        ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_single_choice);
         bluedeviceTV.setAdapter(mArrayAdapter);
 
+        // Get the local Bluetooth adapter and paired devices
         devices = new HashSet<BluetoothDevice>();
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        // If there are paired devices
-        if (pairedDevices.size() > 0) {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter != null) {
+        	Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 BluetoothClass bluetoothClass = device.getBluetoothClass();
