@@ -1,26 +1,127 @@
+Remuco Android Client
+==============================================================================
+
+<!-- WIKI -->
+
+The Android client for Remuco is work in progress, but basic features already
+work.
+
+Outline
+-------------------------------------------------------------------------------
+
+ 1. [User Info][]
+ 2. [Developer Info][]
+
+User Info
+===============================================================================
+
+Prerequisites
+-------------------------------------------------------------------------------
+
+You will need a few things to get to compile the Android Client.
+
+-   A working Android SDK 8 with at least one target environment already
+    created (at least one VM). See <http://developer.android.com/sdk/index.html>
+    for details.
+-   A few dependencies from your linux distribution:
+    - *mercurial* (the soruce control tool used by Remuco)
+    - *sun-java6-jdk* (might be on an archive that is not available by default
+      on your distribution, as it's not entirely free software)
+    - *ant* ("make" for Java)
+
+Here we go ..
+-------------------------------------------------------------------------------
+
+Pull the Remuco source:
+
+    $ hg clone https://remuco.googlecode.com/hg/ remuco
+
+Go in the root directory for the android client:
+
+    $ cd remuco/client/android
+
+You will have to create a file named `local.properties` to tell your compiler
+where all the Android SDK stuff is located. Thankfully, there is already a file
+named `local.properties.exemple` wich you can just copy/paste or rename as
+`local.properties` after you have edited it. If you installed the Android SDK
+in your home directory, it might look like this:
+
+    sdk.dir=/home/john/android-sdk-linux_86
+
+Change that to suit your needs.
+
+Now you are ready to compile your Android Client and create the *APK* file you
+need to install on your phone.
+
+    $ ant debug
+
+will create an *APK* file that can help with debug,
+
+    $ ant release
+
+will create a normal installer *APK* file, while
+
+    $ ant install
+
+will create a package and automatically install it on a running Android
+Virtual Machine if you have one in your Android SDK manager.
+
+The files you will need to transfer to your phone are located in the `bin`
+sub-directory. Look for a file ending with `.apk`. Either `Remuco-debug.apk`
+or `Remuco-unsigned.apk`.
+
+Simply plug your phone with the USB connection, transfer the file to your phone,
+unplug your USB cable. Now, on your phone, browse to the SD Card directory where
+you have stored the *APK* file using any file browser you wish available on the
+Android Market (I'm currently using one named *Astro*).
+
+When you try to launch the *APK* file, your Android operating system should be
+very unhappy: you are trying to install a software that was not downloaded from
+the Android Market and that is not signed with Google's tools. This is a
+security risk and shouldn't be done lightly for anything.
+
+... but you really want this Remuco client on your phone, right ?
+
+Okay, then in your phone's configuration, you have to unlock the possibility to
+install an unsigned application. It should be somewhere at *Settings* ->
+*Applications* -> *Unknown Sources* (or whatever it is called in your locale).
+
+Then try again in your file browser and it should work. Your phone will once
+again be very unhappy that you wish to install an unsigned software but at
+least this time it should allow you to do so.
+
+If you have used any android application even remotely related to networking,
+you know what to do: set your server's IP / port or choose a bluetooth paired
+computer and you're good to go.
+
+Have fun !
+
+Check [Remuco's issue tracker][itr] when you encounter problems.
+
+[itr]: http://code.google.com/p/remuco/wiki/Issues?tm=3
+
 Developer Info
-==============
+===============================================================================
 
-Android project
----------------
+Build Properties
+----------------
 
-Initially this Android project has been created using the following command:
-
-    $ android create project --target 1 --name Remuco --path . \
-          --activity Remuco --package remuco.client.android
-
-The `local.properties` file has been added to `.hgignore`, but an example
-file `local.properties.example` is available in the repository.
+The `local.properties` file has been added to `.hgignore` as it is machine
+dependent. Use `local.properties.example` as a template to create your own
+build properties file.
 
 IDE vs. Ant
 -----------
 
 Though the Android Eclipse plugin is a good way to develop for Android, the
 `client/android` folder should not contain IDE specific files - it should
-always be possible to build the Android client using the Ant `build.xml` file.
+always be possible to build the Android client using the Ant `build.xml` file
+only.
 
-Building the client
--------------------
+Building and test the client
+----------------------------
+
+See above
 
     $ cd /path/to/remuco/client/android
     $ ant debug
@@ -30,16 +131,18 @@ Testing the client
 
 Start an emulator for an Android 1.5 device:
 
-    $ /path/to/android-sdk/tools/emulator -avd <virtual-android-1.5-device> 
+    $ /path/to/android-sdk/tools/emulator -avd <virtual-android-1.5-device>
 
 Then install the app:
 
     $ ant install # or reinstall
 
-Start the Remuco app in the emulated device and connect to `10.0.0.2`
+Start the Remuco app in the emulated device and connect to `10.0.2.2`
 (localhost of your machine running the emulator).
 
-Installing the client
----------------------
+<!-- ---------------------------------------------------------------------- -->
+<!-- in-document section links                                              -->
+<!-- ---------------------------------------------------------------------- -->
 
-See <http://code.google.com/p/remuco/wiki/Android>.
+[User Info]:      #User_Info
+[Developer Info]: #Developer_Info
