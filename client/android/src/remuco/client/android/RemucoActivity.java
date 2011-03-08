@@ -21,8 +21,6 @@
 
 package remuco.client.android;
 
-import java.util.Hashtable;
-
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.SearchDialog;
 import remuco.client.android.dialogs.VolumeDialog;
@@ -30,18 +28,16 @@ import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
-
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.WindowManager;
 
 public class RemucoActivity extends Activity{
 
@@ -95,46 +91,38 @@ public class RemucoActivity extends Activity{
 		// --- construct client info
 		
 		// get screen size
-        WindowManager w = getWindowManager();
-        Display d = w.getDefaultDisplay();
-        int width = d.getWidth();
-        int height = d.getHeight(); 
+        Display d = getWindowManager().getDefaultDisplay();
+        int imgSize = Math.min(d.getWidth(), d.getHeight());
+
+        clientInfo = Remuco.buildClientInfo(imgSize);
         
-        Log.debug("screensize: " + width + "x" + height);
-		
-        // use the smaller dimension
-        int imageSize = Math.min(width, height);
-        Log.debug("preferred image size: " + imageSize);
-		
 		// ------
 		// communication initialization
 		// ------
 		
 		// --- create player adapter
-        player = connect(this.getApplicationContext(), imageSize);
+        player = connect(this.getApplicationContext(), imgSize);
 	}
 
-    public static PlayerAdapter connect(Context context, int imageSize) {
+    public static PlayerAdapter connect(Context context, int imgSize) {
+    	// FIXME: Why is this implemented in a static context?
+    	// The problem is that this requires to manage a ClientInfo object
+    	// twice, in a static and in an instance context
+    	// (`Remuco.buildClientContext()` is a quick fix for this issue).
+    	// I guess this connection method is used to automatically connect to
+    	// the last used server. However, this results in redundant connection
+    	// code as a similar task is done in `onCreateDialog()`.
+
         // --- create player adapter
         PlayerAdapter player = new PlayerAdapter();
 
         // --- enable the Remuco Service
         context.startService(new Intent(context, RemucoService.class));
 
-        // create extra info
-        Hashtable<String,String> info = new Hashtable<String,String>();
-
-        info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
-        Log.ln("running on : " + android.os.Build.MODEL);
-
-        // afaik every android (so far) has a touchscreen and is using unicode
-        info.put("touch", "yes");
-        info.put("utf8", "yes");
-
         // --- try to connect to the last hostname
         SharedPreferences preference = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        ClientInfo clientInfo = new ClientInfo(imageSize, "PNG", 50, info);
 
+        ClientInfo clientInfo = Remuco.buildClientInfo(imgSize);
         int lastType = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
         String lastHostname = preference.getString(LAST_HOSTNAME, "");
         int lastPort = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);

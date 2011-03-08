@@ -21,9 +21,11 @@
 
 package remuco.client.android;
 
-import remuco.client.android.dialogs.RatingDialog;
-import remuco.client.common.util.Log;
+import java.util.Hashtable;
 
+import remuco.client.android.dialogs.RatingDialog;
+import remuco.client.common.data.ClientInfo;
+import remuco.client.common.util.Log;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +39,6 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class Remuco extends RemucoActivity implements OnClickListener{
 	
@@ -66,6 +67,23 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 	RatingBar infoRatingBar;
 
 	
+	/**
+	 * Central utility method to create a client info.
+	 *
+	 * @param imgSize
+	 */
+	public static ClientInfo buildClientInfo(int imgSize) {
+		// TODO: this should be configurable by a user
+        // create extra info
+        Hashtable<String,String> info = new Hashtable<String,String>();
+        info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
+        Log.ln("running on : " + android.os.Build.MODEL);
+        // afaik every android (so far) has a touchscreen and is using unicode
+        info.put("touch", "yes");
+        info.put("utf8", "yes");
+        return new ClientInfo(imgSize, "PNG", 50, info);
+	}
+
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
 	
