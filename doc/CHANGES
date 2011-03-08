@@ -1,13 +1,17 @@
-Release 0.9.3.2 (in development)
-================================
-
-This is a minor bug fix release.
+Release 0.9.4 (in development)
+==============================
 
 Player adapters
 ---------------
 
   * Banshee: Adapted to DBus-API changes in 1.6.0 (see [issue 126][i126]).
   * New: gmusicbrowser
+
+Clients
+-------
+
+  * Android: various new features and improvements and fixes (library support
+    still is a bit buggy, but the basic features work pretty well).
 
 [i126]: http://code.google.com/p/remuco/issues/detail?id=126
 
