@@ -79,6 +79,8 @@ public class ViewHandler extends Handler {
 			remuco.ctrlPrev.setClickable(true);
 			remuco.ctrlPlay.setClickable(true);
 			remuco.ctrlNext.setClickable(true);
+			remuco.ctrlShuffle.setClickable(true);
+			remuco.ctrlRepeat.setClickable(true);
 			
 			// update rating bar
 			remuco.infoRatingBar.setNumStars(info.getMaxRating());
@@ -100,6 +102,8 @@ public class ViewHandler extends Handler {
 			remuco.ctrlPrev.setClickable(false);
 			remuco.ctrlPlay.setClickable(false);
 			remuco.ctrlNext.setClickable(false);
+			remuco.ctrlShuffle.setClickable(false);
+			remuco.ctrlRepeat.setClickable(false);
 
 			// show ape picture
 			remuco.infoCover.setImageResource(R.drawable.remuco_128);

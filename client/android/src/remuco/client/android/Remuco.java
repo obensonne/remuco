@@ -121,6 +121,9 @@ public class Remuco extends RemucoActivity implements OnClickListener{
                 }
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
+                    if (player == null ||
+                        player.getPlayer() == null)
+                        return;
                     int end = ctrlProgressBar.getProgress();
                     player.getPlayer().ctrlSeek((end - start));
                 }
@@ -228,6 +231,10 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 	
 	@Override
 	public void onClick(View v) {
+        if (player == null ||
+            player.getPlayer() == null)
+            return;
+
 		switch(v.getId()){
 		case R.id.CtrlPlay:
 			player.getPlayer().ctrlPlayPause();
