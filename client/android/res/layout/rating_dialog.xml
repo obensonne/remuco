@@ -2,21 +2,18 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	android:padding="5px">
-  
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
   
 	<RatingBar android:id="@+id/rating_dialog_rating_bar" 
+        style="@style/remucoRatingBar"
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"
 		android:stepSize="1.0"/>
-		
 	
 	<Button android:id="@+id/rating_dialog_ok_button" 
 		android:text="@android:string/ok" 
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"/>
+        android:padding="10dp"/>
 </LinearLayout>
