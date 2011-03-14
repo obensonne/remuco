@@ -168,7 +168,8 @@ def build_release_tarballs(release):
 RELEASE_TODOS = """Things to do before building release tarballs:
  - remove "(in development)" marker in doc/CHANGES
  - update version numbers (grep for the last release number)
- - update wiki (also check version numbers there)"""
+ - update wiki (also check version numbers there)
+ - tag it"""
 
 def show_release_todos():
 
