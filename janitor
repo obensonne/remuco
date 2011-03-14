@@ -112,29 +112,54 @@ def build_release_tarballs(release):
     
     excludes = " ".join(["--exclude %s" % x for x in TARBALL_EXCLUDE])
     
+    # create a source archive from the repo
     cmd = "hg archive -r %s -t tgz %s %s" % (release, excludes, pkg_src_tb)
     subprocess.check_call(cmd.split())
     
+    # extract source archive into build dir
     cmd = "tar zxf %s -C %s" % (pkg_src_tb, build_dir)
     subprocess.check_call(cmd.split())
     
+    # set up midp client build environment in extracted source
     cmd = "%s/%s/client/midp/setup.sh" % (build_dir, pkg_src)
     subprocess.check_call(cmd.split())
     
+    # build midp client in extracted source
     cmd = "ant -f %s/client/midp/build.xml dist.all" % pkg_src_dir
     subprocess.check_call(cmd.split())
     
+    # save built midp client app
     shutil.move("%s/client/midp/app" % pkg_src_dir, build_dir)
+
+    # build android client in extracted source
+    lprops = "%s/client/android/local.properties" % pkg_src_dir
+    shutil.copy(lprops + ".example", lprops)
+    cmd = "ant debug"
+    cwd = "%s/client/android" % pkg_src_dir
+    subprocess.check_call(cmd.split(), cwd=cwd)
+
+    # save built android client
+    shutil.move("%s/client/android/bin/Remuco-debug.apk" % pkg_src_dir,
+                "%s/remuco.apk" % build_dir)
+
+    # delete dirty extracted source
     shutil.rmtree(pkg_src_dir)
     
+    # extract (fresh) source archive into build dir
     cmd = "tar zxf %s -C %s" % (pkg_src_tb, build_dir)
     subprocess.check_call(cmd.split())
 
-    shutil.move("%s/app" % build_dir, "%s/client/midp/app" % pkg_src_dir )
+    # move saved client apps into extracted source
+    shutil.move("%s/app" % build_dir, "%s/client/midp/app" % pkg_src_dir)
+    os.mkdir("%s/client/android/app" % pkg_src_dir)
+    shutil.move("%s/remuco.apk" % build_dir, "%s/client/android/app" % pkg_src_dir)
+
+    # rename to complete (incl. binary) package
     shutil.move(pkg_src_dir, pkg_all_dir)
     
     cmd = "tar zcf %s -C %s %s" % (pkg_all_tb, build_dir, pkg_all)
     subprocess.check_call(cmd.split())
+
 
 # -----------------------------------------------------------------------------
 # show_release_reminders
