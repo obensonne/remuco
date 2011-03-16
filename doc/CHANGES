@@ -1,5 +1,10 @@
-Release 0.9.4 (in development)
-==============================
+Release 0.9.4
+=============
+
+Base
+----
+
+  * Remuco now requires Python 2.6.
 
 Player adapters
 ---------------
@@ -12,6 +17,7 @@ Clients
 
   * Android: various new features and improvements and fixes (library support
     still is a bit buggy, but the basic features work pretty well).
+  * Android: ready-to-install package included in the release tarball
 
 [i126]: http://code.google.com/p/remuco/issues/detail?id=126
 
