@@ -108,8 +108,6 @@ Android Client
 The Android client requires Android ≥ 2.1 (though older versions may work).
 Check the [client device list][wcd], maybe your phone is already listed there.
 
-[wac]: http://code.google.com/p/remuco/wiki/AndroidClient
-
 
 Installation
 ===============================================================================
@@ -170,10 +168,15 @@ but yet requires some tweaks, features and fixes. That's why you won't find it
 in the Market. However, you'll find a test version in `client/android/app` to
 install manually (e.g. via USB) on your device.
 
-If you'd like to contribute to the Android client, or if you want to run the
-most recent version, check the [build instructions in the wiki][wac].
+**Note:** You have to tune your phone settings to allow the installation of
+applications from untrusted sources (i.e. not from the market).
 
-[wac]: http://code.google.com/p/remuco/wiki/AndroidClient
+Additionally you may want to check the [Android page in the wiki][wan] for
+further information. There you'll also find some instructions how to build
+the client from source, in case you want to contribute or use the most recent
+version.
+
+[wan]: http://code.google.com/p/remuco/wiki/Android
 
 Usage
 ===============================================================================
