@@ -23,15 +23,15 @@ documentation file if you don't use the most recent Remuco version.
 Outline
 -------------------------------------------------------------------------------
 
- 1. [Quick Start][]  
- 2. [Requirements][]  
- 3. [Installation][]  
- 4. [Usage][]  
- 5. [Configuration][]  
- 6. [Known Issues][]  
- 7. [Troubleshooting][]  
- 8. [Development][]  
- 9. [Packager Information][]  
+ 1. [Quick Start][]
+ 2. [Requirements][]
+ 3. [Installation][]
+ 4. [Usage][]
+ 5. [Configuration][]
+ 6. [Known Issues][]
+ 7. [Troubleshooting][]
+ 8. [Development][]
+ 9. [Packager Information][]
 
 <!-- WIKI -->
 
@@ -198,7 +198,7 @@ Exaile, Rhythmbox, Totem
 -------------------------------------------------------------------------------
 
 The player adapter actually is a plugin of the player. Thus it gets started
-automatically once you activate the Remuco plugin within the player. 
+automatically once you activate the Remuco plugin within the player.
 
 MPD
 -------------------------------------------------------------------------------
@@ -247,7 +247,7 @@ type that last command every time you want to play something with *mplayer*.
 To make your life easier, add this script to your `~/bin` directory:
 
     [ -z $1 ] && echo "Usage: $0 file2 file2 ..." && exit 1
-    
+
     # if mplayer is installed elsewhere, change /usr/bin/mplayer to the correct location
     /usr/bin/mplayer $@ | tee $HOME/.cache/remuco/mplayer.statusfifo
 
@@ -260,7 +260,7 @@ TVtime
 The player adapter can be started with the command `remuco-tvtime`.
 
 For navigating in TVtime's menu with the Remuco client, the keys on the client
-have special functions when using the TVtime adapter: 
+have special functions when using the TVtime adapter:
 
 Client Key | TVtime Key
 -----------|-----------
@@ -312,7 +312,7 @@ file. The player specific options are described below.
 Amarok, Audacious, Songbird, VLC (MPRIS based adapters)
 -------------------------------------------------------------------------------
 
- - `x-playlist-jump-enabled`:  
+ - `x-playlist-jump-enabled`:
    Toggle playlist jump action (default: `0`). If enabled, clients may jump
    within the player's playlist. This is disabled by default because the player
    interface does not support such an action. Remuco implements a dirty hack to
@@ -322,14 +322,14 @@ Amarok, Audacious, Songbird, VLC (MPRIS based adapters)
 MPD
 -------------------------------------------------------------------------------
 
- - `x-mpd-host`:  
+ - `x-mpd-host`:
    Host running MPD (default: `localhost`).
- - `x-mpd-port`:  
-   Port used by MPD (default: `6600`).  
- - `x-mpd-password`:  
+ - `x-mpd-port`:
+   Port used by MPD (default: `6600`).
+ - `x-mpd-password`:
    Password to use when connecting to MPD. Must be set if MPD is configured to
    restrict certain actions with a password requirement.
- - `x-mpd-music`:  
+ - `x-mpd-music`:
    Root directory of MPD's music directory (default: `/var/lib/mpd/music`).
    Used for searching cover art files and only works if MPD is at localhost.
 
@@ -338,11 +338,11 @@ The defaults should work for most MPD setups.
 MPlayer
 -------------------------------------------------------------------------------
 
- - `x-cmdfifo`:  
+ - `x-cmdfifo`:
    FIFO file to use to send commands to MPlayer (default:
    `~/.cache/remuco/mplayer.cmdfifo`). For details see MPlayer usage in the
    [Usage][] section above.
- - `x-statusfifo`:  
+ - `x-statusfifo`:
    FIFO file to use to read output from MPlayer (default:
    ~/.cache/remuco/mplayer.statusfifo). For details see MPlayer usage in the
    [Usage][] section above.
@@ -371,7 +371,7 @@ option `interface=wifi` in a WiFi connection's configuration screen
 Internet Service) instead of the real WiFi interface.
 
 Another user [reported][i67] that the option `deviceside=true` had to be set in
-order to circumvent BES proxy connections. If it still fails, have a try with 
+order to circumvent BES proxy connections. If it still fails, have a try with
 some other [options for WiFi connections on BlackBerry devices][owb] and drop a
 note on the [mailing list][rml] in case you found a useful option.
 
@@ -435,7 +435,7 @@ Android
 -------------------------------------------------------------------------------
 
  - Go and fix it :-P (client is still in development).
- 
+
 <!-- WIKI -->
 
 Development
