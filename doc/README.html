@@ -33,24 +33,15 @@ documentation file if you don't use the most recent Remuco version.</p>
 <a name="Outline" />
 <h2 id="outline">Outline</h2>
 <ol>
-<li><a href="#Quick_Start">Quick Start</a><br />
-</li>
-<li><a href="#Requirements">Requirements</a><br />
-</li>
-<li><a href="#Installation">Installation</a><br />
-</li>
-<li><a href="#Usage">Usage</a><br />
-</li>
-<li><a href="#Configuration">Configuration</a><br />
-</li>
-<li><a href="#Known_Issues">Known Issues</a><br />
-</li>
-<li><a href="#Troubleshooting">Troubleshooting</a><br />
-</li>
-<li><a href="#Development">Development</a><br />
-</li>
-<li><a href="#Packager_Information">Packager Information</a><br />
-</li>
+<li><a href="#Quick_Start">Quick Start</a></li>
+<li><a href="#Requirements">Requirements</a></li>
+<li><a href="#Installation">Installation</a></li>
+<li><a href="#Usage">Usage</a></li>
+<li><a href="#Configuration">Configuration</a></li>
+<li><a href="#Known_Issues">Known Issues</a></li>
+<li><a href="#Troubleshooting">Troubleshooting</a></li>
+<li><a href="#Development">Development</a></li>
+<li><a href="#Packager_Information">Packager Information</a></li>
 </ol>
 <!-- WIKI -->
 
@@ -174,7 +165,7 @@ MPRIS Add-on (see above in section <a href="#Requirements">Requirements</a>).</p
 <a name="Exaile%2C_Rhythmbox%2C_Totem" />
 <h2 id="exaile-rhythmbox-totem">Exaile, Rhythmbox, Totem</h2>
 <p>The player adapter actually is a plugin of the player. Thus it gets started
-automatically once you activate the Remuco plugin within the player. </p>
+automatically once you activate the Remuco plugin within the player.</p>
 <a name="MPD" />
 <h2 id="mpd">MPD</h2>
 <p>The player adapter can be started with the command <code>remuco-mpd</code>.</p>
@@ -220,7 +211,7 @@ your <em>PATH</em> environment variable.</p>
 <h2 id="tvtime">TVtime</h2>
 <p>The player adapter can be started with the command <code>remuco-tvtime</code>.</p>
 <p>For navigating in TVtime's menu with the Remuco client, the keys on the client
-have special functions when using the TVtime adapter: </p>
+have special functions when using the TVtime adapter:</p>
 <table>
 <thead>
 <tr>
@@ -287,7 +278,7 @@ players (look for options starting with <code>x-</code>).</p>
 file. The player specific options are described below.</p>
 <h2 id="amarok-audacious-songbird-vlc-mpris-based-adapters">Amarok, Audacious, Songbird, VLC (MPRIS based adapters)</h2>
 <ul>
-<li><code>x-playlist-jump-enabled</code>:<br />
+<li><code>x-playlist-jump-enabled</code>:
    Toggle playlist jump action (default: <code>0</code>). If enabled, clients may jump
    within the player's playlist. This is disabled by default because the player
    interface does not support such an action. Remuco implements a dirty hack to
@@ -297,15 +288,14 @@ file. The player specific options are described below.</p>
 <a name="MPD" />
 <h2 id="mpd_1">MPD</h2>
 <ul>
-<li><code>x-mpd-host</code>:<br />
+<li><code>x-mpd-host</code>:
    Host running MPD (default: <code>localhost</code>).</li>
-<li><code>x-mpd-port</code>:<br />
-   Port used by MPD (default: <code>6600</code>).<br />
-</li>
-<li><code>x-mpd-password</code>:<br />
+<li><code>x-mpd-port</code>:
+   Port used by MPD (default: <code>6600</code>).</li>
+<li><code>x-mpd-password</code>:
    Password to use when connecting to MPD. Must be set if MPD is configured to
    restrict certain actions with a password requirement.</li>
-<li><code>x-mpd-music</code>:<br />
+<li><code>x-mpd-music</code>:
    Root directory of MPD's music directory (default: <code>/var/lib/mpd/music</code>).
    Used for searching cover art files and only works if MPD is at localhost.</li>
 </ul>
@@ -313,11 +303,11 @@ file. The player specific options are described below.</p>
 <a name="MPlayer" />
 <h2 id="mplayer_1">MPlayer</h2>
 <ul>
-<li><code>x-cmdfifo</code>:<br />
+<li><code>x-cmdfifo</code>:
    FIFO file to use to send commands to MPlayer (default:
    <code>~/.cache/remuco/mplayer.cmdfifo</code>). For details see MPlayer usage in the
    <a href="#Usage">Usage</a> section above.</li>
-<li><code>x-statusfifo</code>:<br />
+<li><code>x-statusfifo</code>:
    FIFO file to use to read output from MPlayer (default:
    ~/.cache/remuco/mplayer.statusfifo). For details see MPlayer usage in the
    <a href="#Usage">Usage</a> section above.</li>
@@ -338,7 +328,7 @@ option <code>interface=wifi</code> in a WiFi connection's configuration screen
 (<a href="http://wiki.remuco.googlecode.com/hg/images/exos/emulator-ifacewifi.png">screenshot</a>). Otherwise the phone tries to connect using BIS (BlackBerry
 Internet Service) instead of the real WiFi interface.</p>
 <p>Another user <a href="http://code.google.com/p/remuco/issues/detail?id=67">reported</a> that the option <code>deviceside=true</code> had to be set in
-order to circumvent BES proxy connections. If it still fails, have a try with 
+order to circumvent BES proxy connections. If it still fails, have a try with
 some other <a href="http://www.blackberry.com/developers/docs/5.0.0api/javax/microedition/io/Connector.html#socket">options for WiFi connections on BlackBerry devices</a> and drop a
 note on the <a href="http://groups.google.com/group/remuco">mailing list</a> in case you found a useful option.</p>
 <a name="Phones_operated_by_AT%26amp%3BT_Wireless_or_T-Mobile_U.S." />
