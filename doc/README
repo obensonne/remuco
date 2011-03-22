@@ -71,7 +71,7 @@ Player specific
  - __Amarok14:__      Amarok ≥ 1.4 and < 2.0, Python module *eyeD3*
  - __Audacious:__     Audacious ≥ 1.5.1 (2.1 has issues, 2.2 works again)
  - __Banshee:__       Banshee ≥ 1.6.0
- - __Exaile:__        Exaile ≥ 0.3.0
+ - __Exaile:__        Exaile ≥ 0.3.1
  - __gmusicbrowser:__ gmusicbrowser ≥ 1.0.2
  - __MPD:__           MPD ≥ 0.13.2, Python module [*mpd*][pym] (≥ 0.2)
  - __Quod Libet:__    Quod Libet ≥ 2.2
