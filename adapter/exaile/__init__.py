@@ -37,6 +37,11 @@ try:
 except ImportError:
     class NoCoverFoundException(Exception): pass # exaile 3.1
 
+try:
+    from xl import covers # exaile 3.2
+except ImportError:
+    pass # exaile 3.1
+
 import remuco
 from remuco import log
 
@@ -470,7 +475,10 @@ class ExaileAdapter(remuco.PlayerAdapter):
             else: # Exaile >= 0.3.1
                 info[remuco.INFO_BITRATE] = get_tag("__bitrate") // 1000
                 info[remuco.INFO_LENGTH] = int(get_tag("__length"))
-                idata = self.__ex.covers.get_cover(track, set_only=True)
+                if self.__ex.get_version() < "0.3.2":
+                    idata = self.__ex.covers.get_cover(track, set_only=True)
+                else:
+                    idata = covers.MANAGER.get_cover(track, set_only=True)
                 if idata:
                     img = os.path.join(self.config.cache, "exaile.cover")
                     with open(img, "w") as fp:
