@@ -171,7 +171,10 @@ class TotemAdapter(remuco.PlayerAdapter):
         
         progress = self.__to.get_current_time()
         
-        self.__to.action_seek_relative(self.__seek_step * direction)
+        try:
+            self.__to.action_seek_relative(self.__seek_step * direction) # Before accurate
+        except TypeError:
+            self.__to.action_seek_relative(self.__seek_step * direction, False) # After accurate
         
         gobject.idle_add(self.__poll_progress)
 
