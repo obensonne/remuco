@@ -1,3 +1,15 @@
+Release 0.9.5 (in development)
+==============================
+
+Player adapters
+---------------
+
+  * Exaile: Adapted to API changes in Exaile 0.3.2 (see [issue 118][i118]).
+  * Totem: Adapted to recent API changes (see [issue 150][i150]).
+
+[i118]: http://code.google.com/p/remuco/issues/detail?id=118
+[i150]: http://code.google.com/p/remuco/issues/detail?id=150
+
 Release 0.9.4
 =============
 
