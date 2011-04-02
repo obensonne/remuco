@@ -219,10 +219,17 @@ CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
 
 for variant in ("", "no-bluetooth", "motorola-fix"):
     sdir = "client/midp/app/%s" % variant
-    ddir = "%s/%s" % (CLIENT_DEST, variant)
+    ddir = "%s/midp/%s" % (CLIENT_DEST, variant)
     if client and os.path.exists("%s/remuco.jar" % sdir):
         data_files.append((ddir, ["%s/remuco.jar" % sdir,
                                   "%s/remuco.jad" % sdir]))
+
+# This expects the Android APK file at client/android/app/remuco.apk, which is
+# true for a binary release package, but not for the source package.
+sdir = "client/android/app"
+ddir = "%s/android" % CLIENT_DEST
+if client and os.path.exists("%s/remuco.apk" % sdir):
+    data_files.append((ddir, ["%s/remuco.apk" % sdir]))
 
 # =============================================================================
 # setup
