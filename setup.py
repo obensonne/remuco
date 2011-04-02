@@ -236,7 +236,7 @@ if client and os.path.exists("%s/remuco.apk" % sdir):
 # =============================================================================
 
 setup(name='remuco',
-      version='0.9.4',
+      version='0.9.5',
       description='Remuco is a remote control system for media players.',
       author='Remuco team',
       url='http://remuco.googlecode.com',

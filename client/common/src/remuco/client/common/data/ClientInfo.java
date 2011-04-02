@@ -43,7 +43,7 @@ public final class ClientInfo implements ISerializable {
 	private final SerialAtom[] atoms;
 
 	/** Remuco version */
-	public static final String VERSION = "0.9.4"; // VERSION_CHECK
+	public static final String VERSION = "0.9.5"; // VERSION_CHECK
 
 	/**
 	 * Create a new client info.
