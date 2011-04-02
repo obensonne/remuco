@@ -50,7 +50,7 @@ pa_files["banshee"] = [
     ["remuco-banshee"]
 ]
 
-# --- Rhythmbox ---------------------------------------------------------------
+# --- Exaile ------------------------------------------------------------------
 
 # set prefix may not be valid for Exaile -> use an Exaile specific prefix:
 PREFIX_EXAILE = os.getenv("PREFIX_EXAILE", "/usr/")
@@ -65,6 +65,12 @@ pa_files["exaile"] = [
 
 pa_files["fooplay"] = [
     ["remuco-fooplay"]
+]
+
+# --- gmusicbrowser -----------------------------------------------------------
+
+pa_files["gmusicbrowser"] = [
+    ["remuco-gmusicbrowser"]
 ]
 
 # --- MPD ---------------------------------------------------------------------
