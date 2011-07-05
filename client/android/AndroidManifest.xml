@@ -58,8 +58,14 @@
           <meta-data android:name="android.appwidget.provider"
                      android:resource="@xml/remucowidget" />
         </receiver>
+        <receiver android:name=".RemucoPhoneReceiver">
+          <intent-filter>
+            <action android:name="android.intent.action.PHONE_STATE" />
+          </intent-filter>
+        </receiver>
     </application>
 
     <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
 </manifest> 
