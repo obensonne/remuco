@@ -44,6 +44,11 @@ public class RemucoPhoneListener extends PhoneStateListener {
             player = RemucoActivity.connect(context, 0);
         }
 
+        if (player == null ||
+            player.getPlayer() == null ||
+            player.getPlayer().state == null)
+            return;
+
         int playerState = player.getPlayer().state.getPlayback();
 
         switch(phoneState) {
