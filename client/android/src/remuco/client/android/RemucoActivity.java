@@ -113,6 +113,10 @@ public class RemucoActivity extends Activity{
     	// the last used server. However, this results in redundant connection
     	// code as a similar task is done in `onCreateDialog()`.
 
+        // In onCreateDialog, we just reconnect to the server. In this method we
+        // initialize the full connection giving the image size and client info.
+        // It is called from `onCreate()`.
+
         // --- create player adapter
         PlayerAdapter player = new PlayerAdapter();
 
