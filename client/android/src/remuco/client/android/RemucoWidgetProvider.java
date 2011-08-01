@@ -91,6 +91,10 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
             createPlayer(context);
         }
 
+        if (player.getPlayer() == null) {
+            return;
+        }
+
         if (intent.getAction().equals(ACTION_PREV)) {
             player.getPlayer().ctrlPrev();
         } else if (intent.getAction().equals(ACTION_PLAY)) {
