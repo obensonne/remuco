@@ -142,7 +142,8 @@ class MplayerAdapter(remuco.PlayerAdapter):
         # and the manager will call stop_pa again
         remuco.PlayerAdapter.stop(self)
 
-        os.closerange(self.fd_cmd_stream_in, self.fd_status_stream_out)
+        if self.fd_cmd_stream_in is not None:
+            os.closerange(self.fd_cmd_stream_in, self.fd_status_stream_out)
 
         [self.fd_cmd_stream_in, self.fd_cmd_stream_out,
             self.fd_status_stream_in, self.fd_status_stream_out] = [None]*4
