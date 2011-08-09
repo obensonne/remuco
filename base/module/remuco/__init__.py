@@ -72,6 +72,7 @@ Logging:
 #==============================================================================
 
 from remuco.adapter import PlayerAdapter, ItemAction, ListAction, ListReply
+from remuco.adapter import MIMETYPES_AUDIO, MIMETYPES_VIDEO, MIMETYPES_AV
 from remuco.config import Config
 from remuco.defs import *
 from remuco.manager import Manager
@@ -88,6 +89,8 @@ __all__ = ["PlayerAdapter", "ListReply", "MPRISAdapter",
            "INFO_RATING", "INFO_TAGS", "INFO_TITLE", "INFO_YEAR",
            
            "PLAYBACK_PAUSE", "PLAYBACK_PLAY", "PLAYBACK_STOP",
+
+           "MIMETYPES_AUDIO", "MIMETYPES_VIDEO", "MIMETYPES_AV",
            ]
 
 __version__ = REMUCO_VERSION

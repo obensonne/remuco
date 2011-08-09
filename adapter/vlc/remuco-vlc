@@ -40,7 +40,7 @@ class VLCAdapter(remuco.MPRISAdapter):
     def __init__(self):
         
         remuco.MPRISAdapter.__init__(self, "vlc", "VLC",
-                                     mime_types=("audio", "video"))
+                                     mime_types=remuco.MIMETYPES_AV)
         
         self.__retry_track_active = False
         

@@ -88,7 +88,7 @@ class TotemAdapter(remuco.PlayerAdapter):
     def __init__(self):
         
         remuco.PlayerAdapter.__init__(self, "Totem",
-                                      mime_types=("audio", "video"),
+                                      mime_types=remuco.MIMETYPES_AV,
                                       volume_known=True,
                                       playback_known=True,
                                       progress_known=True,

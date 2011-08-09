@@ -55,7 +55,7 @@ class MplayerAdapter(remuco.PlayerAdapter):
         remuco.PlayerAdapter.__init__(self, "MPlayer",
                                       progress_known=True,
                                       file_actions=FILE_ACTIONS,
-                                      mime_types=("audio", "video"))
+                                      mime_types=remuco.MIMETYPES_AV)
 
         self.__mode = MODE_INDEPENDENT
 

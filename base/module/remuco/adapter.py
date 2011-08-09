@@ -317,6 +317,10 @@ class ItemAction(object):
 # player adapter
 # =============================================================================
 
+MIMETYPES_AUDIO = ("audio", "application/ogg")
+MIMETYPES_VIDEO = ("video",)
+MIMETYPES_AV = MIMETYPES_AUDIO + MIMETYPES_VIDEO
+
 class PlayerAdapter(object):
     '''Base class for Remuco player adapters.
     

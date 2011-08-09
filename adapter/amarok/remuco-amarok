@@ -40,7 +40,8 @@ class AmarokAdapter(remuco.MPRISAdapter):
     def __init__(self):
         
         remuco.MPRISAdapter.__init__(self, "amarok", "Amarok",
-                                     mime_types=("audio",), rating=True)
+                                     mime_types=remuco.MIMETYPES_AUDIO,
+                                     rating=True)
         
         self.__am = None
         

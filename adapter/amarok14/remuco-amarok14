@@ -68,7 +68,7 @@ class Amarok14Adapter(remuco.PlayerAdapter):
                                       progress_known=True,
                                       shuffle_known=True,
                                       repeat_known=True,
-                                      mime_types=("audio",),
+                                      mime_types=remuco.MIMETYPES_AUDIO,
                                       max_rating=10,
                                       poll=10,
                                       search_mask=SEARCH_MASK

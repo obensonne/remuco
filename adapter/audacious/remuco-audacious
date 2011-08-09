@@ -47,7 +47,7 @@ class AudaciousAdapter(remuco.MPRISAdapter):
     def __init__(self):
         
         remuco.MPRISAdapter.__init__(self, "audacious", "Audacious",
-                                     mime_types=("audio",),
+                                     mime_types=remuco.MIMETYPES_AUDIO,
                                      extra_playlist_actions=PLAYLIST_ACTIONS)
         
         self.__ad = None
