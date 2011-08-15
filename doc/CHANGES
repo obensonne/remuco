@@ -15,6 +15,7 @@ Clients
   * Android: automatically pause playback on incoming calls (see
     [issue 165][i165]).
 
+[i155]: http://code.google.com/p/remuco/issues/detail?id=155
 [i156]: http://code.google.com/p/remuco/issues/detail?id=156
 [i165]: http://code.google.com/p/remuco/issues/detail?id=165
 
