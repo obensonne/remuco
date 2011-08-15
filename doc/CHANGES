@@ -4,6 +4,8 @@ Release 0.9.6 (in development)
 Player adapters
 ---------------
 
+  * Various: make all OGG files are visible in file browser (see
+    [issue 155][i155]).
   * MPlayer: don't crash on failed/broken MPlayer connections (see
     [issue 156][i156]).
 
