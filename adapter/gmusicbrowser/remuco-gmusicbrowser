@@ -22,17 +22,16 @@
 #
 # =============================================================================
 
-
-
 """Gmusicbrowser adapter for Remuco, implemented as an executable script.
-	By Sayan "Riju" Chakrabarti <me[at]sayanriju.co.cc>
+
+By Sayan "Riju" Chakrabarti <me[at]sayanriju.co.cc>
 """
+
 import dbus
 from dbus.exceptions import DBusException
 
 import remuco
 from remuco import log
-
 
 class GmusicbrowserAdapter(remuco.PlayerAdapter):
 
@@ -41,13 +40,13 @@ class GmusicbrowserAdapter(remuco.PlayerAdapter):
                                       progress_known=True,
                                       playback_known=True,
                                       volume_known=True)
-        self.__ad = None
-        self.__songLen=0
-        self.__pos=0
+        self.__gm = None
+        self.__songLen = 0
+        self.__pos = 0
         # Following is the value (100%) to which both the player
         # volume and the client volume is set when either the adapter
         # started OR the client is unmuted.
-        self.__vol=100
+        self.__vol = 100
 
     def start(self):
         remuco.PlayerAdapter.start(self)
@@ -55,7 +54,7 @@ class GmusicbrowserAdapter(remuco.PlayerAdapter):
         try:
             bus = dbus.SessionBus()
             obj = bus.get_object("org.gmusicbrowser","/org/gmusicbrowser")
-            self.__ad = dbus.Interface(obj, "org.gmusicbrowser")
+            self.__gm = dbus.Interface(obj, "org.gmusicbrowser")
         except DBusException, e:
             raise StandardError("dbus error: %s" % e)
 
@@ -63,28 +62,27 @@ class GmusicbrowserAdapter(remuco.PlayerAdapter):
         self.poll()
         # Increase player vol until its 100% to match client vol
         for i in range(0,10):
-            self.__ad.RunCommand("IncVolume")
+            self.__gm.RunCommand("IncVolume")
         self.update_volume(self.__vol)
 
     def stop(self):
         remuco.PlayerAdapter.stop(self)
         log.debug("bye, turning off the light")
-        self.__ad = None
+        self.__gm = None
 
     def poll(self):
-        item = self.__ad.CurrentSong()
+        item = self.__gm.CurrentSong()
         self.__songLen = int(item['length'])
-        self.__pos=int(self.__ad.GetPosition())
-        playing = self.__ad.Playing()
-        self.update_item('',item,'')
-        self.update_progress(self.__pos,self.__songLen)
+        self.__pos = int(self.__gm.GetPosition())
+        playing = self.__gm.Playing()
+        # TODO: item['track'] may give us path we can use to find cover art
+        self.update_item('', item, '')
+        self.update_progress(self.__pos, self.__songLen)
         if playing:
             self.update_playback(remuco.PLAYBACK_PLAY)
         else:
             self.update_playback(remuco.PLAYBACK_PAUSE)
         self.update_volume(self.__vol)
-
-
 
     # =========================================================================
     # control interface
@@ -92,40 +90,40 @@ class GmusicbrowserAdapter(remuco.PlayerAdapter):
 
     def ctrl_toggle_playing(self):
         log.debug("toggle FooPlay's playing status")
-        self.__ad.RunCommand("PlayPause")
+        self.__gm.RunCommand("PlayPause")
         self.poll()
 
     def ctrl_next(self):
-        self.__ad.RunCommand("NextSongInPlaylist")
+        self.__gm.RunCommand("NextSongInPlaylist")
         self.poll()
 
     def ctrl_previous(self):
-        self.__ad.RunCommand("PrevSongInPlaylist")
+        self.__gm.RunCommand("PrevSongInPlaylist")
         self.poll()
 
     def ctrl_volume(self, direction):
         if direction == 0:
-            self.__ad.RunCommand("TogMute")
+            self.__gm.RunCommand("TogMute")
             if self.__vol != 0:
-                self.__vol=0
+                self.__vol = 0
             else:
-                self.__vol=100
+                self.__vol = 100
                 for i in range(0,10):
-                    self.__ad.RunCommand("IncVolume")
+                    self.__gm.RunCommand("IncVolume")
         elif direction == -1:
-            self.__ad.RunCommand("DecVolume")
-            self.__vol=(self.__vol -10) if self.__vol>=10 else 0
+            self.__gm.RunCommand("DecVolume")
+            self.__vol = (self.__vol - 10) if self.__vol >= 10 else 0
         else:
-            self.__ad.RunCommand("IncVolume")
-            self.__vol=(self.__vol+10) if self.__vol<=90 else 100
+            self.__gm.RunCommand("IncVolume")
+            self.__vol = (self.__vol + 10) if self.__vol <= 90 else 100
 
         self.update_volume(self.__vol)
 
     def ctrl_seek(self, direction):
         if direction == -1:
-            self.__ad.RunCommand("Rewind 5")
+            self.__gm.RunCommand("Rewind 5")
         else:
-            self.__ad.RunCommand("Forward 5")
+            self.__gm.RunCommand("Forward 5")
         self.poll()
 
 
