@@ -503,9 +503,10 @@ class BluetoothServer(_Server):
             # bluez does not always convert its internal error into a
             # IOError-based BluetoothError, so we need to catch here everything
             # and convert internal Bluetooth errors to regular IO errors.
-            if isinstance(e, tuple) and len(e) == 2:
-                e = IOError(*e) # `e` is (errno, strerror)
-            raise e
+            if isinstance(e, IOError):
+                raise e
+            else:
+                raise IOError(*e)
         
         return sock
         
