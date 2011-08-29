@@ -20,7 +20,6 @@
 #
 # =============================================================================
 
-import errno
 import socket
 import struct
 import time
@@ -492,24 +491,21 @@ class BluetoothServer(_Server):
 
     def _create_socket(self):
         
-        sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        
-        sock.settimeout(0.33)
-        
         try:
+            sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
             sock.bind(("", self._config.bluetooth_channel or bluetooth.PORT_ANY))
+            sock.settimeout(0.33)
+            bluetooth.advertise_service(sock, self._pinfo.name,
+                service_id=BluetoothServer.UUID,
+                service_classes=[BluetoothServer.UUID, bluetooth.SERIAL_PORT_CLASS],
+                profiles=[bluetooth.SERIAL_PORT_PROFILE])
         except Exception, e:
-            # convert error to regular IO error
-            ioe = IOError()
-            ioe.errno = e[0]
-            ioe.strerror = e[1]
-            raise ioe
-        sock.listen(1)
-        
-        bluetooth.advertise_service(sock, self._pinfo.name,
-            service_id = BluetoothServer.UUID,
-            service_classes = [ BluetoothServer.UUID, bluetooth.SERIAL_PORT_CLASS ],
-            profiles = [ bluetooth.SERIAL_PORT_PROFILE ])
+            # bluez does not always convert its internal error into a
+            # IOError-based BluetoothError, so we need to catch here everything
+            # and convert internal Bluetooth errors to regular IO errors.
+            if isinstance(e, tuple) and len(e) == 2:
+                e = IOError(*e) # `e` is (errno, strerror)
+            raise e
         
         return sock
         
