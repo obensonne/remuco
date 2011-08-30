@@ -494,6 +494,7 @@ class BluetoothServer(_Server):
         try:
             sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
             sock.bind(("", self._config.bluetooth_channel or bluetooth.PORT_ANY))
+            sock.listen(1)
             sock.settimeout(0.33)
             bluetooth.advertise_service(sock, self._pinfo.name,
                 service_id=BluetoothServer.UUID,
