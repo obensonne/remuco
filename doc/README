@@ -401,9 +401,14 @@ Motorola devices
 
 Some Motorola devices (ROKR E2, ROKR E6, MOTOZINE ZN5 and A1200e) crash with
 the default client when adding a new Bluetooth connection. This is a bug in the
-devices' Java implementation. There's a special client version with a work
-around for this bug. It's located in the `motorola-fix` sub-directory where
-the default client files are located.
+devices' Java implementation. There's a special client version with a
+work-around for this bug. It's located in the `motorola-fix` sub-directory
+where the default client files are located.
+
+### Motorola K1 ###
+
+The default client fails on the K1 when using Bluetooth on the. A special
+client version in the `motorola-k1-fix` sub-directory fixes this problem.
 
 Troubleshooting
 ===============================================================================
@@ -426,10 +431,9 @@ MIDP Client
 
  - The client has a menu option called *Log* - check it.
  - If the client fails to start on your device, although it meets all
-   requirements, have a look at [ClientCustomization][wcc] for possible
-   reasons and solutions.
+   requirements, have a look at [MIDP][wmp] for possible reasons and solutions.
 
-[wcc]: http://code.google.com/p/remuco/wiki/ClientCustomization
+[wmp]: http://code.google.com/p/remuco/wiki/MIDP
 
 Android
 -------------------------------------------------------------------------------
