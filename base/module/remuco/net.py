@@ -256,7 +256,7 @@ class ClientConnection(object):
 
     def __io_error(self, fd, cond):
         """ GObject callback function (when there is an error). """
-        log.error("connection to client %s broken" % self)
+        log.warning("connection to client %s broken" % self)
         self.disconnect()
         return False
         
