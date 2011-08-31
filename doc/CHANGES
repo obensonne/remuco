@@ -1,23 +1,30 @@
 Release 0.9.6 (in development)
 ==============================
 
+Base
+----
+
+  * Always log errors to standard out (see [issue 170][i170]).
+
 Player adapters
 ---------------
 
-  * Various: make all OGG files are visible in file browser (see
-    [issue 155][i155]).
+  * Various: make all OGG files visible in file browser (see [issue 155][i155]).
   * MPlayer: don't crash on failed/broken MPlayer connections (see
     [issue 156][i156]).
 
 Clients
 -------
 
+  * MIDP: new variant for Motorola K1 devices (see [issue 84][i84]).
   * Android: automatically pause playback on incoming calls (see
     [issue 165][i165]).
 
+[i84]: http://code.google.com/p/remuco/issues/detail?id=84
 [i155]: http://code.google.com/p/remuco/issues/detail?id=155
 [i156]: http://code.google.com/p/remuco/issues/detail?id=156
 [i165]: http://code.google.com/p/remuco/issues/detail?id=165
+[i170]: http://code.google.com/p/remuco/issues/detail?id=170
 
 Release 0.9.5
 =============
