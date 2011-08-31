@@ -166,6 +166,16 @@
 		         includes="**/*.java"
 		         token="TextField.UNEDITABLE"
 		         value="${textfield.uneditable}" />
+		<!-- motorola-k1-fix for crashing flush method (issue 84) -->
+		<condition property="dos.flush"
+		           value="//dos.flush();"
+		           else="dos.flush();">
+			<equals arg1="${dist.variant}" arg2="motorola-k1-fix" />
+		</condition>
+		<replace dir="build/sources"
+		         includes="**/*.java"
+		         token="dos.flush();"
+		         value="${dos.flush}" />
 	</target>
 
 	<target name="compile" depends="preprocess">
@@ -296,6 +306,9 @@
 		</antcall>
 		<antcall target="dist" inheritall="false">
 			<param name="dist.variant" value="motorola-fix" />
+		</antcall>
+		<antcall target="dist" inheritall="false">
+			<param name="dist.variant" value="motorola-k1-fix" />
 		</antcall>
 		<antcall target="dist" inheritall="false">
 			<param name="dist.variant" value="no-bluetooth" />

@@ -217,7 +217,7 @@ for pa in player_adapters:
 
 CLIENT_DEST = os.getenv("REMUCO_CLIENT_DEST", "share/remuco/client")
 
-for variant in ("", "no-bluetooth", "motorola-fix"):
+for variant in ("", "no-bluetooth", "motorola-fix" ,"motorola-k1-fix"):
     sdir = "client/midp/app/%s" % variant
     ddir = "%s/midp/%s" % (CLIENT_DEST, variant)
     if client and os.path.exists("%s/remuco.jar" % sdir):
