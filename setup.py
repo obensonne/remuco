@@ -50,6 +50,12 @@ pa_files["banshee"] = [
     ["remuco-banshee"]
 ]
 
+# --- Clementine --------------------------------------------------------------
+
+pa_files["clementine"] = [
+    ["remuco-clementine"]
+]
+
 # --- Exaile ------------------------------------------------------------------
 
 # set prefix may not be valid for Exaile -> use an Exaile specific prefix:
