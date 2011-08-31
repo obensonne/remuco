@@ -9,6 +9,7 @@ Base
 Player adapters
 ---------------
 
+  * New: Clementine
   * Various: make all OGG files visible in file browser (see [issue 155][i155]).
   * MPlayer: don't crash on failed/broken MPlayer connections (see
     [issue 156][i156]).
