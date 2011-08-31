@@ -36,10 +36,12 @@ class _config:
     
     FMT = logging.Formatter("%(asctime)s [%(levelname)7s] [%(filename)11s " +
                             "%(lineno)4d] %(message)s")
+    FMTX = logging.Formatter("%(levelname)s: %(message)s (check the log for "
+                             "details)")
     
-    handler_default = logging.StreamHandler()
-    handler_default.setFormatter(FMT)
-    handler = handler_default
+    handler_stdout = logging.StreamHandler()
+    handler_stdout.setFormatter(FMT)
+    handler = handler_stdout
     
     logga = logging.getLogger("remuco")
     logga.addHandler(handler)
@@ -74,9 +76,17 @@ def set_file(file):
         print("Contribute to Remuco: Please run 'remuco-report' once a client "
               "has connected, thanks!")
     
-    _config.logga.removeHandler(_config.handler)
-    _config.handler = new_handler or _config.handler_default
-    _config.logga.addHandler(new_handler)
+    if _config.handler != _config.handler_stdout:
+        _config.logga.removeHandler(_config.handler)
+    if new_handler:
+        _config.handler_stdout.setLevel(ERROR)
+        _config.handler_stdout.setFormatter(_config.FMTX)
+        _config.logga.addHandler(new_handler)
+        _config.handler = new_handler
+    else:
+        _config.handler_stdout.setLevel(_config.logga.level)
+        _config.handler_stdout.setFormatter(_config.FMT)
+        _config.handler = _config.handler_stdout
     
 def set_level(level):
     """ Set log level (one of log.DEBUG, log.INFO, log.WARNING, log.ERROR)."""
