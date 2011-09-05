@@ -169,7 +169,6 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 
     public void setList(ItemList l){
         int i = 0;
-        if (l.getActions().size() == 0) return;
 
         list = l;
         pagemax = list.getPageMax();
