@@ -49,6 +49,9 @@ MLIB_ITEM_ACTIONS = (IA_ADD, IA_SET)
 LA_PLAY = remuco.ListAction("Play")
 LA_ENQUEUE = remuco.ListAction("Enqueue")
 MLIB_LIST_ACTIONS = (LA_PLAY, LA_ENQUEUE)
+LA_ADD = remuco.ListAction("Add to playlist")
+LA_SET = remuco.ListAction("Set as playlist")
+MLIB_DIR_ACTIONS = (LA_ADD, LA_SET)
 
 SEARCH_MASK = [ "Artist", "Album", "Title" ]
 
@@ -304,6 +307,27 @@ class MPDAdapter(remuco.PlayerAdapter):
             except mpd.MPDError, e:
                 log.warning("failed to play playlist (%s): %s" % (name, e))
         
+        elif action_id == LA_ADD.id:
+			
+            try:
+                path_s = ""
+                for elem in path[1:]:
+                    path_s = os.path.join(path_s, elem)
+                self.__mpd.add(path_s)
+            except mpd.MPDERROR, e:
+                log.warning("failed to add in playlist (%s): %s" % (path_s, e))
+        
+        elif action_id == LA_SET.id:
+            
+            try:
+                path_s = ""
+                for elem in path[1:]:
+                    path_s = os.path.join(path_s, elem)
+                self.__mpd.clear()
+                self.__mpd.add(path_s)
+            except mpd.MPDERROR, e:
+                log.warning("failed to set playlist (%s): %s" % (path_s, e))
+                
         else:
             log.error("** BUG ** unexpected mlib list action")
     
@@ -346,6 +370,7 @@ class MPDAdapter(remuco.PlayerAdapter):
         elif path[0] == MLIB_FILES:
             reply.nested, reply.ids, reply.names = self.__get_music_dir(path[1:])
             reply.item_actions = MLIB_ITEM_ACTIONS
+            reply.list_actions = MLIB_DIR_ACTIONS
         elif path[0] == MLIB_PLAYLISTS and len(path) == 1:
             reply.nested = self.__get_playlists()
             reply.list_actions = MLIB_LIST_ACTIONS

@@ -55,12 +55,14 @@
 		<Button android:id="@+id/connect_dialog_ok_button" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
+			android:layout_weight="2"
 			android:text="@android:string/ok"
 			/>
 			
 		<Button android:id="@+id/connect_dialog_cancel_button" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
+			android:layout_weight="1"
 			android:text="@android:string/cancel"
 			/>
 	

@@ -37,6 +37,7 @@ import remuco.client.android.util.LibraryAdapter;
 import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.AbstractAction;
 import remuco.client.common.data.ActionParam;
+import remuco.client.common.data.ListAction;
 import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;
@@ -128,12 +129,18 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
             LibraryItem item = mArrayAdapter.getItem(info.position);
 
-            if (item.nested) return;
+			if (item.position == -1) return; // no ContextMenu en folder '..'
             if (list.getActions().size() == 0) return;
 
-            menu.setHeaderTitle(list.getItemName(item.position));
+			if (item.nested) {
+				menu.setHeaderTitle(list.getNested(item.position));
+			} else {
+	            menu.setHeaderTitle(list.getItemName(item.position));
+			}
             for (int i = 0; i < list.getActions().size(); i++) {
                 AbstractAction act = (AbstractAction) list.getActions().elementAt(i);
+				if ( act.isItemAction() == item.nested ) 
+					continue;
                 menu.add(Menu.NONE, i, i, act.label);
             }
         }
@@ -146,13 +153,33 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         int menuItemIndex = item.getItemId();
 
         AbstractAction act = ((AbstractAction) list.getActions().elementAt(menuItemIndex));
+
+		if (libitem.nested) {
+			if (act.isItemAction()) {
+				Log.debug("[ERROR] This is an item action, not applicable to lists.");
+				return false;
+			}
+			int actionid = ((ListAction) act).id;
+			String[] itemPath = list.getPathForNested(libitem.position);
+			Log.debug("List Action " + ((ListAction) act).label + " " + list.getNested(libitem.position));
+
+			ActionParam a = new ActionParam(actionid, itemPath, null, null);
+			this.sendAction(a);
+			this.getList();
+			return true;
+		}
+
+		if (!act.isItemAction()) {
+			Log.debug("[ERROR] This is a list action, not applicable to items");
+			return false;
+		}
         int actionid = ((ItemAction) act).id;
 
         String[] itemids = new String[1];
         itemids[0] = list.getItemID(libitem.position);
         int[] itempos = new int[1];
         itempos[0] = list.getItemPosAbsolute(libitem.position);
-        Log.debug("Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
+        Log.debug("Item Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
         ActionParam a;
         if (list.isPlaylist() || list.isQueue()) {
             a = new ActionParam(actionid, itempos, itemids);
