@@ -49,9 +49,9 @@ MLIB_ITEM_ACTIONS = (IA_ADD, IA_SET)
 LA_PLAY = remuco.ListAction("Play")
 LA_ENQUEUE = remuco.ListAction("Enqueue")
 MLIB_LIST_ACTIONS = (LA_PLAY, LA_ENQUEUE)
-LA_ADD = remuco.ListAction("Add to playlist")
-LA_SET = remuco.ListAction("Set as playlist")
-MLIB_DIR_ACTIONS = (LA_ADD, LA_SET)
+DA_PLAY = remuco.ListAction("Play")
+DA_ENQUEUE = remuco.ListAction("Enqueue")
+MLIB_DIR_ACTIONS = (DA_ENQUEUE, DA_PLAY)
 
 SEARCH_MASK = [ "Artist", "Album", "Title" ]
 
@@ -307,7 +307,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             except mpd.MPDError, e:
                 log.warning("failed to play playlist (%s): %s" % (name, e))
 
-        elif action_id == LA_ADD.id:
+        elif action_id == DA_ENQUEUE.id:
 
             try:
                 path_s = ""
@@ -317,7 +317,7 @@ class MPDAdapter(remuco.PlayerAdapter):
             except mpd.MPDERROR, e:
                 log.warning("failed to add in playlist (%s): %s" % (path_s, e))
 
-        elif action_id == LA_SET.id:
+        elif action_id == DA_PLAY.id:
 
             try:
                 path_s = ""
