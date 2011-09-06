@@ -310,21 +310,17 @@ class MPDAdapter(remuco.PlayerAdapter):
         elif action_id == DA_ENQUEUE.id:
 
             try:
-                path_s = ""
-                for elem in path[1:]:
-                    path_s = os.path.join(path_s, elem)
-                self.__mpd.add(path_s)
+                xpath = os.path.sep.join(path[1:])
+                self.__mpd.add(xpath)
             except mpd.MPDERROR, e:
                 log.warning("failed to add in playlist (%s): %s" % (path_s, e))
 
         elif action_id == DA_PLAY.id:
 
             try:
-                path_s = ""
-                for elem in path[1:]:
-                    path_s = os.path.join(path_s, elem)
+                xpath = os.path.sep.join(path[1:])
                 self.__mpd.clear()
-                self.__mpd.add(path_s)
+                self.__mpd.add(xpath)
             except mpd.MPDERROR, e:
                 log.warning("failed to set playlist (%s): %s" % (path_s, e))
 
