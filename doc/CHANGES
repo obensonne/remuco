@@ -5,12 +5,14 @@ Base
 ----
 
   * Always log errors to standard out (see [issue 170][i170]).
+  * Report tool for supported client devices is enabled again.
 
 Player adapters
 ---------------
 
   * New: Clementine
   * Various: make all OGG files visible in file browser (see [issue 155][i155]).
+  * MPD: more media browser actions for the MPD adapter
   * MPlayer: don't crash on failed/broken MPlayer connections (see
     [issue 156][i156]).
 
@@ -20,6 +22,7 @@ Clients
   * MIDP: new variant for Motorola K1 devices (see [issue 84][i84]).
   * Android: automatically pause playback on incoming calls (see
     [issue 165][i165]).
+  * Android: support for list actions in media browser
 
 [i84]: http://code.google.com/p/remuco/issues/detail?id=84
 [i155]: http://code.google.com/p/remuco/issues/detail?id=155
