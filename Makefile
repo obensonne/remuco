@@ -3,9 +3,10 @@
 # -----------------------------------------------------------------------------
 
 #PREFIX ?= /usr/local
-#SETUP := python setup.py install --prefix=$(PREFIX)
+#SETUP := python2 setup.py install --prefix=$(PREFIX)
 
-SETUP := python setup.py install
+PYTHON := $(shell command -v python2 >/dev/null 2>&1 && echo "python2" || echo "python")
+SETUP := $(PYTHON) setup.py install
 
 ADAPTERS := $(shell ls adapter)
 
@@ -33,7 +34,7 @@ uninstall: help
 	@true
 
 install-base: clean
-	python base/module/install-check.py
+	$(PYTHON) base/module/install-check.py
 	REMUCO_COMPONENTS="" $(SETUP) --record install-base.log
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Installed Remuco base."
@@ -41,7 +42,7 @@ install-base: clean
 
 install-%: install-base
 	@IC=adapter/$(subst install-,,$@)/install-check.py ; \
-		[ ! -e $$IC ] || python $$IC
+		[ ! -e $$IC ] || $(PYTHON) $$IC
 	REMUCO_COMPONENTS=$(subst install-,,$@) $(SETUP) --record install-tmp.log
 	diff --suppress-common-lines -n install-base.log install-tmp.log \
 		| grep "^/" > install-$(subst install-,,$@).log
@@ -72,7 +73,7 @@ uninstall-%:
 	fi
 
 clean:
-	python setup.py clean --all
+	$(PYTHON) setup.py clean --all
 	@echo "+-----------------------------------------------------------------+"
 	@echo "| Clean ok (keep install log files for uninsallation)."
 	@echo "+-----------------------------------------------------------------+"
