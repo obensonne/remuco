@@ -3,7 +3,21 @@
       package="remuco.client.android"
       android:versionCode="1"
       android:versionName="0.9.6">
-    <application android:label="@string/app_name" android:icon="@drawable/remuco_48" android:theme="@android:style/Theme.NoTitleBar">
+      
+	<uses-sdk
+	    android:minSdkVersion="8"
+	    android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@drawable/remuco_48"
+        android:theme="@style/AppTheme" >
+        
       <service android:name=".RemucoService" />
         <activity android:name=".Remuco"
                   android:label="@string/app_name">
@@ -65,7 +79,4 @@
         </receiver>
     </application>
 
-    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
 </manifest> 
