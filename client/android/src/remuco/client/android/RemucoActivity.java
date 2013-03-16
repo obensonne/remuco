@@ -148,9 +148,6 @@ public class RemucoActivity extends Activity{
 		super.onResume();
 		
 		Log.debug("--- " + this.getClass().getName() + ".onResume()");
-
-		// --- wake up the connection
-		player.resumeConnection();
 	}
 
 	@Override
@@ -158,9 +155,7 @@ public class RemucoActivity extends Activity{
 		super.onPause();
 		Log.debug("--- " + this.getClass().getName() + ".onPause()");
 		
-		// --- pause the connection if possible
         player.clearHandlers();
-        player.pauseConnection();
 	}
 
 	// --- Options Menu

@@ -94,8 +94,11 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	
 	
 	// --- connection powersaving
+	// --- PlayerAdapter has own control own powersavings, if there are no
+	//     handlers to serve, powersaving is enabled, until there new handlers
+	//     are added
 	
-	public void pauseConnection(){
+	private void pauseConnection(){
 		Log.debug("[PA] pausing connection");
 		
 		if(player == null){
@@ -110,7 +113,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 		conn.send(pauseMessage);
 	}
 	
-	public void resumeConnection(){
+	private void resumeConnection(){
 		Log.debug("[PA] waking up connection");
 		
 		if(player == null){
@@ -188,17 +191,24 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	
 	public void addHandler(Handler h){
 		Log.debug("[PA] adding handler: " + h);
+		if(handlers.size() == 0) {
+			this.resumeConnection();
+		}
 		handlers.add(h);
 	}
 	
 	public void removeHandler(Handler h){
 		Log.debug("[PA] removing handler: " + h);
 		handlers.remove(h);
+		if(handlers.size() == 0) {
+			this.pauseConnection();
+		}
 	}
 
 	public void clearHandlers(){
 		Log.debug("[PA] clear handler");
 		handlers.clear();
+		this.pauseConnection();
 	}
 	
 	
