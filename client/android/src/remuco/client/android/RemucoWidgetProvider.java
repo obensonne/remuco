@@ -21,6 +21,7 @@
 
 package remuco.client.android;
 
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
 
 import android.app.PendingIntent;
@@ -28,6 +29,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap.Config;
 import android.widget.RemoteViews;
 
 public class RemucoWidgetProvider extends AppWidgetProvider {
@@ -107,7 +109,8 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     }
 
     private void createPlayer(Context context) {
-        player = RemucoActivity.connect(context, 140);
+    	ClientInfo clientinfo = Client.buildClientInfo(140); //FIXME: Hardcoded :(
+        player = RemucoActivity.connect(context, clientinfo);
 
         // --- create view handler
         WidgetHandler viewHandler = new WidgetHandler(context, player);

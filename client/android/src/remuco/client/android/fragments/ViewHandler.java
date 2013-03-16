@@ -19,41 +19,59 @@
  *   
  */
 
-package remuco.client.android;
+package remuco.client.android.fragments;
 
+import remuco.client.android.MessageFlag;
+import remuco.client.android.PlayerAdapter;
+import remuco.client.android.R;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.data.Progress;
 import remuco.client.common.data.State;
-import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
+/**
+ * Handler that gets updates from a PlayerAdapter, and updates
+ * the player GUI accordingly.
+ */
 public class ViewHandler extends Handler {
 
 	int tick;
 	
 	byte[] imageCache;
 	
-	Remuco remuco;
+	PlayerFragment remuco;
 	
 	boolean running = false;
 	
 	
-	public ViewHandler(Remuco remuco) {
+	public ViewHandler(PlayerFragment remuco) {
 		this.remuco = remuco;
 		this.postDelayed(new Ticker(), 1000);
 	}
 
-    public void setRunning(boolean r) {
-        updateItemGui(remuco.getPlayer().getPlayer().item);
-        updateProgressGui(remuco.getPlayer().getPlayer().progress);
-        updateStateGui(remuco.getPlayer().getPlayer().state);
+	/**
+	 * Sets the status of the viewhandler to running.
+	 * @param player Player to set initial status for. 
+	 * FIXME -- wouldn't it be nicer if the initial state is recieved from the player upon registering?
+	 */
+    public void setRunning(PlayerAdapter player) {
+        updateItemGui(player.getPlayer().item);
+        updateProgressGui(player.getPlayer().progress);
+        updateStateGui(player.getPlayer().state);
 
-        running = r;
+        running = true;
+    }
+    
+    /**
+     * Sets the status of the player to stopped.
+     */
+    public void setStopped() {
+    	running = false;
     }
 
 	@Override
@@ -73,7 +91,7 @@ public class ViewHandler extends Handler {
 					R.string.connection_successful, 
 					info.getName()
 					);
-			Toast.makeText(remuco, toast, Toast.LENGTH_SHORT).show();
+			Toast.makeText(remuco.getActivity(), toast, Toast.LENGTH_SHORT).show();
 			
 			// enable buttons
 			remuco.ctrlPrev.setClickable(true);
@@ -96,7 +114,7 @@ public class ViewHandler extends Handler {
 			
 			// inform the user
 			toast = remuco.getResources().getString(R.string.connection_failed);
-			Toast.makeText(remuco, toast, Toast.LENGTH_SHORT).show();
+			Toast.makeText(remuco.getActivity(), toast, Toast.LENGTH_SHORT).show();
 			
 			// disable buttons
 			remuco.ctrlPrev.setClickable(false);
@@ -271,12 +289,7 @@ public class ViewHandler extends Handler {
 				Log.debug("[VH] repeat = false");
 				remuco.ctrlRepeat.setImageResource(R.drawable.button_norepeat);
 			}
-			
-//			// set volume
-//			VolumeDialog vDialog = remuco.getVolumeDialog();
-//			
-//			if(vDialog!=null)
-//				vDialog.setVolume(player.state.getVolume());
+
     }
 
 	class Ticker implements Runnable {

@@ -28,18 +28,18 @@ import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
-public class RemucoActivity extends Activity{
+public class RemucoActivity extends FragmentActivity implements PlayerProvider {
 
 	// --- dialog ids
 	protected static final int CONNECT_DIALOG = 1;
@@ -60,7 +60,7 @@ public class RemucoActivity extends Activity{
 	protected static final String LAST_BLUEDEVICE = "connect_dialog_last_bluedevices";
 	
 	// --- the player adapter
-	protected PlayerAdapter player;
+	public PlayerAdapter player;  //FIXME
 	
 	// --- client info
 	protected ClientInfo clientInfo;
@@ -71,7 +71,7 @@ public class RemucoActivity extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+				
 		Log.debug("--- " + this.getClass().getName() + ".onCreate()");
 		
 		// ------
@@ -90,30 +90,20 @@ public class RemucoActivity extends Activity{
 		
 		// --- construct client info
 		
-		// get screen size
+		// Build the client info
         Display d = getWindowManager().getDefaultDisplay();
-        int imgSize = Math.min(d.getWidth(), d.getHeight());
-
-        clientInfo = Remuco.buildClientInfo(imgSize);
+        clientInfo = Client.buildClientInfo(d);
         
 		// ------
 		// communication initialization
 		// ------
 		
 		// --- create player adapter
-        player = connect(this.getApplicationContext(), imgSize);
+        player = connect(this.getApplicationContext(), clientInfo);
 	}
 
-    public static PlayerAdapter connect(Context context, int imgSize) {
-    	// FIXME: Why is this implemented in a static context?
-    	// The problem is that this requires to manage a ClientInfo object
-    	// twice, in a static and in an instance context
-    	// (`Remuco.buildClientContext()` is a quick fix for this issue).
-    	// I guess this connection method is used to automatically connect to
-    	// the last used server. However, this results in redundant connection
-    	// code as a similar task is done in `onCreateDialog()`.
-
-        // In onCreateDialog, we just reconnect to the server. In this method we
+    public static PlayerAdapter connect(Context context, ClientInfo clientInfo) {
+    	// In onCreateDialog, we just reconnect to the server. In this method we
         // initialize the full connection giving the image size and client info.
         // It is called from `onCreate()`.
 
@@ -126,7 +116,6 @@ public class RemucoActivity extends Activity{
         // --- try to connect to the last hostname
         SharedPreferences preference = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
-        ClientInfo clientInfo = Remuco.buildClientInfo(imgSize);
         int lastType = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
         String lastHostname = preference.getString(LAST_HOSTNAME, "");
         int lastPort = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
@@ -140,6 +129,11 @@ public class RemucoActivity extends Activity{
         return player;
     }
 	
+	@Override
+	public PlayerAdapter getPlayer() {
+		return this.player;
+	}
+    
 	/**
 	 * this method gets called after on create
 	 */

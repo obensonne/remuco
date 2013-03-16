@@ -21,6 +21,7 @@
 
 package remuco.client.android;
 
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
 import android.content.Context;
@@ -41,7 +42,8 @@ public class RemucoPhoneListener extends PhoneStateListener {
 
     public void onCallStateChanged(int phoneState, String incomingNumber) {
         if (player == null) {
-            player = RemucoActivity.connect(context, 0);
+        	ClientInfo clientinfo = Client.buildClientInfo(0); //FIXME
+            player = RemucoActivity.connect(context, clientinfo);
         }
 
         if (player == null ||
