@@ -22,8 +22,6 @@ package remuco.client.android;
 
 import android.os.Handler;
 import android.os.Message;
-import android.widget.ArrayAdapter;
-
 import remuco.client.common.data.Item;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;

@@ -21,7 +21,6 @@
 
 package remuco.client.android;
 
-import remuco.client.common.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

@@ -23,9 +23,7 @@ package remuco.client.android;
 
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
-import remuco.client.common.data.Progress;
 import remuco.client.common.data.State;
-import remuco.client.common.player.Player;
 import remuco.client.common.util.Log;
 
 import android.content.Context;

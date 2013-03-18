@@ -20,7 +20,6 @@
  */
 package remuco.client.android;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -40,7 +39,6 @@ import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ListAction;
 import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
-import remuco.client.common.player.IRequester;
 import remuco.client.common.util.Log;
 
 public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener{
