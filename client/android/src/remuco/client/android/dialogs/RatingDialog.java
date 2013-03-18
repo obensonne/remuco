@@ -21,46 +21,101 @@
 
 package remuco.client.android.dialogs;
 
+import java.lang.ref.WeakReference;
+
 import remuco.client.android.MessageFlag;
 import remuco.client.android.PlayerAdapter;
+import remuco.client.android.PlayerProvider;
 import remuco.client.android.R;
-import remuco.client.android.Remuco;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
-import android.app.Dialog;
-import android.content.DialogInterface;
+import remuco.client.common.util.Log;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 
-public class RatingDialog extends Dialog implements OnRatingBarChangeListener, OnClickListener{
+public class RatingDialog extends DialogFragment implements OnRatingBarChangeListener, OnClickListener{
 
 	private RatingBar ratingBar;
 	private Button okButton;
 	
 	private PlayerAdapter player;
+	private RatingHandler ratingHandler = new RatingHandler(this);
 	
 	
-	public RatingDialog(Remuco remuco, PlayerAdapter player) {
-		super(remuco);
+	public static RatingDialog newInstance(PlayerAdapter player) {
+		RatingDialog dialog = new RatingDialog();
+		return dialog;
+	}
+	
+	
+	//Approach from: http://stackoverflow.com/a/11336822
+	static class RatingHandler extends Handler {
+		WeakReference<RatingDialog> dialog;
+		
+		public RatingHandler(RatingDialog callback) {
+			dialog = new WeakReference<RatingDialog>(callback);
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			RatingDialog callback = dialog.get();
+			if(callback == null) {
+				return;
+			}
+			
+			switch(msg.what){
+			
+			case MessageFlag.ITEM_CHANGED:
+				Item item = (Item)msg.obj;
+				callback.ratingBar.setProgress(item.getRating());
+				break;
+				
+			case MessageFlag.CONNECTED:
+				PlayerInfo playerInfo = (PlayerInfo)msg.obj;
+				callback.ratingBar.setNumStars(playerInfo.getMaxRating());
+			}
+		}
+	}
+	
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.rating_dialog, container);
+		getDialog().setTitle(R.string.rating_dialog_title);
+		
+		ratingBar = (RatingBar) view.findViewById(R.id.rating_dialog_rating_bar);
+		okButton = (Button) view.findViewById(R.id.rating_dialog_ok_button);
+		ratingBar.setStepSize(1);
+		ratingBar.setOnRatingBarChangeListener(this);
 
-		this.player = player;
+		// configure ok button
+		okButton.setOnClickListener(this);
+		return view;
 	}
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.rating_dialog);
-		setTitle(R.string.rating_dialog_title);
+	public void onResume() {
+		super.onResume();
+		Log.debug("[VD] onResume called");
 		
+		try {
+			PlayerProvider a = (PlayerProvider) getActivity();
+			player = ((PlayerProvider) a).getPlayer();
+			player.addHandler(ratingHandler);
+		} catch(ClassCastException e) {
+			Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
+		}
 		
 		// configure rating bar
-		ratingBar = (RatingBar) findViewById(R.id.rating_dialog_rating_bar);
-		
 		// TODO: this will break pretty sure as soon as there is no player or item ...
         if (player.getPlayer() != null) {
             if (player.getPlayer().info != null) {
@@ -70,31 +125,15 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
                 ratingBar.setProgress(player.getPlayer().item.getRating());
             }
         }
-		ratingBar.setStepSize(1);
-		
-		ratingBar.setOnRatingBarChangeListener(this);
 
-		// configure ok button
-		okButton = (Button) findViewById(R.id.rating_dialog_ok_button);
-		
-		okButton.setOnClickListener(this);
-		
-		player.addHandler(new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				switch(msg.what){
-				
-				case MessageFlag.ITEM_CHANGED:
-					Item item = (Item)msg.obj;
-					ratingBar.setProgress(item.getRating());
-					break;
-					
-				case MessageFlag.CONNECTED:
-					PlayerInfo playerInfo = (PlayerInfo)msg.obj;
-					ratingBar.setNumStars(playerInfo.getMaxRating());
-				}
-			}
-		});
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(player != null) {
+			player.removeHandler(ratingHandler);
+		}
 	}
 
 	@Override
@@ -111,5 +150,4 @@ public class RatingDialog extends Dialog implements OnRatingBarChangeListener, O
 		}
 	}
 	
-
 }

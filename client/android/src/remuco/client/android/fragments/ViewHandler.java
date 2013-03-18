@@ -36,8 +36,9 @@ import android.widget.Toast;
 
 /**
  * Handler that gets updates from a PlayerAdapter, and updates
- * the player GUI accordingly.
+ * the player GUI accordingly. 
  */
+//TODO: Does the usage of this class leaks memory (Weakref to PlayerFragment?)
 public class ViewHandler extends Handler {
 
 	int tick;
@@ -127,9 +128,7 @@ public class ViewHandler extends Handler {
 			remuco.infoCover.setImageResource(R.drawable.remuco_128);
 			
 			// change text
-			remuco.infoTitle.setText("not connected");
-			remuco.infoArtist.setText("use the menu to connect");
-			remuco.infoAlbum.setText("to your remuco server");
+			remuco.setConnectText();
 			
 			// remove stars
 			remuco.infoRatingBar.setProgress(0);

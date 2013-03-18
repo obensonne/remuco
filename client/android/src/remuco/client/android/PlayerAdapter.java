@@ -139,7 +139,7 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
 	
 	@Override
 	public void notifyConnected(Player player) {
-		Log.ln("[PH] CONNECTED");
+		Log.ln("[PA] CONNECTED");
 		
 		PlayerAdapter.player = player;
 		this.reconnect();

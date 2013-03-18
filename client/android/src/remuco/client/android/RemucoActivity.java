@@ -22,33 +22,29 @@
 package remuco.client.android;
 
 import remuco.client.android.dialogs.ConnectDialog;
-import remuco.client.android.dialogs.SearchDialog;
+import remuco.client.android.dialogs.ConnectDialog.ConnectRequestHandler;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
-public class RemucoActivity extends FragmentActivity implements PlayerProvider {
+public class RemucoActivity extends FragmentActivity implements PlayerProvider, ConnectRequestHandler {
 
 	// --- dialog ids
 	protected static final int CONNECT_DIALOG = 1;
 	protected static final int VOLUME_DIALOG = 2;
 	protected static final int RATING_DIALOG = 3;
 	protected static final int SEARCH_DIALOG = 4;
-
-	// --- dialog reference
-	private VolumeDialog volumeDialog;
 
 	// --- preferences
 	protected SharedPreferences preference;
@@ -60,7 +56,7 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider {
 	protected static final String LAST_BLUEDEVICE = "connect_dialog_last_bluedevices";
 	
 	// --- the player adapter
-	public PlayerAdapter player;  //FIXME
+	public PlayerAdapter player;
 	
 	// --- client info
 	protected ClientInfo clientInfo;
@@ -134,23 +130,6 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider {
 		return this.player;
 	}
     
-	/**
-	 * this method gets called after on create
-	 */
-	@Override
-	protected void onResume() {
-		super.onResume();
-		
-		Log.debug("--- " + this.getClass().getName() + ".onResume()");
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Log.debug("--- " + this.getClass().getName() + ".onPause()");
-		
-        player.clearHandlers();
-	}
 
 	// --- Options Menu
 	
@@ -159,7 +138,7 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider {
 		switch(item.getItemId()){
 		
 		case R.id.options_menu_connect:
-			showDialog(CONNECT_DIALOG);
+			showConnectDialog();
             return true;
 			
 		case R.id.options_menu_disconnect:
@@ -175,107 +154,84 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider {
 		return false;
 	}
 	
-	// ------------------------
-	// --- dialogs
-	// ------------------------
 	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-
-		switch(id){
-		
-		// --- connection dialog
-		case CONNECT_DIALOG:
-			
-			// create connect dialog
-			ConnectDialog cDialog = new ConnectDialog(this, player);
-
-			// register callback listener
-			
-			cDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				@Override
-				public void onDismiss(DialogInterface dialog) {
-                    player.disconnect();
-
-					// connect to host
-                    int type = ((ConnectDialog)dialog).getSelectedType();
-					String hostname = ((ConnectDialog)dialog).getSelectedHostname();
-                    int port = ((ConnectDialog)dialog).getSelectedPort();
-                    String bluedevice = ((ConnectDialog)dialog).getSelectedBluedevice();
-                    if (type == R.id.connect_dialog_wifi) {
-                        player.connectWifi(hostname, port, clientInfo);
-                    } else if (type == R.id.connect_dialog_bluetooth) {
-                        player.connectBluetooth(bluedevice, clientInfo);
-                    }
-					
-					// save new address in preferences
-					SharedPreferences.Editor editor = preference.edit();
-					editor.putInt(LAST_TYPE, type);
-					editor.putString(LAST_HOSTNAME, hostname);
-                    editor.putInt(LAST_PORT, port);
-                    editor.putString(LAST_BLUEDEVICE, bluedevice);
-					editor.commit();
-				}
-			});
-			
-			
-			return cDialog;
-			
-		// --- volume dialog
-		case VOLUME_DIALOG:
-			return new VolumeDialog(this, player);
-
-            // --- Search dialog
-        case SEARCH_DIALOG:
-            return new SearchDialog(this, player);
-
-		}
-		
-		Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");
-		return null;
-	}
-	
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		
-		switch(id){
-		
-		case CONNECT_DIALOG:
-			
-			ConnectDialog cDialog = (ConnectDialog)dialog;
-			
-			// set last hostname port
-			int type = preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi);
-			cDialog.setType(type);
-			String hostname = preference.getString(LAST_HOSTNAME, "");
-			cDialog.setHostname(hostname);
-			int port = preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT);
-			cDialog.setPort(port);
-            String bluedevice = preference.getString(LAST_BLUEDEVICE, "");
-			cDialog.setBluedevice(bluedevice);
-			
-			break;
-		
-		}
-		
-		
-	}
-
+	// ------------------------
+	// --- keys
+	// ------------------------
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		switch(keyCode){
 		
 		case KeyEvent.KEYCODE_VOLUME_UP:
-			showDialog(VOLUME_DIALOG);
+			if(player != null && player.getPlayer() != null) {
+				player.getPlayer().ctrlVolume(+1);
+			}
+			showVolumeDialog();
 			return true;
 			
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
-			showDialog(VOLUME_DIALOG);
+			if(player != null && player.getPlayer() != null) {
+				player.getPlayer().ctrlVolume(-1);
+			}
+			showVolumeDialog();
 			return true;
 		}
 		
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	
+	// ------------------------
+	// --- dialogs
+	// ------------------------
+	
+	private void showConnectDialog() {
+        // create connect dialog
+	    FragmentManager fm = getSupportFragmentManager();
+	    ConnectDialog connectdialog = ConnectDialog.newInstance(
+	    		preference.getInt(LAST_TYPE, R.id.connect_dialog_wifi),
+	    		preference.getString(LAST_HOSTNAME, ""),
+	    		preference.getInt(LAST_PORT, WifiSocket.PORT_DEFAULT),
+	    		preference.getString(LAST_BLUEDEVICE, "")
+	    		);
+	    
+	    connectdialog.show(fm, "dialog");
+	}
+	
+	private void showVolumeDialog() {
+	    FragmentManager fm = getSupportFragmentManager();
+	    VolumeDialog volumedialog = VolumeDialog.newInstance(player);
+	    volumedialog.show(fm, "volumedialog");
+	}
+	
+	
+	// -----------------------
+	// --- Connect methods
+	// ---  (callbacks from connectdialog)
+	// -----------------------
+
+	@Override
+	public void connectWifi(String hostname, int port) {
+		// update preferences
+		SharedPreferences.Editor editor = preference.edit();
+		editor.putInt(LAST_TYPE, R.id.connect_dialog_wifi);
+		editor.putString(LAST_HOSTNAME, hostname);
+        editor.putInt(LAST_PORT, port);
+		editor.commit();
+		
+		player.connectWifi(hostname, port, clientInfo);
+	}
+
+	@Override
+	public void connectBluetooth(String bluedevice) {
+		// update preferences
+		SharedPreferences.Editor editor = preference.edit();
+		editor.putInt(LAST_TYPE, R.id.connect_dialog_bluetooth);
+        editor.putString(LAST_BLUEDEVICE, bluedevice);
+		editor.commit();
+		
+		player.connectBluetooth(bluedevice, clientInfo);
 	}
 	
 }

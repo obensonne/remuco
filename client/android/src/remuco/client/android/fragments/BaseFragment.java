@@ -24,30 +24,33 @@ package remuco.client.android.fragments;
 import remuco.client.android.PlayerAdapter;
 import remuco.client.android.PlayerProvider;
 import remuco.client.common.util.Log;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 /**
  * Base Fragment for Remuco fragments.
  * Holds a protected player object which can be accessed to interact with the
- * player.
+ * player. The user of this fragment can assume player != null.
  */
 public class BaseFragment extends Fragment {
-	protected PlayerAdapter player;  //TODO: Find a good way to get the player
-	
-	@Override
-	public void onAttach(Activity a) {
-		super.onAttach(a);
-		if(PlayerProvider.class.isInstance(a)) {
-			this.player = ((PlayerProvider) a).getPlayer();
-		} else{
-			Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
-		}
-	}
+	protected PlayerAdapter player;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		try {
+			PlayerProvider a = (PlayerProvider) getActivity();
+			this.player = ((PlayerProvider) a).getPlayer();
+			
+		} catch(ClassCastException e) {
+			Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
+			throw e;
+		}
 	}
 }

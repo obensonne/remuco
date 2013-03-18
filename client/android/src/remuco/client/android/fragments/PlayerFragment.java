@@ -63,16 +63,11 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
+		Log.debug("--- " + this.getClass().getName() + ".onCreateView()");
+		
 		View rootView = inflater.inflate(R.layout.player_fragment, container, false);
-		this.loadViewHandlers(rootView);
-		
-		//set a connect to server text
-		infoTitle.setText(R.string.player_info_notconnected);
-		infoArtist.setText(R.string.player_info_usemenu);
-		infoAlbum.setText(R.string.player_info_connectoserver);
-		
+		this.setViewhandlerCallbacks(rootView);
 		viewHandler = new ViewHandler(this);
-		
 		return rootView;
 	}
 	
@@ -81,13 +76,12 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
 	public void onResume() {
 		super.onResume();
 		Log.debug("--- " + this.getClass().getName() + ".onResume()");
-
+		
 		player.addHandler(viewHandler);
-
-        if (player.getPlayer() != null &&
-            player.getPlayer().getConnection() != null &&
-            !player.getPlayer().getConnection().isClosed()) {
-            viewHandler.setRunning(player);
+        if (player.getPlayer() != null ) {
+    		viewHandler.setRunning(player);
+        } else {
+        	setConnectText();
         }
 	}
 	
@@ -96,6 +90,7 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
 	public void onPause() {
 		super.onPause();
 		Log.debug("--- " + this.getClass().getName() + ".onPause()");
+		
 		viewHandler.setStopped();
 		player.removeHandler(viewHandler);
 	}
@@ -105,7 +100,7 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
 	 * Loads all GUI elements from view, and sets action listeners.
 	 * @param view R.layout.main
 	 */
-	private void loadViewHandlers(View view) {
+	private void setViewhandlerCallbacks(View view) {
 		// --- retrieve and set view handles
 		infoTitle 	= (TextView) view.findViewById(R.id.infoTitle);
 		infoArtist 	= (TextView) view.findViewById(R.id.infoArtist);
@@ -148,18 +143,28 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (player == null || player.getPlayer() == null)
+                if (player.getPlayer() == null)
                     return;
                 int end = ctrlProgressBar.getProgress();
                 player.getPlayer().ctrlSeek((end - start));
             }
         });
 	}
+	
+	
+	/**
+	 * Sets a connect to server text
+	 */
+	protected void setConnectText() {
+		infoTitle.setText(R.string.player_info_notconnected);
+		infoArtist.setText(R.string.player_info_usemenu);
+		infoAlbum.setText(R.string.player_info_connectoserver);		
+	}
 
 
 	@Override
 	public void onClick(View v) {
-        if (player == null || player.getPlayer() == null)
+        if (player.getPlayer() == null)
             return;
 
 		switch(v.getId()){

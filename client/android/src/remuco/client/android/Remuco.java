@@ -23,7 +23,6 @@ package remuco.client.android;
 
 import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.android.fragments.PlayerFragment;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -31,10 +30,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 
-public class Remuco extends RemucoActivity implements OnClickListener{
+public class Remuco extends RemucoActivity {
 	
 	// -----------------------------------------------------------------------------
 	// --- lifecycle methods
@@ -49,7 +46,6 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 		setContentView(R.layout.main);
 	    if (savedInstanceState == null) {
 	        FragmentManager fragmentManager = getSupportFragmentManager();
-	        // Or: FragmentManager fragmentManager = getSupportFragmentManager()
 	        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 	        PlayerFragment fragment = new PlayerFragment();
 	        fragmentTransaction.add(R.id.fragment_container, fragment);
@@ -81,7 +77,7 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 			return true;
 			
 		case R.id.options_menu_rate:
-			showDialog(RATING_DIALOG);
+			showRateDialog();
 			return true;
 		}
 		
@@ -92,49 +88,10 @@ public class Remuco extends RemucoActivity implements OnClickListener{
 	// --- dialogs
 	// ------------------------
 	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-        Dialog d = super.onCreateDialog(id);
-        if (d != null) return d;
-
-		switch(id){
-		// --- rating dialog
-		case RATING_DIALOG:
-			return new RatingDialog(this, player);
-		}
-		return null;
+	private void showRateDialog() {
+	    FragmentManager fm = getSupportFragmentManager();
+	    RatingDialog ratingdialog = RatingDialog.newInstance(player);
+	    ratingdialog.show(fm, "ratingdialog");
 	}
-	
-	// --- handle clicks (this is the actual playback control)
-	
-	@Override
-	public void onClick(View v) {
-        if (player == null ||
-            player.getPlayer() == null)
-            return;
-
-		switch(v.getId()){
-		case R.id.CtrlPlay:
-			player.getPlayer().ctrlPlayPause();
-			break;
-			
-		case R.id.CtrlPrev:
-			player.getPlayer().ctrlPrev();
-			break;
-			
-		case R.id.CtrlNext:
-			player.getPlayer().ctrlNext();
-			break;
-			
-		case R.id.CtrlShuffle:
-			player.getPlayer().ctrlToggleShuffle();
-			break;
-			
-		case R.id.CtrlRepeat:
-			player.getPlayer().ctrlToggleRepeat();
-			break;
-			
-		}
-	};	
 	
 }
