@@ -35,8 +35,8 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public static String ACTION_PLAY = "play";
     public static String ACTION_NEXT = "next";
 
-	// --- the player adapter
-	protected PlayerAdapter player = null;
+    // --- the player adapter
+    protected PlayerAdapter player = null;
 
     protected static int[] appWidgetIds = null;
 
@@ -106,7 +106,7 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     }
 
     private void createPlayer(Context context) {
-    	ClientInfo clientinfo = Client.buildClientInfo(140); //FIXME: Hardcoded :(
+        ClientInfo clientinfo = Client.buildClientInfo(140); //FIXME: Hardcoded :(
         player = RemucoActivity.connect(context, clientinfo);
 
         // --- create view handler

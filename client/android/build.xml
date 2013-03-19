@@ -63,7 +63,7 @@
          build steps are used.
     -->
     <setup import="false" />
-	
+    
     <!-- copy of <SDK>/platforms/android-1.1/templates/android_rules.xml -->
 
     <!--
@@ -302,5 +302,5 @@
         <echo>   uninstall: uninstall the application from a running emulator or</echo>
         <echo>              device.</echo>
     </target>
-	
+    
 </project>

@@ -38,34 +38,34 @@ import android.widget.TextView;
 
 public class SearchDialog extends Dialog implements OnClickListener{
 
-	PlayerAdapter player;
+    PlayerAdapter player;
     String[] mask;
 
-	Button okButton;
-	Button cancelButton;
+    Button okButton;
+    Button cancelButton;
 
-	EditText query[];
-	
-	public SearchDialog(Context context, PlayerAdapter player) {
-		super(context);
-		this.player = player;
+    EditText query[];
+    
+    public SearchDialog(Context context, PlayerAdapter player) {
+        super(context);
+        this.player = player;
 
         if (player == null || player.getPlayer() == null)
             return;
 
         mask = player.getPlayer().info.getSearchMask();
         query = new EditText[mask.length];
-	}
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    }
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-		setContentView(R.layout.search_dialog);
-		setTitle(R.string.search_dialog_title);
-	
-		// get references
-		okButton = (Button) findViewById(R.id.search_dialog_ok_button);
-		cancelButton = (Button) findViewById(R.id.search_dialog_cancel_button);
+        setContentView(R.layout.search_dialog);
+        setTitle(R.string.search_dialog_title);
+    
+        // get references
+        okButton = (Button) findViewById(R.id.search_dialog_ok_button);
+        cancelButton = (Button) findViewById(R.id.search_dialog_cancel_button);
 
         TableLayout table = (TableLayout) findViewById(R.id.search_dialog_root_layout);
 
@@ -85,16 +85,16 @@ public class SearchDialog extends Dialog implements OnClickListener{
             table.addView(tr);
         }
 
-		// setup listener
-		okButton.setOnClickListener(this);
-		cancelButton.setOnClickListener(this);
-	}
+        // setup listener
+        okButton.setOnClickListener(this);
+        cancelButton.setOnClickListener(this);
+    }
 
-	@Override
-	public void onClick(View v) {
-		
-		if(v == okButton){
-			this.dismiss();
+    @Override
+    public void onClick(View v) {
+        
+        if(v == okButton){
+            this.dismiss();
             if (mask == null) return;
             final Intent intent = new Intent(this.getContext(), RemucoLibrarySearch.class);
             for (int i = 0; i < mask.length; i++) {
@@ -102,10 +102,10 @@ public class SearchDialog extends Dialog implements OnClickListener{
                 intent.putExtra(SearchDialog.class.getName() + "_" + field, query[i].getText().toString());
             }
             this.getContext().startActivity(intent);
-		}
-		
-		if(v == cancelButton){
-			this.cancel();
-		}
-	}
+        }
+        
+        if(v == cancelButton){
+            this.cancel();
+        }
+    }
 }

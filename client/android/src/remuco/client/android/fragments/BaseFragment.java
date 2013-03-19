@@ -33,24 +33,24 @@ import android.support.v4.app.Fragment;
  * player. The user of this fragment can assume player != null.
  */
 public class BaseFragment extends Fragment {
-	protected PlayerAdapter player;
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		
-		try {
-			PlayerProvider a = (PlayerProvider) getActivity();
-			this.player = ((PlayerProvider) a).getPlayer();
-			
-		} catch(ClassCastException e) {
-			Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
-			throw e;
-		}
-	}
+    protected PlayerAdapter player;
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        try {
+            PlayerProvider a = (PlayerProvider) getActivity();
+            this.player = ((PlayerProvider) a).getPlayer();
+            
+        } catch(ClassCastException e) {
+            Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
+            throw e;
+        }
+    }
 }

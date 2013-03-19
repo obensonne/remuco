@@ -35,18 +35,18 @@ public class RemucoLibraryFiles extends RemucoLibrary implements OnClickListener
 
     String[] path = null;
 
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
+    // -----------------------------------------------------------------------------
+    // --- lifecycle methods
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		// ------
-		// android related initialization
-		// ------
-		
-		// --- set listeners
+        // ------
+        // android related initialization
+        // ------
+        
+        // --- set listeners
         lv.setOnItemClickListener(new OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
@@ -62,7 +62,7 @@ public class RemucoLibraryFiles extends RemucoLibrary implements OnClickListener
                 }
             });
     }
-	
+    
     public void sendAction(ActionParam action) {
         player.getPlayer().actionFiles(action);
     }
@@ -70,7 +70,7 @@ public class RemucoLibraryFiles extends RemucoLibrary implements OnClickListener
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
-		Log.debug("--- " + this.getClass().getName() + ".getFiles()");
+        Log.debug("--- " + this.getClass().getName() + ".getFiles()");
 
         mArrayAdapter.clear();
         player.getPlayer().reqFiles(reqHandler, path, page);

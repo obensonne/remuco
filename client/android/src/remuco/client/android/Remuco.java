@@ -32,66 +32,66 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class Remuco extends RemucoActivity {
-	
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    
+    // -----------------------------------------------------------------------------
+    // --- lifecycle methods
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// ------
-		// android related initialization
-		// ------
-		setContentView(R.layout.main);
-	    if (savedInstanceState == null) {
-	        FragmentManager fragmentManager = getSupportFragmentManager();
-	        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-	        PlayerFragment fragment = new PlayerFragment();
-	        fragmentTransaction.add(R.id.fragment_container, fragment);
-	        fragmentTransaction.commit();
-	    }
-	
-	}
-	
+        // ------
+        // android related initialization
+        // ------
+        setContentView(R.layout.main);
+        if (savedInstanceState == null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            PlayerFragment fragment = new PlayerFragment();
+            fragmentTransaction.add(R.id.fragment_container, fragment);
+            fragmentTransaction.commit();
+        }
+    
+    }
+    
 
-	// --- Options Menu
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater mi = getMenuInflater();
-		mi.inflate(R.menu.options_menu, menu);
-		
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+    // --- Options Menu
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater mi = getMenuInflater();
+        mi.inflate(R.menu.options_menu, menu);
+        
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (super.onOptionsItemSelected(item)) return true;
-		
-		switch(item.getItemId()){
-		
-		case R.id.options_menu_library:
+        
+        switch(item.getItemId()){
+        
+        case R.id.options_menu_library:
             final Intent intent = new Intent(this, RemucoLibraryTab.class);
             startActivity(intent);
-			return true;
-			
-		case R.id.options_menu_rate:
-			showRateDialog();
-			return true;
-		}
-		
-		return false;
-	}
-	
-	// ------------------------
-	// --- dialogs
-	// ------------------------
-	
-	private void showRateDialog() {
-	    FragmentManager fm = getSupportFragmentManager();
-	    RatingDialog ratingdialog = RatingDialog.newInstance(player);
-	    ratingdialog.show(fm, "ratingdialog");
-	}
-	
+            return true;
+            
+        case R.id.options_menu_rate:
+            showRateDialog();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // ------------------------
+    // --- dialogs
+    // ------------------------
+    
+    private void showRateDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        RatingDialog ratingdialog = RatingDialog.newInstance(player);
+        ratingdialog.show(fm, "ratingdialog");
+    }
+    
 }

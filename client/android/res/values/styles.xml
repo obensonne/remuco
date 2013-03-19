@@ -19,10 +19,10 @@
     </style>
 
     
-  	<style name="remucoRatingBar" parent="@android:style/Widget.RatingBar">
-		<item name="android:progressDrawable">@drawable/ratingbar_full</item>
-    	<item name="android:minHeight">48dip</item>
-		<item name="android:maxHeight">48dip</item>
-  	</style>
-  	
+      <style name="remucoRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/ratingbar_full</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+      </style>
+      
 </resources>

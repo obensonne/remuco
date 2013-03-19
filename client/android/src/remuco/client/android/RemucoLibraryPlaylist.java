@@ -27,9 +27,9 @@ import remuco.client.common.util.Log;
 
 public class RemucoLibraryPlaylist extends RemucoLibrary implements OnClickListener{
 
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
+    // -----------------------------------------------------------------------------
+    // --- lifecycle methods
+    
     public void sendAction(ActionParam action) {
         player.getPlayer().actionPlaylist(action);
     }
@@ -37,7 +37,7 @@ public class RemucoLibraryPlaylist extends RemucoLibrary implements OnClickListe
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
-		Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
+        Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
 
         mArrayAdapter.clear();
         player.getPlayer().reqPlaylist(reqHandler, page);

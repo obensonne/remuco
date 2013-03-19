@@ -9,16 +9,16 @@
   <!-- Coverart View -->
 
   <FrameLayout android:id="@+id/FrameLayout02"
-			   android:layout_height="fill_parent" 
-			   android:layout_width="fill_parent">
-			
+               android:layout_height="fill_parent" 
+               android:layout_width="fill_parent">
+            
     <ImageView android:id="@+id/WidgetBackground"
-			   android:layout_width="fill_parent" 
-			   android:layout_height="fill_parent"
-			   android:src="@drawable/remuco_100"
-			   android:scaleType="centerInside" 
-			   android:layout_gravity="center"
-			   />
+               android:layout_width="fill_parent" 
+               android:layout_height="fill_parent"
+               android:src="@drawable/remuco_100"
+               android:scaleType="centerInside" 
+               android:layout_gravity="center"
+               />
 
     <LinearLayout android:id="@+id/WidgetForeground"
                   android:layout_width="fill_parent"
@@ -34,7 +34,7 @@
                 android:layout_marginTop="5dip"
                 android:padding="10dip"
                 android:textColor="@android:color/white"
-			    android:gravity="bottom"/>
+                android:gravity="bottom"/>
 
       <TextView android:id="@+id/InfoArtist"
                 android:text=""
@@ -44,26 +44,26 @@
                 android:layout_marginTop="5dip"
                 android:padding="10dip"
                 android:textColor="@android:color/white"
-			    android:gravity="bottom"/>
+                android:gravity="bottom"/>
 
       <LinearLayout
-	     android:layout_width="fill_parent" android:layout_height="wrap_content"
-	     android:gravity="bottom">
+         android:layout_width="fill_parent" android:layout_height="wrap_content"
+         android:gravity="bottom">
 
-	    <ImageButton android:id="@+id/WidgetPrev"
-				     android:layout_width="wrap_content" android:layout_height="wrap_content"
-				     android:src="@drawable/ic_appwidget_music_prev" android:clickable="true"
-				     android:layout_weight="1" android:background="@null" />
+        <ImageButton android:id="@+id/WidgetPrev"
+                     android:layout_width="wrap_content" android:layout_height="wrap_content"
+                     android:src="@drawable/ic_appwidget_music_prev" android:clickable="true"
+                     android:layout_weight="1" android:background="@null" />
 
-	    <ImageButton android:id="@+id/WidgetPlay"
-				     android:layout_width="wrap_content" android:layout_height="wrap_content"
-				     android:src="@drawable/ic_appwidget_music_play" android:clickable="true"
-				     android:layout_weight="1" android:background="@null" />
+        <ImageButton android:id="@+id/WidgetPlay"
+                     android:layout_width="wrap_content" android:layout_height="wrap_content"
+                     android:src="@drawable/ic_appwidget_music_play" android:clickable="true"
+                     android:layout_weight="1" android:background="@null" />
 
-	    <ImageButton android:id="@+id/WidgetNext"
-				     android:layout_width="wrap_content" android:layout_height="wrap_content"
-				     android:src="@drawable/ic_appwidget_music_next" android:clickable="true"
-				     android:layout_weight="1" android:background="@null" />
+        <ImageButton android:id="@+id/WidgetNext"
+                     android:layout_width="wrap_content" android:layout_height="wrap_content"
+                     android:src="@drawable/ic_appwidget_music_next" android:clickable="true"
+                     android:layout_weight="1" android:background="@null" />
       </LinearLayout>
     </LinearLayout>
   </FrameLayout>

@@ -29,23 +29,23 @@ import remuco.client.common.MainLoop;
 
 public class RemucoService extends Service {
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-	
-	@Override
-	public void onCreate() {
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+    
+    @Override
+    public void onCreate() {
         // --- enable the remuco main loop (timer thread)
         MainLoop.enable();
-	}
+    }
 
-	@Override
-	public void onDestroy() {
+    @Override
+    public void onDestroy() {
         MainLoop.disable();
-	}
-	
-	@Override
-	public void onStart(Intent intent, int startid) {
-	}
+    }
+    
+    @Override
+    public void onStart(Intent intent, int startid) {
+    }
 }

@@ -37,108 +37,108 @@ import remuco.client.common.util.Log;
 
 public class PlayerFragment extends BaseFragment implements OnClickListener {
 
-	private ViewHandler viewHandler;
+    private ViewHandler viewHandler;
 
-	TextView infoTitle;
-	TextView infoArtist;
-	TextView infoAlbum;
+    TextView infoTitle;
+    TextView infoArtist;
+    TextView infoAlbum;
 
-	ImageView infoCover;
+    ImageView infoCover;
 
-	SeekBar ctrlProgressBar;
-	TextView ctrlProgress;
-	TextView ctrlLength;
-	
-	ImageButton ctrlPrev;
-	ImageButton ctrlPlay;
-	ImageButton ctrlNext;
-	ImageButton ctrlShuffle;
-	ImageButton ctrlRepeat;
-	
-	RatingBar infoRatingBar;
+    SeekBar ctrlProgressBar;
+    TextView ctrlProgress;
+    TextView ctrlLength;
+    
+    ImageButton ctrlPrev;
+    ImageButton ctrlPlay;
+    ImageButton ctrlNext;
+    ImageButton ctrlShuffle;
+    ImageButton ctrlRepeat;
+    
+    RatingBar infoRatingBar;
 
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
-		
-		Log.debug("--- " + this.getClass().getName() + ".onCreateView()");
-		
-		View rootView = inflater.inflate(R.layout.player_fragment, container, false);
-		this.setViewhandlerCallbacks(rootView);
-		viewHandler = new ViewHandler(this);
-		return rootView;
-	}
-	
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.debug("--- " + this.getClass().getName() + ".onResume()");
-		
-		player.addHandler(viewHandler);
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        
+        Log.debug("--- " + this.getClass().getName() + ".onCreateView()");
+        
+        View rootView = inflater.inflate(R.layout.player_fragment, container, false);
+        this.setViewhandlerCallbacks(rootView);
+        viewHandler = new ViewHandler(this);
+        return rootView;
+    }
+    
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.debug("--- " + this.getClass().getName() + ".onResume()");
+        
+        player.addHandler(viewHandler);
         if (player.getPlayer() != null ) {
-    		viewHandler.setRunning(player);
+            viewHandler.setRunning(player);
         } else {
-        	setConnectText();
+            setConnectText();
         }
-	}
-	
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.debug("--- " + this.getClass().getName() + ".onPause()");
-		
-		viewHandler.setStopped();
-		player.removeHandler(viewHandler);
-	}
-	
-	
-	/**
-	 * Loads all GUI elements from view, and sets action listeners.
-	 * @param view R.layout.main
-	 */
-	private void setViewhandlerCallbacks(View view) {
-		// --- retrieve and set view handles
-		infoTitle 	= (TextView) view.findViewById(R.id.infoTitle);
-		infoArtist 	= (TextView) view.findViewById(R.id.infoArtist);
-		infoAlbum 	= (TextView) view.findViewById(R.id.infoAlbum);
+    }
+    
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.debug("--- " + this.getClass().getName() + ".onPause()");
+        
+        viewHandler.setStopped();
+        player.removeHandler(viewHandler);
+    }
+    
+    
+    /**
+     * Loads all GUI elements from view, and sets action listeners.
+     * @param view R.layout.main
+     */
+    private void setViewhandlerCallbacks(View view) {
+        // --- retrieve and set view handles
+        infoTitle     = (TextView) view.findViewById(R.id.infoTitle);
+        infoArtist     = (TextView) view.findViewById(R.id.infoArtist);
+        infoAlbum     = (TextView) view.findViewById(R.id.infoAlbum);
 
-		infoCover 	= (ImageView) view.findViewById(R.id.infoCover);
-		
-		infoRatingBar = (RatingBar) view.findViewById(R.id.infoRatingBar);
-		
-		ctrlProgressBar 	= (SeekBar) view.findViewById(R.id.CtrlProgressBar);
-		ctrlLength 			= (TextView) view.findViewById(R.id.CtrlLength);
-		ctrlProgress 		= (TextView) view.findViewById(R.id.CtrlProgress);
-		
-		ctrlPrev = (ImageButton) view.findViewById(R.id.CtrlPrev);
-		ctrlPlay = (ImageButton) view.findViewById(R.id.CtrlPlay);
-		ctrlNext = (ImageButton) view.findViewById(R.id.CtrlNext);
-		ctrlShuffle = (ImageButton) view.findViewById(R.id.CtrlShuffle);
-		ctrlRepeat = (ImageButton) view.findViewById(R.id.CtrlRepeat);
-		
-		
-		// --- set listeners
-		ctrlPlay.setOnClickListener(this);
-		ctrlPrev.setOnClickListener(this);
-		ctrlNext.setOnClickListener(this);
-		ctrlShuffle.setOnClickListener(this);
-		ctrlRepeat.setOnClickListener(this);
+        infoCover     = (ImageView) view.findViewById(R.id.infoCover);
+        
+        infoRatingBar = (RatingBar) view.findViewById(R.id.infoRatingBar);
+        
+        ctrlProgressBar     = (SeekBar) view.findViewById(R.id.CtrlProgressBar);
+        ctrlLength             = (TextView) view.findViewById(R.id.CtrlLength);
+        ctrlProgress         = (TextView) view.findViewById(R.id.CtrlProgress);
+        
+        ctrlPrev = (ImageButton) view.findViewById(R.id.CtrlPrev);
+        ctrlPlay = (ImageButton) view.findViewById(R.id.CtrlPlay);
+        ctrlNext = (ImageButton) view.findViewById(R.id.CtrlNext);
+        ctrlShuffle = (ImageButton) view.findViewById(R.id.CtrlShuffle);
+        ctrlRepeat = (ImageButton) view.findViewById(R.id.CtrlRepeat);
+        
+        
+        // --- set listeners
+        ctrlPlay.setOnClickListener(this);
+        ctrlPrev.setOnClickListener(this);
+        ctrlNext.setOnClickListener(this);
+        ctrlShuffle.setOnClickListener(this);
+        ctrlRepeat.setOnClickListener(this);
 
         ctrlProgressBar.setOnSeekBarChangeListener(
-        	new SeekBar.OnSeekBarChangeListener() {
+            new SeekBar.OnSeekBarChangeListener() {
             int start = 0;
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
-            		boolean fromUser) {}
+                    boolean fromUser) {}
             
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-            	start = ctrlProgressBar.getProgress();
+                start = ctrlProgressBar.getProgress();
             }
             
             @Override
@@ -149,47 +149,47 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
                 player.getPlayer().ctrlSeek((end - start));
             }
         });
-	}
-	
-	
-	/**
-	 * Sets a connect to server text
-	 */
-	protected void setConnectText() {
-		infoTitle.setText(R.string.player_info_notconnected);
-		infoArtist.setText(R.string.player_info_usemenu);
-		infoAlbum.setText(R.string.player_info_connectoserver);		
-	}
+    }
+    
+    
+    /**
+     * Sets a connect to server text
+     */
+    protected void setConnectText() {
+        infoTitle.setText(R.string.player_info_notconnected);
+        infoArtist.setText(R.string.player_info_usemenu);
+        infoAlbum.setText(R.string.player_info_connectoserver);        
+    }
 
 
-	@Override
-	public void onClick(View v) {
+    @Override
+    public void onClick(View v) {
         if (player.getPlayer() == null)
             return;
 
-		switch(v.getId()){
-		case R.id.CtrlPlay:
-			player.getPlayer().ctrlPlayPause();
-			break;
-			
-		case R.id.CtrlPrev:
-			player.getPlayer().ctrlPrev();
-			break;
-			
-		case R.id.CtrlNext:
-			player.getPlayer().ctrlNext();
-			break;
-			
-		case R.id.CtrlShuffle:
-			player.getPlayer().ctrlToggleShuffle();
-			break;
-			
-		case R.id.CtrlRepeat:
-			player.getPlayer().ctrlToggleRepeat();
-			break;
-			
-		}
-	};	
-	
-	
+        switch(v.getId()){
+        case R.id.CtrlPlay:
+            player.getPlayer().ctrlPlayPause();
+            break;
+            
+        case R.id.CtrlPrev:
+            player.getPlayer().ctrlPrev();
+            break;
+            
+        case R.id.CtrlNext:
+            player.getPlayer().ctrlNext();
+            break;
+            
+        case R.id.CtrlShuffle:
+            player.getPlayer().ctrlToggleShuffle();
+            break;
+            
+        case R.id.CtrlRepeat:
+            player.getPlayer().ctrlToggleRepeat();
+            break;
+            
+        }
+    };    
+    
+    
 }

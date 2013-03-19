@@ -35,18 +35,18 @@ import android.widget.Toast;
 
 public class WidgetHandler extends Handler {
 
-	byte[] imageCache;
-	
+    byte[] imageCache;
+    
     Context context;
     PlayerAdapter player;
-	
-	boolean running = false;
-	
-	
-	public WidgetHandler(Context context, PlayerAdapter player) {
+    
+    boolean running = false;
+    
+    
+    public WidgetHandler(Context context, PlayerAdapter player) {
         this.context = context;
         this.player = player;
-	}
+    }
 
     public void setRunning(boolean r) {
 
@@ -60,102 +60,102 @@ public class WidgetHandler extends Handler {
         RemucoWidgetProvider.updateAllWidgets(context, views);
     }
 
-	@Override
-	public void handleMessage(Message msg) {
+    @Override
+    public void handleMessage(Message msg) {
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.remucowidget);
 
-		switch(msg.what){
-		
-		case MessageFlag.CONNECTED:
-			
-			Log.ln("[VH] CONNECTED!");
-			
-			// obj should be of type PlayerInfo
-			PlayerInfo info = (PlayerInfo)msg.obj;
-			
-			// inform the user
-			String toast = context.getResources().getString(
-					R.string.connection_successful, 
-					info.getName()
-					);
-			Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-			
-			// update the display
-			sendEmptyMessage(MessageFlag.ITEM_CHANGED);
+        switch(msg.what){
+        
+        case MessageFlag.CONNECTED:
+            
+            Log.ln("[VH] CONNECTED!");
+            
+            // obj should be of type PlayerInfo
+            PlayerInfo info = (PlayerInfo)msg.obj;
+            
+            // inform the user
+            String toast = context.getResources().getString(
+                    R.string.connection_successful, 
+                    info.getName()
+                    );
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+            
+            // update the display
+            sendEmptyMessage(MessageFlag.ITEM_CHANGED);
 
-			break;
-			
-		case MessageFlag.DISCONNECTED:
-			
-			Log.ln("[VH] DISCONNECTED!");
-			
-			// inform the user
-			toast = context.getResources().getString(R.string.connection_failed);
-			Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-			
-			// show ape picture
+            break;
+            
+        case MessageFlag.DISCONNECTED:
+            
+            Log.ln("[VH] DISCONNECTED!");
+            
+            // inform the user
+            toast = context.getResources().getString(R.string.connection_failed);
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+            
+            // show ape picture
             views.setImageViewResource(R.id.WidgetBackground, R.drawable.remuco_100);
-			
-			// change text
+            
+            // change text
             views.setCharSequence(R.id.InfoTitle, "setText", "Not connected");
             views.setCharSequence(R.id.InfoArtist, "setText", "");
-			
-			// not running anymore
-			running = false;
+            
+            // not running anymore
+            running = false;
 
-			break;
-			
-		case MessageFlag.ITEM_CHANGED:
-			
-			Log.ln("[VH] item changed");
+            break;
+            
+        case MessageFlag.ITEM_CHANGED:
+            
+            Log.ln("[VH] item changed");
 
-			// msg.obj should be of type Item
-			if(!(msg.obj instanceof Item)){
-				break;
-			}
-			Item item = (Item)msg.obj;
+            // msg.obj should be of type Item
+            if(!(msg.obj instanceof Item)){
+                break;
+            }
+            Item item = (Item)msg.obj;
             updateItemGui(views, item);
 
-			// done
-			break;
+            // done
+            break;
 
 
-		case MessageFlag.STATE_CHANGED:
-			
-			Log.ln("[VH] state changed");
-			
-			// msg.obj should be of type State
-			State state = (State)msg.obj;
+        case MessageFlag.STATE_CHANGED:
+            
+            Log.ln("[VH] state changed");
+            
+            // msg.obj should be of type State
+            State state = (State)msg.obj;
 
             updateStateGui(views, state);
-			
-			break;
-			
-		}
+            
+            break;
+            
+        }
 
         RemucoWidgetProvider.updateAllWidgets(context, views);
 
-	}
+    }
 
-	// --- convert byte[] to image
-	private void convertByteArrayToImage(RemoteViews views, byte[] image) {
-		if(image == null || image.length == 0){
+    // --- convert byte[] to image
+    private void convertByteArrayToImage(RemoteViews views, byte[] image) {
+        if(image == null || image.length == 0){
             views.setImageViewResource(R.id.WidgetBackground, R.drawable.remuco_100);
 
             imageCache = null;
-		} else {
+        } else {
             views.setImageViewBitmap(R.id.WidgetBackground, BitmapFactory.decodeByteArray(image, 0, image.length));
-			
-			imageCache = image;
-		}
-	}
+            
+            imageCache = image;
+        }
+    }
 
     private void updateItemGui(RemoteViews views, Item item) {
         // get song metadata
         String title = item.getMeta(Item.META_TITLE);
         String artist = item.getMeta(Item.META_ARTIST);
-			
+            
         // set song metadata
         views.setCharSequence(R.id.InfoTitle, "setText", title);
         views.setCharSequence(R.id.InfoArtist, "setText", artist);
@@ -166,16 +166,16 @@ public class WidgetHandler extends Handler {
     }
 
     private void updateStateGui(RemoteViews views, State state) {
-			// toggle playbutton icon
-			if(state.getPlayback() == State.PLAYBACK_PLAY){
-				Log.debug("[VH] playback = true");
+            // toggle playbutton icon
+            if(state.getPlayback() == State.PLAYBACK_PLAY){
+                Log.debug("[VH] playback = true");
                 views.setInt(R.id.WidgetPlay, "setImageResource", R.drawable.ic_appwidget_music_pause);
-				running = true;
-			} else {
-				Log.debug("[VH] playback = false");
+                running = true;
+            } else {
+                Log.debug("[VH] playback = false");
                 views.setInt(R.id.WidgetPlay, "setImageResource", R.drawable.ic_appwidget_music_play);
-				running = false;
-			}
+                running = false;
+            }
     }
 
 

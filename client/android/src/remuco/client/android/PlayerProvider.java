@@ -26,9 +26,9 @@ package remuco.client.android;
  * player.
  */
 public interface PlayerProvider {
-	
-	/**
-	 * Returns a {@link PlayerAdapter} object.
-	 */
-	public PlayerAdapter getPlayer();
+    
+    /**
+     * Returns a {@link PlayerAdapter} object.
+     */
+    public PlayerAdapter getPlayer();
 }

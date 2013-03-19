@@ -51,57 +51,57 @@ import java.util.Set;
  */
 public class ConnectDialog extends DialogFragment implements OnClickListener, OnCheckedChangeListener{
 
-	//These static strings are used for key names
-	private static String arg_type = "type";
-	private static String arg_hostname = "hostname";
-	private static String arg_port = "port";
-	private static String arg_bluedevice = "bluedevice";
-		
-	Button okButton;
-	Button cancelButton;
+    //These static strings are used for key names
+    private static String arg_type = "type";
+    private static String arg_hostname = "hostname";
+    private static String arg_port = "port";
+    private static String arg_bluedevice = "bluedevice";
+        
+    Button okButton;
+    Button cancelButton;
 
     RadioGroup typeTV;
-	EditText hostnameTV;
-	EditText portTV;
+    EditText hostnameTV;
+    EditText portTV;
     ListView bluedeviceTV;
     Set<BluetoothDevice> devices;
     
-	
+    
     /**
      * Interface that the creating activity should implement.
      */
     public interface ConnectRequestHandler {
-		public void connectWifi(String hostname, int port);
-		public void connectBluetooth(String device);
-	}
-	
-	
-	public static ConnectDialog newInstance(int type, String hostname, int port, String bluedevice) {
-		ConnectDialog connectdialog = new ConnectDialog();
-		
-	    Bundle args = new Bundle();
-	    args.putInt(arg_type, type);
-	    args.putString(arg_hostname, hostname);
-	    args.putInt(arg_port, port);
-	    args.putString(arg_bluedevice, bluedevice);
-	    connectdialog.setArguments(args);
-	    
-		return connectdialog;
-	}
-	
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        public void connectWifi(String hostname, int port);
+        public void connectBluetooth(String device);
+    }
+    
+    
+    public static ConnectDialog newInstance(int type, String hostname, int port, String bluedevice) {
+        ConnectDialog connectdialog = new ConnectDialog();
+        
+        Bundle args = new Bundle();
+        args.putInt(arg_type, type);
+        args.putString(arg_hostname, hostname);
+        args.putInt(arg_port, port);
+        args.putString(arg_bluedevice, bluedevice);
+        connectdialog.setArguments(args);
+        
+        return connectdialog;
+    }
+    
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.connect_dialog, container);
-		getDialog().setTitle(R.string.connect_dialog_title);
-	
-		// get references
-		okButton = (Button) view.findViewById(R.id.connect_dialog_ok_button);
-		cancelButton = (Button) view.findViewById(R.id.connect_dialog_cancel_button);
-	
+        View view = inflater.inflate(R.layout.connect_dialog, container);
+        getDialog().setTitle(R.string.connect_dialog_title);
+    
+        // get references
+        okButton = (Button) view.findViewById(R.id.connect_dialog_ok_button);
+        cancelButton = (Button) view.findViewById(R.id.connect_dialog_cancel_button);
+    
         typeTV = (RadioGroup) view.findViewById(R.id.connect_dialog_type);
-		hostnameTV = (EditText) view.findViewById(R.id.connect_dialog_hostname);
+        hostnameTV = (EditText) view.findViewById(R.id.connect_dialog_hostname);
         portTV = (EditText) view.findViewById(R.id.connect_dialog_port);
         portTV.setFilters(new InputFilter[]{ new InputFilterMinMax(0, 65535)});
         bluedeviceTV = (ListView) view.findViewById(R.id.connect_dialog_bluedevice);
@@ -116,7 +116,7 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
         devices = new HashSet<BluetoothDevice>();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
-        	Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 BluetoothClass bluetoothClass = device.getBluetoothClass();
@@ -135,16 +135,16 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
         setHostname(getArguments().getString(arg_hostname));
         setBluedevice(getArguments().getString(arg_bluedevice));
 
-		// setup listener
+        // setup listener
         typeTV.setOnCheckedChangeListener(this);
-		okButton.setOnClickListener(this);
-		cancelButton.setOnClickListener(this);
-		
-		return view;
-	}
+        okButton.setOnClickListener(this);
+        cancelButton.setOnClickListener(this);
+        
+        return view;
+    }
 
-	private void setType(int type){
-		typeTV.check(type);
+    private void setType(int type){
+        typeTV.check(type);
 
         if (type == R.id.connect_dialog_bluetooth) {
             showBluetooth();
@@ -154,29 +154,29 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
             showWifi();
             hideBluetooth();
         }
-	}
+    }
 
-	private int getSelectedType(){
-		return typeTV.getCheckedRadioButtonId();
-	}
+    private int getSelectedType(){
+        return typeTV.getCheckedRadioButtonId();
+    }
 
-	private void setHostname(String hostname){
-		hostnameTV.setText(hostname);
-	}
+    private void setHostname(String hostname){
+        hostnameTV.setText(hostname);
+    }
 
-	private String getSelectedHostname(){
-		return hostnameTV.getText().toString();
-	}
+    private String getSelectedHostname(){
+        return hostnameTV.getText().toString();
+    }
 
-	private void setPort(int port){
-		portTV.setText(""+port);
-	}
+    private void setPort(int port){
+        portTV.setText(""+port);
+    }
 
-	private int getSelectedPort(){
-		return Integer.parseInt(portTV.getText().toString());
-	}
+    private int getSelectedPort(){
+        return Integer.parseInt(portTV.getText().toString());
+    }
 
-	private void setBluedevice(String bluedevice){
+    private void setBluedevice(String bluedevice){
         int pos = -1;
         int i = 0;
         for (BluetoothDevice device : devices) {
@@ -189,9 +189,9 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
 
         if (pos == -1) return;
         bluedeviceTV.setItemChecked(pos, true);
-	}
+    }
 
-	private String getSelectedBluedevice(){
+    private String getSelectedBluedevice(){
         int pos = bluedeviceTV.getCheckedItemPosition();
         if (pos == ListView.INVALID_POSITION)
             return "";
@@ -203,52 +203,52 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
             i++;
         }
         return "";
-	}
+    }
 
-	private void showBluetooth() {
+    private void showBluetooth() {
         bluedeviceTV.setVisibility(View.VISIBLE);
     }
 
-	private void hideBluetooth() {
+    private void hideBluetooth() {
         bluedeviceTV.setVisibility(View.GONE);
     }
 
-	private void showWifi() {
+    private void showWifi() {
         hostnameTV.setVisibility(View.VISIBLE);
         portTV.setVisibility(View.VISIBLE);
     }
 
-	private void hideWifi() {
+    private void hideWifi() {
         hostnameTV.setVisibility(View.GONE);
         portTV.setVisibility(View.GONE);
     }
-	
-	@Override
-	public void onClick(View v) {
-		
-		if(v == okButton){
-			//Connect button was hit, let the activity connect.
-			//Casting as hinted in android-developers.blogspot.
-			ConnectRequestHandler activity = (ConnectRequestHandler) getActivity();
-			
-			if(getSelectedType() == R.id.connect_dialog_bluetooth) {
-				activity.connectBluetooth(getSelectedBluedevice());
-			} else if (getSelectedType() == R.id.connect_dialog_wifi) {
-				activity.connectWifi(getSelectedHostname(), getSelectedPort());
-			}
-			
-			this.dismiss();
-		}
-		
-		if(v == cancelButton){
-			//cancel button was hit, no actions to perform.
-			this.dismiss();
-		}
-	}
-	
-	@Override
-	public void onCheckedChanged(RadioGroup group, int type) {
-		
+    
+    @Override
+    public void onClick(View v) {
+        
+        if(v == okButton){
+            //Connect button was hit, let the activity connect.
+            //Casting as hinted in android-developers.blogspot.
+            ConnectRequestHandler activity = (ConnectRequestHandler) getActivity();
+            
+            if(getSelectedType() == R.id.connect_dialog_bluetooth) {
+                activity.connectBluetooth(getSelectedBluedevice());
+            } else if (getSelectedType() == R.id.connect_dialog_wifi) {
+                activity.connectWifi(getSelectedHostname(), getSelectedPort());
+            }
+            
+            this.dismiss();
+        }
+        
+        if(v == cancelButton){
+            //cancel button was hit, no actions to perform.
+            this.dismiss();
+        }
+    }
+    
+    @Override
+    public void onCheckedChanged(RadioGroup group, int type) {
+        
         if (type == R.id.connect_dialog_bluetooth) {
             showBluetooth();
             hideWifi();
@@ -257,34 +257,34 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
             showWifi();
             hideBluetooth();
         }
-	}
-	
-	
-	/**
-	 * Simple class that filters the number in the number input field.
-	 * TODO: Can make this a bit nicer?
-	 */
-	private class InputFilterMinMax implements InputFilter {
+    }
+    
+    
+    /**
+     * Simple class that filters the number in the number input field.
+     * TODO: Can make this a bit nicer?
+     */
+    private class InputFilterMinMax implements InputFilter {
 
-	    private int min, max;
+        private int min, max;
 
-	    public InputFilterMinMax(int min, int max) {
-	        this.min = min;
-	        this.max = max;
-	    }
+        public InputFilterMinMax(int min, int max) {
+            this.min = min;
+            this.max = max;
+        }
 
-	    @Override
-	    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {   
-	        try {
-	            int input = Integer.parseInt(dest.toString() + source.toString());
-	            if (isInRange(min, max, input))
-	                return null;
-	        } catch (NumberFormatException nfe) { }     
-	        return "";
-	    }
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {   
+            try {
+                int input = Integer.parseInt(dest.toString() + source.toString());
+                if (isInRange(min, max, input))
+                    return null;
+            } catch (NumberFormatException nfe) { }     
+            return "";
+        }
 
-	    private boolean isInRange(int a, int b, int c) {
-	        return b > a ? c >= a && c <= b : c >= b && c <= a;
-	    }
-	}
+        private boolean isInRange(int a, int b, int c) {
+            return b > a ? c >= a && c <= b : c >= b && c <= a;
+        }
+    }
 }

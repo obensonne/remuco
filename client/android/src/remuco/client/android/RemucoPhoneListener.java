@@ -33,8 +33,8 @@ public class RemucoPhoneListener extends PhoneStateListener {
     private Context context;
     private boolean pausedPlayer = false;
 
-	// --- the player adapter
-	protected PlayerAdapter player = null;
+    // --- the player adapter
+    protected PlayerAdapter player = null;
 
     public RemucoPhoneListener(Context context) {
         this.context = context;
@@ -42,7 +42,7 @@ public class RemucoPhoneListener extends PhoneStateListener {
 
     public void onCallStateChanged(int phoneState, String incomingNumber) {
         if (player == null) {
-        	ClientInfo clientinfo = Client.buildClientInfo(0); //FIXME
+            ClientInfo clientinfo = Client.buildClientInfo(0); //FIXME
             player = RemucoActivity.connect(context, clientinfo);
         }
 

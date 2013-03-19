@@ -44,79 +44,79 @@ import android.widget.RatingBar.OnRatingBarChangeListener;
 
 public class RatingDialog extends DialogFragment implements OnRatingBarChangeListener, OnClickListener{
 
-	private RatingBar ratingBar;
-	private Button okButton;
-	
-	private PlayerAdapter player;
-	private RatingHandler ratingHandler = new RatingHandler(this);
-	
-	
-	public static RatingDialog newInstance(PlayerAdapter player) {
-		RatingDialog dialog = new RatingDialog();
-		return dialog;
-	}
-	
-	
-	//Approach from: http://stackoverflow.com/a/11336822
-	static class RatingHandler extends Handler {
-		WeakReference<RatingDialog> dialog;
-		
-		public RatingHandler(RatingDialog callback) {
-			dialog = new WeakReference<RatingDialog>(callback);
-		}
-		
-		@Override
-		public void handleMessage(Message msg) {
-			RatingDialog callback = dialog.get();
-			if(callback == null) {
-				return;
-			}
-			
-			switch(msg.what){
-			
-			case MessageFlag.ITEM_CHANGED:
-				Item item = (Item)msg.obj;
-				callback.ratingBar.setProgress(item.getRating());
-				break;
-				
-			case MessageFlag.CONNECTED:
-				PlayerInfo playerInfo = (PlayerInfo)msg.obj;
-				callback.ratingBar.setNumStars(playerInfo.getMaxRating());
-			}
-		}
-	}
-	
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.rating_dialog, container);
-		getDialog().setTitle(R.string.rating_dialog_title);
-		
-		ratingBar = (RatingBar) view.findViewById(R.id.rating_dialog_rating_bar);
-		okButton = (Button) view.findViewById(R.id.rating_dialog_ok_button);
-		ratingBar.setStepSize(1);
-		ratingBar.setOnRatingBarChangeListener(this);
+    private RatingBar ratingBar;
+    private Button okButton;
+    
+    private PlayerAdapter player;
+    private RatingHandler ratingHandler = new RatingHandler(this);
+    
+    
+    public static RatingDialog newInstance(PlayerAdapter player) {
+        RatingDialog dialog = new RatingDialog();
+        return dialog;
+    }
+    
+    
+    //Approach from: http://stackoverflow.com/a/11336822
+    static class RatingHandler extends Handler {
+        WeakReference<RatingDialog> dialog;
+        
+        public RatingHandler(RatingDialog callback) {
+            dialog = new WeakReference<RatingDialog>(callback);
+        }
+        
+        @Override
+        public void handleMessage(Message msg) {
+            RatingDialog callback = dialog.get();
+            if(callback == null) {
+                return;
+            }
+            
+            switch(msg.what){
+            
+            case MessageFlag.ITEM_CHANGED:
+                Item item = (Item)msg.obj;
+                callback.ratingBar.setProgress(item.getRating());
+                break;
+                
+            case MessageFlag.CONNECTED:
+                PlayerInfo playerInfo = (PlayerInfo)msg.obj;
+                callback.ratingBar.setNumStars(playerInfo.getMaxRating());
+            }
+        }
+    }
+    
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.rating_dialog, container);
+        getDialog().setTitle(R.string.rating_dialog_title);
+        
+        ratingBar = (RatingBar) view.findViewById(R.id.rating_dialog_rating_bar);
+        okButton = (Button) view.findViewById(R.id.rating_dialog_ok_button);
+        ratingBar.setStepSize(1);
+        ratingBar.setOnRatingBarChangeListener(this);
 
-		// configure ok button
-		okButton.setOnClickListener(this);
-		return view;
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.debug("[VD] onResume called");
-		
-		try {
-			PlayerProvider a = (PlayerProvider) getActivity();
-			player = ((PlayerProvider) a).getPlayer();
-			player.addHandler(ratingHandler);
-		} catch(ClassCastException e) {
-			Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
-		}
-		
-		// configure rating bar
-		// TODO: this will break pretty sure as soon as there is no player or item ...
+        // configure ok button
+        okButton.setOnClickListener(this);
+        return view;
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.debug("[VD] onResume called");
+        
+        try {
+            PlayerProvider a = (PlayerProvider) getActivity();
+            player = ((PlayerProvider) a).getPlayer();
+            player.addHandler(ratingHandler);
+        } catch(ClassCastException e) {
+            Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
+        }
+        
+        // configure rating bar
+        // TODO: this will break pretty sure as soon as there is no player or item ...
         if (player.getPlayer() != null) {
             if (player.getPlayer().info != null) {
                 ratingBar.setNumStars(player.getPlayer().info.getMaxRating());
@@ -126,28 +126,28 @@ public class RatingDialog extends DialogFragment implements OnRatingBarChangeLis
             }
         }
 
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		if(player != null) {
-			player.removeHandler(ratingHandler);
-		}
-	}
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(player != null) {
+            player.removeHandler(ratingHandler);
+        }
+    }
 
-	@Override
-	public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-		if(!fromUser) return;
-		if(player.getPlayer() == null) return;
-		player.getPlayer().ctrlRate((int)Math.ceil(rating));
-	}
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        if(!fromUser) return;
+        if(player.getPlayer() == null) return;
+        player.getPlayer().ctrlRate((int)Math.ceil(rating));
+    }
 
-	@Override
-	public void onClick(View v) {
-		if(v.getId() == R.id.rating_dialog_ok_button){
-			dismiss();
-		}
-	}
-	
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.rating_dialog_ok_button){
+            dismiss();
+        }
+    }
+    
 }

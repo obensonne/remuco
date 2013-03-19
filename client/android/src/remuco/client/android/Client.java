@@ -29,25 +29,25 @@ import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
 
 public class Client {
-	/**
-	 * Central utility method to create a client info.
-	 *
-	 * @param imgSize
-	 */
-	public static ClientInfo buildClientInfo(Display d) {
-		@SuppressWarnings("deprecation") //Deprecated as from API 13, but we support >= 8 
-		int imgSize = Math.min(d.getWidth(), d.getHeight());		
-		return buildClientInfo(imgSize);
-	}
-	
-	/**
-	 * Central utility method to create a client info.
-	 *
-	 * @param imgSize
-	 */
-	public static ClientInfo buildClientInfo(int imgSize) {
-		
-		// TODO: this should be configurable by a user
+    /**
+     * Central utility method to create a client info.
+     *
+     * @param imgSize
+     */
+    public static ClientInfo buildClientInfo(Display d) {
+        @SuppressWarnings("deprecation") //Deprecated as from API 13, but we support >= 8 
+        int imgSize = Math.min(d.getWidth(), d.getHeight());        
+        return buildClientInfo(imgSize);
+    }
+    
+    /**
+     * Central utility method to create a client info.
+     *
+     * @param imgSize
+     */
+    public static ClientInfo buildClientInfo(int imgSize) {
+        
+        // TODO: this should be configurable by a user
         // create extra info
         Hashtable<String,String> info = new Hashtable<String,String>();
         info.put("name", "Android Client on \"" + android.os.Build.MODEL + "\"");
@@ -56,6 +56,6 @@ public class Client {
         info.put("touch", "yes");
         info.put("utf8", "yes");
         return new ClientInfo(imgSize, "PNG", 50, info);
-	}
-	
+    }
+    
 }
