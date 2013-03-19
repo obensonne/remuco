@@ -102,24 +102,23 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
      */
     private void setViewhandlerCallbacks(View view) {
         // --- retrieve and set view handles
-        infoTitle     = (TextView) view.findViewById(R.id.infoTitle);
-        infoArtist     = (TextView) view.findViewById(R.id.infoArtist);
-        infoAlbum     = (TextView) view.findViewById(R.id.infoAlbum);
+        infoTitle = (TextView) view.findViewById(R.id.infoTitle);
+        infoArtist = (TextView) view.findViewById(R.id.infoArtist);
+        infoAlbum = (TextView) view.findViewById(R.id.infoAlbum);
 
-        infoCover     = (ImageView) view.findViewById(R.id.infoCover);
-        
+        infoCover = (ImageView) view.findViewById(R.id.infoCover);
+
         infoRatingBar = (RatingBar) view.findViewById(R.id.infoRatingBar);
-        
-        ctrlProgressBar     = (SeekBar) view.findViewById(R.id.CtrlProgressBar);
-        ctrlLength             = (TextView) view.findViewById(R.id.CtrlLength);
-        ctrlProgress         = (TextView) view.findViewById(R.id.CtrlProgress);
-        
+
+        ctrlProgressBar = (SeekBar) view.findViewById(R.id.CtrlProgressBar);
+        ctrlLength = (TextView) view.findViewById(R.id.CtrlLength);
+        ctrlProgress = (TextView) view.findViewById(R.id.CtrlProgress);
+
         ctrlPrev = (ImageButton) view.findViewById(R.id.CtrlPrev);
         ctrlPlay = (ImageButton) view.findViewById(R.id.CtrlPlay);
         ctrlNext = (ImageButton) view.findViewById(R.id.CtrlNext);
         ctrlShuffle = (ImageButton) view.findViewById(R.id.CtrlShuffle);
         ctrlRepeat = (ImageButton) view.findViewById(R.id.CtrlRepeat);
-        
         
         // --- set listeners
         ctrlPlay.setOnClickListener(this);

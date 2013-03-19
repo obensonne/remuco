@@ -29,9 +29,9 @@ import remuco.client.common.util.Log;
 
 public class RequesterAdapter extends Handler implements IRequester{
 
-    RemucoLibrary remucolibrary;
+    RequestHandlerCallback remucolibrary;
 
-    public RequesterAdapter(RemucoLibrary r){
+    public RequesterAdapter(RequestHandlerCallback r){
         remucolibrary = r;
     }
 

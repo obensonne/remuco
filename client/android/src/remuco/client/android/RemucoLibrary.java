@@ -41,7 +41,7 @@ import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.util.Log;
 
-public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener{
+public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener, RequestHandlerCallback {
 
     // --- view handler
     protected RequesterAdapter reqHandler;
@@ -68,7 +68,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         // ------
         
         // --- load layout
-        setContentView(R.layout.library);
+        setContentView(R.layout.playlist);
 
         // --- get view handles
         getViewHandles();
@@ -113,14 +113,6 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
 
     // --- Options Menu
     
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater mi = getMenuInflater();
-        mi.inflate(R.menu.options_library_menu, menu);
-        
-        return true;
-    }
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.library_items) {

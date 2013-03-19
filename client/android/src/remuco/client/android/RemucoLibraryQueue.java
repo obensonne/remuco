@@ -37,7 +37,7 @@ public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
-        Log.debug("--- " + this.getClass().getName() + ".geQueue()");
+        Log.debug("--- " + this.getClass().getName() + ".getQueue()");
 
         mArrayAdapter.clear();
         player.getPlayer().reqQueue(reqHandler, page);
