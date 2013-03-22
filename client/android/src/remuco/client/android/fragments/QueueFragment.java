@@ -4,7 +4,7 @@ import remuco.client.android.RemucoLibraryList;
 import remuco.client.common.data.ActionParam;
 import android.content.Context;
 
-public class PlaylistFragment extends BaseFragmentRemucoLists {
+public class QueueFragment extends BaseFragmentRemucoLists {
 
     @Override
     protected RemucoLibraryList getLibrary(Context context) {
@@ -19,12 +19,12 @@ public class PlaylistFragment extends BaseFragmentRemucoLists {
 
         @Override
         public void sendAction(ActionParam action) {
-            player.getPlayer().actionPlaylist(action);
+            player.getPlayer().actionQueue(action);
         }
 
         @Override
         public void loadList() {
-            player.getPlayer().reqPlaylist(reqHandler, page);
+            player.getPlayer().reqQueue(reqHandler, page);
         }
     }
 

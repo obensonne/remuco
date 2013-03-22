@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import remuco.client.android.fragments.RequesterAdapter;
 import remuco.client.android.util.LibraryAdapter;
 import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.AbstractAction;
@@ -41,6 +41,7 @@ import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.util.Log;
 
+@Deprecated
 public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener, RequestHandlerCallback {
 
     // --- view handler
@@ -171,6 +172,8 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         itempos[0] = list.getItemPosAbsolute(libitem.position);
         Log.debug("Item Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
         ActionParam a;
+        
+        //FIXME
         if (list.isPlaylist() || list.isQueue()) {
             a = new ActionParam(actionid, itempos, itemids);
         } else {

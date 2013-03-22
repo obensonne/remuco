@@ -18,10 +18,12 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.client.android;
+package remuco.client.android.fragments;
 
 import android.os.Handler;
 import android.os.Message;
+import remuco.client.android.MessageFlag;
+import remuco.client.android.RequestHandlerCallback;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;

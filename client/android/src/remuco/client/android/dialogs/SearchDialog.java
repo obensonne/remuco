@@ -36,6 +36,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+@Deprecated
 public class SearchDialog extends Dialog implements OnClickListener{
 
     PlayerAdapter player;

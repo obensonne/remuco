@@ -23,11 +23,13 @@ package remuco.client.android;
 
 import remuco.client.android.dialogs.ConnectDialog;
 import remuco.client.android.dialogs.ConnectDialog.ConnectRequestHandler;
+import remuco.client.android.dialogs.SearchDialog;
 import remuco.client.android.dialogs.VolumeDialog;
 import remuco.client.android.io.WifiSocket;
 import remuco.client.android.util.AndroidLogPrinter;
 import remuco.client.common.data.ClientInfo;
 import remuco.client.common.util.Log;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -131,10 +133,13 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider, 
     }
 
 
+    // ------------------------
     // --- Options Menu
+    // ------------------------
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.debug("MENUITEMSELECTED "+item);
         switch(item.getItemId()){
 
         case R.id.options_menu_connect:
@@ -143,10 +148,11 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider, 
 
         case R.id.options_menu_disconnect:
             Log.ln("disconnect button pressed");
-            player.disconnect();
+            disconnect();
             return true;
 
-        case R.id.options_menu_search:
+        case R.id.options_menu_search:  //TODO: Remove
+            Log.debug("SEARCHDIALOGTHING...");
             showDialog(SEARCH_DIALOG);
             return true;
         }
@@ -205,7 +211,20 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider, 
         volumedialog.show(fm, "volumedialog");
     }
 
+    
+    @Override
+    @Deprecated
+    //TODO: Delete this dialog code when dialog is removed.
+    protected Dialog onCreateDialog(int id) {
+        if (id == SEARCH_DIALOG) {
+            return new SearchDialog(this, player);
+        }
+        
+        Log.bug("onCreateDialog(" + id + ") ... we shouldn't be here");
+        return null;
+    }
 
+    
     // -----------------------
     // --- Connect methods
     // ---  (callbacks from connectdialog)
@@ -234,4 +253,12 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider, 
         player.connectBluetooth(bluedevice, clientInfo);
     }
 
+    
+    public void disconnect() {
+        try {
+            player.disconnect();
+        } catch(Exception e) {
+            //Nothing to do
+        }
+    }
 }

@@ -22,9 +22,12 @@
 package remuco.client.android.fragments;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,6 +36,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import remuco.client.android.R;
+import remuco.client.android.dialogs.RatingDialog;
 import remuco.client.common.util.Log;
 
 public class PlayerFragment extends BaseFragment implements OnClickListener {
@@ -78,10 +82,10 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
         Log.debug("--- " + this.getClass().getName() + ".onResume()");
         
         player.addHandler(viewHandler);
-        if (player.getPlayer() != null ) {
-            viewHandler.setRunning(player);
+        if (player.getPlayer() == null || player.getPlayer().getConnection().isClosed()) {
+            setDisconnected();
         } else {
-            setConnectText();
+            viewHandler.setRunning(player);
         }
     }
     
@@ -109,6 +113,15 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
         infoCover = (ImageView) view.findViewById(R.id.infoCover);
 
         infoRatingBar = (RatingBar) view.findViewById(R.id.infoRatingBar);
+        infoRatingBar.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    showRateDialog();
+                }
+                return true;
+            }
+        });
 
         ctrlProgressBar = (SeekBar) view.findViewById(R.id.CtrlProgressBar);
         ctrlLength = (TextView) view.findViewById(R.id.CtrlLength);
@@ -154,10 +167,12 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
     /**
      * Sets a connect to server text
      */
-    protected void setConnectText() {
+    protected void setDisconnected() {
+        //TODO: Image, click buttons, etc. combine with viewhandler code?
         infoTitle.setText(R.string.player_info_notconnected);
         infoArtist.setText(R.string.player_info_usemenu);
-        infoAlbum.setText(R.string.player_info_connectoserver);        
+        infoAlbum.setText(R.string.player_info_connectoserver);
+        ctrlProgressBar.setProgress(0);
     }
 
 
@@ -188,7 +203,14 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
             break;
             
         }
-    };    
+    };
+    
+    
+    private void showRateDialog() {
+        FragmentManager fm = getChildFragmentManager();
+        RatingDialog ratingdialog = RatingDialog.newInstance(player);
+        ratingdialog.show(fm, "ratingdialog");
+    }
     
     
 }

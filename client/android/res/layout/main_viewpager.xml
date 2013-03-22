@@ -1,4 +1,4 @@
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+<remuco.client.android.views.LockableViewpager xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pager"
     android:layout_width="match_parent"
@@ -20,4 +20,4 @@
         android:paddingTop="4dp"
         android:textColor="#fff" />
 
-</android.support.v4.view.ViewPager>
+</remuco.client.android.views.LockableViewpager>

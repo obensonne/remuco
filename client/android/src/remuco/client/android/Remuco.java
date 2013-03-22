@@ -21,42 +21,30 @@
 
 package remuco.client.android;
 
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 
-
-import remuco.client.android.dialogs.RatingDialog;
+import remuco.client.android.fragments.ListsholderFragment;
 import remuco.client.android.fragments.PlayerFragment;
-import remuco.client.android.fragments.PlaylistFragment;
-import android.content.Intent;
+import remuco.client.android.views.LockableViewpager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import remuco.client.common.util.Log;
 
 
 public class Remuco extends RemucoActivity {
     
-    
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
-     * will keep every loaded fragment in memory. If this becomes too memory
-     * intensive, it may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+
     SectionsPagerAdapter mSectionsPagerAdapter;
+    LockableViewpager mViewPager;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    ViewPager mViewPager;
-
+    private RemucoConnectionHandler connectionHandler = new RemucoConnectionHandler(this);
     
     // -----------------------------------------------------------------------------
     // --- lifecycle methods
@@ -74,26 +62,37 @@ public class Remuco extends RemucoActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (LockableViewpager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        
-        
-        /*
-        //Old style, set only one fragment 
-        setContentView(R.layout.main);
-        if (savedInstanceState == null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            //Fragment fragment = new PlayerFragment();
-            Fragment fragment = new PlaylistFragment();
-            
-            fragmentTransaction.add(R.id.fragment_container, fragment);
-            fragmentTransaction.commit();
+        mViewPager.setPageMargin(1);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+            //FIXME: Bug in Android, the following code does not work on < ICS
+            //       All activities will get the separator background color.
+            //       See https://plus.google.com/108761828584265913206/posts/2na2KrBqNm5
+            //         -> A workaround is also suggested here.
+            mViewPager.setPageMarginDrawable(android.R.drawable.screen_background_dark_transparent);
         }
-        */
-    
+        
     }
     
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        player.addHandler(connectionHandler);
+        if(player.getPlayer() == null || player.getPlayer().getConnection().isClosed()) {
+            handleDisconnected();
+        } else {
+            handleConnected();
+        }
+    }
+    
+    @Override 
+    public void onPause() {
+        super.onPause();
+        player.removeHandler(connectionHandler);
+    }
 
     // --- Options Menu
     
@@ -104,39 +103,7 @@ public class Remuco extends RemucoActivity {
         
         return true;
     }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (super.onOptionsItemSelected(item)) return true;
         
-        switch(item.getItemId()){
-        
-        case R.id.options_menu_library:
-            final Intent intent = new Intent(this, RemucoLibraryTab.class);
-            startActivity(intent);
-            return true;
-            
-        case R.id.options_menu_rate:
-            showRateDialog();
-            return true;
-        }
-        
-        return false;
-    }
-    
-    // ------------------------
-    // --- dialogs FIXME: Move this code to player
-    // ------------------------
-    
-    private void showRateDialog() {
-        FragmentManager fm = getSupportFragmentManager();
-        RatingDialog ratingdialog = RatingDialog.newInstance(player);
-        ratingdialog.show(fm, "ratingdialog");
-    }
-    
-    
-    
-    
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -159,7 +126,7 @@ public class Remuco extends RemucoActivity {
             if(position == 0) {
                 return new PlayerFragment();
             } else if(position == 1) {
-                return new PlaylistFragment();
+                return new ListsholderFragment();
             }
             return null; //TODO
             
@@ -177,13 +144,53 @@ public class Remuco extends RemucoActivity {
             case 0:
                 return "Player".toUpperCase(l);
             case 1:
-                return "Playlist".toUpperCase(l);
-            case 2:
-                return "Collection".toUpperCase(l);
-            case 3:
-                return "Browse".toUpperCase(l);
+                return "Library".toUpperCase(l);
             }
             return null;
+        }
+    }
+
+    
+    //is called when the player connection has come up.
+    // Enables scrolling to the library pages.
+    private void handleConnected() {
+        mViewPager.setPagingEnabled(true);
+    }
+    
+    //is called when the player connection was dropped.
+    // Disables scrolling to the library pages.
+    private void handleDisconnected() {
+        mViewPager.setPagingEnabled(false);
+        mViewPager.setCurrentItem(0, true);
+    }
+    
+    
+    
+    //Approach from: http://stackoverflow.com/a/11336822
+    static class RemucoConnectionHandler extends Handler {
+        WeakReference<Remuco> remuco;
+        
+        public RemucoConnectionHandler(Remuco callback) {
+            remuco = new WeakReference<Remuco>(callback);
+        }
+        
+        @Override
+        public void handleMessage(Message msg) {
+            Remuco callback = remuco.get();
+            if(callback ==  null) {
+                return;
+            }
+            
+            switch(msg.what){
+            
+            case MessageFlag.CONNECTED:
+                callback.handleConnected();
+                break;
+                
+            case MessageFlag.DISCONNECTED:
+                callback.handleDisconnected();
+
+            }
         }
     }
 

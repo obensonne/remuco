@@ -21,6 +21,9 @@
 
 package remuco.client.android;
 
+import remuco.client.android.R;
+import remuco.client.android.R.id;
+import remuco.client.android.R.layout;
 import remuco.client.common.data.ClientInfo;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;

@@ -3,7 +3,7 @@ package remuco.client.android.fragments;
 import remuco.client.android.R;
 import remuco.client.android.RemucoLibraryList;
 import remuco.client.android.RequestHandlerCallback;
-import remuco.client.android.RequesterAdapter;
+import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.util.Log;
 import android.content.Context;
@@ -14,12 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 /**
  * Base fragment for lists.
  */
-public abstract class RemucoListBaseFragment extends BaseFragment implements RequestHandlerCallback {
+public abstract class BaseFragmentRemucoLists extends BaseFragment implements RequestHandlerCallback {
     
     RemucoLibraryList mylib;
     ListView lv;
@@ -38,6 +40,12 @@ public abstract class RemucoListBaseFragment extends BaseFragment implements Req
         lv = (ListView) view.findViewById(R.id.library_items);
         lv.setTextFilterEnabled(true);
         lv.setAdapter(mylib.getAdapter());
+        lv.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                itemClicked(mylib.getItem(position));                
+            }            
+        });
         registerForContextMenu(lv);
         
         reqHandler = new RequesterAdapter(this);
@@ -63,7 +71,7 @@ public abstract class RemucoListBaseFragment extends BaseFragment implements Req
     
     
     //
-    //---  Context menu methods
+    //---  Context menu and item click methods
     //     In this base class there are no special elements to manage,
     //     let superclass and mylib do the work
      
@@ -82,12 +90,17 @@ public abstract class RemucoListBaseFragment extends BaseFragment implements Req
     }
     
     
+    protected void itemClicked(LibraryItem i) {
+        //Method can be overwritten to handle LibraryItem clicks.
+        Log.debug("--- " + this.getClass().getName() + " list click");
+    }
+    
     /**
      * List methods
      */
     public void getList() {
         if(player.getPlayer() == null) return;
-        mylib.getList();
+        mylib.loadList();
         
     }
     

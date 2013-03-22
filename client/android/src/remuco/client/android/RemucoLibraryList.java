@@ -21,10 +21,11 @@ public abstract class RemucoLibraryList {
     private LibraryAdapter mArrayAdapter;
     private ItemList list;
 
+    protected int page = 0; //FIXME
     
     public abstract void sendAction(ActionParam a);
-    public abstract void getList();
-    
+    public abstract void loadList();
+        
     
     public RemucoLibraryList(Context context) {
         System.out.println(context);
@@ -47,6 +48,7 @@ public abstract class RemucoLibraryList {
     }
     
     public void setList(ItemList l) {
+        clearList();
         list = l;
         
         for (int j = 0; j < list.getNumNested(); j++) {
@@ -68,15 +70,19 @@ public abstract class RemucoLibraryList {
         }
     }
     
+
     
+    public void insert(LibraryItem item, int index) {
+        mArrayAdapter.insert(item, index);
+    }
+    
+    
+    /**
+     * Builds the context menu for items in our list.
+     * The items are retrieved from ReMuCo, and are simply presented to
+     * the user.
+     */
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        Log.debug("------> Create contextmenu");
-                
-        /**
-         * Builds the context menu for items in our list.
-         * The items are retrieved from ReMuCo, and are simply presented to
-         * the user.
-         */
         if (v.getId() == R.id.library_items) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
             LibraryItem item = mArrayAdapter.getItem(info.position);
@@ -117,7 +123,7 @@ public abstract class RemucoLibraryList {
 
             ActionParam a = new ActionParam(actionid, itemPath, null, null);
             this.sendAction(a);
-            this.getList();
+            this.loadList();
             return true;
         }
 
@@ -139,7 +145,7 @@ public abstract class RemucoLibraryList {
             a = new ActionParam(actionid, list.getPath(), itempos, itemids);
         }
         this.sendAction(a);
-        this.getList();
+        this.loadList();
         return true;
     }
     

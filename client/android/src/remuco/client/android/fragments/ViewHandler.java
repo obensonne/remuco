@@ -39,6 +39,7 @@ import android.widget.Toast;
  * the player GUI accordingly. 
  */
 //TODO: Does the usage of this class leaks memory (Weakref to PlayerFragment?)
+//TODO: Feature envy of PlayerFragment(?)
 public class ViewHandler extends Handler {
 
     int tick;
@@ -128,7 +129,7 @@ public class ViewHandler extends Handler {
             remuco.infoCover.setImageResource(R.drawable.remuco_128);
             
             // change text
-            remuco.setConnectText();
+            remuco.setDisconnected();
             
             // remove stars
             remuco.infoRatingBar.setProgress(0);
