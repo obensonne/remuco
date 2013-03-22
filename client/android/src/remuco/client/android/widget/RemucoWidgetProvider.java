@@ -19,11 +19,13 @@
  *   
  */
 
-package remuco.client.android;
+package remuco.client.android.widget;
 
+import remuco.client.android.Client;
+import remuco.client.android.PlayerAdapter;
 import remuco.client.android.R;
-import remuco.client.android.R.id;
-import remuco.client.android.R.layout;
+import remuco.client.android.Remuco;
+import remuco.client.android.RemucoActivity;
 import remuco.client.common.data.ClientInfo;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -51,7 +53,7 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
             createPlayer(context);
         }
 
-        this.appWidgetIds = appWidgetIds;
+        RemucoWidgetProvider.appWidgetIds = appWidgetIds;
 
         final int N = appWidgetIds.length;
 

@@ -62,7 +62,7 @@
                 <category android:name="android.intent.category.VIEW" />
             </intent-filter>
         </activity>
-        <receiver android:name="remuco.client.android.RemucoWidgetProvider">
+        <receiver android:name="remuco.client.android.widget.RemucoWidgetProvider">
           <intent-filter>
             <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             <action android:name="remuco.client.android.RemucoWidgetProvider.ACTION_PREV"/>

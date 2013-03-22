@@ -19,13 +19,11 @@
  *   
  */
 
-package remuco.client.android;
+package remuco.client.android.widget;
 
+import remuco.client.android.MessageFlag;
+import remuco.client.android.PlayerAdapter;
 import remuco.client.android.R;
-import remuco.client.android.R.drawable;
-import remuco.client.android.R.id;
-import remuco.client.android.R.layout;
-import remuco.client.android.R.string;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
 import remuco.client.common.data.State;
