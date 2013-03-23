@@ -24,7 +24,6 @@ package remuco.client.android.fragments;
 import remuco.client.android.PlayerAdapter;
 import remuco.client.android.PlayerProvider;
 import remuco.client.common.util.Log;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 /**
@@ -36,17 +35,12 @@ public class BaseFragment extends Fragment {
     protected PlayerAdapter player;
     
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-    
-    @Override
     public void onResume() {
         super.onResume();
         
         try {
             PlayerProvider a = (PlayerProvider) getActivity();
-            this.player = ((PlayerProvider) a).getPlayer();
+            this.player = a.getPlayer();
             
         } catch(ClassCastException e) {
             Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");

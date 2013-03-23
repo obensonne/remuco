@@ -138,6 +138,7 @@ public abstract class RemucoLibraryList {
         int[] itempos = new int[1];
         itempos[0] = list.getItemPosAbsolute(libitem.position);
         Log.debug("Item Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
+        //FIXME remove branch, init a correctly.
         ActionParam a;
         if (list.isPlaylist() || list.isQueue()) {
             a = new ActionParam(actionid, itempos, itemids);
@@ -145,6 +146,7 @@ public abstract class RemucoLibraryList {
             a = new ActionParam(actionid, list.getPath(), itempos, itemids);
         }
         this.sendAction(a);
+        
         this.loadList();
         return true;
     }

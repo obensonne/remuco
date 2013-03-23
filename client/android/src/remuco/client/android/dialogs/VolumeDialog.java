@@ -24,7 +24,6 @@ import java.lang.ref.WeakReference;
 
 import remuco.client.android.MessageFlag;
 import remuco.client.android.PlayerAdapter;
-import remuco.client.android.PlayerProvider;
 import remuco.client.android.R;
 import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
@@ -33,7 +32,6 @@ import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,10 +44,9 @@ import android.widget.SeekBar;
  * TODO: Faster client volume change reflection
  * TODO: Cleanup, how to set the player in a safe way, and removing the need for player != null
  */
-public class VolumeDialog extends DialogFragment implements OnKeyListener{
+public class VolumeDialog extends BaseDialog implements OnKeyListener {
     
     private SeekBar volumeBar;
-    private PlayerAdapter player;
     private Handler dismissHandler;
     private VolumeHandler volumeHandler = new VolumeHandler(this);
     
@@ -110,14 +107,9 @@ public class VolumeDialog extends DialogFragment implements OnKeyListener{
         super.onResume();
         Log.debug("[VD] onResume called");
         
-        try {
-            PlayerProvider a = (PlayerProvider) getActivity();
-            player = ((PlayerProvider) a).getPlayer();
-            player.addHandler(volumeHandler);
-            updateVolume();
-        } catch(ClassCastException e) {
-            Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
-        }
+        player.addHandler(volumeHandler);
+        updateVolume();
+        
         resetDismissTimeout();
     }
     
@@ -128,10 +120,7 @@ public class VolumeDialog extends DialogFragment implements OnKeyListener{
         Log.debug("[VD] onPause called");
         
         dismissHandler.removeCallbacks(dismissRunnable);
-        if(player != null) {
-            player.removeHandler(volumeHandler);
-        }
-        player = null;
+        player.removeHandler(volumeHandler);
     }
     
     

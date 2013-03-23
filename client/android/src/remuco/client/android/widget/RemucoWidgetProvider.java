@@ -55,10 +55,10 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
 
         RemucoWidgetProvider.appWidgetIds = appWidgetIds;
 
-        final int N = appWidgetIds.length;
+        final int n = appWidgetIds.length;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i=0; i<N; i++) {
+        for (int i=0; i<n; i++) {
             int appWidgetId = appWidgetIds[i];
 
             // Get the layout for the App Widget and attach an on-click listener to the button
@@ -130,11 +130,11 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public static void updateAllWidgets(Context context, RemoteViews views) {
         if (appWidgetIds == null) return;
 
-        final int N = appWidgetIds.length;
+        final int n = appWidgetIds.length;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i=0; i<N; i++) {
+        for (int i=0; i<n; i++) {
             int appWidgetId = appWidgetIds[i];
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

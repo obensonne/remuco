@@ -58,7 +58,7 @@ public class RemucoPhoneListener extends PhoneStateListener {
             Log.debug("Call Finish");
             if (playerState == State.PLAYBACK_PAUSE
                 || playerState == State.PLAYBACK_STOP
-                || pausedPlayer == true){
+                || pausedPlayer){
                 player.getPlayer().ctrlPlayPause();
                 pausedPlayer = false;
             }

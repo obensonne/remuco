@@ -114,7 +114,7 @@ public class Remuco extends RemucoActivity {
      *   - Player
      *   - Playlist
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

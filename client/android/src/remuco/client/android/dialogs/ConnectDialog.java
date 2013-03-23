@@ -264,7 +264,7 @@ public class ConnectDialog extends DialogFragment implements OnClickListener, On
      * Simple class that filters the number in the number input field.
      * TODO: Can make this a bit nicer?
      */
-    private class InputFilterMinMax implements InputFilter {
+    private static class InputFilterMinMax implements InputFilter {
 
         private int min, max;
 

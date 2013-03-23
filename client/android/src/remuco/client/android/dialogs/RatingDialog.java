@@ -25,7 +25,6 @@ import java.lang.ref.WeakReference;
 
 import remuco.client.android.MessageFlag;
 import remuco.client.android.PlayerAdapter;
-import remuco.client.android.PlayerProvider;
 import remuco.client.android.R;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.PlayerInfo;
@@ -33,7 +32,6 @@ import remuco.client.common.util.Log;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,12 +40,11 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 
-public class RatingDialog extends DialogFragment implements OnRatingBarChangeListener, OnClickListener{
+public class RatingDialog extends BaseDialog implements OnRatingBarChangeListener, OnClickListener{
 
     private RatingBar ratingBar;
     private Button okButton;
-    
-    private PlayerAdapter player;
+
     private RatingHandler ratingHandler = new RatingHandler(this);
     
     
@@ -105,15 +102,8 @@ public class RatingDialog extends DialogFragment implements OnRatingBarChangeLis
     @Override
     public void onResume() {
         super.onResume();
-        Log.debug("[VD] onResume called");
-        
-        try {
-            PlayerProvider a = (PlayerProvider) getActivity();
-            player = ((PlayerProvider) a).getPlayer();
-            player.addHandler(ratingHandler);
-        } catch(ClassCastException e) {
-            Log.bug("-- BaseFragment gots an unsupported activity type, expected a PlayerProvider.");
-        }
+        Log.debug("[RD] onResume called");
+        player.addHandler(ratingHandler);
         
         // configure rating bar
         // TODO: this will break pretty sure as soon as there is no player or item ...
