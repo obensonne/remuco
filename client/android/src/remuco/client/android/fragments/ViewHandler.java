@@ -115,28 +115,10 @@ public class ViewHandler extends Handler {
             Log.ln("[VH] DISCONNECTED!");
             
             // inform the user
-            toast = remuco.getResources().getString(R.string.connection_failed);
+            toast = remuco.getResources().getString(R.string.connection_disconnected);
             Toast.makeText(remuco.getActivity(), toast, Toast.LENGTH_SHORT).show();
             
-            // disable buttons
-            remuco.ctrlPrev.setClickable(false);
-            remuco.ctrlPlay.setClickable(false);
-            remuco.ctrlNext.setClickable(false);
-            remuco.ctrlShuffle.setClickable(false);
-            remuco.ctrlRepeat.setClickable(false);
-
-            // show ape picture
-            remuco.infoCover.setImageResource(R.drawable.remuco_128);
-            
-            // change text
-            remuco.setDisconnected();
-            
-            // remove stars
-            remuco.infoRatingBar.setProgress(0);
-            
-            // set times
-            remuco.ctrlLength.setText("--:--");
-            remuco.ctrlProgress.setText("--:--");
+            remuco.resetGUI();
             
             // not running anymore
             running = false;
@@ -292,6 +274,7 @@ public class ViewHandler extends Handler {
 
     }
 
+    
     class Ticker implements Runnable {
         
         @Override

@@ -80,7 +80,8 @@ public class PlayerAdapter implements IConnectionListener, IItemListener, IProgr
      * does nothing if not connected
      */
     public void disconnect(){
-        if(player!=null){
+        if(player!=null && player.getConnection() != null &&
+                !player.getConnection().isClosed()){
             player.getConnection().close();
             
             // we get no disconnect signal if we close the connection ourself

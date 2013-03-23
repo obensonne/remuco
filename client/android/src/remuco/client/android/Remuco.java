@@ -79,6 +79,7 @@ public class Remuco extends RemucoActivity {
     @Override
     public void onResume() {
         super.onResume();
+        Log.debug("-- "+this+".onResume()");
         
         player.addHandler(connectionHandler);
         if(player.getPlayer() == null || player.getPlayer().getConnection().isClosed()) {

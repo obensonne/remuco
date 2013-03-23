@@ -100,6 +100,12 @@ public class RemucoActivity extends FragmentActivity implements PlayerProvider, 
         player = connect(this.getApplicationContext(), clientInfo);
     }
 
+    //FIXME
+    // Bug in this code.
+    // The service is started async AFTER the connect-call. The call fails the
+    // first time the activity is called because the mainloop is not running.
+    // This leads in a first-time start with no auto-connection.
+    //
     public static PlayerAdapter connect(Context context, ClientInfo clientInfo) {
         // In onCreateDialog, we just reconnect to the server. In this method we
         // initialize the full connection giving the image size and client info.

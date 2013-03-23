@@ -83,7 +83,7 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
         
         player.addHandler(viewHandler);
         if (player.getPlayer() == null || player.getPlayer().getConnection().isClosed()) {
-            setDisconnected();
+            resetGUI();
         } else {
             viewHandler.setRunning(player);
         }
@@ -116,6 +116,7 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
         infoRatingBar.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(player.getPlayer() != null && !player.getPlayer().getConnection().isClosed())
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     showRateDialog();
                 }
@@ -167,12 +168,30 @@ public class PlayerFragment extends BaseFragment implements OnClickListener {
     /**
      * Sets a connect to server text
      */
-    protected void setDisconnected() {
-        //TODO: Image, click buttons, etc. combine with viewhandler code?
+    protected void resetGUI() {
+        // set connect text
         infoTitle.setText(R.string.player_info_notconnected);
         infoArtist.setText(R.string.player_info_usemenu);
         infoAlbum.setText(R.string.player_info_connectoserver);
         ctrlProgressBar.setProgress(0);
+        
+        // disable buttons
+        ctrlPrev.setClickable(false);
+        ctrlPlay.setClickable(false);
+        ctrlNext.setClickable(false);
+        ctrlShuffle.setClickable(false);
+        ctrlRepeat.setClickable(false);
+
+        // show ape picture
+        infoCover.setImageResource(R.drawable.remuco_128);
+
+        // remove stars
+        infoRatingBar.setProgress(0);
+        
+        // set times
+        ctrlLength.setText("--:--");
+        ctrlProgress.setText("--:--");
+        
     }
 
 
