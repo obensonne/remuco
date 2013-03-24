@@ -27,7 +27,8 @@ import android.os.Looper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
+import java.lang.reflect.Method;
+//import java.util.UUID;
 
 import remuco.client.common.UserException;
 import remuco.client.common.io.Connection;
@@ -48,7 +49,7 @@ public class BluetoothSocket implements ISocket {
     private boolean isClosed = false;
 
     /** Remuco service UUID */
-    private final UUID REMUCO_UUID = UUID.fromString("025fe2ae-0762-4bed-90f2-d8d778f020fe");
+    //private final UUID REMUCO_UUID = UUID.fromString("025fe2ae-0762-4bed-90f2-d8d778f020fe");
 
     /**
      * Create a new Bluetooth client socket for the given host.
@@ -67,7 +68,16 @@ public class BluetoothSocket implements ISocket {
         try {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(host);
-            this.sock = device.createRfcommSocketToServiceRecord(REMUCO_UUID);
+            
+            //FIXME: Somehow some devices sometimes fail to connect
+            //       The following work-around fixes this, however if there are
+            //       other solutions, those are preferred.
+            //       See http://stackoverflow.com/q/3397071 for more info.
+            //this.sock = device.createRfcommSocketToServiceRecord(REMUCO_UUID);
+            Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+            this.sock = (android.bluetooth.BluetoothSocket) m.invoke(device, 1);
+            
+            
             this.sock.connect();
             isClosed = false;
         } catch (SecurityException e) {
