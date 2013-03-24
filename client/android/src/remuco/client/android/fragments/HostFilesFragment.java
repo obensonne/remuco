@@ -44,7 +44,7 @@ public class HostFilesFragment extends BaseFragmentRemucoLists {
         }
 
         @Override
-        public void loadList() {
+        public void loadList(int page) {
             Log.debug("Path: "+path);
             player.getPlayer().reqFiles(reqHandler, path, page);
         }

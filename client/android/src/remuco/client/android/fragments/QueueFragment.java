@@ -23,7 +23,7 @@ public class QueueFragment extends BaseFragmentRemucoLists {
         }
 
         @Override
-        public void loadList() {
+        public void loadList(int page) {
             player.getPlayer().reqQueue(reqHandler, page);
         }
     }

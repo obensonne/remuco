@@ -44,7 +44,7 @@ public class MlibFragment extends BaseFragmentRemucoLists {
         }
 
         @Override
-        public void loadList() {
+        public void loadList(int page) {
             Log.debug("Path: "+path);
             player.getPlayer().reqMLib(reqHandler, path, page);
         }

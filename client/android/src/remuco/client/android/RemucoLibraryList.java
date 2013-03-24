@@ -21,11 +21,12 @@ public abstract class RemucoLibraryList {
     private LibraryAdapter mArrayAdapter;
     private ItemList list;
 
-    protected int page = 0; //FIXME
-    
     public abstract void sendAction(ActionParam a);
-    public abstract void loadList();
-        
+    public abstract void loadList(int page);
+    
+    //paginator
+    private int page = 0;
+    private int maxpage = 0;
     
     public RemucoLibraryList(Context context) {
         System.out.println(context);
@@ -47,9 +48,20 @@ public abstract class RemucoLibraryList {
         mArrayAdapter.clear();
     }
     
+    public int getPage() {
+        return page;
+    }
+    
+    public int getMaxPage() {
+        return maxpage;
+    }
+    
     public void setList(ItemList l) {
         clearList();
         list = l;
+        
+        page = list.getPage();
+        maxpage = list.getPageMax();
         
         for (int j = 0; j < list.getNumNested(); j++) {
             LibraryItem item = new LibraryItem();
@@ -123,7 +135,7 @@ public abstract class RemucoLibraryList {
 
             ActionParam a = new ActionParam(actionid, itemPath, null, null);
             this.sendAction(a);
-            this.loadList();
+            this.loadList(page);
             return true;
         }
 
@@ -147,7 +159,7 @@ public abstract class RemucoLibraryList {
         }
         this.sendAction(a);
         
-        this.loadList();
+        this.loadList(page);
         return true;
     }
     

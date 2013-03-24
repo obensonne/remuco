@@ -23,7 +23,7 @@ public class PlaylistFragment extends BaseFragmentRemucoLists {
         }
 
         @Override
-        public void loadList() {
+        public void loadList(int page) {
             player.getPlayer().reqPlaylist(reqHandler, page);
         }
     }

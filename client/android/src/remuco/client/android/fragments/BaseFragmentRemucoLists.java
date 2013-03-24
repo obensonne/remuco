@@ -12,10 +12,13 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 /**
@@ -25,6 +28,9 @@ public abstract class BaseFragmentRemucoLists extends BaseFragment implements Re
     
     RemucoLibraryList mylib;
     ListView lv;
+    LinearLayout navbuttons;
+    Button navbuttonleft;
+    Button navbuttonright;
     protected RequesterAdapter reqHandler;
     
     protected abstract RemucoLibraryList getLibrary(Context context);
@@ -37,6 +43,25 @@ public abstract class BaseFragmentRemucoLists extends BaseFragment implements Re
         
         mylib = getLibrary(getActivity().getApplicationContext());
         View view = inflater.inflate(R.layout.playlist, container, false);
+        
+        navbuttons = (LinearLayout) view.findViewById(R.id.library_navigatebuttons);
+        navbuttonleft = (Button) view.findViewById(R.id.library_prev_button);
+        navbuttonleft.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mylib.loadList(mylib.getPage() - 1);
+            }
+        });
+        
+        
+        navbuttonright = (Button) view.findViewById(R.id.library_next_button);
+        navbuttonright.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mylib.loadList(mylib.getPage() + 1);
+            }
+        });
+        
         lv = (ListView) view.findViewById(R.id.library_items);
         lv.setTextFilterEnabled(true);
         lv.setAdapter(mylib.getAdapter());
@@ -100,8 +125,7 @@ public abstract class BaseFragmentRemucoLists extends BaseFragment implements Re
      */
     public void getList() {
         if(player.getPlayer() == null) return;
-        mylib.loadList();
-        
+        mylib.loadList(mylib.getPage());
     }
     
     public void clearList() {
@@ -111,6 +135,13 @@ public abstract class BaseFragmentRemucoLists extends BaseFragment implements Re
     @Override
     public void setList(ItemList l) {
         mylib.setList(l);
+        if(l.getPageMax() > 0) {
+            navbuttons.setVisibility(View.VISIBLE);
+            navbuttonleft.setEnabled(l.getPage() > 0);
+            navbuttonright.setEnabled(l.getPage() < l.getPageMax());
+        } else {
+            navbuttons.setVisibility(View.GONE);
+        }
     }
 
 }
