@@ -120,10 +120,9 @@ public class RatingDialog extends BaseDialog implements OnRatingBarChangeListene
     
     @Override
     public void onPause() {
+        Log.debug("[RD] onPause called");
+        player.removeHandler(ratingHandler);
         super.onPause();
-        if(player != null) {
-            player.removeHandler(ratingHandler);
-        }
     }
 
     @Override

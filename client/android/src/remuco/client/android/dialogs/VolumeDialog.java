@@ -116,11 +116,11 @@ public class VolumeDialog extends BaseDialog implements OnKeyListener {
     
     @Override
     public void onPause() {
-        super.onPause();
         Log.debug("[VD] onPause called");
         
         dismissHandler.removeCallbacks(dismissRunnable);
         player.removeHandler(volumeHandler);
+        super.onPause();
     }
     
     
