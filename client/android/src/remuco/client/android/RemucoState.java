@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -21,6 +21,6 @@
 package remuco.client.android;
 
 public enum RemucoState {
-	CONNECTED,
-	DISCONNECTED;
+    CONNECTED,
+    DISCONNECTED;
 }

@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -18,11 +18,14 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
+package remuco.client.android.widget;
 
-package remuco.client.android;
-
-import remuco.client.common.util.Log;
-
+import remuco.client.android.Client;
+import remuco.client.android.PlayerAdapter;
+import remuco.client.android.R;
+import remuco.client.android.Remuco;
+import remuco.client.android.RemucoActivity;
+import remuco.client.common.data.ClientInfo;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -36,8 +39,8 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public static String ACTION_PLAY = "play";
     public static String ACTION_NEXT = "next";
 
-	// --- the player adapter
-	protected PlayerAdapter player = null;
+    // --- the player adapter
+    protected PlayerAdapter player = null;
 
     protected static int[] appWidgetIds = null;
 
@@ -49,12 +52,12 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
             createPlayer(context);
         }
 
-        this.appWidgetIds = appWidgetIds;
+        RemucoWidgetProvider.appWidgetIds = appWidgetIds;
 
-        final int N = appWidgetIds.length;
+        final int n = appWidgetIds.length;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i=0; i<N; i++) {
+        for (int i=0; i<n; i++) {
             int appWidgetId = appWidgetIds[i];
 
             // Get the layout for the App Widget and attach an on-click listener to the button
@@ -107,7 +110,8 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     }
 
     private void createPlayer(Context context) {
-        player = RemucoActivity.connect(context, 140);
+        ClientInfo clientinfo = Client.buildClientInfo(140); //FIXME: Hardcoded :(
+        player = RemucoActivity.connect(context, clientinfo);
 
         // --- create view handler
         WidgetHandler viewHandler = new WidgetHandler(context, player);
@@ -125,11 +129,11 @@ public class RemucoWidgetProvider extends AppWidgetProvider {
     public static void updateAllWidgets(Context context, RemoteViews views) {
         if (appWidgetIds == null) return;
 
-        final int N = appWidgetIds.length;
+        final int n = appWidgetIds.length;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i=0; i<N; i++) {
+        for (int i=0; i<n; i++) {
             int appWidgetId = appWidgetIds[i];
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

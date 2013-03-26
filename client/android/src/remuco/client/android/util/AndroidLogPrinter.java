@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -25,25 +25,25 @@ import remuco.client.common.util.ILogPrinter;
 
 public class AndroidLogPrinter implements ILogPrinter {
 
-	/*
-	 * This log printer uses Android's logging framework which is good when
-	 * debugging. When running on real devices, it might be better to print
-	 * logging output to a screen visible to the user.
-	 */
+    /*
+     * This log printer uses Android's logging framework which is good when
+     * debugging. When running on real devices, it might be better to print
+     * logging output to a screen visible to the user.
+     */
 
-	@Override
-	public void println(String s) {
-		if(s.startsWith("[DEBUG] ")){
-			Log.d("Remuco", s);
-			return;
-		}
-		
-		if(s.startsWith("[BUG] ")){
-			Log.e("Remuco", s);
-		}
-		
-		Log.i("Remuco", s);
-	}
-	
-	
+    @Override
+    public void println(String s) {
+        if(s.startsWith("[DEBUG] ")){
+            Log.d("Remuco", s);
+            return;
+        }
+        
+        if(s.startsWith("[BUG] ")){
+            Log.e("Remuco", s);
+        }
+        
+        Log.i("Remuco", s);
+    }
+    
+    
 }

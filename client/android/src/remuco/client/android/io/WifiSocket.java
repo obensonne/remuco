@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -35,88 +35,88 @@ import remuco.client.common.io.ISocket;
  */
 public class WifiSocket implements ISocket {
 
-	public static final int PORT_DEFAULT = 34271;
+    public static final int PORT_DEFAULT = 34271;
 
-	private final InputStream is;
+    private final InputStream is;
 
-	private final OutputStream os;
+    private final OutputStream os;
 
-	private final java.net.Socket sock;
+    private final java.net.Socket sock;
 
-	/**
-	 * Create a new TCP client socket for the given host and port.
-	 * 
-	 * @param host
-	 *            host name or IP address
-	 * @param port
-	 *            port number
-	 * @throws UserException
-	 *             if setting up the socket and connection fails
-	 */
-	public WifiSocket(String host, int port) throws UserException {
+    /**
+     * Create a new TCP client socket for the given host and port.
+     * 
+     * @param host
+     *            host name or IP address
+     * @param port
+     *            port number
+     * @throws UserException
+     *             if setting up the socket and connection fails
+     */
+    public WifiSocket(String host, int port) throws UserException {
 
-		try {
-			this.sock = new java.net.Socket(host, port);
-		} catch (UnknownHostException e) {
-			throw new UserException("Connection Error",
-					"Given host name is unknown.");
-		} catch (SecurityException e) {
-			throw new UserException("Connection Error",
-					"Not allowed to connect.");
-		} catch (IOException e) {
-			throw new UserException("Connection Error",
-					"IO error while setting up the connection");
-		}
+        try {
+            this.sock = new java.net.Socket(host, port);
+        } catch (UnknownHostException e) {
+            throw new UserException("Connection Error",
+                    "Given host name is unknown.");
+        } catch (SecurityException e) {
+            throw new UserException("Connection Error",
+                    "Not allowed to connect.");
+        } catch (IOException e) {
+            throw new UserException("Connection Error",
+                    "IO error while setting up the connection");
+        }
 
-		try {
-			is = sock.getInputStream();
-		} catch (IOException e) {
-			try {
-				sock.close();
-			} catch (IOException e1) {
-			}
-			throw new UserException("Connecting failed",
-					"IO Error while opening streams.", e);
-		}
+        try {
+            is = sock.getInputStream();
+        } catch (IOException e) {
+            try {
+                sock.close();
+            } catch (IOException e1) {
+            }
+            throw new UserException("Connecting failed",
+                    "IO Error while opening streams.", e);
+        }
 
-		try {
-			os = sock.getOutputStream();
-		} catch (IOException e) {
-			try {
-				is.close();
-				sock.close();
-			} catch (IOException e1) {
-			}
-			throw new UserException("Connecting failed",
-					"IO Error while opening streams.", e);
-		}
+        try {
+            os = sock.getOutputStream();
+        } catch (IOException e) {
+            try {
+                is.close();
+                sock.close();
+            } catch (IOException e1) {
+            }
+            throw new UserException("Connecting failed",
+                    "IO Error while opening streams.", e);
+        }
 
-	}
+    }
 
-	@Override
-	public void close() {
-		try {
-			sock.close();
-		} catch (IOException e) {
-		}
-		try {
-			os.close();
-		} catch (IOException e) {
-		}
-		try {
-			is.close();
-		} catch (IOException e) {
-		}
-	}
+    @Override
+    public void close() {
+        try {
+            sock.close();
+        } catch (IOException e) {
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+        }
+    }
 
-	@Override
-	public InputStream getInputStream() {
-		return is;
-	}
+    @Override
+    public InputStream getInputStream() {
+        return is;
+    }
 
-	@Override
-	public OutputStream getOutputStream() {
-		return os;
-	}
+    @Override
+    public OutputStream getOutputStream() {
+        return os;
+    }
 
 }

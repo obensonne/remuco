@@ -10,27 +10,32 @@
     <string name="app_name_widget">Remuco Widget</string>
 
 
-<string name="connect_dialog_type">Type</string>
-<string name="connect_dialog_wifi">Wifi</string>
-<string name="connect_dialog_bluetooth">Bluetooth</string>
-<string name="connect_dialog_hostname">Hostname</string>
-<string name="connect_dialog_port">Port</string>
-<string name="connect_dialog_bluedevice">Bluetooth device</string>
-<string name="connect_dialog_title">Connect to Remuco</string>
-<string name="connection_failed">connection failed</string>
-<string name="connecting">connecting to host \&quot;%s\&quot;</string>
-<string name="connection_successful">connection to \&quot;%s\&quot; established</string>
-<string name="volume_dialog_title">Remuco Volume</string>
-<string name="options_menu_connect">Connect</string>
-<string name="options_menu_disconnect">Disconnect</string>
-<string name="options_menu_library">Library</string>
-<string name="options_menu_rate">Rate</string>
-<string name="options_menu_search">Search</string>
-<string name="rating_dialog_title">Rate Song</string>
-
-<string name="library_prev">&lt;&lt;</string>
-<string name="library_next">&gt;&gt;</string>
-
-<string name="action_dialog_title">Actions Available</string>
-<string name="search_dialog_title">Search</string>
+    <string name="connect_dialog_type">Type</string>
+    <string name="connect_dialog_wifi">Wifi</string>
+    <string name="connect_dialog_bluetooth">Bluetooth</string>
+    <string name="connect_dialog_hostname">Hostname</string>
+    <string name="connect_dialog_port">Port</string>
+    <string name="connect_dialog_bluedevice">Bluetooth device</string>
+    <string name="connect_dialog_title">Connect to Remuco</string>
+    <string name="connection_failed">connection failed</string>
+    <string name="connection_disconnected">player disconnected</string>
+    <string name="connecting">connecting to host \&quot;%s\&quot;</string>
+    <string name="connection_successful">connection to \&quot;%s\&quot; established</string>
+    <string name="volume_dialog_title">Remuco Volume</string>
+    <string name="options_menu_connect">Connect</string>
+    <string name="options_menu_disconnect">Disconnect</string>
+    <string name="options_menu_library">Library</string>
+    <string name="options_menu_rate">Rate</string>
+    <string name="options_menu_search">Search</string>
+    <string name="rating_dialog_title">Rate Song</string>
+    
+    <string name="library_prev">&lt;&lt;</string>
+    <string name="library_next">&gt;&gt;</string>
+    
+    <string name="action_dialog_title">Actions Available</string>
+    <string name="search_dialog_title">Search</string>
+    
+    <string name="player_info_notconnected">not connected</string>
+    <string name="player_info_usemenu">use the menu to connect</string>
+    <string name="player_info_connectoserver">to your remuco server</string>
 </resources>

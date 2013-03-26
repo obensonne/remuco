@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -18,7 +18,6 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-
 package remuco.client.android;
 
 import android.app.Service;
@@ -29,23 +28,23 @@ import remuco.client.common.MainLoop;
 
 public class RemucoService extends Service {
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-	
-	@Override
-	public void onCreate() {
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+    
+    @Override
+    public void onCreate() {
         // --- enable the remuco main loop (timer thread)
         MainLoop.enable();
-	}
+    }
 
-	@Override
-	public void onDestroy() {
+    @Override
+    public void onDestroy() {
         MainLoop.disable();
-	}
-	
-	@Override
-	public void onStart(Intent intent, int startid) {
-	}
+    }
+    
+    @Override
+    public void onStart(Intent intent, int startid) {
+    }
 }

@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -18,12 +18,12 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.client.android;
+package remuco.client.android.fragments;
 
 import android.os.Handler;
 import android.os.Message;
-import android.widget.ArrayAdapter;
-
+import remuco.client.android.MessageFlag;
+import remuco.client.android.RequestHandlerCallback;
 import remuco.client.common.data.Item;
 import remuco.client.common.data.ItemList;
 import remuco.client.common.player.IRequester;
@@ -31,22 +31,22 @@ import remuco.client.common.util.Log;
 
 public class RequesterAdapter extends Handler implements IRequester{
 
-    RemucoLibrary remucolibrary;
+    RequestHandlerCallback remucolibrary;
 
-    public RequesterAdapter(RemucoLibrary r){
+    public RequesterAdapter(RequestHandlerCallback r){
         remucolibrary = r;
     }
 
-	@Override
-	public void handleMessage(Message msg) {
+    @Override
+    public void handleMessage(Message msg) {
 
-		switch(msg.what){
-		case MessageFlag.CONNECTED:
-			Log.ln("[VH] CONNECTED!");
+        switch(msg.what){
+        case MessageFlag.CONNECTED:
+            Log.ln("[VH] CONNECTED!");
             remucolibrary.getList();
-			break;
-		case MessageFlag.DISCONNECTED:
-			Log.ln("[VH] DISCONNECTED!");
+            break;
+        case MessageFlag.DISCONNECTED:
+            Log.ln("[VH] DISCONNECTED!");
             remucolibrary.clearList();
             break;
         case MessageFlag.PLAYLIST:
@@ -60,35 +60,35 @@ public class RequesterAdapter extends Handler implements IRequester{
     }
 
     @Override
-	public void handleFiles(ItemList files){
+    public void handleFiles(ItemList files){
         Message msg = this.obtainMessage(MessageFlag.FILES, files);
         msg.sendToTarget();
     }
 
     @Override
-	public void handleItem(Item item){
+    public void handleItem(Item item){
     }
 
     @Override
-	public void handleLibrary(ItemList library){
+    public void handleLibrary(ItemList library){
         Message msg = this.obtainMessage(MessageFlag.MLIB, library);
         msg.sendToTarget();
     }
 
     @Override
-	public void handlePlaylist(ItemList playlist){
+    public void handlePlaylist(ItemList playlist){
         Message msg = this.obtainMessage(MessageFlag.PLAYLIST, playlist);
         msg.sendToTarget();
     }
 
     @Override
-	public void handleQueue(ItemList queue){
+    public void handleQueue(ItemList queue){
         Message msg = this.obtainMessage(MessageFlag.QUEUE, queue);
         msg.sendToTarget();
     }
-	
+    
     @Override
-	public void handleSearch(ItemList search){
+    public void handleSearch(ItemList search){
         Message msg = this.obtainMessage(MessageFlag.SEARCH, search);
         msg.sendToTarget();
     }

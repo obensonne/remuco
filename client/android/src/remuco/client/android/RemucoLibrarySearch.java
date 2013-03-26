@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -21,7 +21,6 @@
 package remuco.client.android;
 
 import android.os.Bundle;
-import android.view.View;
 import android.view.View.OnClickListener;
 
 import remuco.client.android.dialogs.SearchDialog;
@@ -33,9 +32,9 @@ public class RemucoLibrarySearch extends RemucoLibrary implements OnClickListene
     String[] query;
     String[] mask;
 
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
+    // -----------------------------------------------------------------------------
+    // --- lifecycle methods
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +56,7 @@ public class RemucoLibrarySearch extends RemucoLibrary implements OnClickListene
     public void getList(){
         if (player == null || player.getPlayer() == null) return;
 
-		Log.debug("--- " + this.getClass().getName() + ".getSearch()");
+        Log.debug("--- " + this.getClass().getName() + ".getSearch()");
 
         mArrayAdapter.clear();
         player.getPlayer().reqSearch(reqHandler, query, page);

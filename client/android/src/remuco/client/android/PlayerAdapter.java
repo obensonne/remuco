@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -40,166 +40,177 @@ import android.os.Message;
 
 public class PlayerAdapter implements IConnectionListener, IItemListener, IProgressListener, IStateListener{
 
-	private static final int PING_INTERVAL = 5;
-	private static Player player;
-	
-	ArrayList<Handler> handlers;
-	
-	public PlayerAdapter() {
-		handlers = new ArrayList<Handler>();
-        if (this.player != null) {
+    private static final int PING_INTERVAL = 5;
+    private static Player player;
+    
+    ArrayList<Handler> handlers;
+    
+    public PlayerAdapter() {
+        handlers = new ArrayList<Handler>();
+        if (player != null) {
             this.reconnect();
         }
-	}
-
-	// --- connection related methods
-	
-	/**
-	 * connects to a wifi remote remuco server
-	 * @param hostname the host to connect to
-	 * @param port the port to connect to
-	 * @param clientInfo client info describing this client
-	 */
-	public void connectWifi(String hostname, int port, ClientInfo clientInfo){
-        if (player != null && !player.getConnection().isClosed()) return;
-		MainLoop.schedule(new ConnectTask(ConnectTask.WIFI, hostname, port, clientInfo, this));
-	}
-
-	/**
-	 * connects to a bluetooth remote remuco server
-	 * @param hostname the host to connect to
-	 * @param clientInfo client info describing this client
-	 */
-	public void connectBluetooth(String hostname, ClientInfo clientInfo){
-        if (player != null && !player.getConnection().isClosed()) return;
-		MainLoop.schedule(new ConnectTask(ConnectTask.BLUETOOTH, hostname, clientInfo, this));
-	}
-	
-	/**
-	 * disconnects from the server
-	 * does nothing if not connected
-	 */
-	public void disconnect(){
-		if(player!=null){
-			player.getConnection().close();
-			
-			// we get no disconnect signal if we close the connection ourself
-			notifyHandlers(MessageFlag.DISCONNECTED);
-		}
-	}
-
-	public Player getPlayer(){
-		return player;
-	}
-	
-	
-	// --- connection powersaving
-	
-	public void pauseConnection(){
-		Log.debug("[PA] pausing connection");
-		
-		if(player == null){
-			Log.debug("[PA] cannot pause connection: not connected");
-			return;
-		}
-		
-		Connection conn = player.getConnection();
-		conn.setPing(0);
-		remuco.client.common.io.Message pauseMessage = new remuco.client.common.io.Message();
-		pauseMessage.id = remuco.client.common.io.Message.CONN_SLEEP;
-		conn.send(pauseMessage);
-	}
-	
-	public void resumeConnection(){
-		Log.debug("[PA] waking up connection");
-		
-		if(player == null){
-			Log.debug("[PA] cannot resume connection: not connected");
-			return;
-		}
-		
-        this.reconnect();
-	    Connection conn = player.getConnection(); 
-	    conn.setPing(PING_INTERVAL);
-	    remuco.client.common.io.Message m = new remuco.client.common.io.Message();
-	    m.id = remuco.client.common.io.Message.CONN_WAKEUP;
-	    conn.send(m);
-	}
-
-	private void reconnect(){
-		this.player.setItemListener(this);
-		this.player.setProgressListener(this);
-		this.player.setStateListener(this);
     }
-	
-	// --- remuco event handlers
-	
-	@Override
-	public void notifyConnected(Player player) {
-		Log.ln("[PH] CONNECTED");
-		
-		this.player = player;
-		this.reconnect();
 
-		// set ping interval
-		this.player.getConnection().setPing(PING_INTERVAL);
-		
-		notifyHandlers(MessageFlag.CONNECTED, player.info);
-	}
+    // --- connection related methods
+    
+    /**
+     * connects to a wifi remote remuco server
+     * @param hostname the host to connect to
+     * @param port the port to connect to
+     * @param clientInfo client info describing this client
+     */
+    public void connectWifi(String hostname, int port, ClientInfo clientInfo){
+        if (player != null && !player.getConnection().isClosed()) return;
+        MainLoop.schedule(new ConnectTask(ConnectTask.WIFI, hostname, port, clientInfo, this));
+    }
 
-	@Override
-	public void notifyDisconnected(ISocket sock, UserException reason) {
-		Log.ln("[PA] DISCONNECTED: " + reason.getMessage());
-		
-		notifyHandlers(MessageFlag.DISCONNECTED);
-	}
-	
-	@Override
-	public void notifyItemChanged() {
-		Log.debug("[PA] now playing: " + player.item.getMeta(Item.META_TITLE) + " by " + player.item.getMeta(Item.META_ARTIST));
-		notifyHandlers(MessageFlag.ITEM_CHANGED, player.item);
-	}
+    /**
+     * connects to a bluetooth remote remuco server
+     * @param hostname the host to connect to
+     * @param clientInfo client info describing this client
+     */
+    public void connectBluetooth(String hostname, ClientInfo clientInfo){
+        if (player != null && !player.getConnection().isClosed()) return;
+        MainLoop.schedule(new ConnectTask(ConnectTask.BLUETOOTH, hostname, clientInfo, this));
+    }
+    
+    /**
+     * disconnects from the server
+     * does nothing if not connected
+     */
+    public void disconnect(){
+        if(player!=null && player.getConnection() != null &&
+                !player.getConnection().isClosed()){
+            player.getConnection().close();
+            
+            // we get no disconnect signal if we close the connection ourself
+            notifyHandlers(MessageFlag.DISCONNECTED);
+        }
+    }
 
-	@Override
-	public void notifyProgressChanged() {
-		Log.debug("[PA] new progress: " + player.progress.getProgressFormatted() + "/" + player.progress.getLengthFormatted());
-		notifyHandlers(MessageFlag.PROGRESS_CHANGED, player.progress);
-	}
+    public Player getPlayer(){
+        return player;
+    }
+    
+    
+    // --- connection powersaving
+    // --- PlayerAdapter has own control own powersavings, if there are no
+    //     handlers to serve, powersaving is enabled, until there new handlers
+    //     are added
+    
+    private void pauseConnection(){
+        Log.debug("[PA] pausing connection");
+        
+        if(player == null){
+            Log.debug("[PA] cannot pause connection: not connected");
+            return;
+        }
+        
+        Connection conn = player.getConnection();
+        conn.setPing(0);
+        remuco.client.common.io.Message pauseMessage = new remuco.client.common.io.Message();
+        pauseMessage.id = remuco.client.common.io.Message.CONN_SLEEP;
+        conn.send(pauseMessage);
+    }
+    
+    private void resumeConnection(){
+        Log.debug("[PA] waking up connection");
+        
+        if(player == null){
+            Log.debug("[PA] cannot resume connection: not connected");
+            return;
+        }
+        
+        this.reconnect();
+        Connection conn = player.getConnection(); 
+        conn.setPing(PING_INTERVAL);
+        remuco.client.common.io.Message m = new remuco.client.common.io.Message();
+        m.id = remuco.client.common.io.Message.CONN_WAKEUP;
+        conn.send(m);
+    }
 
-	@Override
-	public void notifyStateChanged() {
-		Log.debug("[PA] state changed");
-		notifyHandlers(MessageFlag.STATE_CHANGED, player.state);
-	}
+    private void reconnect(){
+        player.setItemListener(this);
+        player.setProgressListener(this);
+        player.setStateListener(this);
+    }
+    
+    // --- remuco event handlers
+    
+    @Override
+    public void notifyConnected(Player player) {
+        Log.ln("[PA] CONNECTED");
+        
+        PlayerAdapter.player = player;
+        this.reconnect();
 
-	private void notifyHandlers(int what, Object obj){
-		for(Handler h : handlers){
-			Message msg = h.obtainMessage(what, obj);
-			msg.sendToTarget();
-		}
-	}
-	
-	private void notifyHandlers(int what){
-		for(Handler h : handlers){
-			Message msg = h.obtainMessage(what);
-			msg.sendToTarget();
-		}
-	}
-	
-	public void addHandler(Handler h){
-		Log.debug("[PA] adding handler: " + h);
-		handlers.add(h);
-	}
-	
-	public void removeHandler(Handler h){
-		Log.debug("[PA] removing handler: " + h);
-		handlers.remove(h);
-	}
+        // set ping interval
+        player.getConnection().setPing(PING_INTERVAL);
+        
+        notifyHandlers(MessageFlag.CONNECTED, player.info);
+    }
 
-	public void clearHandlers(){
-		Log.debug("[PA] clear handler");
-		handlers.clear();
-	}
-	
-	
+    @Override
+    public void notifyDisconnected(ISocket sock, UserException reason) {
+        Log.ln("[PA] DISCONNECTED: " + reason.getMessage());
+        
+        notifyHandlers(MessageFlag.DISCONNECTED);
+    }
+    
+    @Override
+    public void notifyItemChanged() {
+        Log.debug("[PA] now playing: " + player.item.getMeta(Item.META_TITLE) + " by " + player.item.getMeta(Item.META_ARTIST));
+        notifyHandlers(MessageFlag.ITEM_CHANGED, player.item);
+    }
+
+    @Override
+    public void notifyProgressChanged() {
+        Log.debug("[PA] new progress: " + player.progress.getProgressFormatted() + "/" + player.progress.getLengthFormatted());
+        notifyHandlers(MessageFlag.PROGRESS_CHANGED, player.progress);
+    }
+
+    @Override
+    public void notifyStateChanged() {
+        Log.debug("[PA] state changed");
+        notifyHandlers(MessageFlag.STATE_CHANGED, player.state);
+    }
+
+    private void notifyHandlers(int what, Object obj){
+        for(Handler h : handlers){
+            Message msg = h.obtainMessage(what, obj);
+            msg.sendToTarget();
+        }
+    }
+    
+    private void notifyHandlers(int what){
+        for(Handler h : handlers){
+            Message msg = h.obtainMessage(what);
+            msg.sendToTarget();
+        }
+    }
+    
+    public void addHandler(Handler h){
+        Log.debug("[PA] adding handler: " + h);
+        if(handlers.size() == 0) {
+            this.resumeConnection();
+        }
+        handlers.add(h);
+    }
+    
+    public void removeHandler(Handler h){
+        Log.debug("[PA] removing handler: " + h);
+        handlers.remove(h);
+        if(handlers.size() == 0) {
+            this.pauseConnection();
+        }
+    }
+
+    public void clearHandlers(){
+        Log.debug("[PA] clear handler");
+        handlers.clear();
+        this.pauseConnection();
+    }
+    
+    
 }

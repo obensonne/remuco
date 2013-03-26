@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -18,9 +18,9 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-
 package remuco.client.android;
 
+import remuco.client.common.data.ClientInfo;
 import remuco.client.common.data.State;
 import remuco.client.common.util.Log;
 import android.content.Context;
@@ -32,8 +32,8 @@ public class RemucoPhoneListener extends PhoneStateListener {
     private Context context;
     private boolean pausedPlayer = false;
 
-	// --- the player adapter
-	protected PlayerAdapter player = null;
+    // --- the player adapter
+    protected PlayerAdapter player = null;
 
     public RemucoPhoneListener(Context context) {
         this.context = context;
@@ -41,7 +41,8 @@ public class RemucoPhoneListener extends PhoneStateListener {
 
     public void onCallStateChanged(int phoneState, String incomingNumber) {
         if (player == null) {
-            player = RemucoActivity.connect(context, 0);
+            ClientInfo clientinfo = Client.buildClientInfo(0); //FIXME
+            player = RemucoActivity.connect(context, clientinfo);
         }
 
         if (player == null ||
@@ -56,7 +57,7 @@ public class RemucoPhoneListener extends PhoneStateListener {
             Log.debug("Call Finish");
             if (playerState == State.PLAYBACK_PAUSE
                 || playerState == State.PLAYBACK_STOP
-                || pausedPlayer == true){
+                || pausedPlayer){
                 player.getPlayer().ctrlPlayPause();
                 pausedPlayer = false;
             }

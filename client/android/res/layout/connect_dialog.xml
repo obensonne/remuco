@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/connect_dialog_root_layout"
-	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content"
-	android:padding="10px" 
-	android:orientation="vertical">
+    android:id="@+id/connect_dialog_root_layout"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
   <RadioGroup 
      android:id="@+id/connect_dialog_type" 
@@ -29,46 +28,47 @@
        />
   </RadioGroup>
 
-  	<EditText android:id="@+id/connect_dialog_hostname" 
-  		android:layout_width="fill_parent" 
-  		android:layout_height="wrap_content"
-  		android:minEms="30"
-  		/>
-  	<net.technologichron.manacalc.NumberPicker
-       android:id="@+id/connect_dialog_port"
-       android:orientation="horizontal"
-       android:layout_width="fill_parent"
-       android:layout_height="wrap_content"
-       />
+      <EditText android:id="@+id/connect_dialog_hostname" 
+          android:layout_width="fill_parent" 
+          android:layout_height="wrap_content"
+          android:inputType="textNoSuggestions"
+          android:hint="@string/connect_dialog_hostname"
+          android:minEms="30"
+          />
+
+      <EditText
+        android:id="@+id/connect_dialog_port"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:ems="10"
+          android:inputType="number" />
+
 
     <ListView android:id="@+id/connect_dialog_bluedevice"
-  		android:layout_width="fill_parent" 
-  		android:layout_height="wrap_content"
+          android:layout_width="fill_parent" 
+          android:layout_height="0dip"
         android:stackFromBottom="true"
         android:layout_weight="1"
         />
 
-  	<LinearLayout 
-  		android:layout_width="fill_parent"
-  		android:layout_height="wrap_content">
-	
-		<Button android:id="@+id/connect_dialog_ok_button" 
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
-			android:layout_weight="2"
-			android:text="@android:string/ok"
-			/>
-			
-		<Button android:id="@+id/connect_dialog_cancel_button" 
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:text="@android:string/cancel"
-			/>
-	
-	</LinearLayout>
-
-
-
+      <LinearLayout 
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content">
+            
+        <Button android:id="@+id/connect_dialog_cancel_button" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/cancel"
+            />
+        
+        <Button android:id="@+id/connect_dialog_ok_button" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:layout_weight="2"
+            android:text="@android:string/ok"
+            />
+    
+    </LinearLayout>
 
 </LinearLayout>

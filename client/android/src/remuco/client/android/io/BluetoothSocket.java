@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -27,7 +27,8 @@ import android.os.Looper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
+import java.lang.reflect.Method;
+//import java.util.UUID;
 
 import remuco.client.common.UserException;
 import remuco.client.common.io.Connection;
@@ -39,99 +40,108 @@ import remuco.client.common.io.ISocket;
  */
 public class BluetoothSocket implements ISocket {
 
-	private final InputStream is;
+    private final InputStream is;
 
-	private final OutputStream os;
+    private final OutputStream os;
 
-	private final android.bluetooth.BluetoothSocket sock;
+    private final android.bluetooth.BluetoothSocket sock;
 
-	private boolean isClosed = false;
+    private boolean isClosed = false;
 
-	/** Remuco service UUID */
-	private final UUID REMUCO_UUID = UUID.fromString("025fe2ae-0762-4bed-90f2-d8d778f020fe");
+    /** Remuco service UUID */
+    //private final UUID REMUCO_UUID = UUID.fromString("025fe2ae-0762-4bed-90f2-d8d778f020fe");
 
-	/**
-	 * Create a new Bluetooth client socket for the given host.
-	 * 
-	 * @param host
-	 *            device mac bluetooth address
-	 * @throws UserException
-	 *             if setting up the socket and connection fails
-	 */
-	public BluetoothSocket(String host) throws UserException {
+    /**
+     * Create a new Bluetooth client socket for the given host.
+     * 
+     * @param host
+     *            device mac bluetooth address
+     * @throws UserException
+     *             if setting up the socket and connection fails
+     */
+    public BluetoothSocket(String host) throws UserException {
 
-		try {
+        try {
             Looper.prepare();
-		} catch (RuntimeException e) {}
+        } catch (RuntimeException e) {}
 
-		try {
+        try {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(host);
-			this.sock = device.createRfcommSocketToServiceRecord(REMUCO_UUID);
+            
+            //FIXME: Somehow some devices sometimes fail to connect
+            //       The following work-around fixes this, however if there are
+            //       other solutions, those are preferred.
+            //       See http://stackoverflow.com/q/3397071 for more info.
+            //this.sock = device.createRfcommSocketToServiceRecord(REMUCO_UUID);
+            Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+            this.sock = (android.bluetooth.BluetoothSocket) m.invoke(device, 1);
+            
+            
             this.sock.connect();
             isClosed = false;
-		} catch (SecurityException e) {
-			throw new UserException("Connection Error",
-					"Not allowed to connect to " + host);
-		} catch (IOException e) {
-			throw new UserException("Connection Error",
-					"IO error while setting up the connection to " + host);
-		} catch (Exception e) {
-			throw new UserException("Connection Error",
-					"Error while setting up the connection to " + host);
-		}
+        } catch (SecurityException e) {
+            throw new UserException("Connection Error",
+                    "Not allowed to connect to " + host);
+        } catch (IOException e) {
+            throw new UserException("Connection Error",
+                    "IO error while setting up the connection to " + host);
+        } catch (Exception e) {
+            throw new UserException("Connection Error",
+                    "Error while setting up the connection to " + host);
+        }
 
-		try {
-			is = sock.getInputStream();
-		} catch (IOException e) {
-			try {
-				sock.close();
-			} catch (IOException e1) {
-			}
-			throw new UserException("Connecting failed",
-					"IO Error while opening streams.", e);
-		}
+        try {
+            is = sock.getInputStream();
+        } catch (IOException e) {
+            try {
+                sock.close();
+            } catch (IOException e1) {
+            }
+            throw new UserException("Connecting failed",
+                    "IO Error while opening streams.", e);
+        }
 
-		try {
-			os = sock.getOutputStream();
-		} catch (IOException e) {
-			try {
-				is.close();
-				sock.close();
-			} catch (IOException e1) {
-			}
-			throw new UserException("Connecting failed",
-					"IO Error while opening streams.", e);
-		}
+        try {
+            os = sock.getOutputStream();
+        } catch (IOException e) {
+            try {
+                is.close();
+                sock.close();
+            } catch (IOException e1) {
+            }
+            throw new UserException("Connecting failed",
+                    "IO Error while opening streams.", e);
+        }
 
-	}
+    }
 
-	@Override
-	public void close() {
+    @Override
+    public void close() {
         if (isClosed) return;
         isClosed = true;
-		try {
-			sock.close();
-		} catch (IOException e) {
-		}
-		try {
-			os.close();
-		} catch (IOException e) {
-		}
-		try {
-			is.close();
-		} catch (IOException e) {
-		}
-	}
+        try {
+            sock.close();
+        } catch (IOException e) {
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+        }
+    }
 
-	@Override
-	public InputStream getInputStream() {
-		return is;
-	}
+    @Override
+    public InputStream getInputStream() {
+        return is;
+    }
 
-	@Override
-	public OutputStream getOutputStream() {
-		return os;
-	}
+    @Override
+    public OutputStream getOutputStream() {
+        return os;
+    }
 
 }

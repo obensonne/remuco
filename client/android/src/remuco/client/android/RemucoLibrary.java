@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -20,12 +20,10 @@
  */
 package remuco.client.android;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import remuco.client.android.fragments.RequesterAdapter;
 import remuco.client.android.util.LibraryAdapter;
 import remuco.client.android.util.LibraryItem;
 import remuco.client.common.data.AbstractAction;
@@ -40,17 +39,17 @@ import remuco.client.common.data.ActionParam;
 import remuco.client.common.data.ListAction;
 import remuco.client.common.data.ItemAction;
 import remuco.client.common.data.ItemList;
-import remuco.client.common.player.IRequester;
 import remuco.client.common.util.Log;
 
-public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener{
+@Deprecated
+public abstract class RemucoLibrary extends RemucoActivity implements OnClickListener, RequestHandlerCallback {
 
-	// --- view handler
-	protected RequesterAdapter reqHandler;
+    // --- view handler
+    protected RequesterAdapter reqHandler;
 
-	// get view handles
-	Button prevButton;
-	Button nextButton;
+    // get view handles
+    Button prevButton;
+    Button nextButton;
     ListView lv;
     LibraryAdapter mArrayAdapter;
     ItemList list;
@@ -58,38 +57,38 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
     int page = 0;
     int pagemax = 0;
 
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
+    // -----------------------------------------------------------------------------
+    // --- lifecycle methods
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		// ------
-		// android related initialization
-		// ------
-		
-		// --- load layout
-		setContentView(R.layout.library);
+        // ------
+        // android related initialization
+        // ------
+        
+        // --- load layout
+        setContentView(R.layout.playlist);
 
-		// --- get view handles
-		getViewHandles();
+        // --- get view handles
+        getViewHandles();
 
-		// --- create view handler
+        // --- create view handler
         reqHandler = new RequesterAdapter(this);
 
-		// --- set listeners
-		prevButton.setOnClickListener(this);
+        // --- set listeners
+        prevButton.setOnClickListener(this);
         prevButton.setClickable(false);
-		nextButton.setOnClickListener(this);
+        nextButton.setOnClickListener(this);
         nextButton.setClickable(false);
     }
-	
-	private void getViewHandles() {
-		// get view handles
-		prevButton = (Button) findViewById(R.id.library_prev_button);
-		nextButton = (Button) findViewById(R.id.library_next_button);
-	
+    
+    private void getViewHandles() {
+        // get view handles
+        prevButton = (Button) findViewById(R.id.library_prev_button);
+        nextButton = (Button) findViewById(R.id.library_next_button);
+    
         mArrayAdapter = new LibraryAdapter(getApplicationContext(), R.layout.list_item);
         lv = (ListView) findViewById(R.id.library_items);
         lv.setTextFilterEnabled(true);
@@ -97,82 +96,74 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         registerForContextMenu(lv);
     }
 
-	
-	/**
-	 * this method gets called after on create
-	 */
-	@Override
-	protected void onResume() {
-		super.onResume();
-		
-		Log.debug("--- " + this.getClass().getName() + ".onResume()");
+    
+    /**
+     * this method gets called after on create
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        Log.debug("--- " + this.getClass().getName() + ".onResume()");
 
-		// --- register view handler at player
-		player.addHandler(reqHandler);
+        // --- register view handler at player
+        player.addHandler(reqHandler);
 
         this.getList();
-	}
+    }
 
-	// --- Options Menu
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater mi = getMenuInflater();
-		mi.inflate(R.menu.options_library_menu, menu);
-		
-		return true;
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    // --- Options Menu
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.library_items) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
             LibraryItem item = mArrayAdapter.getItem(info.position);
 
-			if (item.position == -1) return; // no ContextMenu en folder '..'
+            if (item.position == -1) return; // no ContextMenu en folder '..'
             if (list.getActions().size() == 0) return;
 
-			if (item.nested) {
-				menu.setHeaderTitle(list.getNested(item.position));
-			} else {
-	            menu.setHeaderTitle(list.getItemName(item.position));
-			}
+            if (item.nested) {
+                menu.setHeaderTitle(list.getNested(item.position));
+            } else {
+                menu.setHeaderTitle(list.getItemName(item.position));
+            }
             for (int i = 0; i < list.getActions().size(); i++) {
                 AbstractAction act = (AbstractAction) list.getActions().elementAt(i);
-				if ( act.isItemAction() == item.nested ) 
-					continue;
+                if ( act.isItemAction() == item.nested ) 
+                    continue;
                 menu.add(Menu.NONE, i, i, act.label);
             }
         }
-	}
+    }
 
     @Override
-	public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
         LibraryItem libitem = mArrayAdapter.getItem(info.position);
         int menuItemIndex = item.getItemId();
 
         AbstractAction act = ((AbstractAction) list.getActions().elementAt(menuItemIndex));
 
-		if (libitem.nested) {
-			if (act.isItemAction()) {
-				Log.debug("[ERROR] This is an item action, not applicable to lists.");
-				return false;
-			}
-			int actionid = ((ListAction) act).id;
-			String[] itemPath = list.getPathForNested(libitem.position);
-			Log.debug("List Action " + ((ListAction) act).label + " " + list.getNested(libitem.position));
+        if (libitem.nested) {
+            if (act.isItemAction()) {
+                Log.debug("[ERROR] This is an item action, not applicable to lists.");
+                return false;
+            }
+            int actionid = ((ListAction) act).id;
+            String[] itemPath = list.getPathForNested(libitem.position);
+            Log.debug("List Action " + ((ListAction) act).label + " " + list.getNested(libitem.position));
 
-			ActionParam a = new ActionParam(actionid, itemPath, null, null);
-			this.sendAction(a);
-			this.getList();
-			return true;
-		}
+            ActionParam a = new ActionParam(actionid, itemPath, null, null);
+            this.sendAction(a);
+            this.getList();
+            return true;
+        }
 
-		if (!act.isItemAction()) {
-			Log.debug("[ERROR] This is a list action, not applicable to items");
-			return false;
-		}
+        if (!act.isItemAction()) {
+            Log.debug("[ERROR] This is a list action, not applicable to items");
+            return false;
+        }
         int actionid = ((ItemAction) act).id;
 
         String[] itemids = new String[1];
@@ -181,6 +172,8 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         itempos[0] = list.getItemPosAbsolute(libitem.position);
         Log.debug("Item Action " + ((ItemAction) act).label + " " + list.getItemID(libitem.position) + " " + list.getItemPosAbsolute(libitem.position));
         ActionParam a;
+        
+        //FIXME
         if (list.isPlaylist() || list.isQueue()) {
             a = new ActionParam(actionid, itempos, itemids);
         } else {
@@ -189,7 +182,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         this.sendAction(a);
         this.getList();
         return true;
-	}
+    }
 
     public abstract void sendAction(ActionParam action);
     public abstract void getList();
@@ -228,7 +221,7 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
             i++;
         }
     }
-	
+    
     public void clearList() {
         mArrayAdapter.clear();
     }
@@ -246,17 +239,17 @@ public abstract class RemucoLibrary extends RemucoActivity implements OnClickLis
         }
     }
 
-	@Override
-	public void onClick(View v) {
-		
-		if(v == prevButton){
+    @Override
+    public void onClick(View v) {
+        
+        if(v == prevButton){
             page--;
             this.getList();
-		}
+        }
 
-		if(v == nextButton){
+        if(v == nextButton){
             page++;
             this.getList();
-		}
-	}
+        }
+    }
 }

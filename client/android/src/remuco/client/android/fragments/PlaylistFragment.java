@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -18,31 +18,34 @@
  *   along with Remuco.  If not, see <http://www.gnu.org/licenses/>.
  *   
  */
-package remuco.client.android;
+package remuco.client.android.fragments;
 
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-
+import remuco.client.android.RemucoLibraryList;
 import remuco.client.common.data.ActionParam;
-import remuco.client.common.util.Log;
+import android.content.Context;
 
-public class RemucoLibraryPlaylist extends RemucoLibrary implements OnClickListener{
+public class PlaylistFragment extends BaseFragmentRemucoLists {
 
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-	
-    public void sendAction(ActionParam action) {
-        player.getPlayer().actionPlaylist(action);
+    @Override
+    protected RemucoLibraryList getLibrary(Context context) {
+        return new MyRemucoLibraryList(context);
     }
 
-    public void getList(){
-        if (player == null || player.getPlayer() == null) return;
+    private class MyRemucoLibraryList extends RemucoLibraryList {
 
-		Log.debug("--- " + this.getClass().getName() + ".getPlaylist()");
+        public MyRemucoLibraryList(Context context) {
+            super(context);
+        }
 
-        mArrayAdapter.clear();
-        player.getPlayer().reqPlaylist(reqHandler, page);
+        @Override
+        public void sendAction(ActionParam action) {
+            player.getPlayer().actionPlaylist(action);
+        }
+
+        @Override
+        public void loadList(int page) {
+            player.getPlayer().reqPlaylist(reqHandler, page);
+        }
     }
 
 }

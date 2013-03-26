@@ -1,6 +1,6 @@
 /*   
  *   Remuco - A remote control system for media players.
- *   Copyright (C) 2006-2010 by the Remuco team, see AUTHORS.
+ *   Copyright (C) 2006-2013 by the Remuco team, see AUTHORS.
  *
  *   This file is part of Remuco.
  *
@@ -20,29 +20,14 @@
  */
 package remuco.client.android;
 
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-
-import remuco.client.common.data.ActionParam;
-import remuco.client.common.util.Log;
-
-public class RemucoLibraryQueue extends RemucoLibrary implements OnClickListener{
-
-	// -----------------------------------------------------------------------------
-	// --- lifecycle methods
-
-    public void sendAction(ActionParam action) {
-        player.getPlayer().actionQueue(action);
-    }
-
-    public void getList(){
-        if (player == null || player.getPlayer() == null) return;
-
-		Log.debug("--- " + this.getClass().getName() + ".geQueue()");
-
-        mArrayAdapter.clear();
-        player.getPlayer().reqQueue(reqHandler, page);
-    }
-
+/**
+ * Simple interface that ensure that the implemented class can return a
+ * player.
+ */
+public interface PlayerProvider {
+    
+    /**
+     * Returns a {@link PlayerAdapter} object.
+     */
+    public PlayerAdapter getPlayer();
 }
